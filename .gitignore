@@ -5,5 +5,8 @@ Win32/*
 */x64/*
 */x86/*
 */Win32/*
+*.vcxproj.user
+Installer/bin/*
 
+!UCID/*
 
