@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+    <!-- Upgrade code should not change unless you want to install 
+     a new product and have the old product remain installed, 
+     that is, both products existing as separate instances. -->
+    <?define UpgradeCode = "a00ade60-6aa4-431f-8db7-8f9386236798" ?>
+
+    <!-- Product name as you want it to appear in Add/Remove Programs-->
+    <?define ProductName =  "Cisco Unified Connector" ?>
+
+    <!-- Directory Information -->
+    <!-- Directory name used as default installation location -->
+    <?define InstallName = "Unified Connector" ?>
+    <?define CiscoDirectory = "Cisco" ?>
+    <?define SecureXYZDirectory = "SecureXYZ" ?>
+    <?define UnifiedConnectorDirectory = "Unified Connector" ?>
+    <?define ServiceDictory = "Service" ?>
+    <?define UCIDDirectory = "ID" ?>
+    <?define UCPMDirectory = "Package Manager" ?>
+
+    <!-- Registry key name used to store installation location -->
+    <?define InstallNameKey = "Unified Connector" ?>
+
+    <!-- Auto-generate ProductCode for each build, release and upgrade -->
+    <?define ProductId = "*" ?>
+
+    <!-- Version info -->
+    <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
+    <?define Version = "1.0.1" ?>
+
+    <!-- Minimum version supported if product already installed and this is an upgrade -->
+    <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
+    <?define MinimumUpgradeVersion = "0.0.0" ?>
+
+    <!-- Platform specific variables -->
+    <?if $(var.Platform) = x64 ?>
+        <?define Win64 = "yes" ?>
+        <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+    <?else ?>
+        <?define Win64 = "no" ?>
+        <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?endif ?>
+
+    <?define Manufacturer = "!(loc.Manufacturer)"?>
+
+    <!-- Decimal Language ID (LCID) for the Product. Used for localization. -->
+    <?define Language = "1033" ?>
+</Include>

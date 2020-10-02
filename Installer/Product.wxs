@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?include $(sys.CURRENTDIR)\Config.wxi?>
+
+    <Product Id="$(var.ProductId)"
+			 Name="$(var.ProductName)"
+			 Language="$(var.Language)"
+			 Version="$(var.Version)"
+			 Manufacturer="$(var.Manufacturer)"
+			 UpgradeCode="$(var.UpgradeCode)">
+
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+        <MajorUpgrade AllowDowngrades="no"
+					  AllowSameVersionUpgrades="no"
+					  DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <MediaTemplate />
+
+        <Feature Id="UCService" Title="Unified Connector Service" Level="1">
+            <ComponentGroupRef Id="UCServiceComponents" />
+        </Feature>
+
+        <Feature Id="UCID" Title="Unified Connector ID" Level="1">
+            <ComponentGroupRef Id="UCIDComponents" />
+        </Feature>
+
+        <Feature Id="UCPM" Title="Unified Connector Package Manager" Level="1">
+            <ComponentGroupRef Id="UCPMComponents" />
+        </Feature>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
+                    <Directory Id="SECUREXYZ_DIRECTORY" Name="$(var.SecureXYZDirectory)">
+                        <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
+                            <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
+                                <Directory Id="UCSERVICE_BASE_DIRECTORY" Name="$(var.ServiceDictory)">
+                                    <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.Version)" />
+                                </Directory>
+                                <Directory Id="UCID_BASE_DIRECTORY" Name="$(var.UCIDDirectory)">
+                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" />
+                                </Directory>
+                                <Directory Id="UCPM_BASE_DIRECTORY" Name="$(var.UCPMDirectory)">
+                                    <Directory Id="UCPM_DIRECTORY" Name="$(var.Version)" />
+                                </Directory>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
+            <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCSERVICE">
+                    <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="UCIDComponents" Directory="UCID_DIRECTORY">
+            <Component Id="UCID_VERSION_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
+                    <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="ucidagent.exe" Guid="*">
+                <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidagent.exe" />
+            </Component>
+            <Component Id="ucidapi.dll" Guid="*">
+                <File Id="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidapi.dll" />
+            </Component>
+            <Component Id="ucidcontrolplugin.dll" Guid="*">
+                <File Id="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidcontrolplugin.dll" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="UCPMComponents" Directory="UCPM_DIRECTORY">
+            <Component Id="UCPM_VERSION_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
+                    <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
