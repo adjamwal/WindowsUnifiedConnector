@@ -1,6 +1,9 @@
-UCService/x64/*
-UCService/Release/*
-UCService/.vs/*
-UCService/Debug/*
-UCService/x64/
-UCService/.vs/
+.vs/
+x64/*
+x86/*
+Win32/*
+*/x64/*
+*/x86/*
+*/Win32/*
+
+
