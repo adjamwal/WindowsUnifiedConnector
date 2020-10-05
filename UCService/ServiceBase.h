@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>  
+#include <Evntrace.h>
 
 class ServiceBase
 {
@@ -13,12 +14,11 @@ public:
         BOOL fCanStop = TRUE,
         BOOL fCanShutdown = TRUE,
         BOOL fCanPauseContinue = FALSE );
-
     virtual ~ServiceBase( void );
 
     void Stop();
 
-    std::wofstream m_debugLogFile;
+    void LogMessage( _In_ PWSTR pszFunction, _In_ PWSTR pszMessage, _In_ BYTE bLevel = TRACE_LEVEL_INFORMATION, _In_ DWORD dwError = GetLastError() );
 
 protected:
 
@@ -31,15 +31,14 @@ protected:
         DWORD dwWin32ExitCode = NO_ERROR,
         DWORD dwWaitHint = 0 );
 
-    virtual void WriteEventLogEntry( PWSTR pszMessage, BYTE bLevel );
-    void WriteErrorLogEntry( PWSTR pszFunction,
-        DWORD dwError = GetLastError() );
-
 private:
 
     static void WINAPI ServiceMain( DWORD dwArgc, PWSTR* pszArgv );
     static void WINAPI ServiceCtrlHandler( DWORD dwCtrl );
-    std::wstring GetExePath();
+
+    void InitializeDebugLogFile();
+    void InitializeEventLog( BOOL fCanStop, BOOL fCanShutdown, BOOL fCanPauseContinue );
+    std::wstring GetExeDirectory();
 
     void Start( DWORD dwArgc, PWSTR* pszArgv );
     void Pause();
@@ -47,8 +46,9 @@ private:
     void Shutdown();
 
     static ServiceBase* s_service;
-    PWSTR m_name;
-    SERVICE_STATUS m_status;
+    std::wofstream m_debugLogFile;
+    PWSTR m_svcName;
     SERVICE_STATUS_HANDLE m_statusHandle;
     REGHANDLE m_etwRegHandle;
+    SERVICE_STATUS m_status;
 };

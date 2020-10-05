@@ -16,6 +16,7 @@
     <ClInclude Include="ServiceInstaller.h">
       <Filter>ServiceInstaller</Filter>
     </ClInclude>
+    <ClInclude Include="Main.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ServiceInstaller">

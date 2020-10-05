@@ -6,6 +6,7 @@
 
 #include "ServiceInstaller.h"
 #include "UCService.h"
+#include "Main.h"
 
 int wmain( int argc, wchar_t* argv[] )
 {
@@ -28,19 +29,28 @@ int wmain( int argc, wchar_t* argv[] )
             // Uninstall the service when the arg is "-remove" or "/remove". 
             UninstallService( SERVICE_NAME );
         }
+        else
+        {
+            DisplayHelp();
+        }
     }
     else
     {
-        wprintf( L"Parameters:\n" );
-        wprintf( L" -install  to install the UC service.\n" );
-        wprintf( L" -remove   to remove the UC service.\n" );
+        DisplayHelp();
 
         UCService service( SERVICE_NAME );
         if( !ServiceBase::Run( service ) )
         {
-            wprintf( L"UC Service failed to run w/err 0x%08lx\n", GetLastError() );
+            wprintf( L"%s failed to run w/err 0x%08lx\n", SERVICE_NAME, GetLastError() );
         }
     }
 
     return 0;
+}
+
+void DisplayHelp()
+{
+    wprintf( L"Parameters:\n" );
+    wprintf( L" -install  to install the %s.\n", SERVICE_NAME );
+    wprintf( L" -remove   to remove the %s.\n", SERVICE_NAME );
 }
