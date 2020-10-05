@@ -1,5 +1,18 @@
 # Windows Unified Connector
 
+## Checkout
+This repository has a submodule. This will need to be initialized after cloning the repository
+
+```
+git clone https://code.engine.sourcefire.com/UnifiedConnector/WindowsUnifiedConnector.git
+git submodule update --init
+```
+
+## Building UC
+The UC solution has a dependency of the environment variable `IMN_COMMON` which is the common repository for the fireamp-windows-connector project. To build UC you will have to either:
+* Set the `IMN_COMMON` environment variable before starting Visual Studio or msbuild
+* or Open the UC solution using the VS startup script used by fireamp-windows-connector project
+
 ## Installer
 The Installer can install/upgrade/uninstall the service.
 
