@@ -16,6 +16,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageManager", "PackageManager", "{3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageMananger", "PackageManager\PackageMananger\PackageMananger.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A3C9E21E-4C04-496C-96B7-D3C68362E25F} = {A3C9E21E-4C04-496C-96B7-D3C68362E25F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libLogger", "libLogger\libLogger.vcxproj", "{822CCD07-F01C-4DD7-A587-0A241953FB62}"
 EndProject
