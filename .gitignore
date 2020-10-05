@@ -2,9 +2,14 @@
 x64/*
 x86/*
 Win32/*
+Debug/*
+Release/*
 */x64/*
 */x86/*
 */Win32/*
+*/Debug/*
+*/Release/*
+*/obj/*
 *.vcxproj.user
 Installer/bin/*
 

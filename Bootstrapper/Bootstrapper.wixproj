@@ -7,12 +7,12 @@
     <OutputName>Bootstrapper</OutputName>
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>Debug</DefineConstants>
     <OutputPath>$(SolutionDir)$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>$(SolutionDir)$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
@@ -37,7 +37,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Installer\Installer.wixproj">
       <Name>Installer</Name>
-      <Project>{01eeefe2-3806-4e2b-aad0-96eec6fd9bb0}</Project>
+      <Project>{79012334-b136-43c8-8236-acd158e03d2a}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
