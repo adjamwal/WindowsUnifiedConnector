@@ -11,16 +11,15 @@ public:
         BOOL fCanStop = TRUE,
         BOOL fCanShutdown = TRUE,
         BOOL fCanPauseContinue = FALSE );
-
-    void WriteEventLogEntry( PWSTR pszMessage, BYTE bLevel ) override;
     virtual ~UCService( void );
 
 protected:
-    bool DirectoryExists( const char* dirname );
-    bool FileExists( const char* filename );
     virtual void OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv ) override;
     virtual void OnStop() override;
 
 private:
+    bool DirectoryExists( const char* dirname );
+    bool FileExists( const char* filename );
+
     PTP_WORK m_threadPoolWorker = nullptr;
 };
