@@ -1,16 +1,12 @@
-
-.vs
-*x86/
-*Win32/
-*x64/
-*obj/
+.vs/
+**/x64/*
+**/x86/*
+**/Win32/*
+**/Debug/*
+**/Release/*
+**/obj/*
 *.vcxproj.user
 Installer/bin/*
-UCService/x64/*
-UCService/Release/*
-UCService/.vs/*
-UCService/Debug/*
-UCService/x64/
-UCService/.vs/
 
 !UCID/*
+
