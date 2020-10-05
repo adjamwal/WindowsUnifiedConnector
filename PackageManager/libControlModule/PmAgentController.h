@@ -15,9 +15,7 @@
 #include <Windows.h>
 #include "PmTypes.h"
 
-#define PM_AGENT_BINARY L"PmAgent.exe"
-#define PM_AGENT_BINARY_A "PmAgent.exe"
-
+#define PM_AGENT_BINARY "UC_PM.exe"
 
 class PmAgentController
 {

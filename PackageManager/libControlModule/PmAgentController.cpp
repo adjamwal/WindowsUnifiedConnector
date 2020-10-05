@@ -4,9 +4,10 @@
 #include "CodesignVerifier.h"
 #include "IUcLogger.h"
 #include <iostream>
+#include <tchar.h>
 
 PmAgentController::PmAgentController( const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath ) :
-    m_tstrProcessPath( rtstrPath + L"\\" + PM_AGENT_BINARY)
+    m_tstrProcessPath( rtstrPath + L"\\" + _T( PM_AGENT_BINARY ) )
     , m_tstrConfigPath( rtstrConfigPath ),
     m_bIsProcessStartedByPlugin( false )
 {
@@ -166,7 +167,7 @@ PM_STATUS PmAgentController::killIfRunning()
                 lpBaseName[ procNameSize ] = '\0';
 
                 // check if name is different from the one which is searched
-                if( PM_AGENT_BINARY_A == std::string( lpBaseName ) )
+                if( PM_AGENT_BINARY == std::string( lpBaseName ) )
                 {
                     LOG_DEBUG( "Process name is [%s] and process pid is [%d]", lpBaseName, pProcessIds[ i ] );
                     if( TerminateProcess( hProcess, 0 ) )
@@ -176,7 +177,7 @@ PM_STATUS PmAgentController::killIfRunning()
                     }
                     else
                     {
-                        LOG_ERROR( L"TerminateProcess failed." );
+                        LOG_ERROR( "TerminateProcess failed." );
                         goto safe_exit;
                     }
                 }

@@ -64,7 +64,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <NMakeOutput>pmlib.lib</NMakeOutput>
+    <NMakeOutput>$(SolutionDir)$(Platform)\$(Configuration)\lib\pmlib.lib</NMakeOutput>
     <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
@@ -77,7 +77,7 @@ call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --c
     <NMakeCleanCommandLine>rmdir /Q/S $(Platform)\$(Configuration)\build</NMakeCleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeOutput>pmlib.lib</NMakeOutput>
+    <NMakeOutput>$(SolutionDir)$(Platform)\$(Configuration)\lib\pmlib.lib</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
@@ -90,7 +90,7 @@ call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --c
     <NMakeCleanCommandLine>rmdir /Q/S $(Platform)\$(Configuration)\build</NMakeCleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeOutput>pmlib.lib</NMakeOutput>
+    <NMakeOutput>$(SolutionDir)$(Platform)\$(Configuration)\lib\pmlib.lib</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
@@ -103,7 +103,7 @@ call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --c
     <NMakeCleanCommandLine>rmdir /Q/S $(Platform)\$(Configuration)\build</NMakeCleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <NMakeOutput>pmlib.lib</NMakeOutput>
+    <NMakeOutput>$(SolutionDir)$(Platform)\$(Configuration)\lib\pmlib.lib</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
