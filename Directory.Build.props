@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <UC_PATH>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</UC_PATH>
-	<WORKSPACE_PATH>$([System.IO.Path]::GetFullPath('$(UC_PATH)..\'))</WORKSPACE_PATH>
-	<IMN_COMMON>$([System.IO.Path]::GetFullPath('$(WORKSPACE_PATH)common\'))</IMN_COMMON>
+    <WORKSPACE_PATH>$([System.IO.Path]::GetFullPath('$(UC_PATH)..\'))</WORKSPACE_PATH>
+    <IMN_COMMON>$([System.IO.Path]::GetFullPath('$(WORKSPACE_PATH)common\'))</IMN_COMMON>
   </PropertyGroup>
 </Project>
