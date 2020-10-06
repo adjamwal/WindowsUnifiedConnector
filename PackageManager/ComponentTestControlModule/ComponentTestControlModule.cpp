@@ -1,17 +1,30 @@
 #include "pch.h"
 #include "PackageManagerInternalModuleAPI.h"
 #include "IUcLogger.h"
+#include <cstdio>
 
 class ComponentTestControlModule : public ::testing::Test
 {
 protected:
     void SetUp()
     {
+        FILE* fp = fopen( "config.json", "w" );
+        std::string contents = R"(
+{
+    "cloud": {
+        "CheckinUri": "https://packagemanager.cisco.com/checkin",
+        "CheckinInterval": 1000
+    }
+}
+)";
+        fwrite( contents.c_str(), 1, contents.length(), fp );
+        fclose( fp );
         EXPECT_EQ( CreateModuleInstance( &m_patient, NULL ), PM_MODULE_SUCCESS );
     }
 
     void TearDown()
     {
+        DeleteFile( L"config.json" );
         EXPECT_EQ( ReleaseModuleInstance( &m_patient ), PM_MODULE_SUCCESS );
     }
 
@@ -20,7 +33,7 @@ protected:
 
 TEST_F( ComponentTestControlModule, CanStartPM )
 {
-    EXPECT_EQ( m_patient.fpStart( L".", L".", L"." ), PM_MODULE_SUCCESS );
+    EXPECT_EQ( m_patient.fpStart( L".", L".", L"config.json" ), PM_MODULE_SUCCESS );
 
     Sleep( 100 );
     
