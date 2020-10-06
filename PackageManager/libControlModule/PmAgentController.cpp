@@ -258,6 +258,7 @@ PM_STATUS PmAgentController::startProcess()
 
     wcscpy_s( tszCmdline, MAX_PATH, tstrProcessArgs.c_str() );
 
+    WLOG_DEBUG( L"StartingProcess: %s", tszCmdline );
     // Create the child process.
     bRetStatus = CreateProcess( NULL, //application name
         tszCmdline,     // command line

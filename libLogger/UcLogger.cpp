@@ -46,7 +46,7 @@ DefaultUCLogger::~DefaultUCLogger()
 }
 
 #ifdef _DEBUG
-void printTime()
+static void printTime()
 {
     char tstr[ 32 ] = {};
     time_t now = time( NULL );
