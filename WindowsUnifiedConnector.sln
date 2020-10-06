@@ -16,13 +16,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageManager", "PackageManager", "{3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageMananger", "PackageManager\PackageMananger\PackageMananger.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A3C9E21E-4C04-496C-96B7-D3C68362E25F} = {A3C9E21E-4C04-496C-96B7-D3C68362E25F}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libLogger", "libLogger\libLogger.vcxproj", "{822CCD07-F01C-4DD7-A587-0A241953FB62}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libControlModule", "PackageManager\libControlModule\libControlModule.vcxproj", "{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{443D3CE9-D446-4D25-A448-AB318FB397F9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestControlModule", "PackageManager\ComponentTestControlModule\ComponentTestControlModule.vcxproj", "{58A03B25-981D-428A-A251-F8E02C60BCAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +96,14 @@ Global
 		{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}.Release|x64.Build.0 = Release|x64
 		{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}.Release|x86.ActiveCfg = Release|Win32
 		{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}.Release|x86.Build.0 = Release|Win32
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Debug|x64.ActiveCfg = Debug|x64
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Debug|x64.Build.0 = Debug|x64
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Debug|x86.ActiveCfg = Debug|Win32
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Debug|x86.Build.0 = Debug|Win32
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Release|x64.ActiveCfg = Release|x64
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Release|x64.Build.0 = Release|x64
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Release|x86.ActiveCfg = Release|Win32
+		{58A03B25-981D-428A-A251-F8E02C60BCAC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +113,8 @@ Global
 		{E7DB0C5A-D7C4-4E3B-85B6-53758EDE0A23} = {3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}
 		{805379CA-1C31-40A9-B908-8B2A603927F1} = {3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}
 		{31FC5172-1CDF-40AF-9E2C-1AD069CEB772} = {3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}
+		{443D3CE9-D446-4D25-A448-AB318FB397F9} = {3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}
+		{58A03B25-981D-428A-A251-F8E02C60BCAC} = {443D3CE9-D446-4D25-A448-AB318FB397F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

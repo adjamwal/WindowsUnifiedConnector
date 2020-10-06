@@ -62,6 +62,7 @@
 extern "C" {
 #endif
 
+    class IUcLogger;
 /**
 * @brief Defines current interface version
 */
@@ -193,7 +194,7 @@ typedef struct _PM_MODULE_CTX_T
 *         PM_MODULE_UNSUPPORTED_PLATFORM_VERSION if current platform is not supported by the module, <br>
 *         other PM_MODULE_RESULT_T in case of errors. <br>
 */
-PM_MODULE_RESULT_T PM_MODULE_API CreateModuleInstance(IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX);
+PM_MODULE_RESULT_T PM_MODULE_API CreateModuleInstance(IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger );
 
 /**
 * @brief Releases a module instance - REQUIRED

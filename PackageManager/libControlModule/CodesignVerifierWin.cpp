@@ -75,28 +75,28 @@ PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rts
     HRESULT hr = WinVerifyTrustEx((HWND)INVALID_HANDLE_VALUE, &guidPublishedSoftware, &wintrustdata);
     if (ERROR_SUCCESS != hr)
     {
-        LOG_ERROR( L"unable to verify trust for [%s]", rtstrPath.c_str() );
+        WLOG_ERROR( L"unable to verify trust for [%s]", rtstrPath.c_str() );
         goto safe_exit;
     }
 
     pProvData = WTHelperProvDataFromStateData(wintrustdata.hWVTStateData);
     if (NULL == pProvData)
     {
-        LOG_ERROR( L"unable to get Data using WTHelperProvDataFromStateData for [%s]", rtstrPath.c_str() );
+        WLOG_ERROR( L"unable to get Data using WTHelperProvDataFromStateData for [%s]", rtstrPath.c_str() );
         goto safe_exit;
     }
 
     pProvSigner = WTHelperGetProvSignerFromChain(pProvData, 0, FALSE, 0);
     if (NULL == pProvSigner)
     {
-        LOG_ERROR( L"unable to get signer from chain for [%s]", rtstrPath.c_str() );
+        WLOG_ERROR( L"unable to get signer from chain for [%s]", rtstrPath.c_str() );
         goto safe_exit;
     }
 
     pProvCert = WTHelperGetProvCertFromChain(pProvSigner, 0);
     if (NULL == pProvCert)
     {
-        LOG_ERROR( L"unable to get signer from chain for [%ls]", rtstrPath.c_str() );
+        WLOG_ERROR( L"unable to get signer from chain for [%ls]", rtstrPath.c_str() );
         goto safe_exit;
     }
 
@@ -123,11 +123,11 @@ PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rts
         if (rtstrSigner == tstrSignerName)
         {
             // found a valid match
-            LOG_DEBUG( L"found a valid match for [%s], [%s]", rtstrPath.c_str(), tstrSignerName.c_str() );
+            WLOG_DEBUG( L"found a valid match for [%s], [%s]", rtstrPath.c_str(), tstrSignerName.c_str() );
         }
         else
         {
-            LOG_ERROR( L"Cert signer name didn't match for [%ls], [%ls]", rtstrPath.c_str(), tstrSignerName.c_str() );
+            WLOG_ERROR( L"Cert signer name didn't match for [%ls], [%ls]", rtstrPath.c_str(), tstrSignerName.c_str() );
             retStatus = PM_STATUS::PM_CODE_SIGNER_MISMATCH;
             goto safe_exit;
         }
@@ -137,7 +137,7 @@ PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rts
     {
         FileTimeToLocalFileTime(&pProvSigner->pasCounterSigners[0].sftVerifyAsOf, &sigTimestamp);
         convertFileTime1601To1970(sigTimestamp, timeStamp);
-        LOG_DEBUG( L"path and timestamp is [%ls] - [%llu]", rtstrPath.c_str(), timeStamp );
+        WLOG_DEBUG( L"path and timestamp is [%ls] - [%llu]", rtstrPath.c_str(), timeStamp );
     }
     else
     {
@@ -149,7 +149,7 @@ PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rts
         /* verify timestamp against killdate */
         if ( timeStamp < killdate )
         {
-            LOG_ERROR( L"timestamp expired for file: [%s].", rtstrPath.c_str() );
+            WLOG_ERROR( L"timestamp expired for file: [%s].", rtstrPath.c_str() );
             retStatus = PM_STATUS::PM_CODE_SIGN_EXPIRED;
             goto safe_exit;
         }
@@ -163,7 +163,7 @@ safe_exit:
     hr = WinVerifyTrustEx((HWND)INVALID_HANDLE_VALUE, &guidPublishedSoftware, &wintrustdata);
     if (ERROR_SUCCESS != hr)
     {
-        LOG_ERROR( L"failed to release trust for [%s]", rtstrPath.c_str() );
+        WLOG_ERROR( L"failed to release trust for [%s]", rtstrPath.c_str() );
     }
 
     return retStatus;
@@ -191,7 +191,7 @@ PM_STATUS verify_by_catalog( const std::wstring& rtstrPath, const std::wstring& 
     GUID ActionGuid = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     unsigned int i = 0;
 
-    LOG_DEBUG( L"checking signature by catalog [%s]", rtstrPath.c_str() );
+    WLOG_DEBUG( L"checking signature by catalog [%s]", rtstrPath.c_str() );
 
     if( FALSE == CryptCATAdminAcquireContext(&cat_admin_ctx, NULL, 0) || NULL == cat_admin_ctx )
     {
@@ -268,7 +268,7 @@ PM_STATUS verify_by_catalog( const std::wstring& rtstrPath, const std::wstring& 
 
     if( 0 != WinVerifyTrust( 0, &ActionGuid, &wintrust_data ) )
     {
-        LOG_ERROR( L"unable to verify trust for [%s]", rtstrPath.c_str() );
+        WLOG_ERROR( L"unable to verify trust for [%s]", rtstrPath.c_str() );
         goto safe_exit;
     }
 
@@ -312,7 +312,7 @@ safe_exit:
 
 PM_STATUS CodesignVerifier::VerifyWithKilldate( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type, uint64_t killdate )
 {
-    LOG_DEBUG( L"verifying file signature: file = [%s], signer = [%s], type = [%d]", rtstrPath.c_str(), rtstrSigner.c_str(), sig_type );
+    WLOG_DEBUG( L"verifying file signature: file = [%s], signer = [%s], type = [%d]", rtstrPath.c_str(), rtstrSigner.c_str(), sig_type );
     if (PM_STATUS::PM_OK == verify_by_file( rtstrPath, rtstrSigner, sig_type, killdate))
     {
         LOG_DEBUG("file signature verified by file." );
@@ -325,7 +325,7 @@ PM_STATUS CodesignVerifier::VerifyWithKilldate( const std::wstring& rtstrPath, c
 
     else
     {
-        LOG_ERROR( L"unable to verify file signature: [%s]", rtstrPath.c_str() );
+        WLOG_ERROR( L"unable to verify file signature: [%s]", rtstrPath.c_str() );
         return PM_STATUS::PM_CODE_SIGN_VERIFICATION_FAILED;
     }
 
@@ -336,7 +336,7 @@ PM_STATUS CodesignVerifier::Verify( const std::wstring& rtstrPath, const std::ws
 {
     if( (rtstrPath.empty()) || (rtstrSigner.empty()) || (SigType::SIGTYPE_NATIVE != sig_type))
     {
-        LOG_ERROR( L"invalid parameters [%s] : [%s]", rtstrPath.c_str(), rtstrSigner.c_str() );
+        WLOG_ERROR( L"invalid parameters [%s] : [%s]", rtstrPath.c_str(), rtstrSigner.c_str() );
         return PM_STATUS::PM_INVAL;
     }
     return CodesignVerifier::VerifyWithKilldate( rtstrPath, rtstrSigner, sig_type, KILLDATE );
