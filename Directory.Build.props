@@ -2,8 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
+    <WLHBASE>C:\Program Files (x86)\Windows Kits\10</WLHBASE>
     <UC_PATH>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</UC_PATH>
     <WORKSPACE_PATH>$([System.IO.Path]::GetFullPath('$(UC_PATH)..\'))</WORKSPACE_PATH>
     <IMN_COMMON>$([System.IO.Path]::GetFullPath('$(WORKSPACE_PATH)common\'))</IMN_COMMON>
   </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="IMN_COMMON">
+      <Value>$(IMN_COMMON)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+	<BuildMacro Include="WLHBASE">
+      <Value>$(WLHBASE)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
 </Project>
