@@ -63,6 +63,10 @@
                     <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
+        
+            <Component Id="UCService.exe" Guid="*">
+                <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
+            </Component>
         </ComponentGroup>
     </Fragment>
 
@@ -94,6 +98,13 @@
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
                     <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
                 </RegistryKey>
+            </Component>
+        
+            <Component Id="ControlModule.dll" Guid="*">
+                <File Id="ControlModule.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\ControlModule.dll" />
+            </Component>
+            <Component Id="PackageMananger.exe" Guid="*">
+                <File Id="PackageMananger.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\PackageMananger.exe" />
             </Component>
         </ComponentGroup>
     </Fragment>
