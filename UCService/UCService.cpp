@@ -16,17 +16,12 @@ UCService::UCService(
     BOOL fCanPauseContinue )
     : ServiceBase( pszServiceName, fCanStop, fCanShutdown, fCanPauseContinue )
 {
-    m_debugLogFile << SERVICE_NAME << " created" << std::endl;
+    LogMessage( __FUNCTIONW__, L"created" );
 }
 
 UCService::~UCService( void )
 {
-    m_debugLogFile << SERVICE_NAME << " destroyed" << std::endl;
-}
-
-void UCService::WriteEventLogEntry( PWSTR pszMessage, BYTE bLevel )
-{
-    __super::WriteEventLogEntry( pszMessage, bLevel );
+    LogMessage( __FUNCTIONW__, L"destroyed" );
 }
 
 bool UCService::FileExists( const char* filename )
@@ -57,14 +52,13 @@ VOID CALLBACK ServiceWorkerThread(
     _In_ PTP_WORK /*Work*/ )
 {
     UCService* pService = static_cast< UCService* >( Parameter );
-    pService->m_debugLogFile << "ServiceWorkerThread started" << std::endl;
+    pService->LogMessage( __FUNCTIONW__, L"started" );
 
     //  Periodically check if the service has been requested to stop
     while( WaitForSingleObject( m_ServiceStopEvent, 0 ) != WAIT_OBJECT_0 )
     {
         //do some work
-        pService->m_debugLogFile << "ServiceWorkerThread ... doing some work" << std::endl;
-        pService->WriteEventLogEntry( SERVICE_NAME" ServiceWorkerThread ... doing some work", TRACE_LEVEL_ERROR );
+        pService->LogMessage( __FUNCTIONW__, L"... doing some work" );
 
         Sleep( 3000 );
     }
@@ -77,11 +71,11 @@ VOID CALLBACK ServiceWorkerThread(
 
 void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 {
-    WriteEventLogEntry( SERVICE_NAME" in OnStart", TRACE_LEVEL_INFORMATION );
+    LogMessage( __FUNCTIONW__, L"in OnStart" );
 
     if( m_ServiceStopEvent != INVALID_HANDLE_VALUE )
     {
-        WriteEventLogEntry( SERVICE_NAME" OnStart error: ServiceWorkerThread still running", TRACE_LEVEL_ERROR );
+        LogMessage( __FUNCTIONW__, L"OnStart error: ServiceWorkerThread still running", TRACE_LEVEL_ERROR );
         return;
     }
 
@@ -92,7 +86,7 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 
     if( NULL == m_threadPoolWorker )
     {
-        WriteEventLogEntry( SERVICE_NAME" CreateThreadpoolWork failed", TRACE_LEVEL_ERROR );
+        LogMessage( __FUNCTIONW__, L" CreateThreadpoolWork failed", TRACE_LEVEL_ERROR );
     }
 
     SubmitThreadpoolWork( m_threadPoolWorker );
@@ -100,11 +94,11 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 
 void UCService::OnStop()
 {
-    WriteEventLogEntry( SERVICE_NAME" in OnStop", TRACE_LEVEL_INFORMATION );
+    LogMessage( __FUNCTIONW__, L"in OnStop" );
 
     if( m_ServiceStopEvent == INVALID_HANDLE_VALUE )
     {
-        WriteEventLogEntry( SERVICE_NAME" OnStop error: ServiceWorkerThread is not running", TRACE_LEVEL_ERROR );
+        LogMessage( __FUNCTIONW__, L"OnStop error: ServiceWorkerThread is not running", TRACE_LEVEL_ERROR );
         return;
     }
 

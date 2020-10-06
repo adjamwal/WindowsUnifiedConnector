@@ -15,8 +15,8 @@
     <?define SecureXYZDirectory = "SecureXYZ" ?>
     <?define UnifiedConnectorDirectory = "Unified Connector" ?>
     <?define ServiceDictory = "Service" ?>
-    <?define UCIDDirectory = "ID" ?>
-    <?define UCPMDirectory = "Package Manager" ?>
+    <?define UCIDDirectory = "UCID" ?>
+    <?define UCPMDirectory = "UCPM" ?>
 
     <!-- Registry key name used to store installation location -->
     <?define InstallNameKey = "Unified Connector" ?>
@@ -26,7 +26,7 @@
 
     <!-- Version info -->
     <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
-    <?define Version = "1.0.1" ?>
+    <?define Version = "1.0.0" ?>
 
     <!-- Minimum version supported if product already installed and this is an upgrade -->
     <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
@@ -35,9 +35,11 @@
     <!-- Platform specific variables -->
     <?if $(var.Platform) = x64 ?>
         <?define Win64 = "yes" ?>
+        <?define ProjectsPlatform = "x64" ?>
         <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
     <?else ?>
         <?define Win64 = "no" ?>
+        <?define ProjectsPlatform = "Win32" ?>
         <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
     <?endif ?>
 
