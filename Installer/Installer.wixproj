@@ -37,6 +37,12 @@
     <EmbeddedResource Include="en-us.wxl" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PackageManager\ControlModule\ControlModule.vcxproj">
       <Name>ControlModule</Name>
       <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
