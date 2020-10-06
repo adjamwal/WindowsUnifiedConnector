@@ -16,10 +16,10 @@
                  InstallPrivileges="elevated"/>
 
         <MajorUpgrade AllowDowngrades="no"
-					  AllowSameVersionUpgrades="no"
+					  AllowSameVersionUpgrades="yes"
 					  DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-
-        <MediaTemplate />
+        
+        <MediaTemplate EmbedCab="yes" />
 
         <Feature Id="UCService" Title="Unified Connector Service" Level="1">
             <ComponentGroupRef Id="UCServiceComponents" />
