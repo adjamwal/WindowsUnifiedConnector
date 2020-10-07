@@ -181,6 +181,12 @@
     <ClCompile Include="PmLogAdapter.cpp" />
     <ClCompile Include="WindowsPmDependencies.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\libLogger\libLogger.vcxproj">
+      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

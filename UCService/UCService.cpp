@@ -16,12 +16,12 @@ UCService::UCService(
     BOOL fCanPauseContinue )
     : ServiceBase( pszServiceName, fCanStop, fCanShutdown, fCanPauseContinue )
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": created" );
+    LOG_DEBUG( "created" );
 }
 
 UCService::~UCService( void )
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": destroyed" );
+    LOG_DEBUG( "destroyed" );
 }
 
 #pragma endregion
@@ -31,12 +31,12 @@ UCService::~UCService( void )
 
 void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": in OnStart" );
+    LOG_DEBUG( "in OnStart" );
 }
 
 void UCService::OnStop()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": in OnStop" );
+    LOG_DEBUG( "in OnStop" );
 }
 
 #pragma endregion
