@@ -1,0 +1,34 @@
+#pragma once
+
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+
+using ::testing::Field;
+using ::testing::Values;
+using ::testing::Combine;
+using ::testing::NiceMock;
+using ::testing::Return;
+using ::testing::Invoke;
+using ::testing::InvokeWithoutArgs;
+using ::testing::_;
+using ::testing::AnyNumber;
+using ::testing::AtLeast;
+using ::testing::InSequence;
+using ::testing::TestWithParam;
+using ::testing::Matcher;
+using ::testing::Values;
+using ::testing::Ref;
+using ::testing::ReturnRef;
+using ::testing::StrEq;
+using ::testing::StrNe;
+using ::testing::ContainerEq;
+using ::testing::SetArgReferee;
+using ::testing::SetArgPointee;
+using ::testing::DoAll;
+using ::testing::Mock;
+using ::testing::ContainsRegex;
+using ::testing::An;
+using ::testing::Ne;
+using ::testing::SetArrayArgument;
+using ::testing::HasSubstr;
+using ::testing::NotNull;
