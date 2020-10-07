@@ -55,6 +55,7 @@ pipeline {
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
     WIN_DEV_GITHUB_TOKEN = credentials('fireamp-win-dev-git-token')
     CLG5_LAB_PASSWORD = credentials('CLG5_LAB_GENERIC_USER_PW')
+    CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
   }
   stages {
     stage ('Init') {
@@ -76,6 +77,8 @@ pipeline {
               return;
             }
           } else {
+            //TODO: Enable when we have a branch build agent
+            //TODO: Set production signer cerdentials on branch builds
             //agentLabel = "branchBuildEnabled"
           }
         }
@@ -106,8 +109,11 @@ pipeline {
         stage ('Build') {
           steps {
             script {
+              SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86'
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x86'
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x64'
               }                
             }
@@ -116,25 +122,54 @@ pipeline {
         stage ('Test') {
           steps {
             script {
+              SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console Win32\Debug\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console Win32\Debug\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
-                
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\Debug\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\Debug\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
+                //TODO: Enable unit tests when we have them
+                // bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x86\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common'
+                // bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common'
               }                
             }
           }
         }
         stage ('Archive') {
-          zip zipFile: 'Debug-Win32.zip', archive: true, dir: 'WindowsUnifiedConnector\\Win32\\Debug'
-          zip zipFile: 'Debug-x64.zip', archive: true, dir: 'WindowsUnifiedConnector\\x64\\Debug'
-          zip zipFile: 'Release-Win32.zip', archive: true, dir: 'WindowsUnifiedConnector\\Win32\\Release'
-          zip zipFile: 'Release-x64.zip', archive: true, dir: 'WindowsUnifiedConnector\\x64\\Release'
-          
-          archiveArtifacts artifacts: '*.zip', fingerprint: true
-          archiveArtifacts artifacts: '**\Release\**\Cisco-UC-Installer*.msi', fingerprint: true
-          archiveArtifacts artifacts: '**\Release\**\Cisco-UC-Installer.exe', fingerprint: true
+          steps {
+            script {
+              SetGithubPendingStatus()
+              
+              bat "if not exist ${env.CLG5_SHARE_BUILD_LOCATION} ( mkdir ${env.CLG5_SHARE_BUILD_LOCATION} )"
+              if (env.CHANGE_ID != null) {
+                BUILD_PATH = "${env.CLG5_SHARE_BUILD_LOCATION}\\${env.CHANGE_ID}"
+                bat "if not exist ${BUILD_PATH} ( mkdir ${BUILD_PATH} )"
+              }
+              else {
+                BUILD_PATH = "${env.CLG5_SHARE_BUILD_LOCATION}\\${env.BRANCH_NAME}"
+                bat "if not exist ${BUILD_PATH} ( mkdir ${BUILD_PATH} )"
+              }
+              
+              if (env.BUILD_NUMBER != null) {
+                BUILD_PATH = "${BUILD_PATH}\\${env.BUILD_NUMBER}"
+                bat "if not exist ${BUILD_PATH} ( mkdir ${BUILD_PATH} )"
+              }
+                  
+              dir('WindowsUnifiedConnector') {
+                powershell 'Compress-Archive -Path "Win32\\Debug" -DestinationPath "Debug-Win32.zip"'
+                powershell 'Compress-Archive -Path "x64\\Debug" -DestinationPath "Debug-x64.zip"'
+                powershell 'Compress-Archive -Path "Win32\\Release" -DestinationPath "Release-Win32.zip"'
+                powershell 'Compress-Archive -Path "x64\\Release" -DestinationPath "Release-x64.zip"'
+                
+                archiveArtifacts artifacts: '*.zip', fingerprint: true
+                
+                bat "COPY Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${BUILD_PATH} /Y"
+                bat "COPY Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${BUILD_PATH} /Y"
+                bat "COPY x64\\Release\\Cisco-UC-Installer.exe ${BUILD_PATH} /Y"
+              }
+              
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer.exe', fingerprint: true
+            }
+          }
         }
       }
       post {
