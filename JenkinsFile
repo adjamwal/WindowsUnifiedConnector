@@ -106,15 +106,42 @@ pipeline {
             }
           }
         }
-        stage ('Build') {
+        stage ('Build Release x86') {
           steps {
             script {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x86'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x64'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m'
+              }                
+            }
+          }
+        }
+        stage ('Build Release x64') {
+          steps {
+            script {
+              SetGithubPendingStatus()
+              dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m'
+              }                
+            }
+          }
+        }
+        stage ('Build Debug x86') {
+          steps {
+            script {
+              SetGithubPendingStatus()
+              dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x86 -m'
+              }                
+            }
+          }
+        }
+        stage ('Build Debug x64') {
+          steps {
+            script {
+              SetGithubPendingStatus()
+              dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x64 -m'
               }                
             }
           }
