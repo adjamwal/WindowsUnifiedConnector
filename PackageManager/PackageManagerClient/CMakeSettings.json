@@ -1,0 +1,52 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-Djsoncpp_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\x64\\include -Djsoncpp_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Debug\\x64\\lib -Dgtest_force_shared_crt=ON",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "variables": []
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-Djsoncpp_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Release\\x64\\include -Djsoncpp_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Release\\x64\\lib -Dgtest_force_shared_crt=ON",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": []
+    },
+    {
+      "name": "x86-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-Djsoncpp_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Djsoncpp_LIBRARY=${env.IMN_COMMON}\\common\\common-windows-build\\Debug\\Win32\\lib -Dgtest_force_shared_crt=ON",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": []
+    },
+    {
+      "name": "x86-Release",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-Djsoncpp_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Release\\Win32\\include -Djsoncpp_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Release\\Win32\\lib -Dgtest_force_shared_crt=ON",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": []
+    }
+  ]
+}
