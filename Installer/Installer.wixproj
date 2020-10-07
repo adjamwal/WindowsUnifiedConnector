@@ -85,7 +85,7 @@
     <PreBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>If $(Platform)==x64 ("$(MSBuildBinPath)\MSBuild.exe" $(SolutionDir)WindowsUnifiedConnector.sln /t:Installer /p:Configuration="$(ConfigurationName)" /p:Platform="x86" /p:BuildProjectReferences=false)</PostBuildEvent>
+    <PostBuildEvent>If $(Platform)==x64 ("$(MSBuildBinPath)\MSBuild.exe" $(SolutionDir)WindowsUnifiedConnector.sln /t:Installer /p:Configuration="$(ConfigurationName)" /p:Platform="x86")</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
