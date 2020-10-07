@@ -1,0 +1,160 @@
+#!/usr/bin/env groovy
+
+@Library('JenkinsShared')_
+
+agentLabel = "VS2019"
+
+def SetGithubPendingStatus() {
+  if (env.CHANGE_ID != null) {
+    last_stage = env.STAGE_NAME
+    echo "Setting Github PR Pending Status: ${last_stage}"
+    pullRequest.createStatus( status: 'pending', context: "WinJenkins/CI", description: "Build Stage: ${last_stage}", targetUrl: "${env.JOB_URL}" )
+  }
+}
+
+def SetGithubSuccessStatus() {
+  if (env.CHANGE_ID != null) {
+    echo "Setting Github PR Success Status"
+    pullRequest.createStatus( status: 'success', context: "WinJenkins/CI", description: "Build Completed", targetUrl: "${env.JOB_URL}" )
+  }
+}
+
+def SetGithubFailureStatus() {
+  if (env.CHANGE_ID != null) {
+    echo "Setting Github PR Failure Status: ${last_stage}"
+    pullRequest.createStatus( status: 'failure', context: "WinJenkins/CI", description: "Failed on: ${last_stage}", targetUrl: "${env.JOB_URL}" )
+  }
+}
+
+def CheckoutDependencies() {
+  getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
+  powershell ".\\AmpRepositorySync.exe -cws ."
+  powershell ".\\AmpRepositorySync.exe -cc latest"
+}
+
+pipeline {
+  agent none
+  options {
+    checkoutToSubdirectory('WindowsUnifiedConnector')
+    timeout(time: 4, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr:'10'))
+  }
+  environment {
+    NOTIFICATION_RECIPIENTS = 'fireamp-dev-connector-win@cisco.com'
+    BUILD_LOG_LINES         = '500'
+
+    MASTER_BRANCH_NAME      = 'master'
+    LOCAL_CERT_LOCATION = 'C:\\machineCerts'
+    CERT_FILENAME = 'MyCA.cer'
+
+    SKIP_CI = '[noci]'
+    FORCE_COVERAGE = '[coverage]'
+    FORCE_COVERITY = '[coverity]'
+    JENKINS_USERNAME = 'Jenkins'
+    JENKINS_USER_PASSWORD = credentials('JENKINS_USER_PASSWORD')
+    GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
+    WIN_DEV_GITHUB_TOKEN = credentials('fireamp-win-dev-git-token')
+    CLG5_LAB_PASSWORD = credentials('CLG5_LAB_GENERIC_USER_PW')
+  }
+  stages {
+    stage ('Init') {
+      agent {
+        label 'master'
+      }
+      steps {
+        script {
+          abortPreviousBuilds()
+          SetGithubPendingStatus()
+          email.setupChangeAuthorEmail()
+
+          if (env.CHANGE_ID != null) {
+            if (env.CHANGE_TITLE.toLowerCase().contains(env.SKIP_CI)) {
+              echo "${SKIP_CI} found in pull request title, ending build early as this is considered a no ci change"
+              currentBuild.result = 'SUCCESS'
+              env.CHANGE_AUTHOR_EMAIL = ''
+              SetGithubSuccessStatus()
+              return;
+            }
+          } else {
+            //agentLabel = "branchBuildEnabled"
+          }
+        }
+      }
+    }
+    stage ('Build UC') {
+      agent {
+        node {
+          label "${agentLabel}"
+        }
+      }
+      stages {
+        stage ('Setup') {
+          steps {
+            script {
+              SetGithubPendingStatus()
+              powershell "gci env:"
+              connectClgShare()
+              CheckoutDependencies()
+              dir('WindowsUnifiedConnector') {
+                powershell "git clean -dfx"
+                powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
+                powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
+              }
+            }
+          }
+        }
+        stage ('Build') {
+          steps {
+            script {
+              dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x64'
+              }                
+            }
+          }
+        }
+        stage ('Test') {
+          steps {
+            script {
+              dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console Win32\Debug\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console Win32\Debug\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
+                
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\Debug\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && vstest.console x64\Debug\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\GoogleTestAdapter.0.18.0\build\_common'
+              }                
+            }
+          }
+        }
+        stage ('Archive') {
+          zip zipFile: 'Debug-Win32.zip', archive: true, dir: 'WindowsUnifiedConnector\\Win32\\Debug'
+          zip zipFile: 'Debug-x64.zip', archive: true, dir: 'WindowsUnifiedConnector\\x64\\Debug'
+          zip zipFile: 'Release-Win32.zip', archive: true, dir: 'WindowsUnifiedConnector\\Win32\\Release'
+          zip zipFile: 'Release-x64.zip', archive: true, dir: 'WindowsUnifiedConnector\\x64\\Release'
+          
+          archiveArtifacts artifacts: '*.zip', fingerprint: true
+          archiveArtifacts artifacts: '**\Release\**\Cisco-UC-Installer*.msi', fingerprint: true
+          archiveArtifacts artifacts: '**\Release\**\Cisco-UC-Installer.exe', fingerprint: true
+        }
+      }
+      post {
+        cleanup {
+          cleanWs cleanWhenAborted: true, cleanWhenFailure: false, cleanWhenSuccess: true
+        }
+      }
+    }
+  }
+  post {
+    success {
+      script {
+        SetGithubSuccessStatus()
+        email.sendSuccessEmail("fireamp-win-connector")
+      }
+    }
+    failure {
+      script {
+        email.sendFailureEmail("fireamp-win-connector")
+      }
+    }
+  }
+}
