@@ -1,3 +1,0 @@
-[submodule "PackageManager/PackageManagerClient"]
-	path = PackageManager/PackageManagerClient
-	url = https://code.engine.sourcefire.com/UnifiedConnector/PackageManagerClient.git
