@@ -107,8 +107,8 @@
                 </RegistryKey>
             </Component>
         
-            <Component Id="ControlModule.dll" Guid="*">
-                <File Id="ControlModule.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\ControlModule.dll" />
+            <Component Id="PM_MCP.dll" Guid="*">
+                <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
             </Component>
             <Component Id="UC_PM.exe" Guid="*">
                 <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />

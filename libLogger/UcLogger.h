@@ -9,12 +9,12 @@ class UcLogger : public IUcLogger
 {
 public:
     UcLogger( IUcLogFile& logFile );
-    virtual ~UcLogger();
+    ~UcLogger();
 
-    virtual void Log( Severity serverity, const char* msgFormatter, ... );
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, ... );
-    virtual void Log( Severity serverity, const char* msgFormatter, va_list args );
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, va_list args );
+    void Log( Severity serverity, const char* msgFormatter, ... ) override;
+    void Log( Severity serverity, const wchar_t* msgFormatter, ... ) override;
+    void Log( Severity serverity, const char* msgFormatter, va_list args ) override;
+    void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) override;
 
     void SetLogLevel( Severity logLevel );
 
