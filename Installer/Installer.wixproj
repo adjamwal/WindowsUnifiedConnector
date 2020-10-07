@@ -85,8 +85,7 @@
     <PreBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>If $(Platform)==x64 ( call "$(MSBuildBinPath)\MSBuild.exe" $(SolutionDir)WindowsUnifiedConnector.sln /t:Installer /p:Configuration="$(ConfigurationName)" /p:Platform="x86")
-call copy $(SolutionDir)\Installer\bin\$(Platform)\$(Configuration)\en-us\Installer-unsigned.msi $(SolutionDir)\Installer\bin\$(Platform)\$(Configuration)\en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)\Installer\bin\$(Platform)\$(Configuration)\en-us\Installer-unsigned.msi $(SolutionDir)\Installer\bin\$(Platform)\$(Configuration)\en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
