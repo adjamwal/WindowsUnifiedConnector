@@ -1,5 +1,5 @@
 /**
- * @file UCIDAPI.h
+ * @file ucidapi.h
  *
  * UCIDAPI has functions for use by clients to get the UCID and
  * its associated token. It is also possible to request for a refresh
@@ -18,7 +18,7 @@
  *
  * \code
  *
- * #include "UCIDAPI.h"
+ * #include "ucidapi.h"
  *
  * void func_that_needs_ucid()
  * {
