@@ -20,6 +20,4 @@ protected:
 private:
     bool DirectoryExists( const char* dirname );
     bool FileExists( const char* filename );
-
-    PTP_WORK m_threadPoolWorker = nullptr;
 };

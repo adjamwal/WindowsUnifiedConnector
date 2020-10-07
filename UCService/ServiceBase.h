@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>  
 #include <Evntrace.h>
+#include <memory>
+#include "UcLogFile.h"
+#include "UcLogger.h"
 
 class ServiceBase
 {
@@ -18,8 +21,6 @@ public:
 
     void Stop();
 
-    void LogMessage( _In_ PWSTR pszFunction, _In_ PWSTR pszMessage, _In_ BYTE bLevel = TRACE_LEVEL_INFORMATION, _In_ DWORD dwError = GetLastError() );
-
 protected:
 
     virtual void OnStart( DWORD dwArgc, PWSTR* pszArgv );
@@ -31,14 +32,17 @@ protected:
         DWORD dwWin32ExitCode = NO_ERROR,
         DWORD dwWaitHint = 0 );
 
+    PWSTR m_serviceName;
+    std::unique_ptr<IUcLogFile> m_logFile;
+    std::unique_ptr<IUcLogger> m_logger;
+    REGHANDLE m_etwRegHandle;
 private:
 
     static void WINAPI ServiceMain( DWORD dwArgc, PWSTR* pszArgv );
     static void WINAPI ServiceCtrlHandler( DWORD dwCtrl );
 
-    void InitializeDebugLogFile();
-    void InitializeEventLog( BOOL fCanStop, BOOL fCanShutdown, BOOL fCanPauseContinue );
-    std::wstring GetExeDirectory();
+    void InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCanPauseContinue );
+    void DeinitializeLogging();
 
     void Start( DWORD dwArgc, PWSTR* pszArgv );
     void Pause();
@@ -46,9 +50,6 @@ private:
     void Shutdown();
 
     static ServiceBase* s_service;
-    std::wofstream m_debugLogFile;
-    PWSTR m_svcName;
     SERVICE_STATUS_HANDLE m_statusHandle;
-    REGHANDLE m_etwRegHandle;
     SERVICE_STATUS m_status;
 };

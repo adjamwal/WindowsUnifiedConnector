@@ -7,7 +7,7 @@
 
 #include "UCService.h"
 
-HANDLE m_ServiceStopEvent = INVALID_HANDLE_VALUE;
+#pragma region Service Constructor and Destructor
 
 UCService::UCService(
     PWSTR pszServiceName,
@@ -16,13 +16,33 @@ UCService::UCService(
     BOOL fCanPauseContinue )
     : ServiceBase( pszServiceName, fCanStop, fCanShutdown, fCanPauseContinue )
 {
-    LogMessage( __FUNCTIONW__, L"created" );
+    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": created" );
 }
 
 UCService::~UCService( void )
 {
-    LogMessage( __FUNCTIONW__, L"destroyed" );
+    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": destroyed" );
 }
+
+#pragma endregion
+
+
+#pragma region Service Event Handlers
+
+void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
+{
+    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": in OnStart" );
+}
+
+void UCService::OnStop()
+{
+    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": in OnStop" );
+}
+
+#pragma endregion
+
+
+#pragma region Helper Functions
 
 bool UCService::FileExists( const char* filename )
 {
@@ -46,62 +66,4 @@ bool UCService::DirectoryExists( const char* dirname )
     return false;
 }
 
-VOID CALLBACK ServiceWorkerThread(
-    _In_ PTP_CALLBACK_INSTANCE /*Instance*/,
-    _In_ PVOID Parameter,
-    _In_ PTP_WORK /*Work*/ )
-{
-    UCService* pService = static_cast< UCService* >( Parameter );
-    pService->LogMessage( __FUNCTIONW__, L"started" );
-
-    //  Periodically check if the service has been requested to stop
-    while( WaitForSingleObject( m_ServiceStopEvent, 0 ) != WAIT_OBJECT_0 )
-    {
-        //do some work
-        pService->LogMessage( __FUNCTIONW__, L"... doing some work" );
-
-        Sleep( 3000 );
-    }
-
-    CloseHandle( m_ServiceStopEvent );
-    m_ServiceStopEvent = INVALID_HANDLE_VALUE;
-
-    return;
-}
-
-void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
-{
-    LogMessage( __FUNCTIONW__, L"in OnStart" );
-
-    if( m_ServiceStopEvent != INVALID_HANDLE_VALUE )
-    {
-        LogMessage( __FUNCTIONW__, L"OnStart error: ServiceWorkerThread still running", TRACE_LEVEL_ERROR );
-        return;
-    }
-
-    m_ServiceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-
-    PTP_WORK_CALLBACK workcallback = ServiceWorkerThread;
-    m_threadPoolWorker = CreateThreadpoolWork( workcallback, this, nullptr );
-
-    if( NULL == m_threadPoolWorker )
-    {
-        LogMessage( __FUNCTIONW__, L" CreateThreadpoolWork failed", TRACE_LEVEL_ERROR );
-    }
-
-    SubmitThreadpoolWork( m_threadPoolWorker );
-}
-
-void UCService::OnStop()
-{
-    LogMessage( __FUNCTIONW__, L"in OnStop" );
-
-    if( m_ServiceStopEvent == INVALID_HANDLE_VALUE )
-    {
-        LogMessage( __FUNCTIONW__, L"OnStop error: ServiceWorkerThread is not running", TRACE_LEVEL_ERROR );
-        return;
-    }
-
-    // This will signal the worker thread to start shutting down
-    SetEvent( m_ServiceStopEvent );
-}
+#pragma endregion
