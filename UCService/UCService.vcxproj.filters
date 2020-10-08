@@ -18,6 +18,7 @@
     </ClInclude>
     <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ServiceInstaller">

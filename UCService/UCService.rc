@@ -49,10 +49,11 @@ END
 //
 // Version
 //
+#include "Version.h"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION FILEVER
+ PRODUCTVERSION PRODUCTVER
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -67,14 +68,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
-            VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "UCServic.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2020"
-            VALUE "OriginalFilename", "UCServic.exe"
-            VALUE "ProductName", "TODO: <Product name>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "CompanyName", STRCOMPANYNAME
+            VALUE "FileDescription", LOCALSTRFILEDESC
+            VALUE "FileVersion", STRFILEVER
+            VALUE "InternalName", LOCALSTRINTERNALFILENAME
+            VALUE "LegalCopyright", STRLEGALCOPYRIGHT
+            VALUE "OriginalFilename", LOCALSTRFILENAME
+            VALUE "ProductName", STRPRODUCTNAME
+            VALUE "ProductVersion", STRPRODUCTVER
         END
     END
     BLOCK "VarFileInfo"
