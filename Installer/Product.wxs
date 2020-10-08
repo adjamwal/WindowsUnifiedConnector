@@ -82,6 +82,12 @@
                 <Component Id="vcruntime140.dll" Guid="*">
                     <File Id="vcruntime140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140.dll" />
                 </Component>
+                <?if $(var.Platform) = "x64" ?>
+                <!-- vcruntime140_1.dll does not have a x86 version, so only install it for x64 -->
+                    <Component Id="vcruntime140_1.dll" Guid="*">
+                        <File Id="vcruntime140_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\VC\vcruntime140_1.dll" />
+                    </Component>
+                <?endif?>
                 <Component Id="ucrtbase.dll" Guid="*">
                     <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase.dll" />
                 </Component>
@@ -99,6 +105,12 @@
                 <Component Id="vcruntime140d.dll" Guid="*">
                     <File Id="vcruntime140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140d.dll" />
                 </Component>
+                <?if $(var.Platform) = "x64" ?>
+                    <!-- vcruntime140_1d.dll does not have a x86 version, so only install it for x64 -->
+                    <Component Id="vcruntime140_1d.dll" Guid="*">
+                        <File Id="vcruntime140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\VC\vcruntime140_1d.dll" />
+                    </Component>
+                <?endif?>
                 <Component Id="ucrtbased.dll" Guid="*">
                     <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
@@ -137,7 +149,7 @@
             <Component Id="UCID_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
-                    <RegistryValue Type="string" Name="Path" Value="UCID_DIRECTORY" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="Path" Value="[UCID_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
@@ -181,7 +193,7 @@
             <Component Id="UCPM_DLL_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
-                    <RegistryValue Type="string" Name="DllPath" Value="UCPM_DIRECTORY\UC_MCP.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="DllPath" Value="[UCPM_DIRECTORY]UC_MCP.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
         
