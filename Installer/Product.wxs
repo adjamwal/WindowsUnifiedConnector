@@ -21,6 +21,10 @@
         
         <MediaTemplate EmbedCab="yes" />
 
+        <Feature Id="VCRedist" Title="VCRedist" AllowAdvertise="no" Display="hidden" Level="1">
+            <ComponentGroupRef Id="VCRedistComponents"/>
+        </Feature>
+
         <Feature Id="UCService" Title="Unified Connector Service" Level="1">
             <ComponentGroupRef Id="UCServiceComponents" />
         </Feature>
@@ -58,6 +62,45 @@
         </Directory>
     </Fragment>
 
+    <Fragment>
+        <ComponentGroup Id="VCRedistComponents" Directory="UCSERVICE_DIRECTORY">
+            <?if $(var.Configuration) = "Release" ?>
+                <Component Id="msvcp140.dll" Guid="*">
+                    <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
+                </Component>
+                <Component Id="msvcp140_1.dll" Guid="*">
+                    <File Id="msvcp140_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_1.dll" />
+                </Component>
+                <Component Id="msvcp140_2.dll" Guid="*">
+                    <File Id="msvcp140_2.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_2.dll" />
+                </Component>
+                <Component Id="vcruntime140.dll" Guid="*">
+                    <File Id="vcruntime140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140.dll" />
+                </Component>
+                <Component Id="ucrtbase.dll" Guid="*">
+                    <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase$(var.ConfigurationPostfix).dll" />
+                </Component>
+            <?endif?>
+            <?if $(var.Configuration) = "Debug" ?>
+                <Component Id="msvcp140d.dll" Guid="*">
+                    <File Id="msvcp140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140d.dll" />
+                </Component>
+                <Component Id="msvcp140_1d.dll" Guid="*">
+                    <File Id="msvcp140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_1d.dll" />
+                </Component>
+                <Component Id="msvcp140_2d.dll" Guid="*">
+                    <File Id="msvcp140_2d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_2d.dll" />
+                </Component>
+                <Component Id="vcruntime140d.dll" Guid="*">
+                    <File Id="vcruntime140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140d.dll" />
+                </Component>
+                <Component Id="ucrtbased.dll" Guid="*">
+                    <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
+                </Component>
+            <?endif?>  
+        </ComponentGroup>
+    </Fragment>
+    
     <Fragment>
         <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
             <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
