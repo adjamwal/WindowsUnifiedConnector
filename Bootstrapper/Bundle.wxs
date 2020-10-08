@@ -4,8 +4,8 @@
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
 
         <Chain>
-            <MsiPackage Id="Installer32" InstallCondition='NOT VersionNT64' SourceFile="..\Installer\bin\x86\$(var.Configuration)\en-us\Installer.msi" />
-            <MsiPackage Id="Installer64" InstallCondition='VersionNT64' SourceFile="..\Installer\bin\x64\$(var.Configuration)\en-us\Installer.msi" />
+            <MsiPackage Id="Installer32" InstallCondition='NOT VersionNT64' SourceFile="..\Installer\bin\x86\$(var.Configuration)\en-us\Cisco-UC-Installer-x86.msi" />
+            <MsiPackage Id="Installer64" InstallCondition='VersionNT64' SourceFile="..\Installer\bin\x64\$(var.Configuration)\en-us\Cisco-UC-Installer-x64.msi" />
         </Chain>
     </Bundle>
 </Wix>

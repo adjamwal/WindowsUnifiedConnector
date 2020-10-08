@@ -89,7 +89,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;$(SolutionDir)PackageManager\libControlModule;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,7 +112,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;$(SolutionDir)PackageManager\libControlModule;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -135,7 +135,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;$(SolutionDir)PackageManager\libControlModule;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -161,7 +161,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)libLogger;$(SolutionDir)PackageManager\libControlModule;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -192,6 +192,12 @@
   <ItemGroup>
     <ProjectReference Include="..\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PackageManager\ControlModule\ControlModule.vcxproj">
+      <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PackageManager\PackageMananger\PackageMananger.vcxproj">
+      <Project>{805379ca-1c31-40a9-b908-8b2a603927f1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,7 +4,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>068683a5-cecc-45f9-94d7-60cf1e0c941b</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Bootstrapper</OutputName>
+    <OutputName>Cisco-UC-Installer</OutputName>
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
