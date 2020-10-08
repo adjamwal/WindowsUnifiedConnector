@@ -149,7 +149,7 @@
             <Component Id="UCID_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
-                    <RegistryValue Type="string" Name="Path" Value="UCID_DIRECTORY" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="Path" Value="[UCID_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
@@ -193,7 +193,7 @@
             <Component Id="UCPM_DLL_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
-                    <RegistryValue Type="string" Name="DllPath" Value="UCPM_DIRECTORY\UC_MCP.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="DllPath" Value="[UCPM_DIRECTORY]UC_MCP.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
         
