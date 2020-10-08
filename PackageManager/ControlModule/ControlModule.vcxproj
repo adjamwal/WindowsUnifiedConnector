@@ -267,9 +267,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libLogger\libLogger.vcxproj">
-      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libControlModule\libControlModule.vcxproj">
       <Project>{31fc5172-1cdf-40af-9e2c-1ad069ceb772}</Project>
     </ProjectReference>
