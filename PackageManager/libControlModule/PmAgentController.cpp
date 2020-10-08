@@ -1,15 +1,16 @@
 #include "pch.h"
 
 #include "PmAgentController.h"
-#include "CodesignVerifier.h"
+#include "ICodesignVerifier.h"
 #include "IUcLogger.h"
 #include <iostream>
 #include <tchar.h>
 
-PmAgentController::PmAgentController( const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath ) :
-    m_tstrProcessPath( rtstrPath + L"\\" + _T( PM_AGENT_BINARY ) )
-    , m_tstrConfigPath( rtstrConfigPath ),
-    m_bIsProcessStartedByPlugin( false )
+PmAgentController::PmAgentController( ICodesignVerifier& codeSignVerifier, const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath ) :
+    m_codesignVerifier( codeSignVerifier )
+    , m_tstrProcessPath( rtstrPath + L"\\" + _T( PM_AGENT_BINARY ) ) 
+    , m_tstrConfigPath( rtstrConfigPath )
+    , m_bIsProcessStartedByPlugin( false )
 {
     if( rtstrPath.empty() )
     {
@@ -202,6 +203,27 @@ safe_exit:
     return retStatus;
 }
 
+PM_STATUS CodeSignToPmStatus( CodesignStatus status ) 
+{
+    switch( status )
+    {
+    case CodesignStatus::CODE_SIGNER_SUCCESS:
+        return PM_STATUS::PM_OK;
+    case CodesignStatus::CODE_SIGNER_ERROR:
+        return PM_STATUS::PM_ERROR;
+    case CodesignStatus::CODE_SIGNER_INVALID:
+        return PM_STATUS::PM_INVAL;
+    case CodesignStatus::CODE_SIGNER_EXPIRED:
+        return PM_STATUS::PM_CODE_SIGN_EXPIRED;
+    case CodesignStatus::CODE_SIGNER_MISMATCH:
+        return PM_STATUS::PM_CODE_SIGNER_MISMATCH;
+    case CodesignStatus::CODE_SIGNER_VERIFICATION_FAILED:
+        return PM_STATUS::PM_CODE_SIGN_VERIFICATION_FAILED;
+    }
+
+    return PM_STATUS::PM_ERROR;
+}
+
 PM_STATUS PmAgentController::startProcess()
 {
     auto status = PM_STATUS::PM_ERROR;
@@ -209,8 +231,7 @@ PM_STATUS PmAgentController::startProcess()
     DWORD bRetStatus = -1;
 
     //Verify CodeSign
-    CodesignVerifier codesignverifier;
-    status = codesignverifier.Verify( m_tstrProcessPath, SIGNER_CISCO, SIGTYPE_DEFAULT );
+    status = CodeSignToPmStatus( m_codesignVerifier.Verify( m_tstrProcessPath, SIGNER_CISCO, SIGTYPE_DEFAULT ) );
     if( PM_STATUS::PM_OK != status )
     {
         LOG_ERROR( "Sign verification failed for the process" );

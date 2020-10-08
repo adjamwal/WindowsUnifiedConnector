@@ -5,6 +5,7 @@
 #include <mutex>
 #include "PackageManagerInternalModuleAPI.h"
 #include "PmAgentController.h"
+#include "CodesignVerifier.h"
 
 class PmControlPlugin
 {
@@ -24,7 +25,7 @@ private:
     // private member functions
 
     PmControlPlugin( const std::wstring& rtstrBasePath, const std::wstring& rtstrConfigPath ) :
-        m_AgentCtrlInst( rtstrBasePath, rtstrConfigPath )
+        m_AgentCtrlInst( m_codeSignVerifier, rtstrBasePath, rtstrConfigPath )
         , m_bIsProcessStarted( false )
     {
     }
@@ -33,6 +34,7 @@ private:
     PmControlPlugin( PmControlPlugin&& ) = delete;
 
     // private data members
+    CodesignVerifier m_codeSignVerifier;
     PmAgentController m_AgentCtrlInst;
     std::mutex m_mtxAgentCtrl; // protect instance returned by GetInstance()
     bool m_bIsProcessStarted;  // tracking bool for module Start/Stop

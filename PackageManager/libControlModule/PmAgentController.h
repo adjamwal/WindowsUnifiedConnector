@@ -17,6 +17,8 @@
 
 #define PM_AGENT_BINARY "UC_PM.exe"
 
+class ICodesignVerifier;
+
 class PmAgentController
 {
 public:
@@ -24,7 +26,9 @@ public:
     * Constructor
     * @param[in] rstrPath - Path to the child process
     */
-    PmAgentController( const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath );
+    PmAgentController( ICodesignVerifier& codesignVerifier, 
+        const std::wstring& rtstrPath, 
+        const std::wstring& rtstrConfigPath );
 
     ~PmAgentController();
     /**
@@ -50,6 +54,7 @@ private:
     PM_STATUS stopProcess();
     eProcStatus waitForProcess();
 
+    ICodesignVerifier& m_codesignVerifier;
     std::wstring m_tstrProcessPath;
     std::wstring m_tstrConfigPath;
     std::thread m_threadMonitor;

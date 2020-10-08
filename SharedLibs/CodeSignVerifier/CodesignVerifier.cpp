@@ -33,9 +33,9 @@ void convertFileTime1601To1970(const FILETIME& rFileTime, uint64_t& pTime_t)
     pTime_t = (uint64_t)(ull.QuadPart / FT_TO_SECS - FT_TO_TIMET_DIFF_SECS);
 }
 
-PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type, uint64_t killdate)
+CodesignStatus verify_by_file( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type, uint64_t killdate)
 {
-    PM_STATUS retStatus = PM_STATUS::PM_ERROR;
+    CodesignStatus retStatus = CodesignStatus::CODE_SIGNER_ERROR;
     uint64_t timeStamp = 0;
     LPTSTR tszCommonName = NULL;
     std::wstring tstrSignerName;
@@ -128,7 +128,7 @@ PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rts
         else
         {
             WLOG_ERROR( L"Cert signer name didn't match for [%ls], [%ls]", rtstrPath.c_str(), tstrSignerName.c_str() );
-            retStatus = PM_STATUS::PM_CODE_SIGNER_MISMATCH;
+            retStatus = CodesignStatus::CODE_SIGNER_MISMATCH;
             goto safe_exit;
         }
     }
@@ -150,12 +150,12 @@ PM_STATUS verify_by_file( const std::wstring& rtstrPath, const std::wstring& rts
         if ( timeStamp < killdate )
         {
             WLOG_ERROR( L"timestamp expired for file: [%s].", rtstrPath.c_str() );
-            retStatus = PM_STATUS::PM_CODE_SIGN_EXPIRED;
+            retStatus = CodesignStatus::CODE_SIGNER_EXPIRED;
             goto safe_exit;
         }
     }
 
-    retStatus = PM_STATUS::PM_OK;
+    retStatus = CodesignStatus::CODE_SIGNER_SUCCESS;
 
 safe_exit:
     // Any hWVTStateData must be released by a call with close.
@@ -169,15 +169,15 @@ safe_exit:
     return retStatus;
 }
 
-PM_STATUS verify_by_catalog( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type )
+CodesignStatus verify_by_catalog( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type )
 {
     /* only trust MS files for catalog verification. */
     if ( SIGNER_MICROSOFT != rtstrSigner)
     {
-        return PM_STATUS::PM_ERROR;
+        return CodesignStatus::CODE_SIGNER_ERROR;
     }
 
-    PM_STATUS status = PM_STATUS::PM_ERROR;
+    CodesignStatus status = CodesignStatus::CODE_SIGNER_ERROR;
 
     HCATADMIN cat_admin_ctx = NULL;
     HANDLE file_handle = INVALID_HANDLE_VALUE;
@@ -272,7 +272,7 @@ PM_STATUS verify_by_catalog( const std::wstring& rtstrPath, const std::wstring& 
         goto safe_exit;
     }
 
-    status = PM_STATUS::PM_OK;
+    status = CodesignStatus::CODE_SIGNER_SUCCESS;
 
 safe_exit:
 
@@ -310,15 +310,15 @@ safe_exit:
 }
 
 
-PM_STATUS CodesignVerifier::VerifyWithKilldate( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type, uint64_t killdate )
+CodesignStatus CodesignVerifier::VerifyWithKilldate( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type, uint64_t killdate )
 {
     WLOG_DEBUG( L"verifying file signature: file = [%s], signer = [%s], type = [%d]", rtstrPath.c_str(), rtstrSigner.c_str(), sig_type );
-    if (PM_STATUS::PM_OK == verify_by_file( rtstrPath, rtstrSigner, sig_type, killdate))
+    if ( CodesignStatus::CODE_SIGNER_SUCCESS == verify_by_file( rtstrPath, rtstrSigner, sig_type, killdate))
     {
         LOG_DEBUG("file signature verified by file." );
     }
 
-    else if (PM_STATUS::PM_OK == verify_by_catalog( rtstrPath, rtstrSigner, sig_type))
+    else if ( CodesignStatus::CODE_SIGNER_SUCCESS == verify_by_catalog( rtstrPath, rtstrSigner, sig_type))
     {
         LOG_DEBUG( "file signature verified by catalog." );
     }
@@ -326,18 +326,18 @@ PM_STATUS CodesignVerifier::VerifyWithKilldate( const std::wstring& rtstrPath, c
     else
     {
         WLOG_ERROR( L"unable to verify file signature: [%s]", rtstrPath.c_str() );
-        return PM_STATUS::PM_CODE_SIGN_VERIFICATION_FAILED;
+        return CodesignStatus::CODE_SIGNER_VERIFICATION_FAILED;
     }
 
-    return PM_STATUS::PM_OK;
+    return CodesignStatus::CODE_SIGNER_SUCCESS;
 }
 
-PM_STATUS CodesignVerifier::Verify( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type )
+CodesignStatus CodesignVerifier::Verify( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type )
 {
     if( (rtstrPath.empty()) || (rtstrSigner.empty()) || (SigType::SIGTYPE_NATIVE != sig_type))
     {
         WLOG_ERROR( L"invalid parameters [%s] : [%s]", rtstrPath.c_str(), rtstrSigner.c_str() );
-        return PM_STATUS::PM_INVAL;
+        return CodesignStatus::CODE_SIGNER_INVALID;
     }
-    return CodesignVerifier::VerifyWithKilldate( rtstrPath, rtstrSigner, sig_type, KILLDATE );
+    return VerifyWithKilldate( rtstrPath, rtstrSigner, sig_type, KILLDATE );
 }

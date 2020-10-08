@@ -115,7 +115,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule;$(solutiondir)SharedLibs\CodeSignVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,7 +150,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule;$(solutiondir)SharedLibs\CodeSignVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -185,7 +185,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule;$(solutiondir)SharedLibs\CodeSignVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -220,7 +220,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)PackageManager\libControlModule;$(solutiondir)SharedLibs\CodeSignVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -267,6 +267,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\libLogger\libLogger.vcxproj">
+      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SharedLibs\CodeSignVerifier\CodeSignVerifier.vcxproj">
+      <Project>{780b5314-e3ca-4427-96e0-9262f8c7a2ce}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libControlModule\libControlModule.vcxproj">
       <Project>{31fc5172-1cdf-40af-9e2c-1ad069ceb772}</Project>
     </ProjectReference>

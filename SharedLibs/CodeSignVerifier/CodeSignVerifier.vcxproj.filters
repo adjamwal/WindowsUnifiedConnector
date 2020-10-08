@@ -21,16 +21,10 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PackageManagerInternalModuleAPI.h">
+    <ClInclude Include="CodesignVerifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PmAgentController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PmControlPlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PmTypes.h">
+    <ClInclude Include="ICodeSignVerifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,10 +32,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PmAgentController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PmControlPlugin.cpp">
+    <ClCompile Include="CodesignVerifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
