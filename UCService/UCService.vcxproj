@@ -193,6 +193,9 @@
     <ProjectReference Include="..\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\PackageManager\ControlModule\ControlModule.vcxproj">
+      <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\PackageManager\PackageMananger\PackageMananger.vcxproj">
       <Project>{805379ca-1c31-40a9-b908-8b2a603927f1}</Project>
     </ProjectReference>
