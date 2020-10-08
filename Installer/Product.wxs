@@ -78,7 +78,7 @@
                     <File Id="vcruntime140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140.dll" />
                 </Component>
                 <Component Id="ucrtbase.dll" Guid="*">
-                    <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase$(var.ConfigurationPostfix).dll" />
+                    <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase.dll" />
                 </Component>
             <?endif?>
             <?if $(var.Configuration) = "Debug" ?>
