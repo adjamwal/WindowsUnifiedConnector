@@ -183,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="UCService.h" />
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="ServiceInstaller.h" />
@@ -199,6 +200,9 @@
     <ProjectReference Include="..\PackageManager\PackageMananger\PackageMananger.vcxproj">
       <Project>{805379ca-1c31-40a9-b908-8b2a603927f1}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,10 +17,14 @@
       <Filter>ServiceInstaller</Filter>
     </ClInclude>
     <ClInclude Include="Main.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ServiceInstaller">
       <UniqueIdentifier>{cefbc782-9215-4e4e-b096-6fe3ef762d42}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
 </Project>

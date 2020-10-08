@@ -48,7 +48,7 @@
                         <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
                             <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
                                 <Directory Id="UCSERVICE_BASE_DIRECTORY" Name="$(var.ServiceDictory)">
-                                    <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.Version)" />
+                                    <Directory Id="UCSERVICE_DIRECTORY" Name="!(bind.fileVersion.UCService.exe)" />
                                 </Directory>
                                 <Directory Id="UCID_BASE_DIRECTORY" Name="$(var.UCIDDirectory)">
                                     <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" >
