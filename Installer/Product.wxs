@@ -45,7 +45,10 @@
                                     <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.Version)" />
                                 </Directory>
                                 <Directory Id="UCID_BASE_DIRECTORY" Name="$(var.UCIDDirectory)">
-                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" />
+                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" >
+                                        <Directory Id="UCID_DIRECTORY_X86" Name="$(var.Platform)" />
+                                        <Directory Id="UCID_DIRECTORY_X64" Name="$(var.Platform)" />
+                                    </Directory>
                                 </Directory>
                                 <Directory Id="UCPM_BASE_DIRECTORY" Name="$(var.UCPMDirectory)">
                                     <Directory Id="UCPM_DIRECTORY" Name="$(var.Version)" />
