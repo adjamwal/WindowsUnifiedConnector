@@ -137,12 +137,16 @@
             <Component Id="UCID_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
-                    <RegistryValue Type="string" Name="Path" Value="UCID_BASE_DIRECTORY" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="Path" Value="UCID_DIRECTORY" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="ucidagent.exe" Guid="*">
                 <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidagent.exe" />
+            </Component>
+
+            <Component Id="ucid_config.xml" Guid="*">
+                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\config.xml" />
             </Component>
         </ComponentGroup>
 
@@ -173,12 +177,23 @@
                     <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
+
+            <Component Id="UCPM_DLL_PATH_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
+                    <RegistryValue Type="string" Name="DllPath" Value="UCPM_DIRECTORY\UC_MCP.dll" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
         
             <Component Id="PM_MCP.dll" Guid="*">
                 <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
             </Component>
             <Component Id="UC_PM.exe" Guid="*">
                 <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />
+            </Component>
+
+            <Component Id="PM_MCP_config.json" Guid="*">
+                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\PackageManager\ControlModule\PM_MCP_config.json" />
             </Component>
         </ComponentGroup>
     </Fragment>
