@@ -48,16 +48,16 @@
                         <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
                             <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
                                 <Directory Id="UCSERVICE_BASE_DIRECTORY" Name="$(var.ServiceDictory)">
-                                    <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.Version)" />
+                                    <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.ServiceVersion)" />
                                 </Directory>
                                 <Directory Id="UCID_BASE_DIRECTORY" Name="$(var.UCIDDirectory)">
-                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" >
+                                    <Directory Id="UCID_DIRECTORY" Name="$(var.UCIDVersion)" >
                                         <Directory Id="UCID_DIRECTORY_X86" Name="x86" />
                                         <Directory Id="UCID_DIRECTORY_X64" Name="x64" />
                                     </Directory>
                                 </Directory>
                                 <Directory Id="UCPM_BASE_DIRECTORY" Name="$(var.UCPMDirectory)">
-                                    <Directory Id="UCPM_DIRECTORY" Name="$(var.Version)" />
+                                    <Directory Id="UCPM_DIRECTORY" Name="$(var.UCPMVersion)" />
                                 </Directory>
                             </Directory>
                         </Directory>
@@ -123,7 +123,7 @@
             <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCSERVICE">
-                    <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
         
@@ -142,7 +142,7 @@
             <Component Id="UCID_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
-                    <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="Version" Value="$(var.UCIDVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
@@ -186,7 +186,7 @@
             <Component Id="UCPM_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
-                    <RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="Version" Value="$(var.UCPMVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 

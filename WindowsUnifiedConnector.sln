@@ -27,6 +27,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestControlModule"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C8505725-0B3E-4425-9EB7-55785D1CCC9D}"
 	ProjectSection(SolutionItems) = preProject
+		GlobalVersion.h = GlobalVersion.h
 		JenkinsFile = JenkinsFile
 		README.md = README.md
 	EndProjectSection

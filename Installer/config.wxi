@@ -26,7 +26,11 @@
 
     <!-- Version info -->
     <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
-    <?define Version = "1.0.0" ?>
+    <!-- Version and Service Version will be the same for now, in the future they might be different to support individual module updates -->
+    <?define Version = "!(bind.fileVersion.UCService.exe)" ?>
+    <?define ServiceVersion = "!(bind.fileVersion.UCService.exe)" ?>
+    <?define UCIDVersion = "1.0.0" ?>
+    <?define UCPMVersion = "!(bind.fileVersion.UC_PM.exe)" ?>
 
     <!-- Minimum version supported if product already installed and this is an upgrade -->
     <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
