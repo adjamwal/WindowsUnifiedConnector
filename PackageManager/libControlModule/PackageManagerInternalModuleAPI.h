@@ -208,6 +208,8 @@ PM_MODULE_RESULT_T PM_MODULE_API CreateModuleInstance(IN OUT PM_MODULE_CTX_T* pP
 */
 PM_MODULE_RESULT_T PM_MODULE_API ReleaseModuleInstance(IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX);
 
+#define PM_MCP_CONFIG_FILENAME L"PM_MCP_config.json"
+
 #ifdef __cplusplus
 }
 #endif

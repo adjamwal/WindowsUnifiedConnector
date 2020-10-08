@@ -106,7 +106,7 @@ ServiceBase::~ServiceBase( void )
 
 void ServiceBase::Start( DWORD dwArgc, PWSTR* pszArgv )
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": Service trying to start." );
+    LOG_DEBUG( "Service trying to start." );
     try
     {
         SetServiceStatus( SERVICE_START_PENDING );
@@ -115,12 +115,12 @@ void ServiceBase::Start( DWORD dwArgc, PWSTR* pszArgv )
     }
     catch( DWORD dwError )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to start, error %d", dwError );
+        LOG_ERROR( "Service failed to start, error %d", dwError );
         SetServiceStatus( SERVICE_STOPPED, dwError );
     }
     catch( ... )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to start." );
+        LOG_ERROR( "Service failed to start." );
         SetServiceStatus( SERVICE_STOPPED );
     }
 }
@@ -132,7 +132,7 @@ void ServiceBase::OnStart( DWORD dwArgc, PWSTR* pszArgv )
 
 void ServiceBase::Stop()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": Service trying to stop." );
+    LOG_DEBUG( "Service trying to stop." );
 
     DWORD dwOriginalState = m_status.dwCurrentState;
     try
@@ -143,12 +143,12 @@ void ServiceBase::Stop()
     }
     catch( DWORD dwError )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to stop, error %d", dwError );
+        LOG_ERROR( "Service failed to stop, error %d", dwError );
         SetServiceStatus( dwOriginalState );
     }
     catch( ... )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to stop." );
+        LOG_ERROR( "Service failed to stop." );
         SetServiceStatus( dwOriginalState );
     }
 }
@@ -160,7 +160,7 @@ void ServiceBase::OnStop()
 
 void ServiceBase::Pause()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": Service trying to pause." );
+    LOG_DEBUG( "Service trying to pause." );
     try
     {
         SetServiceStatus( SERVICE_PAUSE_PENDING );
@@ -169,12 +169,12 @@ void ServiceBase::Pause()
     }
     catch( DWORD dwError )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to pause, error %d", dwError );
+        LOG_ERROR( "Service failed to pause, error %d", dwError );
         SetServiceStatus( SERVICE_RUNNING );
     }
     catch( ... )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to pause." );
+        LOG_ERROR( "Service failed to pause." );
         SetServiceStatus( SERVICE_RUNNING );
     }
 }
@@ -186,7 +186,7 @@ void ServiceBase::OnPause()
 
 void ServiceBase::Continue()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": Service trying to continue." );
+    LOG_DEBUG( "Service trying to continue." );
     try
     {
         SetServiceStatus( SERVICE_CONTINUE_PENDING );
@@ -195,12 +195,12 @@ void ServiceBase::Continue()
     }
     catch( DWORD dwError )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to continue, error %d", dwError );
+        LOG_ERROR( "Service failed to continue, error %d", dwError );
         SetServiceStatus( SERVICE_PAUSED );
     }
     catch( ... )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to continue." );
+        LOG_ERROR( "Service failed to continue." );
         SetServiceStatus( SERVICE_PAUSED );
     }
 }
@@ -212,7 +212,7 @@ void ServiceBase::OnContinue()
 
 void ServiceBase::Shutdown()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ L": Service trying to shut down." );
+    LOG_DEBUG( "Service trying to shut down." );
     try
     {
         OnShutdown();
@@ -220,11 +220,11 @@ void ServiceBase::Shutdown()
     }
     catch( DWORD dwError )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to shutdown, error %d", dwError );
+        LOG_ERROR( "Service failed to shutdown, error %d", dwError );
     }
     catch( ... )
     {
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": Service failed to shut down." );
+        LOG_ERROR( "Service failed to shut down." );
     }
 }
 
@@ -257,8 +257,11 @@ void ServiceBase::SetServiceStatus( _In_ DWORD dwCurrentState, _In_ DWORD dwWin3
 void ServiceBase::InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCanPauseContinue )
 {
     m_logFile = std::unique_ptr<IUcLogFile>( new UcLogFile() );
-    m_logFile->Init( m_serviceName );
-    m_logger = std::unique_ptr<IUcLogger>( new UcLogger( *m_logFile.get() ) );
+    m_logFile->Init( NULL ); //log file name is generated here
+    m_logger = std::unique_ptr<UcLogger>( new UcLogger( *m_logFile ) );
+    m_logger->SetLogLevel( IUcLogger::LOG_DEBUG );
+
+    SetUcLogger( m_logger.get() );
 
     m_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     m_status.dwCurrentState = SERVICE_START_PENDING;
@@ -285,7 +288,7 @@ void ServiceBase::InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCan
     if( status != ERROR_SUCCESS )
     {
         m_etwRegHandle = 0;
-        m_logger->Log( IUcLogger::LOG_ERROR, __FUNCTIONW__ L": EventRegister failed, provider not registered." );
+        LOG_ERROR( "EventRegister failed, provider not registered." );
     }
     else
     {

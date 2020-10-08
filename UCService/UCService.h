@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "ServiceBase.h"
+#include "PackageManagerInternalModuleAPI.h"
 
 class UCService : public ServiceBase
 {
@@ -18,6 +19,13 @@ protected:
     virtual void OnStop() override;
 
 private:
-    bool DirectoryExists( const char* dirname );
-    bool FileExists( const char* filename );
+    void LoadPMControlModule();
+    void UnloadPMControlModule();
+
+    bool FileExists( const WCHAR* filename );
+    bool DirectoryExists( const WCHAR* dirname );
+    std::wstring GetExePath();
+
+    PM_MODULE_CTX_T m_ucpm;
+    bool m_isUcpmLoaded;
 };

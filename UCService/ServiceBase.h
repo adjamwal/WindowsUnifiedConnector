@@ -34,7 +34,7 @@ protected:
 
     PWSTR m_serviceName;
     std::unique_ptr<IUcLogFile> m_logFile;
-    std::unique_ptr<IUcLogger> m_logger;
+    std::unique_ptr<UcLogger> m_logger;
     REGHANDLE m_etwRegHandle;
 private:
 
