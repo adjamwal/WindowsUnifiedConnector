@@ -105,7 +105,7 @@
                 <?if $(var.Platform) = "x64" ?>
                     <!-- vcruntime140_1d.dll does not have a x86 version, so only install it for x64 -->
                     <Component Id="vcruntime140_1d.dll" Guid="*">
-                        <File Id="vcruntime140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140_1d.dll" />
+                        <File Id="vcruntime140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\VC\vcruntime140_1d.dll" />
                     </Component>
                 <?endif?>
                 <Component Id="ucrtbased.dll" Guid="*">
