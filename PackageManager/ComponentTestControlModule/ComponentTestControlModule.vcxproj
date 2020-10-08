@@ -55,14 +55,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ControlModule\ControlModule.vcxproj">
-      <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\PackageMananger\PackageMananger.vcxproj">
-      <Project>{805379ca-1c31-40a9-b908-8b2a603927f1}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
