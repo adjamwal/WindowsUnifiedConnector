@@ -257,7 +257,7 @@ void ServiceBase::SetServiceStatus( _In_ DWORD dwCurrentState, _In_ DWORD dwWin3
 void ServiceBase::InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCanPauseContinue )
 {
     m_logFile = std::unique_ptr<IUcLogFile>( new UcLogFile() );
-    m_logFile->Init( m_serviceName );
+    m_logFile->Init( NULL ); //log file name is generated here
     m_logger = std::unique_ptr<IUcLogger>( new UcLogger( *m_logFile.get() ) );
     SetUcLogger( m_logger.get() );
 
