@@ -144,6 +144,10 @@
             <Component Id="ucidagent.exe" Guid="*">
                 <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidagent.exe" />
             </Component>
+
+            <Component Id="ucid_config.xml" Guid="*">
+                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\config.xml" />
+            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
@@ -161,10 +165,6 @@
             </Component>
             <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
                 <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidcontrolplugin.dll" />
-            </Component>
-
-            <Component Id="ucid_config.xml" Guid="*">
-                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\config.xml" />
             </Component>
         </ComponentGroup>
     </Fragment>
