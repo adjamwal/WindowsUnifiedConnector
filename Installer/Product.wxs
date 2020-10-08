@@ -95,6 +95,10 @@
             <Component Id="ucidcontrolplugin.dll" Guid="*">
                 <File Id="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidcontrolplugin.dll" />
             </Component>
+
+            <Component Id="ucid_config.xml" Guid="*">
+                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\config.xml" />
+            </Component>
         </ComponentGroup>
     </Fragment>
 
@@ -112,6 +116,10 @@
             </Component>
             <Component Id="UC_PM.exe" Guid="*">
                 <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />
+            </Component>
+
+            <Component Id="PM_MCP_config.json" Guid="*">
+                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\PackageManager\ControlModule\PM_MCP_config.json" />
             </Component>
         </ComponentGroup>
     </Fragment>
