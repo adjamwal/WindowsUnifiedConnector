@@ -31,6 +31,8 @@
 
         <Feature Id="UCID" Title="Unified Connector ID" Level="1">
             <ComponentGroupRef Id="UCIDComponents" />
+            <ComponentGroupRef Id="UCIDx86Components"/>
+            <ComponentGroupRef Id="UCIDx64Components"/>
         </Feature>
 
         <Feature Id="UCPM" Title="Unified Connector Package Manager" Level="1">
@@ -49,7 +51,10 @@
                                     <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.Version)" />
                                 </Directory>
                                 <Directory Id="UCID_BASE_DIRECTORY" Name="$(var.UCIDDirectory)">
-                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" />
+                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" >
+                                        <Directory Id="UCID_DIRECTORY_X86" Name="x86" />
+                                        <Directory Id="UCID_DIRECTORY_X64" Name="x64" />
+                                    </Directory>
                                 </Directory>
                                 <Directory Id="UCPM_BASE_DIRECTORY" Name="$(var.UCPMDirectory)">
                                     <Directory Id="UCPM_DIRECTORY" Name="$(var.Version)" />
@@ -129,14 +134,33 @@
                 </RegistryKey>
             </Component>
 
+            <Component Id="UCID_PATH_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
+                    <RegistryValue Type="string" Name="Path" Value="UCID_BASE_DIRECTORY" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
             <Component Id="ucidagent.exe" Guid="*">
                 <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidagent.exe" />
             </Component>
-            <Component Id="ucidapi.dll" Guid="*">
-                <File Id="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidapi.dll" />
+        </ComponentGroup>
+
+        <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
+            <Component Id="ucidapi.dll.x86" Guid="*">
+                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x86\bin\ucidapi.dll" />
             </Component>
-            <Component Id="ucidcontrolplugin.dll" Guid="*">
-                <File Id="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidcontrolplugin.dll" />
+            <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
+                <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x86\bin\ucidcontrolplugin.dll" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
+            <Component Id="ucidapi.dll.x64" Guid="*">
+                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidapi.dll" />
+            </Component>
+            <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
+                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidcontrolplugin.dll" />
             </Component>
         </ComponentGroup>
     </Fragment>
