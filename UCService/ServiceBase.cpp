@@ -258,7 +258,9 @@ void ServiceBase::InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCan
 {
     m_logFile = std::unique_ptr<IUcLogFile>( new UcLogFile() );
     m_logFile->Init( NULL ); //log file name is generated here
-    m_logger = std::unique_ptr<IUcLogger>( new UcLogger( *m_logFile.get() ) );
+    m_logger = std::unique_ptr<UcLogger>( new UcLogger( *m_logFile ) );
+    m_logger->SetLogLevel( IUcLogger::LOG_DEBUG );
+
     SetUcLogger( m_logger.get() );
 
     m_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
