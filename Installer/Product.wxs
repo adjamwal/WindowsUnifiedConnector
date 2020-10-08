@@ -21,12 +21,18 @@
         
         <MediaTemplate EmbedCab="yes" />
 
+        <Feature Id="VCRedist" Title="VCRedist" AllowAdvertise="no" Display="hidden" Level="1">
+            <ComponentGroupRef Id="VCRedistComponents"/>
+        </Feature>
+
         <Feature Id="UCService" Title="Unified Connector Service" Level="1">
             <ComponentGroupRef Id="UCServiceComponents" />
         </Feature>
 
         <Feature Id="UCID" Title="Unified Connector ID" Level="1">
             <ComponentGroupRef Id="UCIDComponents" />
+            <ComponentGroupRef Id="UCIDx86Components"/>
+            <ComponentGroupRef Id="UCIDx64Components"/>
         </Feature>
 
         <Feature Id="UCPM" Title="Unified Connector Package Manager" Level="1">
@@ -45,7 +51,10 @@
                                     <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.Version)" />
                                 </Directory>
                                 <Directory Id="UCID_BASE_DIRECTORY" Name="$(var.UCIDDirectory)">
-                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" />
+                                    <Directory Id="UCID_DIRECTORY" Name="$(var.Version)" >
+                                        <Directory Id="UCID_DIRECTORY_X86" Name="x86" />
+                                        <Directory Id="UCID_DIRECTORY_X64" Name="x64" />
+                                    </Directory>
                                 </Directory>
                                 <Directory Id="UCPM_BASE_DIRECTORY" Name="$(var.UCPMDirectory)">
                                     <Directory Id="UCPM_DIRECTORY" Name="$(var.Version)" />
@@ -58,6 +67,45 @@
         </Directory>
     </Fragment>
 
+    <Fragment>
+        <ComponentGroup Id="VCRedistComponents" Directory="UCSERVICE_DIRECTORY">
+            <?if $(var.Configuration) = "Release" ?>
+                <Component Id="msvcp140.dll" Guid="*">
+                    <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
+                </Component>
+                <Component Id="msvcp140_1.dll" Guid="*">
+                    <File Id="msvcp140_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_1.dll" />
+                </Component>
+                <Component Id="msvcp140_2.dll" Guid="*">
+                    <File Id="msvcp140_2.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_2.dll" />
+                </Component>
+                <Component Id="vcruntime140.dll" Guid="*">
+                    <File Id="vcruntime140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140.dll" />
+                </Component>
+                <Component Id="ucrtbase.dll" Guid="*">
+                    <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase.dll" />
+                </Component>
+            <?endif?>
+            <?if $(var.Configuration) = "Debug" ?>
+                <Component Id="msvcp140d.dll" Guid="*">
+                    <File Id="msvcp140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140d.dll" />
+                </Component>
+                <Component Id="msvcp140_1d.dll" Guid="*">
+                    <File Id="msvcp140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_1d.dll" />
+                </Component>
+                <Component Id="msvcp140_2d.dll" Guid="*">
+                    <File Id="msvcp140_2d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_2d.dll" />
+                </Component>
+                <Component Id="vcruntime140d.dll" Guid="*">
+                    <File Id="vcruntime140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140d.dll" />
+                </Component>
+                <Component Id="ucrtbased.dll" Guid="*">
+                    <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
+                </Component>
+            <?endif?>  
+        </ComponentGroup>
+    </Fragment>
+    
     <Fragment>
         <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
             <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
@@ -86,14 +134,33 @@
                 </RegistryKey>
             </Component>
 
+            <Component Id="UCID_PATH_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
+                    <RegistryValue Type="string" Name="Path" Value="UCID_BASE_DIRECTORY" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
             <Component Id="ucidagent.exe" Guid="*">
                 <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidagent.exe" />
             </Component>
-            <Component Id="ucidapi.dll" Guid="*">
-                <File Id="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidapi.dll" />
+        </ComponentGroup>
+
+        <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
+            <Component Id="ucidapi.dll.x86" Guid="*">
+                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x86\bin\ucidapi.dll" />
             </Component>
-            <Component Id="ucidcontrolplugin.dll" Guid="*">
-                <File Id="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidcontrolplugin.dll" />
+            <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
+                <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x86\bin\ucidcontrolplugin.dll" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
+            <Component Id="ucidapi.dll.x64" Guid="*">
+                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidapi.dll" />
+            </Component>
+            <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
+                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidcontrolplugin.dll" />
             </Component>
 
             <Component Id="ucid_config.xml" Guid="*">
