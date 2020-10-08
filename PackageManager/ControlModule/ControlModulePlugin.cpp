@@ -5,11 +5,10 @@
 #include <string>
 #include <Windows.h>
 #include "PmControlPlugin.h"
+#include "ControlModulePlugin.h"
 #include "IUcLogger.h"
 
-PM_MODULE_API
-PM_MODULE_RESULT_T
-CreateModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger )
+extern "C" PM_MODULE_API PM_MODULE_RESULT_T CreateModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger )
 {
     if( nullptr == pPM_MODULE_CTX )
     {
@@ -31,9 +30,7 @@ CreateModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger 
     return PM_MODULE_SUCCESS;
 }
 
-PM_MODULE_API
-PM_MODULE_RESULT_T
-ReleaseModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
+extern "C" PM_MODULE_API PM_MODULE_RESULT_T ReleaseModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
     if( nullptr == pPM_MODULE_CTX )
     {
