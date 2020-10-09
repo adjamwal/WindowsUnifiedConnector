@@ -2,9 +2,11 @@
 
 #include "UCMCPLoader.h"
 #include "IUCLogger.h"
+#include "ICodeSignVerifier.h"
 
-UCMCPLoader::UCMCPLoader()
-    : m_controlLib( 0 )
+UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier )
+    : m_codeSignVerifier( codeSignVerifier )
+    , m_controlLib( 0 )
     , m_createModule( NULL )
     , m_releaseModule( NULL )
     , m_loadedDllName()
@@ -33,6 +35,11 @@ bool UCMCPLoader::LoadDll( const std::wstring dllPath )
     if( m_controlLib != 0 )
     {
         WLOG_ERROR( L"Dll already loaded: %s", dllPath.c_str() );
+        return false;
+    }
+
+    if( m_codeSignVerifier.Verify( dllPath, SIGNER_CISCO, SIGTYPE_DEFAULT ) != CodesignStatus::CODE_SIGNER_SUCCESS ) {
+        WLOG_ERROR( L"Failed to verify dll signature: %s", dllPath.c_str() );
         return false;
     }
 

@@ -4,6 +4,7 @@
 #include "ServiceBase.h"
 #include "PackageManagerInternalModuleAPI.h"
 #include "UCMCPLoader.h"
+#include "CodesignVerifier.h"
 
 class UCService : public ServiceBase
 {
@@ -23,6 +24,7 @@ private:
     void LoadPMControlModule();
     void UnloadPMControlModule();
 
+    CodesignVerifier m_codeSignVerifer;
     UCMCPLoader m_ucmcpLoader;
     PM_MODULE_CTX_T m_ucmcp;
     bool m_isUcmcpLoaded;
