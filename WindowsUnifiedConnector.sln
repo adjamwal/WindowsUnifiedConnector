@@ -41,6 +41,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnifiedConnector", "Unified
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CodeSignVerifier", "SharedLibs\CodeSignVerifier\CodeSignVerifier.vcxproj", "{780B5314-E3CA-4427-96E0-9262F8C7A2CE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EA581C03-8594-4E64-A5D7-7D8CA6E48E03}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestCodeSignVerifier", "SharedLibs\ComponentTestCodeSignVerifier\ComponentTestCodeSignVerifier.vcxproj", "{2AA7A34A-8977-439A-B8F3-BDCAC604095C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -135,6 +139,14 @@ Global
 		{780B5314-E3CA-4427-96E0-9262F8C7A2CE}.Release|x64.Build.0 = Release|x64
 		{780B5314-E3CA-4427-96E0-9262F8C7A2CE}.Release|x86.ActiveCfg = Release|Win32
 		{780B5314-E3CA-4427-96E0-9262F8C7A2CE}.Release|x86.Build.0 = Release|Win32
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Debug|x64.ActiveCfg = Debug|x64
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Debug|x64.Build.0 = Debug|x64
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Debug|x86.ActiveCfg = Debug|Win32
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Debug|x86.Build.0 = Debug|Win32
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Release|x64.ActiveCfg = Release|x64
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Release|x64.Build.0 = Release|x64
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Release|x86.ActiveCfg = Release|Win32
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +164,8 @@ Global
 		{934A27FE-D684-45D0-B901-562F44E4D66F} = {3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}
 		{822CCD07-F01C-4DD7-A587-0A241953FB62} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
 		{780B5314-E3CA-4427-96E0-9262F8C7A2CE} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
+		{EA581C03-8594-4E64-A5D7-7D8CA6E48E03} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
+		{2AA7A34A-8977-439A-B8F3-BDCAC604095C} = {EA581C03-8594-4E64-A5D7-7D8CA6E48E03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

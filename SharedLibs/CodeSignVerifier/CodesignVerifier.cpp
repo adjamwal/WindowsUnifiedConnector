@@ -222,7 +222,7 @@ CodesignStatus verify_by_catalog( const std::wstring& rtstrPath, const std::wstr
         goto safe_exit;
     }
 
-    member_tag = (TCHAR*) calloc( ( file_hash_size * 2 ) + 1, sizeof( TCHAR) );
+    member_tag = (TCHAR*) calloc( ( file_hash_size + 1 ) * 2, sizeof( TCHAR) );
     if( NULL == member_tag )
     {
         goto safe_exit;
