@@ -187,11 +187,27 @@
     <ClInclude Include="HelperFunctions.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="UCMCPLoader.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="UCService.h" />
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="ServiceInstaller.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libLogger\libLogger.vcxproj">
+      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PackageManager\ControlModule\ControlModule.vcxproj">
+      <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PackageManager\PackageMananger\PackageMananger.vcxproj">
+      <Project>{805379ca-1c31-40a9-b908-8b2a603927f1}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

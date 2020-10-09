@@ -29,6 +29,8 @@
     <ClInclude Include="HelperFunctions.h">
       <Filter>HelperFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ServiceInstaller">
@@ -40,5 +42,8 @@
     <Filter Include="HelperFunctions">
       <UniqueIdentifier>{4aff12ea-c6e2-41c8-ae95-eece0968e428}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
 </Project>

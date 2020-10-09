@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\Directory.Build.props"/>
+  <Import Project="..\Directory.Build.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -14,21 +14,25 @@
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug;WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON)</DefineConstants>
+    <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-	<DefineConstants>WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON)</DefineConstants>
+    <DefineConstants>WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON)</DefineConstants>
+    <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug;WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON)</DefineConstants>
+    <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-	<DefineConstants>WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON)</DefineConstants>
+    <DefineConstants>WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON)</DefineConstants>
+    <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
@@ -49,14 +53,6 @@
     <ProjectReference Include="..\PackageManager\ControlModule\ControlModule.vcxproj">
       <Name>ControlModule</Name>
       <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\PackageManager\PackageManagerClient.vcxproj">
-      <Name>PackageManagerClient</Name>
-      <Project>{a3c9e21e-4c04-496c-96b7-d3c68362e25f}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
@@ -88,7 +84,10 @@
     <PreBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy $(SolutionDir)\Installer\bin\$(Platform)\$(Configuration)\en-us\Installer-unsigned.msi $(SolutionDir)\Installer\bin\$(Platform)\$(Configuration)\en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
+    <PostBuildEvent>copy $(TargetDir)en-us\$(TargetFileName) $(TargetDir)en-us\Cisco-UC-Installer-$(Platform).msi
+set WLHBASE=$(WLHBASE)
+set IMN_COMMON=$(IMN_COMMON)
+$(SolutionDir)sign.bat "$(IMN_COMMON)common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetDir)en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
