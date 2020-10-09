@@ -23,7 +23,7 @@ bool UCMCPLoader::LoadDll( const std::wstring dllPath )
     std::wstring::size_type pos = dllPath.find_last_of( L"/\\" );
     if( pos == std::wstring::npos || pos >= dllPath.size() )
     {
-        LOG_ERROR( L"Invalid dll path specified: %s", dllPath.c_str());
+        WLOG_ERROR( L"Invalid dll path specified: %s", dllPath.c_str());
         return false;
     }
 
@@ -32,17 +32,17 @@ bool UCMCPLoader::LoadDll( const std::wstring dllPath )
 
     if( m_controlLib != 0 )
     {
-        LOG_ERROR( L"Dll already loaded: %s", dllPath.c_str() );
+        WLOG_ERROR( L"Dll already loaded: %s", dllPath.c_str() );
         return false;
     }
 
-    LOG_DEBUG( L"Loading dll %s from %s", m_loadedDllName.c_str(), dllDir.c_str() );
+    WLOG_DEBUG( L"Loading dll %s from %s", m_loadedDllName.c_str(), dllDir.c_str() );
 
     SetDllDirectory( dllDir.c_str() );
 
     m_controlLib = LoadLibrary( m_loadedDllName.c_str() );
     if( !m_controlLib  ) {
-        LOG_ERROR( L"LoadLibrary() call failed. Error %d", GetLastError() );
+        WLOG_ERROR( L"LoadLibrary() call failed. Error %d", GetLastError() );
         SetDllDirectory( NULL );
         return false;
     }
