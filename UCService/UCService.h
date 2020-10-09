@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "ServiceBase.h"
 #include "PackageManagerInternalModuleAPI.h"
+#include "UCMCPLoader.h"
 
 class UCService : public ServiceBase
 {
@@ -22,10 +23,7 @@ private:
     void LoadPMControlModule();
     void UnloadPMControlModule();
 
-    bool FileExists( const WCHAR* filename );
-    bool DirectoryExists( const WCHAR* dirname );
-    std::wstring GetExePath();
-
-    PM_MODULE_CTX_T m_ucpm;
-    bool m_isUcpmLoaded;
+    UCMCPLoader m_ucmcpLoader;
+    PM_MODULE_CTX_T m_ucmcp;
+    bool m_isUcmcpLoaded;
 };
