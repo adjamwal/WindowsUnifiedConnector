@@ -128,7 +128,7 @@
             </Component>
         
             <Component Id="UCService.exe" Guid="*">
-                <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
+                <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
                 <ServiceControl Id="StartService" Name="CiscoUnifiedConnector" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
                 <ServiceInstall Id="ServiceInstaller" Name="CiscoUnifiedConnector" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
@@ -154,29 +154,29 @@
             </Component>
 
             <Component Id="ucidagent.exe" Guid="*">
-                <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\$(var.Platform)\bin\ucidagent.exe" />
+                <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\$(var.Platform)\bin\ucidagent.exe" />
             </Component>
 
             <Component Id="ucid_config.xml" Guid="*">
-                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\config.xml" />
+                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\config.xml" />
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
             <Component Id="ucidapi.dll.x86" Guid="*">
-                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x86\bin\ucidapi.dll" />
+                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\x86\bin\ucidapi.dll" />
             </Component>
             <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
-                <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x86\bin\ucidcontrolplugin.dll" />
+                <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\x86\bin\ucidcontrolplugin.dll" />
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
             <Component Id="ucidapi.dll.x64" Guid="*">
-                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidapi.dll" />
+                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\x64\bin\ucidapi.dll" />
             </Component>
             <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
-                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\UCID\x64\bin\ucidcontrolplugin.dll" />
+                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\x64\bin\ucidcontrolplugin.dll" />
             </Component>
         </ComponentGroup>
     </Fragment>
@@ -198,14 +198,14 @@
             </Component>
         
             <Component Id="PM_MCP.dll" Guid="*">
-                <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
+                <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
             </Component>
             <Component Id="UC_PM.exe" Guid="*">
-                <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />
+                <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />
             </Component>
 
             <Component Id="PM_MCP_config.json" Guid="*">
-                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="yes" DiskId="1" Source="..\PackageManager\ControlModule\PM_MCP_config.json" />
+                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\PackageManager\ControlModule\PM_MCP_config.json" />
             </Component>
         </ComponentGroup>
     </Fragment>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\Directory.Build.props" />
+  <Import Project="$(SolutionDir)Directory.Build.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -50,7 +50,7 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PackageManager\ControlModule\ControlModule.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\PackageManager\ControlModule\ControlModule.vcxproj">
       <Name>ControlModule</Name>
       <Project>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</Project>
       <Private>True</Private>
@@ -58,7 +58,7 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\PackageManager\PackageMananger\PackageMananger.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\PackageManager\PackageMananger\PackageMananger.vcxproj">
       <Name>PackageMananger</Name>
       <Project>{805379ca-1c31-40a9-b908-8b2a603927f1}</Project>
       <Private>True</Private>
@@ -66,7 +66,7 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\UCService\UCService.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\UCService\UCService.vcxproj">
       <Name>UCService</Name>
       <Project>{ed56f555-f214-4b00-805e-e6564e9c1bf2}</Project>
       <Private>True</Private>
