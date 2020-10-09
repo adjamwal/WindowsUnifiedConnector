@@ -61,21 +61,21 @@ void UCService::LoadPMControlModule()
         return;
     }
 
-    std::wstring serviceDir( HelperFunctions::GetExePath() );
-    std::wstring pmConfigFile( serviceDir );
+    std::wstring dllFullPath;
+    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
+    {
+        LOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
+        return;
+    }
+
+    std::wstring pmPath( HelperFunctions::GetDirPath( dllFullPath ) );
+    std::wstring pmConfigFile( pmPath );
     pmConfigFile.append( L"\\" );
     pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
 
     if( !HelperFunctions::FileExists( pmConfigFile.c_str() ) )
     {
         LOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
-        return;
-    }
-
-    std::wstring dllFullPath;
-    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
-    {
-        LOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
         return;
     }
 
@@ -106,7 +106,7 @@ void UCService::LoadPMControlModule()
         return;
     }
 
-    if( ( result = m_ucmcp.fpStart( serviceDir.c_str(), serviceDir.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_ucmcp.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
     {
         LOG_ERROR( L"Failed to start PackageManager Control Module: fpStart() returned %d.", result );
         return;

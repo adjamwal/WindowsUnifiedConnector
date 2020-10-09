@@ -33,6 +33,13 @@ std::wstring HelperFunctions::GetExePath()
     return std::wstring( buffer ).substr( 0, pos );
 }
 
+std::wstring HelperFunctions::GetDirPath( const std::wstring& path )
+{
+    std::wstring::size_type pos = std::wstring( path ).find_last_of( L"/\\" );
+
+    return path.substr( 0, pos );
+}
+
 bool HelperFunctions::ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data )
 {
     DWORD dataSize {};
