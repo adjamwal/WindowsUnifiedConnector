@@ -193,7 +193,7 @@
             <Component Id="UCPM_DLL_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
-                    <RegistryValue Type="string" Name="DllPath" Value="[UCPM_DIRECTORY]UC_MCP.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="DllPath" Value="[UCPM_DIRECTORY]PM_MCP.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
         

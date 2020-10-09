@@ -20,12 +20,12 @@ UCService::UCService(
     , m_ucmcp( { 0 } )
     , m_isUcmcpLoaded( false )
 {
-    LOG_DEBUG( L"created" );
+    WLOG_DEBUG( L"created" );
 }
 
 UCService::~UCService( void )
 {
-    LOG_DEBUG( L"destroyed" );
+    WLOG_DEBUG( L"destroyed" );
 }
 
 #pragma endregion
@@ -35,14 +35,14 @@ UCService::~UCService( void )
 
 void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 {
-    LOG_DEBUG( L"in OnStart" );
+    WLOG_DEBUG( L"in OnStart" );
 
     LoadPMControlModule();
 }
 
 void UCService::OnStop()
 {
-    LOG_DEBUG( L"in OnStop" );
+    WLOG_DEBUG( L"in OnStop" );
 
     UnloadPMControlModule();
     m_ucmcpLoader.UnloadDll();
@@ -57,25 +57,25 @@ void UCService::LoadPMControlModule()
 {
     if( m_isUcmcpLoaded )
     {
-        LOG_ERROR( L"PackageManager Control Module already running.");
-        return;
-    }
-
-    std::wstring serviceDir( HelperFunctions::GetExePath() );
-    std::wstring pmConfigFile( serviceDir );
-    pmConfigFile.append( L"\\" );
-    pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
-
-    if( !HelperFunctions::FileExists( pmConfigFile.c_str() ) )
-    {
-        LOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
+        WLOG_ERROR( L"PackageManager Control Module already running.");
         return;
     }
 
     std::wstring dllFullPath;
     if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
     {
-        LOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
+        WLOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
+        return;
+    }
+
+    std::wstring pmPath( HelperFunctions::GetDirPath( dllFullPath ) );
+    std::wstring pmConfigFile( pmPath );
+    pmConfigFile.append( L"\\" );
+    pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
+
+    if( !HelperFunctions::FileExists( pmConfigFile.c_str() ) )
+    {
+        WLOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
         return;
     }
 
@@ -83,13 +83,13 @@ void UCService::LoadPMControlModule()
     {
         if( !m_ucmcpLoader.LoadDll( dllFullPath ) )
         {
-            LOG_ERROR( L"Failed to load %s", dllFullPath.c_str() );
+            WLOG_ERROR( L"Failed to load %s", dllFullPath.c_str() );
             return;
         }
     }
     catch( std::exception &ex )
     {
-        LOG_ERROR( "Exception: %s", ex.what() );
+        WLOG_ERROR( "Exception: %s", ex.what() );
     }
     
     m_ucmcp.nVersion = PM_MODULE_INTERFACE_VERSION;
@@ -102,26 +102,26 @@ void UCService::LoadPMControlModule()
 
     if( ( result = m_ucmcpLoader.CreateModule( &m_ucmcp, m_logger.get() ) ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( L"Failed to load PackageManager Control Module: CreateModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to load PackageManager Control Module: CreateModuleInstance() returned %d.", result );
         return;
     }
 
-    if( ( result = m_ucmcp.fpStart( serviceDir.c_str(), serviceDir.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_ucmcp.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( L"Failed to start PackageManager Control Module: fpStart() returned %d.", result );
+        WLOG_ERROR( L"Failed to start PackageManager Control Module: fpStart() returned %d.", result );
         return;
     }
 
     m_isUcmcpLoaded = true;
 
-    LOG_DEBUG( L"PackageManager Control Module loaded and started." );
+    WLOG_DEBUG( L"PackageManager Control Module loaded and started." );
 }
 
 void UCService::UnloadPMControlModule()
 {
     if( !m_isUcmcpLoaded )
     {
-        LOG_ERROR( L"PackageManager Control Module already released." );
+        WLOG_ERROR( L"PackageManager Control Module already released." );
         return;
     }
 
@@ -129,19 +129,19 @@ void UCService::UnloadPMControlModule()
 
     if( ( result = m_ucmcp.fpStop() ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( L"Failed to stop PackageManager Control Module: fpStop() returned %d.", result );
+        WLOG_ERROR( L"Failed to stop PackageManager Control Module: fpStop() returned %d.", result );
         return;
     }
 
     if( ( result = m_ucmcpLoader.ReleaseModule( &m_ucmcp ) ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( L"Failed to release PackageManager Control Module: ReleaseModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to release PackageManager Control Module: ReleaseModuleInstance() returned %d.", result );
         return;
     }
 
     m_isUcmcpLoaded = false;
 
-    LOG_DEBUG( L"PackageManager Control Module stopped and released." );
+    WLOG_DEBUG( L"PackageManager Control Module stopped and released." );
 }
 
 #pragma endregion
