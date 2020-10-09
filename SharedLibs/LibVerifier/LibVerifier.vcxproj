@@ -24,6 +24,7 @@
     <ProjectGuid>{780b5314-e3ca-4427-96e0-9262f8c7a2ce}</ProjectGuid>
     <RootNamespace>CodeSignVerifier</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>libVerifier</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
