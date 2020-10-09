@@ -21,6 +21,10 @@
         
         <MediaTemplate EmbedCab="yes" />
 
+        <Feature Id="UnifiedConnector" Title="UnifiedConnector" AllowAdvertise="no" Display="hidden" Level="1">
+            <ComponentGroupRef Id="UnifiedConnectorComponents"/>
+        </Feature>
+
         <Feature Id="VCRedist" Title="VCRedist" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentGroupRef Id="VCRedistComponents"/>
         </Feature>
@@ -65,6 +69,17 @@
                 </Directory>
             </Directory>
         </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_DIRECTORY">
+            <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector">
+                    <RegistryValue Type="string" Name="ProductCode" Value="[ProductCode]" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
     </Fragment>
 
     <Fragment>
@@ -158,7 +173,7 @@
             </Component>
 
             <Component Id="ucid_config.xml" Guid="*">
-                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\config.xml" />
+                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\UCID\config.xml" />
             </Component>
         </ComponentGroup>
 
@@ -205,7 +220,7 @@
             </Component>
 
             <Component Id="PM_MCP_config.json" Guid="*">
-                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\PackageManager\ControlModule\PM_MCP_config.json" />
+                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\PackageManager\ControlModule\PM_MCP_config.json" />
             </Component>
         </ComponentGroup>
     </Fragment>
