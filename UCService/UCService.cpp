@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "UCService.h"
+#include "HelperFunctions.h"
 
 #pragma region Service Constructor and Destructor
 
@@ -15,15 +16,16 @@ UCService::UCService(
     BOOL fCanShutdown,
     BOOL fCanPauseContinue )
     : ServiceBase( pszServiceName, fCanStop, fCanShutdown, fCanPauseContinue )
-    , m_ucpm( { 0 } )
-    , m_isUcpmLoaded( false )
+    , m_ucmcpLoader()
+    , m_ucmcp( { 0 } )
+    , m_isUcmcpLoaded( false )
 {
-    LOG_DEBUG( "created" );
+    WLOG_DEBUG( L"created" );
 }
 
 UCService::~UCService( void )
 {
-    LOG_DEBUG( "destroyed" );
+    WLOG_DEBUG( L"destroyed" );
 }
 
 #pragma endregion
@@ -33,16 +35,17 @@ UCService::~UCService( void )
 
 void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 {
-    LOG_DEBUG( "in OnStart" );
+    WLOG_DEBUG( L"in OnStart" );
 
     LoadPMControlModule();
 }
 
 void UCService::OnStop()
 {
-    LOG_DEBUG( "in OnStop" );
+    WLOG_DEBUG( L"in OnStop" );
 
     UnloadPMControlModule();
+    m_ucmcpLoader.UnloadDll();
 }
 
 #pragma endregion
@@ -52,109 +55,93 @@ void UCService::OnStop()
 
 void UCService::LoadPMControlModule()
 {
-    if( m_isUcpmLoaded )
+    if( m_isUcmcpLoaded )
     {
-        LOG_ERROR( "PackageManager Control Module already running.");
+        WLOG_ERROR( L"PackageManager Control Module already running.");
         return;
     }
 
-    std::wstring serviceDir( GetExePath() );
-    std::wstring pmConfigFile( serviceDir );
+    std::wstring dllFullPath;
+    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
+    {
+        WLOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
+        return;
+    }
+
+    std::wstring pmPath( HelperFunctions::GetDirPath( dllFullPath ) );
+    std::wstring pmConfigFile( pmPath );
     pmConfigFile.append( L"\\" );
     pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
 
-    if( !FileExists( pmConfigFile.c_str() ) )
+    if( !HelperFunctions::FileExists( pmConfigFile.c_str() ) )
     {
-        LOG_ERROR( "PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
+        WLOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
         return;
     }
 
-    m_ucpm.nVersion = PM_MODULE_INTERFACE_VERSION;
-    if( m_ucpm.fpInit )
+    try
     {
-        m_ucpm.fpInit();
+        if( !m_ucmcpLoader.LoadDll( dllFullPath ) )
+        {
+            WLOG_ERROR( L"Failed to load %s", dllFullPath.c_str() );
+            return;
+        }
+    }
+    catch( std::exception &ex )
+    {
+        WLOG_ERROR( "Exception: %s", ex.what() );
+    }
+    
+    m_ucmcp.nVersion = PM_MODULE_INTERFACE_VERSION;
+    if( m_ucmcp.fpInit )
+    {
+        m_ucmcp.fpInit();
     }
 
     PM_MODULE_RESULT_T result;
 
-    if( ( result = CreateModuleInstance( &m_ucpm, m_logger.get() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_ucmcpLoader.CreateModule( &m_ucmcp, m_logger.get() ) ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( "Failed to load PackageManager Control Module: CreateModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to load PackageManager Control Module: CreateModuleInstance() returned %d.", result );
         return;
     }
 
-    if( ( result = m_ucpm.fpStart( serviceDir.c_str(), serviceDir.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_ucmcp.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( "Failed to start PackageManager Control Module: fpStart() returned %d.", result );
+        WLOG_ERROR( L"Failed to start PackageManager Control Module: fpStart() returned %d.", result );
         return;
     }
 
-    m_isUcpmLoaded = true;
+    m_isUcmcpLoaded = true;
 
-    LOG_DEBUG( "PackageManager Control Module loaded and started." );
+    WLOG_DEBUG( L"PackageManager Control Module loaded and started." );
 }
 
 void UCService::UnloadPMControlModule()
 {
-    if( !m_isUcpmLoaded )
+    if( !m_isUcmcpLoaded )
     {
-        LOG_ERROR( "PackageManager Control Module already released." );
+        WLOG_ERROR( L"PackageManager Control Module already released." );
         return;
     }
 
     PM_MODULE_RESULT_T result;
 
-    if( ( result = m_ucpm.fpStop() ) != PM_MODULE_SUCCESS )
+    if( ( result = m_ucmcp.fpStop() ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( "Failed to stop PackageManager Control Module: fpStop() returned %d.", result );
+        WLOG_ERROR( L"Failed to stop PackageManager Control Module: fpStop() returned %d.", result );
         return;
     }
 
-    if( ( result = ReleaseModuleInstance( &m_ucpm ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_ucmcpLoader.ReleaseModule( &m_ucmcp ) ) != PM_MODULE_SUCCESS )
     {
-        LOG_ERROR( "Failed to release PackageManager Control Module: ReleaseModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to release PackageManager Control Module: ReleaseModuleInstance() returned %d.", result );
         return;
     }
 
-    m_isUcpmLoaded = false;
+    m_isUcmcpLoaded = false;
 
-    LOG_DEBUG( "PackageManager Control Module stopped and released." );
-}
-
-#pragma endregion
-
-#pragma region Helper Functions
-
-bool UCService::FileExists( const WCHAR* filename )
-{
-    struct _stat stFileInfo;
-    return ( _wstat( filename, &stFileInfo ) == 0 );
-}
-
-bool UCService::DirectoryExists( const WCHAR* dirname )
-{
-    DWORD ftyp = GetFileAttributes( dirname );
-    if( ftyp == INVALID_FILE_ATTRIBUTES )
-    {
-        return false;
-    }
-
-    if( ftyp & FILE_ATTRIBUTE_DIRECTORY )
-    {
-        return true;
-    }
-
-    return false;
-}
-
-std::wstring UCService::GetExePath()
-{
-    WCHAR buffer[ MAX_PATH ] = { 0 };
-
-    GetModuleFileName( NULL, buffer, MAX_PATH );
-    std::wstring::size_type pos = std::wstring( buffer ).find_last_of( L"/\\" );
-
-    return std::wstring( buffer ).substr( 0, pos );
+    WLOG_DEBUG( L"PackageManager Control Module stopped and released." );
 }
 
 #pragma endregion

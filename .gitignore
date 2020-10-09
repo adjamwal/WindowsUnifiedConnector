@@ -5,6 +5,7 @@
 **/Debug/*
 **/Release/*
 **/obj/*
+*.aps
 *.vcxproj.user
 Installer/bin/*
 packages/*

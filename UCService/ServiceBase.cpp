@@ -106,7 +106,7 @@ ServiceBase::~ServiceBase( void )
 
 void ServiceBase::Start( DWORD dwArgc, PWSTR* pszArgv )
 {
-    LOG_DEBUG( "Service trying to start." );
+    WLOG_DEBUG( L"Service trying to start." );
     try
     {
         SetServiceStatus( SERVICE_START_PENDING );
@@ -115,12 +115,12 @@ void ServiceBase::Start( DWORD dwArgc, PWSTR* pszArgv )
     }
     catch( DWORD dwError )
     {
-        LOG_ERROR( "Service failed to start, error %d", dwError );
+        WLOG_ERROR( L"Service failed to start, error %d", dwError );
         SetServiceStatus( SERVICE_STOPPED, dwError );
     }
     catch( ... )
     {
-        LOG_ERROR( "Service failed to start." );
+        WLOG_ERROR( L"Service failed to start." );
         SetServiceStatus( SERVICE_STOPPED );
     }
 }
@@ -132,7 +132,7 @@ void ServiceBase::OnStart( DWORD dwArgc, PWSTR* pszArgv )
 
 void ServiceBase::Stop()
 {
-    LOG_DEBUG( "Service trying to stop." );
+    WLOG_DEBUG( L"Service trying to stop." );
 
     DWORD dwOriginalState = m_status.dwCurrentState;
     try
@@ -143,12 +143,12 @@ void ServiceBase::Stop()
     }
     catch( DWORD dwError )
     {
-        LOG_ERROR( "Service failed to stop, error %d", dwError );
+        WLOG_ERROR( L"Service failed to stop, error %d", dwError );
         SetServiceStatus( dwOriginalState );
     }
     catch( ... )
     {
-        LOG_ERROR( "Service failed to stop." );
+        WLOG_ERROR( L"Service failed to stop." );
         SetServiceStatus( dwOriginalState );
     }
 }
@@ -160,7 +160,7 @@ void ServiceBase::OnStop()
 
 void ServiceBase::Pause()
 {
-    LOG_DEBUG( "Service trying to pause." );
+    WLOG_DEBUG( L"Service trying to pause." );
     try
     {
         SetServiceStatus( SERVICE_PAUSE_PENDING );
@@ -169,12 +169,12 @@ void ServiceBase::Pause()
     }
     catch( DWORD dwError )
     {
-        LOG_ERROR( "Service failed to pause, error %d", dwError );
+        WLOG_ERROR( L"Service failed to pause, error %d", dwError );
         SetServiceStatus( SERVICE_RUNNING );
     }
     catch( ... )
     {
-        LOG_ERROR( "Service failed to pause." );
+        WLOG_ERROR( L"Service failed to pause." );
         SetServiceStatus( SERVICE_RUNNING );
     }
 }
@@ -186,7 +186,7 @@ void ServiceBase::OnPause()
 
 void ServiceBase::Continue()
 {
-    LOG_DEBUG( "Service trying to continue." );
+    WLOG_DEBUG( L"Service trying to continue." );
     try
     {
         SetServiceStatus( SERVICE_CONTINUE_PENDING );
@@ -195,12 +195,12 @@ void ServiceBase::Continue()
     }
     catch( DWORD dwError )
     {
-        LOG_ERROR( "Service failed to continue, error %d", dwError );
+        WLOG_ERROR( L"Service failed to continue, error %d", dwError );
         SetServiceStatus( SERVICE_PAUSED );
     }
     catch( ... )
     {
-        LOG_ERROR( "Service failed to continue." );
+        WLOG_ERROR( L"Service failed to continue." );
         SetServiceStatus( SERVICE_PAUSED );
     }
 }
@@ -212,7 +212,7 @@ void ServiceBase::OnContinue()
 
 void ServiceBase::Shutdown()
 {
-    LOG_DEBUG( "Service trying to shut down." );
+    WLOG_DEBUG( L"Service trying to shut down." );
     try
     {
         OnShutdown();
@@ -220,11 +220,11 @@ void ServiceBase::Shutdown()
     }
     catch( DWORD dwError )
     {
-        LOG_ERROR( "Service failed to shutdown, error %d", dwError );
+        WLOG_ERROR( L"Service failed to shutdown, error %d", dwError );
     }
     catch( ... )
     {
-        LOG_ERROR( "Service failed to shut down." );
+        WLOG_ERROR( L"Service failed to shut down." );
     }
 }
 
@@ -288,11 +288,11 @@ void ServiceBase::InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCan
     if( status != ERROR_SUCCESS )
     {
         m_etwRegHandle = 0;
-        LOG_ERROR( "EventRegister failed, provider not registered." );
+        WLOG_ERROR( L"EventRegister failed, provider not registered." );
     }
     else
     {
-        m_logger->Log( IUcLogger::LOG_INFO, __FUNCTIONW__ L": EventLog initialized." );
+        WLOG_DEBUG( L"EventLog initialized." );
         EventWriteString( m_etwRegHandle, EVENTLOG_SUCCESS, 0, __FUNCTIONW__ L": EventLog initialized." );
     }
 }

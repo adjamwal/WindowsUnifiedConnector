@@ -188,8 +188,8 @@ pipeline {
                 
                 archiveArtifacts artifacts: '*.zip', fingerprint: true
                 
-                bat "COPY Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${BUILD_PATH} /Y"
-                bat "COPY Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${BUILD_PATH} /Y"
+                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${BUILD_PATH} /Y"
+                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${BUILD_PATH} /Y"
                 bat "COPY x64\\Release\\Cisco-UC-Installer.exe ${BUILD_PATH} /Y"
               }
               

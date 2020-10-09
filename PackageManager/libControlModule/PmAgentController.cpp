@@ -250,7 +250,7 @@ PM_STATUS PmAgentController::startProcess()
 
     // command line passed as : 'process path' + _T("--config-path") + 'process config path'
     // to provide ease if additional arguments are needed.
-    std::wstring tstrProcessArgs = m_tstrProcessPath + L" --config-path " + m_tstrConfigPath;
+    std::wstring tstrProcessArgs = m_tstrProcessPath + L" --config-path " + L"\"" + m_tstrConfigPath + L"\"";
 
     //Create a pipe for the child process's STDIN
     if( !CreatePipe( &hChildStdinRd, &m_hChildStdinWr, &saAttr, 0 ) )
