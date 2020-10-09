@@ -16,7 +16,8 @@ UCService::UCService(
     BOOL fCanShutdown,
     BOOL fCanPauseContinue )
     : ServiceBase( pszServiceName, fCanStop, fCanShutdown, fCanPauseContinue )
-    , m_ucmcpLoader()
+    , m_codeSignVerifer()
+    , m_ucmcpLoader( m_codeSignVerifer )
     , m_ucmcp( { 0 } )
     , m_isUcmcpLoaded( false )
 {
