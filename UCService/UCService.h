@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "ServiceBase.h"
 #include "PackageManagerInternalModuleAPI.h"
+#include "UCIDLoader.h"
 #include "UCMCPLoader.h"
 #include "CodesignVerifier.h"
 
@@ -21,11 +22,7 @@ protected:
     virtual void OnStop() override;
 
 private:
-    void LoadPMControlModule();
-    void UnloadPMControlModule();
-
     CodesignVerifier m_codeSignVerifer;
+    UCIDLoader m_ucidLoader;
     UCMCPLoader m_ucmcpLoader;
-    PM_MODULE_CTX_T m_ucmcp;
-    bool m_isUcmcpLoaded;
 };
