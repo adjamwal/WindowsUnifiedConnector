@@ -11,4 +11,5 @@ public:
     static std::wstring GetExePath();
     static std::wstring GetDirPath( const std::wstring& path );
     static bool ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data );
+    static bool Is64BitWindows();
 };

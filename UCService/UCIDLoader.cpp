@@ -1,13 +1,14 @@
 #include "stdafx.h"
 
-#include "UCMCPLoader.h"
+#include "UCIDLoader.h"
 #include "IUCLogger.h"
 #include "ICodeSignVerifier.h"
 #include "HelperFunctions.h"
 
-#define PM_MCP_CONFIG_FILENAME L"PM_MCP_config.json"
+#define UCID_MODULE_INTERFACE_VERSION 1u
+#define UCID_MODULE_CONFIG_FILENAME L"config.xml"
 
-UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier, IUcLogger& logger )
+UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier, IUcLogger& logger )
     : m_codeSignVerifier( codeSignVerifier )
     , m_logger( logger )
     , m_controlLib( 0 )
@@ -19,13 +20,13 @@ UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier, IUcLogger& logger
 {
 }
 
-UCMCPLoader::~UCMCPLoader()
+UCIDLoader::~UCIDLoader()
 {
     UnloadControlModule();
     UnloadDll();
 }
 
-bool UCMCPLoader::LoadDll( const std::wstring dllPath )
+bool UCIDLoader::LoadDll( const std::wstring dllPath )
 {
     std::wstring dllDir;
 
@@ -78,7 +79,7 @@ bool UCMCPLoader::LoadDll( const std::wstring dllPath )
     return true;
 }
 
-void UCMCPLoader::UnloadDll()
+void UCIDLoader::UnloadDll()
 {
     if( !m_controlLib )
     {
@@ -98,39 +99,49 @@ void UCMCPLoader::UnloadDll()
     m_loadedDllName.clear();
 }
 
-PM_MODULE_RESULT_T UCMCPLoader::CreateModule( PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger )
+PM_MODULE_RESULT_T UCIDLoader::CreateModule( PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
-    return m_createModule( pPM_MODULE_CTX, logger );
+    return m_createModule( pPM_MODULE_CTX );
 }
 
-PM_MODULE_RESULT_T UCMCPLoader::ReleaseModule( PM_MODULE_CTX_T* pPM_MODULE_CTX )
+PM_MODULE_RESULT_T UCIDLoader::ReleaseModule( PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
     return m_releaseModule( pPM_MODULE_CTX );
 }
 
-void UCMCPLoader::LoadControlModule()
+void UCIDLoader::LoadControlModule()
 {
     if( m_isModuleLoaded )
     {
-        WLOG_ERROR( L"PackageManager Control Module already running." );
+        WLOG_ERROR( L"UnifiedConnectorID Control Module already running." );
         return;
     }
 
+    std::wstring ucidDllDir;
     std::wstring dllFullPath;
-    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
+    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
     {
-        WLOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
+        WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module data from registry" );
         return;
     }
 
-    std::wstring pmPath( HelperFunctions::GetDirPath( dllFullPath ) );
-    std::wstring pmConfigFile( pmPath );
-    pmConfigFile.append( L"\\" );
-    pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
-
-    if( !HelperFunctions::FileExists( pmConfigFile.c_str() ) )
+    if( HelperFunctions::Is64BitWindows )
     {
-        WLOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
+        ucidDllDir.append( L"x64\\" );
+    }
+    else
+    {
+        ucidDllDir.append( L"x86\\" );
+    }
+    dllFullPath = ucidDllDir;
+    dllFullPath.append( L"ucidcontrolplugin.dll" );
+
+    std::wstring ucidConfigFile( ucidDllDir );
+    ucidConfigFile.append( UCID_MODULE_CONFIG_FILENAME );
+
+    if( !HelperFunctions::FileExists( ucidConfigFile.c_str() ) )
+    {
+        WLOG_ERROR( L"UnifiedConnectorID Control Module configuration file not found: %s", ucidConfigFile.c_str() );
         return;
     }
 
@@ -147,7 +158,7 @@ void UCMCPLoader::LoadControlModule()
         WLOG_ERROR( "Exception: %s", ex.what() );
     }
 
-    m_context.nVersion = PM_MODULE_INTERFACE_VERSION;
+    m_context.nVersion = UCID_MODULE_INTERFACE_VERSION;
     if( m_context.fpInit )
     {
         m_context.fpInit();
@@ -155,28 +166,28 @@ void UCMCPLoader::LoadControlModule()
 
     PM_MODULE_RESULT_T result;
 
-    if( ( result = CreateModule( &m_context, &m_logger ) ) != PM_MODULE_SUCCESS )
+    if( ( result = CreateModule( &m_context ) ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to load PackageManager Control Module: CreateModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to load UnifiedConnectorID Control Module: CreateModuleInstance() returned %d.", result );
         return;
     }
 
-    if( ( result = m_context.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_context.fpStart( ucidDllDir.c_str(), ucidDllDir.c_str(), ucidConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to start PackageManager Control Module: fpStart() returned %d.", result );
+        WLOG_ERROR( L"Failed to start UnifiedConnectorID Control Module: fpStart() returned %d.", result );
         return;
     }
 
     m_isModuleLoaded = true;
 
-    WLOG_DEBUG( L"PackageManager Control Module loaded and started." );
+    WLOG_DEBUG( L"UnifiedConnectorID Control Module loaded and started." );
 }
 
-void UCMCPLoader::UnloadControlModule()
+void UCIDLoader::UnloadControlModule()
 {
     if( !m_isModuleLoaded )
     {
-        WLOG_ERROR( L"PackageManager Control Module already released." );
+        WLOG_ERROR( L"UnifiedConnectorID Control Module already released." );
         return;
     }
 
@@ -184,17 +195,17 @@ void UCMCPLoader::UnloadControlModule()
 
     if( ( result = m_context.fpStop() ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to stop PackageManager Control Module: fpStop() returned %d.", result );
+        WLOG_ERROR( L"Failed to stop UnifiedConnectorID Control Module: fpStop() returned %d.", result );
         return;
     }
 
     if( ( result = ReleaseModule( &m_context ) ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to release PackageManager Control Module: ReleaseModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to release UnifiedConnectorID Control Module: ReleaseModuleInstance() returned %d.", result );
         return;
     }
 
     m_isModuleLoaded = false;
 
-    WLOG_DEBUG( L"PackageManager Control Module stopped and released." );
+    WLOG_DEBUG( L"UnifiedConnectorID Control Module stopped and released." );
 }
