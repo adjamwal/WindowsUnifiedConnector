@@ -124,7 +124,6 @@ void UCIDLoader::LoadControlModule()
         WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module data from registry" );
         return;
     }
-    ucidDllDir.append( L"\\" );
 
     dllFullPath = ucidDllDir;
     if( HelperFunctions::Is64BitWindows )
