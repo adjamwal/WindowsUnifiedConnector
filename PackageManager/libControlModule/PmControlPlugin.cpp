@@ -88,3 +88,24 @@ PM_MODULE_RESULT_T
     }
 }
 
+PM_MODULE_RESULT_T 
+    PmControlPlugin::SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, size_t nSize )
+{
+    try
+    {
+        if( nOptionID == PM_MODULE_OPTION_LOG_LEVEL ) {
+            SetUcLogger( ( IUcLogger* )pOption );
+        }
+        else {
+            throw( "Invalid PM option" );
+            return PM_MODULE_SUCCESS;
+        }
+    }
+    catch( const std::exception& e )
+    {
+        LOG_WARNING( "Invalid option parameter: %s", e.what() );
+        return PM_MODULE_INVALID_PARAM;
+    }
+
+    return PM_MODULE_SUCCESS;
+}

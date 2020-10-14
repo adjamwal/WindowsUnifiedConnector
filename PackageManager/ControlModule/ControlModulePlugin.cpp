@@ -6,18 +6,14 @@
 #include <Windows.h>
 #include "PmControlPlugin.h"
 #include "ControlModulePlugin.h"
-#include "IUcLogger.h"
 
-extern "C" PM_MODULE_API PM_MODULE_RESULT_T CreateModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger )
+extern "C" PM_MODULE_API PM_MODULE_RESULT_T CreateModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
     if( nullptr == pPM_MODULE_CTX )
     {
         return PM_MODULE_INVALID_PARAM;
     }
 
-    if( logger ) {
-        SetUcLogger( logger );
-    }
     // NOTE: not doing anything with PmControlPlugin singleton here
     // NOTE: not complaining here about any paths; will only know about paths in Start
 
@@ -25,7 +21,7 @@ extern "C" PM_MODULE_API PM_MODULE_RESULT_T CreateModuleInstance( IN OUT PM_MODU
     pPM_MODULE_CTX->fpDeinit = nullptr;
     pPM_MODULE_CTX->fpStart = PmControlPlugin::StartPmAgent;
     pPM_MODULE_CTX->fpStop = PmControlPlugin::StopPmAgent;
-    pPM_MODULE_CTX->fpSetOption = nullptr;
+    pPM_MODULE_CTX->fpSetOption = PmControlPlugin::SetPmOption;
     pPM_MODULE_CTX->fpConfigUpdated = nullptr;
     return PM_MODULE_SUCCESS;
 }
@@ -39,10 +35,9 @@ extern "C" PM_MODULE_API PM_MODULE_RESULT_T ReleaseModuleInstance( IN OUT PM_MOD
 
     // NOTE: not doing anything with PmControlPlugin singleton here
 
-    pPM_MODULE_CTX->fpStart = nullptr; // clear
-    pPM_MODULE_CTX->fpStop = nullptr; // clear
-
-    SetUcLogger( nullptr );
+    pPM_MODULE_CTX->fpStart = nullptr;
+    pPM_MODULE_CTX->fpStop = nullptr;
+    pPM_MODULE_CTX->fpSetOption = nullptr;
 
     return PM_MODULE_SUCCESS;
 }
