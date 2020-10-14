@@ -98,9 +98,9 @@ void UCMCPLoader::UnloadDll()
     m_loadedDllName.clear();
 }
 
-PM_MODULE_RESULT_T UCMCPLoader::CreateModule( PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger )
+PM_MODULE_RESULT_T UCMCPLoader::CreateModule( PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
-    return m_createModule( pPM_MODULE_CTX, logger );
+    return m_createModule( pPM_MODULE_CTX );
 }
 
 PM_MODULE_RESULT_T UCMCPLoader::ReleaseModule( PM_MODULE_CTX_T* pPM_MODULE_CTX )
@@ -155,10 +155,14 @@ void UCMCPLoader::LoadControlModule()
 
     PM_MODULE_RESULT_T result;
 
-    if( ( result = CreateModule( &m_context, &m_logger ) ) != PM_MODULE_SUCCESS )
+    if( ( result = CreateModule( &m_context ) ) != PM_MODULE_SUCCESS )
     {
         WLOG_ERROR( L"Failed to load PackageManager Control Module: CreateModuleInstance() returned %d.", result );
         return;
+    }
+
+    if( ( result = m_context.fpSetOption( PM_MODULE_OPTION_LOG_LEVEL, &m_logger, sizeof( &m_logger ) ) ) != PM_MODULE_SUCCESS ) {
+        WLOG_ERROR( L"Failed to set option PM_MODULE_OPTION_LOG_LEVEL", result );
     }
 
     if( ( result = m_context.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )

@@ -21,6 +21,8 @@ public:
     static PM_MODULE_RESULT_T
         StopPmAgent();
 
+    static PM_MODULE_RESULT_T 
+        SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, size_t nSize );
 private:
     // private member functions
 

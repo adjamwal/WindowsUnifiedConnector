@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <Windows.h>
 
-typedef PM_MODULE_RESULT_T ( *CreateModule )( PM_MODULE_CTX_T* pPM_MODULE_CTX, IUcLogger* logger );
+typedef PM_MODULE_RESULT_T ( *CreateModule )( PM_MODULE_CTX_T* pPM_MODULE_CTX );
 typedef PM_MODULE_RESULT_T ( *ReleaseModule ) ( PM_MODULE_CTX_T* pPM_MODULE_CTX );
 
 class ComponentTestControlModule : public ::testing::Test
@@ -34,7 +34,7 @@ protected:
 )";
             fwrite( contents.c_str(), 1, contents.length(), fp );
             fclose( fp );
-            EXPECT_EQ( m_createModule( &m_patient, NULL ), PM_MODULE_SUCCESS );
+            EXPECT_EQ( m_createModule( &m_patient ), PM_MODULE_SUCCESS );
         }
     }
 
