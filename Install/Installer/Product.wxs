@@ -21,25 +21,13 @@
         
         <MediaTemplate EmbedCab="yes" />
 
-        <Feature Id="UnifiedConnector" Title="UnifiedConnector" AllowAdvertise="no" Display="hidden" Level="1">
+        <Feature Id="UnifiedConnector" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentGroupRef Id="UnifiedConnectorComponents"/>
-        </Feature>
-
-        <Feature Id="VCRedist" Title="VCRedist" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentGroupRef Id="VCRedistComponents"/>
-        </Feature>
-
-        <Feature Id="UCService" Title="Unified Connector Service" Level="1">
             <ComponentGroupRef Id="UCServiceComponents" />
-        </Feature>
-
-        <Feature Id="UCID" Title="Unified Connector ID" Level="1">
             <ComponentGroupRef Id="UCIDComponents" />
             <ComponentGroupRef Id="UCIDx86Components"/>
             <ComponentGroupRef Id="UCIDx64Components"/>
-        </Feature>
-
-        <Feature Id="UCPM" Title="Unified Connector Package Manager" Level="1">
             <ComponentGroupRef Id="UCPMComponents" />
         </Feature>
     </Product>
