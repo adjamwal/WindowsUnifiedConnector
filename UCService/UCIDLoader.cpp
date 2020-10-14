@@ -172,6 +172,8 @@ void UCIDLoader::LoadControlModule()
         return;
     }
 
+    //HACK to load UCID file. Revet when fix in UCID!!!!!
+    ucidConfigFile = L"\"" + ucidConfigFile + L"\"";
     if( ( result = m_context.fpStart( ucidDllDir.c_str(), ucidDllDir.c_str(), ucidConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
     {
         WLOG_ERROR( L"Failed to start UnifiedConnectorID Control Module: fpStart() returned %d.", result );
