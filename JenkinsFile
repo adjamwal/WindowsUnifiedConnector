@@ -32,6 +32,31 @@ def CheckoutDependencies() {
   powershell ".\\AmpRepositorySync.exe -cc latest"
 }
 
+def SetupVersion() {
+  dir('WindowsUnifiedConnector') {
+    //Setup GlobalVersion.h
+    //Note: Can't use custom environment variables like ${UC_MAJOR} in contentReplace
+    def ucMajor = UC_MAJOR
+    def ucMinor = UC_MINOR
+    def ucPatch = UC_PATCH
+
+    if (env.CHANGE_ID != null) {
+      ucMajor = 9
+      ucMinor = 0
+      ucPatch = 0
+    }
+                
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(FILEVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'FILEVER\t\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(PRODUCTVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'PRODUCTVER\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRFILEVER).+\\"(\\d+, \\d+, \\d+, \\d+)', replace: 'STRFILEVER\t"' + ucMajor + ', ' + ucMinor + ', ' + ucPatch + ', ${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRPRODUCTVER).+\\"(\\d+, \\d+, \\d+, \\d+)', replace: 'STRPRODUCTVER\t"' + ucMajor + ', ' + ucMinor + ', ' + ucPatch + ', ${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRFORMATPRODVER).+L\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'STRFORMATPRODVER\tL"' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+
+    // contentReplace removes the last newline which is required
+    bat 'echo. >> GlobalVersion.h'
+  }
+}
+
 pipeline {
   agent none
   options {
@@ -40,6 +65,10 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'10'))
   }
   environment {
+    UC_MAJOR = 0
+    UC_MINOR = 0
+    UC_PATCH = 1
+    
     NOTIFICATION_RECIPIENTS = 'fireamp-dev-connector-win@cisco.com'
     BUILD_LOG_LINES         = '500'
 
@@ -103,6 +132,7 @@ pipeline {
                 powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
                 powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
               }
+              SetupVersion()
             }
           }
         }
