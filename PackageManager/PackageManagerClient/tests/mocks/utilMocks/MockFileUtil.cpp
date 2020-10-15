@@ -20,3 +20,35 @@ void MockFileUtil::ExpectReadFileNotCalled()
 {
     EXPECT_CALL( *this, ReadFile( _ ) ).Times( 0 );
 }
+
+void MockFileUtil::MakePmCreateFileReturn( FileUtilHandle* value )
+{
+    ON_CALL( *this, PmCreateFile( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectPmCreateFileNotCalled()
+{
+    EXPECT_CALL( *this, PmCreateFile( _ ) ).Times( 0 );
+}
+
+
+void MockFileUtil::MakeCloseFileReturn( int32_t value )
+{
+    ON_CALL( *this, CloseFile( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectCloseFileNotCalled()
+{
+    EXPECT_CALL( *this, CloseFile( _ ) ).Times( 0 );
+}
+
+
+void MockFileUtil::MakeAppendFileReturn( int32_t value )
+{
+    ON_CALL( *this, AppendFile( _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectAppendFileNotCalled()
+{
+    EXPECT_CALL( *this, AppendFile( _, _, _ ) ).Times( 0 );
+}

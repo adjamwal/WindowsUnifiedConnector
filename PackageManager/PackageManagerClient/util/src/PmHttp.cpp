@@ -1,0 +1,231 @@
+#include "PmHttp.h"
+#include "PmLogger.h"
+#include "IFileUtil.h"
+
+size_t PmHttp::WriteString( void* ptr, size_t size, size_t nmemb, std::string* data )
+{
+    if( data ) {
+        data->append( ( char* )ptr, size * nmemb );
+    }
+    return size * nmemb;
+}
+
+size_t PmHttp::WriteFile( void* ptr, size_t size, size_t nmemb, WriteFileCtx* data )
+{
+    if( data && data->fileUtil ) {
+        data->fileUtil->AppendFile( data->handle, ptr, size * nmemb );
+    }
+    return size * nmemb;
+}
+
+PmHttp::PmHttp( IFileUtil& fileUtil ) :
+    m_fileUtil( fileUtil )
+    , m_curlHandle( nullptr )
+    , m_agent( "DefaultPackageManager")
+{
+
+}
+
+PmHttp::~PmHttp()
+{
+
+}
+
+int32_t PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& agent )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    CURLcode rtn = CURLE_OK;
+
+    if( m_curlHandle ) {
+        WLOG_ERROR( L"PmHttp Instance already initialized" );
+        return rtn;
+    }
+
+    m_curlHandle = curl_easy_init();
+    if( !m_curlHandle ) {
+        WLOG_ERROR( L"curl_easy_init failed" );
+        return -1;
+    }
+
+    if( !agent.empty() ) {
+        m_agent = agent;
+    }
+
+    rtn = curl_easy_setopt( m_curlHandle, CURLOPT_USERAGENT, m_agent.c_str() );
+    if( rtn != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_USERAGENT failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_FOLLOWLOCATION, 1L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_FOLLOWLOCATION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    } 
+    else if( callback ) {
+        if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_XFERINFOFUNCTION failed on function %x %d:%s", callback, rtn, curl_easy_strerror( rtn ) );
+        }
+        else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFODATA, ctx ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_XFERINFODATA failed on data %x %d:%s", ctx, rtn, curl_easy_strerror( rtn ) );
+        }
+    }
+
+    return rtn;
+}
+
+int32_t PmHttp::Deinit()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    if( !m_curlHandle ) {
+        WLOG_DEBUG( L"curl was not initialized" );
+        return 0;
+    }
+
+    curl_easy_cleanup( m_curlHandle );
+
+    return 0;
+}
+
+int32_t PmHttp::HttpGet( const std::string& url, std::string& response, int32_t &httpReturn )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    CURLcode rtn = CURLE_OK;
+
+    if( !m_curlHandle ) {
+        WLOG_ERROR( L"curl was not initialized" );
+        return -1;
+    }
+
+    if( url.empty() ) {
+        WLOG_ERROR( L"Url was not provided" );
+        return -1;
+    }
+
+    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &response ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 0 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
+        LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &httpReturn ) ) ) {
+        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else {
+        LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
+    }
+
+    return rtn;
+}
+
+int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t &httpReturn )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    CURLcode rtn = CURLE_OK;
+
+    if( !m_curlHandle ) {
+        WLOG_ERROR( L"curl was not initialized" );
+        return -1;
+    }
+
+    if( url.empty() ) {
+        WLOG_ERROR( L"Url was not provided" );
+        return -1;
+    }
+
+    if( !data || !dataSize ) {
+        WLOG_ERROR( L"post data was not provided" );
+        return -1;
+    }
+
+    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &response ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 1 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDS, data ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDSIZE, dataSize ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
+        LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &httpReturn ) ) ) {
+        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else {
+        LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
+    }
+
+    return rtn;
+}
+
+int32_t PmHttp::HttpDownload( const std::string& url, std::string& filepath, int32_t &httpReturn )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    CURLcode rtn = CURLE_OK;
+    WriteFileCtx ctx = { &m_fileUtil, NULL };
+
+    if( !m_curlHandle ) {
+        WLOG_ERROR( L"curl was not initialized" );
+        return -1;
+    }
+
+    if( url.empty() ) {
+        WLOG_ERROR( L"Url was not provided" );
+        return -1;
+    }
+
+    if( filepath.empty() ) {
+        WLOG_ERROR( L"filepath was not provided" );
+        return -1;
+    }
+
+    ctx.handle = m_fileUtil.PmCreateFile( filepath );
+    if( ctx.handle == NULL ) {
+        WLOG_ERROR( L"failed to create file %hs", filepath.c_str() );
+        return -1;
+    }
+
+    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteFile ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &ctx ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 0 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
+        LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &httpReturn ) ) ) {
+        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else {
+        LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
+    }
+
+    m_fileUtil.CloseFile( ctx.handle );
+    ctx.handle = NULL;
+
+    return rtn;
+}

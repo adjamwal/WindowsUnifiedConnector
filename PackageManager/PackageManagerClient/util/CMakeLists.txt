@@ -5,10 +5,10 @@ add_library (utilLib "include/IFileUtil.h"
     "src/FileUtil.cpp" 
     "include/IPmLogger.h" 
     "include/PmLogger.h" 
-    "src/PmLogger.cpp" "include/IWorkerThread.h" "include/WorkerThread.h" "src/WorkerThread.cpp")
+    "src/PmLogger.cpp" "include/IWorkerThread.h" "include/WorkerThread.h" "src/WorkerThread.cpp" "include/IPmHttp.h" "include/PmHttp.h" "src/PmHttp.cpp")
 
 target_include_directories(utilLib 
-    PRIVATE "include"
+    PRIVATE "include" ${curl_INCLUDE_DIRS}
     INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include"
     )
 

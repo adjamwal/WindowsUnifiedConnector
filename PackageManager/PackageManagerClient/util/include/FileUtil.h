@@ -9,4 +9,7 @@ public:
     ~FileUtil();
 
     std::string ReadFile( const std::string& filename ) override;
+    FileUtilHandle* PmCreateFile( const std::string& filename ) override;
+    int32_t CloseFile( FileUtilHandle* handle ) override;
+    int32_t AppendFile( FileUtilHandle* handle, void* data, size_t dataLen ) override;
 };
