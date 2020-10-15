@@ -32,7 +32,7 @@ def CheckoutDependencies() {
   powershell ".\\AmpRepositorySync.exe -cc latest"
 }
 
-def SetupVersion() {
+def SetupVersion( boolean upgrade ) {
   dir('WindowsUnifiedConnector') {
     //Setup GlobalVersion.h
     //Note: Can't use custom environment variables like ${UC_MAJOR} in contentReplace
@@ -40,7 +40,12 @@ def SetupVersion() {
     def ucMinor = UC_MINOR
     def ucPatch = UC_PATCH
 
-    if (env.CHANGE_ID != null) {
+    if ( upgrade ) {
+      ucMajor = 99
+      ucMinor = 0
+      ucPatch = 0
+    }
+    else if (env.CHANGE_ID != null) {
       ucMajor = 9
       ucMinor = 0
       ucPatch = 0
@@ -79,6 +84,7 @@ pipeline {
     SKIP_CI = '[noci]'
     FORCE_COVERAGE = '[coverage]'
     FORCE_COVERITY = '[coverity]'
+    FORCE_UPGRADE = '[upgrade]'
     JENKINS_USERNAME = 'Jenkins'
     JENKINS_USER_PASSWORD = credentials('JENKINS_USER_PASSWORD')
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
@@ -132,7 +138,7 @@ pipeline {
                 powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
                 powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
               }
-              SetupVersion()
+              SetupVersion(false)
             }
           }
         }
@@ -225,6 +231,34 @@ pipeline {
               
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer.exe', fingerprint: true
+            }
+          }
+        }
+        stage ('Upgrade Builds') {
+          when {
+            anyOf {
+              not { changeRequest() }
+              expression { env.CHANGE_TITLE.toLowerCase().contains(env.FORCE_UPGRADE) }
+            }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+              SetupVersion(true)
+              dir('WindowsUnifiedConnector') {
+                // Encountered a random build failre using the /t:rebuild target. Seems like libControlModule is cleaned but not rebuilt
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 /t:clean'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:clean'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m'
+                
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-Upgrade.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-Upgrade.msi"
+                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-Upgrade.exe"
+              }
+
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
             }
           }
         }
