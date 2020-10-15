@@ -84,6 +84,7 @@ pipeline {
     SKIP_CI = '[noci]'
     FORCE_COVERAGE = '[coverage]'
     FORCE_COVERITY = '[coverity]'
+    FORCE_UPGRADE = '[upgrade]'
     JENKINS_USERNAME = 'Jenkins'
     JENKINS_USER_PASSWORD = credentials('JENKINS_USER_PASSWORD')
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
@@ -234,6 +235,12 @@ pipeline {
           }
         }
         stage ('Upgrade Builds') {
+          when {
+            anyOf {
+              not { changeRequest() }
+              expression { env.CHANGE_TITLE.toLowerCase().contains(env.FORCE_UPGRADE) }
+            }
+          }
           steps {
             script {
               SetGithubPendingStatus()
@@ -242,12 +249,13 @@ pipeline {
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 /t:rebuild -m'
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild -m'
                 
-                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-Upgrade.msi /Y"
-                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-Upgrade.msi /Y"
-                bat "COPY x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-Upgrade.exe /Y"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-Upgrade.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-Upgrade.msi"
+                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-Upgrade.exe"
               }
+
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer.exe', fingerprint: true
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
             }
           }
         }
