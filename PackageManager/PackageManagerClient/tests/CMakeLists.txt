@@ -26,3 +26,4 @@ include(GoogleTest)
 
 add_subdirectory(mocks)
 add_subdirectory(UnitTests)
+add_subdirectory(ComponentTests)

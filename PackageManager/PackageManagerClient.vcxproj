@@ -68,7 +68,7 @@
     <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
-call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dgtest_force_shared_crt=ON
+call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dcurl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dcurl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dssl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dssl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dfff_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dgtest_force_shared_crt=ON
 call cmake --build . --config $(Configuration)
 call ctest
 call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --config $(Configuration)</NMakeBuildCommandLine>
@@ -81,7 +81,7 @@ call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --c
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
-call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dgtest_force_shared_crt=ON
+call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dcurl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dcurl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dssl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dssl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dfff_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dgtest_force_shared_crt=ON
 call cmake --build . --config $(Configuration)
 call ctest
 call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --config $(Configuration)</NMakeBuildCommandLine>
@@ -94,7 +94,7 @@ call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --c
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
-call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dgtest_force_shared_crt=ON
+call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dcurl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dcurl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dssl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dssl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dfff_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dgtest_force_shared_crt=ON
 call cmake --build . --config $(Configuration)
 call ctest
 call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --config $(Configuration)</NMakeBuildCommandLine>
@@ -107,7 +107,7 @@ call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --c
     <NMakePreprocessorDefinitions>NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>call mkdir  $(Platform)\$(Configuration)\build
 call cd  $(Platform)\$(Configuration)\build
-call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dgtest_force_shared_crt=ON
+call cmake ..\..\..\PackageManagerClient . -DCMAKE_GENERATOR_PLATFORM=$(Platform) -Djsoncpp_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Djsoncpp_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dcurl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dcurl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dssl_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dssl_LIBRARY=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\lib -Dfff_INCLUDE_DIRS=$(IMN_COMMON)\common-windows-build\$(Configuration)\$(PLATFORM)\include -Dgtest_force_shared_crt=ON
 call cmake --build . --config $(Configuration)
 call ctest
 call cmake --install . --prefix "$(SolutionDir)$(Platform)\$(Configuration)" --config $(Configuration)</NMakeBuildCommandLine>

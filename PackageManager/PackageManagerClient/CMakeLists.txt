@@ -20,10 +20,22 @@ if(NOT DEFINED jsoncpp_LIBRARY OR NOT DEFINED jsoncpp_INCLUDE_DIRS)
     message( FATAL_ERROR "Missing jsoncpp" )
 endif()
 
-# jsoncpp
+# curl
 message( "Using jsoncpp curl_LIBRARY=${curl_LIBRARY} curl_INCLUDE_DIRS=${curl_INCLUDE_DIRS}" )
 if(NOT DEFINED curl_LIBRARY OR NOT DEFINED curl_INCLUDE_DIRS)
     message( FATAL_ERROR "Missing curl" )
+endif()
+
+# openssl
+message( "Using openssl ssl_LIBRARY=${ssl_LIBRARY} ssl_INCLUDE_DIRS=${ssl_INCLUDE_DIRS}" )
+if(NOT DEFINED ssl_LIBRARY OR NOT DEFINED ssl_INCLUDE_DIRS)
+    message( FATAL_ERROR "Missing ssl" )
+endif()
+
+# fake function framework
+message( "Using fake functon framework fff_INCLUDE_DIRS=${fff_INCLUDE_DIRS}" )
+if(NOT DEFINED fff_INCLUDE_DIRS)
+    message( FATAL_ERROR "Missing fake functon framework" )
 endif()
 
 # configure a header file to pass the version number only

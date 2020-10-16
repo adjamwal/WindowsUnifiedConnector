@@ -5,6 +5,10 @@
 
 #include <memory>
 
+#ifdef X509_NAME
+#undef X509_NAME
+#endif
+
 DEFINE_FFF_GLOBALS
 
 FAKE_VALUE_FUNC( const char*, curl_easy_strerror, CURLcode );
@@ -13,8 +17,25 @@ FAKE_VALUE_FUNC_VARARG( CURLcode, curl_easy_setopt, CURL*, CURLoption, ... );
 FAKE_VALUE_FUNC( CURLcode, curl_easy_perform, CURL* );
 FAKE_VOID_FUNC( curl_easy_cleanup, CURL* );
 FAKE_VALUE_FUNC_VARARG( CURLcode, curl_easy_getinfo, CURL*, CURLINFO, ... );
-
+FAKE_VOID_FUNC( curl_slist_free_all, struct curl_slist* );
+FAKE_VALUE_FUNC( struct curl_slist*, curl_slist_append, struct curl_slist*, const char* );
 FAKE_VALUE_FUNC( int, xferCallback, void*, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T );
+
+FAKE_VALUE_FUNC( BIO*, BIO_new, const BIO_METHOD* );
+FAKE_VALUE_FUNC( int, BIO_free, BIO* );
+FAKE_VALUE_FUNC( long, BIO_ctrl, BIO*, int, long, void* );
+FAKE_VALUE_FUNC( const BIO_METHOD*, BIO_s_mem );
+FAKE_VALUE_FUNC( int, X509_STORE_add_cert, X509_STORE*, X509* );
+FAKE_VALUE_FUNC( int, X509_NAME_print_ex, BIO*, const X509_NAME*, int, unsigned long );
+FAKE_VALUE_FUNC( X509_NAME*, X509_get_subject_name, const X509* );
+FAKE_VOID_FUNC( X509_free, X509* );
+FAKE_VALUE_FUNC( int, X509_up_ref, X509* );
+
+extern "C" {
+    FAKE_VALUE_FUNC( X509_STORE*, SSL_CTX_get_cert_store, const SSL_CTX* );
+    FAKE_VALUE_FUNC( unsigned long, ERR_get_error );
+    FAKE_VALUE_FUNC( char*, ERR_error_string, unsigned long, char* );
+}
 
 class TestPmHttp: public ::testing::Test
 {
@@ -27,7 +48,22 @@ protected:
         RESET_FAKE( curl_easy_perform );
         RESET_FAKE( curl_easy_cleanup );
         RESET_FAKE( curl_easy_getinfo );
+        RESET_FAKE( curl_slist_free_all );
+        RESET_FAKE( curl_slist_append );
         RESET_FAKE( xferCallback );
+
+        RESET_FAKE( BIO_new );
+        RESET_FAKE( BIO_free );
+        RESET_FAKE( BIO_ctrl );
+        RESET_FAKE( BIO_s_mem );
+        RESET_FAKE( X509_STORE_add_cert );
+        RESET_FAKE( X509_NAME_print_ex );
+        RESET_FAKE( X509_get_subject_name );
+        RESET_FAKE( X509_free );
+        RESET_FAKE( X509_up_ref );
+        RESET_FAKE( SSL_CTX_get_cert_store );
+        RESET_FAKE( ERR_get_error );
+        RESET_FAKE( ERR_error_string );
         FFF_RESET_HISTORY();
     }
 
@@ -271,4 +307,70 @@ TEST_F( TestPmHttp, HttpDownloadWillCloseFile )
     EXPECT_CALL( *m_fileUtil, CloseFile( ( FileUtilHandle* )1 ) );
 
     m_patient->HttpDownload( "http://", filepath, httpRtn );
+}
+
+TEST_F( TestPmHttp, SetTokenFailsWhenNotInitialize )
+{
+    std::string token( "MyToken" );
+
+    EXPECT_NE( m_patient->SetToken( token ), CURLE_OK );
+    EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
+}
+
+TEST_F( TestPmHttp, SetTokenWillSucceed )
+{
+    std::string token( "MyToken" );
+    int32_t httpRtn = 0;
+
+    InitPatient();
+    curl_slist_append_fake.return_val = ( struct curl_slist* )1;
+
+    EXPECT_EQ( m_patient->SetToken( token ), CURLE_OK );
+}
+
+TEST_F( TestPmHttp, SetTokenWillUpdateHeader )
+{
+    std::string token( "MyToken" );
+    int32_t httpRtn = 0;
+
+    InitPatient();
+    curl_slist_append_fake.return_val = ( struct curl_slist* )1;
+
+    m_patient->SetToken( token );
+
+    EXPECT_NE( std::string( curl_slist_append_fake.arg1_val ).find( token ), std::string::npos );
+    EXPECT_TRUE( FindCurlOpt( CURLOPT_HTTPHEADER ) );
+}
+
+
+TEST_F( TestPmHttp, SetTokenFreePreviousToken )
+{
+    std::string token( "MyToken" );
+    int32_t httpRtn = 0;
+
+    InitPatient();
+    curl_slist_append_fake.return_val = ( struct curl_slist* )1;
+
+    m_patient->SetToken( token );
+    m_patient->SetToken( token );
+    
+    EXPECT_EQ( curl_slist_free_all_fake.call_count, 1 );
+}
+
+TEST_F( TestPmHttp, SetCertsFailsWhenNotInitialize )
+{
+    PmHttpCertList certs{};
+
+    EXPECT_NE( m_patient->SetCerts( certs ), CURLE_OK );
+    EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
+}
+
+TEST_F( TestPmHttp, SetCertWillSucceed )
+{
+    PmHttpCertList certs{};
+
+    InitPatient();
+    curl_slist_append_fake.return_val = ( struct curl_slist* )1;
+
+    EXPECT_EQ( m_patient->SetCerts( certs ), CURLE_OK );
 }
