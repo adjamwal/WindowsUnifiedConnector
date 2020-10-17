@@ -30,7 +30,7 @@
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-Djsoncpp_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Djsoncpp_LIBRARY=${env.IMN_COMMON}\\common\\common-windows-build\\Debug\\Win32\\lib -Dcurl_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Dcurl_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\lib -Dssl_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Dssl_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\lib -Dfff_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Dgtest_force_shared_crt=ON",
+      "cmakeCommandArgs": "-Djsoncpp_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Djsoncpp_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\lib -Dcurl_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Dcurl_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\lib -Dssl_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Dssl_LIBRARY=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\lib -Dfff_INCLUDE_DIRS=${env.IMN_COMMON}\\common-windows-build\\Debug\\Win32\\include -Dgtest_force_shared_crt=ON",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
