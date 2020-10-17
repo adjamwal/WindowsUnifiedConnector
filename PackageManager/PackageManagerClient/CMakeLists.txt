@@ -25,6 +25,7 @@ message( "Using jsoncpp curl_LIBRARY=${curl_LIBRARY} curl_INCLUDE_DIRS=${curl_IN
 if(NOT DEFINED curl_LIBRARY OR NOT DEFINED curl_INCLUDE_DIRS)
     message( FATAL_ERROR "Missing curl" )
 endif()
+add_definitions( -DCURL_STATICLIB )
 
 # openssl
 message( "Using openssl ssl_LIBRARY=${ssl_LIBRARY} ssl_INCLUDE_DIRS=${ssl_INCLUDE_DIRS}" )

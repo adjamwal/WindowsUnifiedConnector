@@ -12,8 +12,6 @@ target_include_directories(utilLib
     INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include"
     )
 
-target_compile_definitions(utilLib PRIVATE CURL_STATICLIB)
-
 # install rules
 install(TARGETS utilLib DESTINATION lib)
 install(FILES 

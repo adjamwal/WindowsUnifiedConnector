@@ -6,8 +6,6 @@ target_include_directories(ComponentTests
     PRIVATE ${curl_INCLUDE_DIRS}
     )
 
-target_compile_definitions(ComponentTests PRIVATE CURL_STATICLIB)
-
 target_link_directories(ComponentTests PRIVATE ${jsoncpp_LIBRARY} ${curl_LIBRARY} )
 
 if(MSVC) 

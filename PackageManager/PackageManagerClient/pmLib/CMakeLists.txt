@@ -14,8 +14,6 @@ target_include_directories(pmlib
     INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include"
     )
 
-target_compile_definitions(pmlib PRIVATE CURL_STATICLIB)
-
 target_link_libraries(pmlib utilLib)
 
 # install rules
