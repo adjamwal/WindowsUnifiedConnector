@@ -1,0 +1,21 @@
+{
+    "packages": [
+        {
+            "package": "uc/1.0.0",
+            "configs": [
+                {
+                    "path": "uc.json",
+                    "contents": "<base64-data>",
+                    "sha256": "4d0bc0da51c1aac547c5473ed53413ae9d9d0c8c57c15ec6a2ac6652812058f4",
+                    "verify_path": "verify_config.exe"
+                },
+                {
+                    "path": "id.json",
+                    "contents": "<base64-data>",
+                    "sha256": "71b6769dbf49596914321b9df4846dacc197cabe8fc6d5f03da17e2f6c2b7356",
+                    "verify_path": "verify_config.exe"
+                }
+            ]
+        }
+    ]
+}
