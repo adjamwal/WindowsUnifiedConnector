@@ -210,6 +210,53 @@
             <Component Id="PM_MCP_config.json" Guid="*">
                 <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\PackageManager\ControlModule\PM_MCP_config.json" />
             </Component>
+
+            <?if $(var.Configuration) = "Release" ?>
+                <Component Id="UCPMmsvcp140.dll" Guid="*">
+                  <File Id="UCPMmsvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
+                </Component>
+                <Component Id="UCPMmsvcp140_1.dll" Guid="*">
+                  <File Id="UCPMmsvcp140_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_1.dll" />
+                </Component>
+                <Component Id="UCPMmsvcp140_2.dll" Guid="*">
+                  <File Id="UCPMmsvcp140_2.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_2.dll" />
+                </Component>
+                <Component Id="UCPMvcruntime140.dll" Guid="*">
+                  <File Id="UCPMvcruntime140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140.dll" />
+                </Component>
+                <?if $(var.Platform) = "x64" ?>
+                    <!-- vcruntime140_1.dll does not have a x86 version, so only install it for x64 -->
+                    <Component Id="UCPMvcruntime140_1.dll" Guid="*">
+                      <File Id="UCPMvcruntime140_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\VC\vcruntime140_1.dll" />
+                    </Component>
+                <?endif?>
+                <Component Id="UCPMucrtbase.dll" Guid="*">
+                  <File Id="UCPMucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase.dll" />
+                </Component>
+            <?endif?>
+            <?if $(var.Configuration) = "Debug" ?>
+                <Component Id="UCPMmsvcp140d.dll" Guid="*">
+                  <File Id="UCPMmsvcp140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140d.dll" />
+                </Component>
+                <Component Id="UCPMmsvcp140_1d.dll" Guid="*">
+                  <File Id="UCPMmsvcp140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_1d.dll" />
+                </Component>
+                <Component Id="UCPMmsvcp140_2d.dll" Guid="*">
+                  <File Id="UCPMmsvcp140_2d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140_2d.dll" />
+                </Component>
+                <Component Id="UCPMvcruntime140d.dll" Guid="*">
+                  <File Id="UCPMvcruntime140d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140d.dll" />
+                </Component>
+                <?if $(var.Platform) = "x64" ?>
+                    <!-- vcruntime140_1d.dll does not have a x86 version, so only install it for x64 -->
+                    <Component Id="UCPMvcruntime140_1d.dll" Guid="*">
+                      <File Id="UCPMvcruntime140_1d.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\VC\vcruntime140_1d.dll" />
+                    </Component>
+                <?endif?>
+                <Component Id="UCPMucrtbased.dll" Guid="*">
+                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
+                </Component>
+            <?endif?>
         </ComponentGroup>
     </Fragment>
 </Wix>
