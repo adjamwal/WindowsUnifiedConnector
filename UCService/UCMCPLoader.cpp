@@ -3,7 +3,7 @@
 #include "UCMCPLoader.h"
 #include "IUCLogger.h"
 #include "ICodeSignVerifier.h"
-#include "HelperFunctions.h"
+#include "WindowsUtilities.h"
 
 #define PM_MCP_CONFIG_FILENAME L"PM_MCP_config.json"
 
@@ -117,18 +117,18 @@ void UCMCPLoader::LoadControlModule()
     }
 
     std::wstring dllFullPath;
-    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCPM", L"DllPath", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
         return;
     }
 
-    std::wstring pmPath( HelperFunctions::GetDirPath( dllFullPath ) );
+    std::wstring pmPath(WindowsUtilities::GetDirPath( dllFullPath ) );
     std::wstring pmConfigFile( pmPath );
     pmConfigFile.append( L"\\" );
     pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
 
-    if( !HelperFunctions::FileExists( pmConfigFile.c_str() ) )
+    if( !WindowsUtilities::FileExists( pmConfigFile.c_str() ) )
     {
         WLOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
         return;

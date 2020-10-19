@@ -2,7 +2,7 @@
 
 #include "UCIDApiDll.h"
 #include "ICodeSignVerifier.h"
-#include "HelperFunctions.h"
+#include "WindowsUtilities.h"
 #include <IUcLogger.h>
 
 #define UCID_API_GET_ID_FUNCTION_NAME "ucid_get_id"
@@ -181,14 +181,14 @@ bool UCIDApiDll::LoadApi()
 
     std::wstring ucidDllDir;
     std::wstring dllFullPath;
-    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnectorID Api data from registry" );
         return false;
     }
 
     dllFullPath = ucidDllDir;
-    if( HelperFunctions::Is64BitWindows() )
+    if(WindowsUtilities::Is64BitWindows() )
     {
         dllFullPath.append( L"x64\\" );
     }
