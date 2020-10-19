@@ -240,6 +240,46 @@ pipeline {
             }
           }
         }
+        stage ('Publish') {
+          when {
+            not { changeRequest() }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+
+              nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'https',
+                nexusUrl: 'nexus.engine.sourcefire.com',
+                groupId: 'UnifiedConnector/Windows',
+                version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
+                repository: 'raw',
+                credentialsId: 'nexus_credentials',
+                artifacts: [
+                  [
+                    artifactId: "Cisco-UC-Installer-x64",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ],
+                  [
+                    artifactId: "Cisco-UC-Installer-x86",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ],
+                  [
+                    artifactId: "Cisco-UC-Installer",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\x64\\Release\\Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe",
+                    type: 'exe'
+                  ]
+                ]
+              )
+            }
+          }
+        }
         stage ('Upgrade Builds') {
           when {
             anyOf {
@@ -265,6 +305,36 @@ pipeline {
 
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
+
+              nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'https',
+                nexusUrl: 'nexus.engine.sourcefire.com',
+                groupId: 'UnifiedConnector/Windows',
+                version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
+                repository: 'raw',
+                credentialsId: 'nexus_credentials',
+                artifacts: [
+                  [
+                    artifactId: "Cisco-UC-Installer-x64",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ],
+                  [
+                    artifactId: "Cisco-UC-Installer-x86",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ],
+                  [
+                    artifactId: "Cisco-UC-Installer",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\x64\\Release\\Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe",
+                    type: 'exe'
+                  ]
+                ]
+              )
             }
           }
         }
