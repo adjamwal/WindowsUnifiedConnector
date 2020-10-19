@@ -3,7 +3,7 @@
 #include "UCIDLoader.h"
 #include "IUCLogger.h"
 #include "ICodeSignVerifier.h"
-#include "HelperFunctions.h"
+#include "WindowsUtilities.h"
 
 #define UCID_MODULE_INTERFACE_VERSION 1u
 #define UCID_MODULE_CONFIG_FILENAME L"config.xml"
@@ -119,14 +119,15 @@ void UCIDLoader::LoadControlModule()
 
     std::wstring ucidDllDir;
     std::wstring dllFullPath;
-    if( !HelperFunctions::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module data from registry" );
         return;
     }
 
     dllFullPath = ucidDllDir;
-    if( HelperFunctions::Is64BitWindows() )
+
+    if(WindowsUtilities::Is64BitWindows() )
     {
         dllFullPath.append( L"x64\\" );
     }
@@ -139,7 +140,7 @@ void UCIDLoader::LoadControlModule()
     std::wstring ucidConfigFile( ucidDllDir );
     ucidConfigFile.append( UCID_MODULE_CONFIG_FILENAME );
 
-    if( !HelperFunctions::FileExists( ucidConfigFile.c_str() ) )
+    if( !WindowsUtilities::FileExists( ucidConfigFile.c_str() ) )
     {
         WLOG_ERROR( L"UnifiedConnectorID Control Module configuration file not found: %s", ucidConfigFile.c_str() );
         return;
