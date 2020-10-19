@@ -157,6 +157,8 @@ bool PackageManager::PmGetUCIDId()
         {
             LOG_ERROR("GetIdentityToken: %s", token.c_str());
         }
+
+        m_dependencies->Configuration().UnloadUcidApi();
     }
     else
     {

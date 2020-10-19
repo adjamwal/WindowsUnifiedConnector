@@ -222,6 +222,8 @@ bool UCIDApiDll::LoadApi()
 
 void UCIDApiDll::UnloadApi()
 {
+    UnloadDll();
+
     if( !m_isModuleLoaded )
     {
         WLOG_ERROR( L"UnifiedConnectorID Api already unloaded." );
