@@ -126,7 +126,8 @@ void UCIDLoader::LoadControlModule()
     }
 
     dllFullPath = ucidDllDir;
-    if(WindowsUtilities::Is64BitWindows )
+
+    if(WindowsUtilities::Is64BitWindows() )
     {
         dllFullPath.append( L"x64\\" );
     }
