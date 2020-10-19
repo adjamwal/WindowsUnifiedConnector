@@ -14,7 +14,7 @@ WindowsConfiguration::~WindowsConfiguration()
     m_winCertLoader.UnloadSystemCerts();
 }
 
-int32_t GetConfigFileLocation( char* filename, size_t& filenameLength )
+int32_t WindowsConfiguration::GetConfigFileLocation( char* filename, size_t& filenameLength )
 {
     return -1;
 }

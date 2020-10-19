@@ -10,7 +10,7 @@ class WindowsConfiguration : public IPmPlatformConfiguration
 {
 public:
     WindowsConfiguration(IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier);
-    ~WindowsConfiguration() {}
+    ~WindowsConfiguration();
 
     /**
      * TO be deleted? Not sure this is required
