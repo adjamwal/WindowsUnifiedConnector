@@ -24,6 +24,7 @@
     <ProjectGuid>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</ProjectGuid>
     <RootNamespace>ControlModule</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>dllControlModule</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

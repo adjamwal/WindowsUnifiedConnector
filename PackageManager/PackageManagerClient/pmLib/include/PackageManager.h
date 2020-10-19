@@ -40,6 +40,7 @@ private:
     std::chrono::milliseconds PmThreadWait();
     bool PmLoadConfig();
     bool PmLoadPackageList();
+    bool PmGetUCIDId();
     bool PmCheckin();
     bool PmProcessComponent( const PmComponent& component );
     bool PmProcessManifest( const std::string& manifest);

@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "UCService.h"
-#include "HelperFunctions.h"
+#include "WindowsUtilities.h"
 
 #pragma region Service Constructor and Destructor
 

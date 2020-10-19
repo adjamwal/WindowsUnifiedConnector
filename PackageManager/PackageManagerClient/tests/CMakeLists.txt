@@ -25,12 +25,5 @@ endif()
 include(GoogleTest)
 
 add_subdirectory(mocks)
-add_executable(TestPmConfig pmLibTests/TestPmConfig.cpp )
-target_link_directories(TestPmConfig PRIVATE ${jsoncpp_LIBRARY} )
-target_link_libraries(TestPmConfig gtest gmock gtest_main pmlib jsoncpp mockLib )
-
-gtest_discover_tests(TestPmConfig
-    WORKING_DIRECTORY ${PROJECT_DIR}
-    PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
-)
-set_target_properties(TestPmConfig PROPERTIES FOLDER tests)
+add_subdirectory(UnitTests)
+add_subdirectory(ComponentTests)

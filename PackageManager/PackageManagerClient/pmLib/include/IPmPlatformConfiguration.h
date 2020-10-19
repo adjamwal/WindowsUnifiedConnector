@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <openssl/ssl.h>
 
 /**
  * @file IPmPlatformConfiguration.h
@@ -19,8 +21,46 @@ public:
     virtual int32_t GetConfigFileLocation( char* filename, size_t& filenameLength ) = 0;
 
     /**
+     * @brief Load the UCID API.
+     */
+    virtual bool LoadUcidApi() = 0;
+
+    /**
+     * @brief Unload the UCID API.
+     */
+    virtual void UnloadUcidApi() = 0;
+
+    /**
+     * @brief Retrieves the clients identity id.
+     */
+    virtual bool GetIdentity( std::string& token ) = 0;
+
+    /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
-    virtual int32_t GetIdentity( char* token, size_t& tokenLength ) = 0;
+    virtual bool GetIdentityToken( std::string& token ) = 0;
+
+    /**
+     * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
+     *   communicating with the cloud.
+     */
+    virtual bool RefreshIdentityToken() = 0;
+
+    /**
+     * @brief (Optional) Retrieves the clients system certs
+     *   Needed in Windows since curl can't load system certs without schannel
+     *
+     *  @param[in|out] certificates - Array of certs returned. The platfrom should allocated these
+     *  @param[out] certificates - Number to certs returned
+     */
+    virtual int32_t GetSslCertificates( X509*** certificates, size_t &count ) = 0;
+
+    /**
+     * @brief (Optional) Frees the cert list allocated by GetSslCertificates
+     *
+     *  @param[in] certificates - The cert array to be freed
+     *  @param[in] certificates - Number to certs in the array
+     */
+    virtual void ReleaseSslCertificates( X509** certificates, size_t count ) = 0;
 };
