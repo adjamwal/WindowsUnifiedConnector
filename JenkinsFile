@@ -36,9 +36,9 @@ def SetupVersion( boolean upgrade ) {
   dir('WindowsUnifiedConnector') {
     //Setup GlobalVersion.h
     //Note: Can't use custom environment variables like ${UC_MAJOR} in contentReplace
-    def ucMajor = UC_MAJOR
-    def ucMinor = UC_MINOR
-    def ucPatch = UC_PATCH
+    ucMajor = UC_MAJOR
+    ucMinor = UC_MINOR
+    ucPatch = UC_PATCH
 
     if ( upgrade ) {
       ucMajor = 99
@@ -224,13 +224,17 @@ pipeline {
                 
                 archiveArtifacts artifacts: '*.zip', fingerprint: true
                 
-                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${BUILD_PATH} /Y"
-                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${BUILD_PATH} /Y"
-                bat "COPY x64\\Release\\Cisco-UC-Installer.exe ${BUILD_PATH} /Y"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe"
+                
+                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
+                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
+                bat "COPY x64\\Release\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
               }
               
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer.exe', fingerprint: true
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
             }
           }
         }
@@ -252,9 +256,9 @@ pipeline {
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m'
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m'
                 
-                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-Upgrade.msi"
-                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-Upgrade.msi"
-                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-Upgrade.exe"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe"
               }
 
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
