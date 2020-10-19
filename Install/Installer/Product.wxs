@@ -257,6 +257,21 @@
                   <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
             <?endif?>
+            <?if $(var.Platform) = "x64" ?>
+              <Component Id="UCPMlibcrypto_1_1_x64.dll" Guid="*">
+                <File Id="UCPMlibcrypto_1_1_x64.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\libcrypto-1_1-x64.dll" />
+              </Component>
+              <Component Id="UCPMlibssl_1_1_x64.dll" Guid="*">
+                <File Id="UCPMlibssl_1_1_x64.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\libssl-1_1-x64.dll" />
+              </Component>
+            <?else?>
+              <Component Id="UCPMlibcrypto_1_1.dll" Guid="*">
+                <File Id="UCPMlibcrypto_1_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\Win32\bin\libcrypto-1_1.dll" />
+              </Component>
+              <Component Id="UCPMlibssl_1_1.dll" Guid="*">
+                <File Id="UCPMlibssl_1_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\Win32\bin\libssl-1_1.dll" />
+              </Component>
+            <?endif?>
         </ComponentGroup>
     </Fragment>
 </Wix>
