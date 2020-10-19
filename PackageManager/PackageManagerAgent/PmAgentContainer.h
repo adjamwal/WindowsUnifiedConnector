@@ -8,6 +8,7 @@ class WindowsConfiguration;
 class WindowsComponentManager;
 class WindowsPmDependencies;
 class IPMLogger;
+class ICodesignVerifier;
 
 class PmAgentContainer
 {
@@ -18,6 +19,7 @@ public:
     PmAgent& pmAgent();
 
 private:
+    std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
     std::unique_ptr<WindowsConfiguration> m_configuration;
     std::unique_ptr<WindowsComponentManager> m_componentMgr;
     std::unique_ptr<WindowsPmDependencies> m_pmDependencies;

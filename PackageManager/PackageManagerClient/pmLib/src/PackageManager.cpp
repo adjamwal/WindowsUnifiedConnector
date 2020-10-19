@@ -10,6 +10,7 @@
 #include "IPmManifest.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
+#include "IPmPlatformConfiguration.h"
 #include "PmTypes.h"
 
 using namespace std;
@@ -107,6 +108,10 @@ void PackageManager::PmWorkflowThread()
     if( !PmLoadPackageList() ) {
         LOG_ERROR( "Failed to load PM PackageList" );
     }
+	
+	if (!PmGetUCIDId() ) {
+		LOG_ERROR( "Failed to get UCID Id" );
+	}
 
     if( !PmCheckin() ) {
         LOG_ERROR( "Package Manager Checkin failed" );
@@ -125,6 +130,40 @@ bool PackageManager::PmLoadPackageList()
 
     //For release this should discover installed packages
     //If empty then add one package... The package manager
+
+    return false;
+}
+
+bool PackageManager::PmGetUCIDId()
+{
+    int32_t ret;
+
+    if (m_dependencies->Configuration().LoadUcidApi())
+    {
+        //refreshh indentity token
+        if (m_dependencies->Configuration().RefreshIdentityToken())
+        {
+            LOG_ERROR("Refreshed UCID Token");
+        }
+
+        //get ucid id
+        std::string lmao;
+        if (m_dependencies->Configuration().GetIdentity(lmao))
+        {
+            LOG_ERROR("GetIdentity: %s", lmao.c_str());
+        }
+
+        //get ucid token 
+        std::string wtf;
+        if (m_dependencies->Configuration().GetIdentityToken(wtf))
+        {
+            LOG_ERROR("GetIdentityToken: %s", wtf.c_str());
+        }
+    }
+    else
+    {
+        LOG_ERROR("Failed to load ucid api");
+    }
 
     return false;
 }

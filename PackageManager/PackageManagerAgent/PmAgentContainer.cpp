@@ -7,9 +7,11 @@
 #include "PmAgent.h"
 #include "PmLogAdapter.h"
 #include "IUcLogger.h"
+#include "CodesignVerifier.h"
 
 PmAgentContainer::PmAgentContainer( const std::wstring& configFilePath ) :
-    m_configuration( new WindowsConfiguration() )
+    m_codeSignVerifer( new CodesignVerifier() )
+    , m_configuration( new WindowsConfiguration( *m_codeSignVerifer.get() ) )
     , m_componentMgr( new WindowsComponentManager() )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
     , m_pmLogger( new PmLogAdapter() )
