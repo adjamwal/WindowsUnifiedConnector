@@ -136,8 +136,6 @@ bool PackageManager::PmLoadPackageList()
 
 bool PackageManager::PmGetUCIDId()
 {
-    int32_t ret;
-
     if (m_dependencies->Configuration().LoadUcidApi())
     {
         //refreshh indentity token
@@ -147,17 +145,17 @@ bool PackageManager::PmGetUCIDId()
         }
 
         //get ucid id
-        std::string lmao;
-        if (m_dependencies->Configuration().GetIdentity(lmao))
+        std::string id;
+        if (m_dependencies->Configuration().GetIdentity(id))
         {
-            LOG_ERROR("GetIdentity: %s", lmao.c_str());
+            LOG_ERROR("GetIdentity: %s", id.c_str());
         }
 
         //get ucid token 
-        std::string wtf;
-        if (m_dependencies->Configuration().GetIdentityToken(wtf))
+        std::string token;
+        if (m_dependencies->Configuration().GetIdentityToken(token))
         {
-            LOG_ERROR("GetIdentityToken: %s", wtf.c_str());
+            LOG_ERROR("GetIdentityToken: %s", token.c_str());
         }
     }
     else
