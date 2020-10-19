@@ -22,7 +22,7 @@ public:
     /**
      * @brief Load the UCID API.
      */
-    virtual bool LoadUcidApi() override
+    bool LoadUcidApi() override
     {
         return m_ucidApi.LoadApi();
     }
@@ -30,7 +30,7 @@ public:
     /**
      * @brief Unload the UCID API.
      */
-    virtual void UnloadUcidApi() override
+    void UnloadUcidApi() override
     {
         return m_ucidApi.UnloadApi();
     }
@@ -38,7 +38,7 @@ public:
     /**
      * @brief Retrieves the clients identity id.
      */
-    virtual bool GetIdentity( std::string& id ) override
+    bool GetIdentity( std::string& id ) override
     {
         bool ret = false;
 
@@ -61,7 +61,7 @@ public:
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
-    virtual bool GetIdentityToken( std::string& token ) override
+    bool GetIdentityToken( std::string& token ) override
     {
         bool ret = false;
 
@@ -84,7 +84,7 @@ public:
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
-    virtual bool RefreshIdentityToken() override
+    bool RefreshIdentityToken() override
     {
         bool ret = false;
 
