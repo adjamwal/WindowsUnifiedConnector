@@ -95,7 +95,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -113,7 +113,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -131,7 +131,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -149,7 +149,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)$(Platform)\$(Configuration)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -161,10 +161,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IWinCertLoader.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PmAgent.h" />
     <ClInclude Include="PmAgentContainer.h" />
     <ClInclude Include="PmLogAdapter.h" />
+    <ClInclude Include="WinCertLoader.h" />
     <ClInclude Include="WindowsComponentManager.h" />
     <ClInclude Include="WindowsConfiguraton.h" />
     <ClInclude Include="WindowsPmDependencies.h" />
@@ -179,6 +181,8 @@
     </ClCompile>
     <ClCompile Include="PmAgentContainer.cpp" />
     <ClCompile Include="PmLogAdapter.cpp" />
+    <ClCompile Include="WinCertLoader.cpp" />
+    <ClCompile Include="WindowsConfiguration.cpp" />
     <ClCompile Include="WindowsPmDependencies.cpp" />
   </ItemGroup>
   <ItemGroup>
