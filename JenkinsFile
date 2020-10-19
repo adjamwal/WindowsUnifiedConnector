@@ -36,9 +36,9 @@ def SetupVersion( boolean upgrade ) {
   dir('WindowsUnifiedConnector') {
     //Setup GlobalVersion.h
     //Note: Can't use custom environment variables like ${UC_MAJOR} in contentReplace
-    def ucMajor = UC_MAJOR
-    def ucMinor = UC_MINOR
-    def ucPatch = UC_PATCH
+    ucMajor = UC_MAJOR
+    ucMinor = UC_MINOR
+    ucPatch = UC_PATCH
 
     if ( upgrade ) {
       ucMajor = 99
@@ -147,7 +147,7 @@ pipeline {
             script {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Release\\Win32\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m"
               }                
             }
           }
@@ -157,7 +157,7 @@ pipeline {
             script {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Release\\x64\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m"
               }                
             }
           }
@@ -167,7 +167,7 @@ pipeline {
             script {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Debug\\Win32\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x86 -m"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Debug /p:Platform=x86 -m"
               }                
             }
           }
@@ -188,10 +188,10 @@ pipeline {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
                 //TODO: Enable unit tests when we have them
-                // bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Debug\\Win32\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x86\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
-                // bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Debug\\x64\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
-                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Debug\\Win32\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
-                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Debug\\x64\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                // bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x86\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                // bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
               }                
             }
           }
@@ -224,13 +224,17 @@ pipeline {
                 
                 archiveArtifacts artifacts: '*.zip', fingerprint: true
                 
-                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${BUILD_PATH} /Y"
-                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${BUILD_PATH} /Y"
-                bat "COPY x64\\Release\\Cisco-UC-Installer.exe ${BUILD_PATH} /Y"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe"
+                
+                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
+                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
+                bat "COPY x64\\Release\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
               }
               
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer.exe', fingerprint: true
+              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
             }
           }
         }
@@ -246,15 +250,15 @@ pipeline {
               SetGithubPendingStatus()
               SetupVersion(true)
               dir('WindowsUnifiedConnector') {
-                // Encountered a random build failre using the /t:rebuild target. Seems like libControlModule is cleaned but not rebuilt
+                // Encountered a random build failure using the /t:rebuild target. Seems like libControlModule is cleaned but not rebuilt
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 /t:clean'
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:clean'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m'
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m"
                 
-                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-Upgrade.msi"
-                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-Upgrade.msi"
-                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-Upgrade.exe"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe"
               }
 
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
