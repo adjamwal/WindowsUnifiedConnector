@@ -250,11 +250,11 @@ pipeline {
               SetGithubPendingStatus()
               SetupVersion(true)
               dir('WindowsUnifiedConnector') {
-                // Encountered a random build failre using the /t:rebuild target. Seems like libControlModule is cleaned but not rebuilt
+                // Encountered a random build failure using the /t:rebuild target. Seems like libControlModule is cleaned but not rebuilt
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 /t:clean'
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:clean'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m'
+                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Release\\Win32\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m"
+                bat "set PATH=${WORKSPACE}\\common\\common-windows-build\\Debug\\x64\\bin;%PATH% && \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m"
                 
                 bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
                 bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
