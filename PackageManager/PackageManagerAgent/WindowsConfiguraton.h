@@ -4,105 +4,64 @@
 #include "IUcLogger.h"
 #include "UCIDApiDll.h"
 
+class IWinCertLoader;
+
 class WindowsConfiguration : public IPmPlatformConfiguration
 {
 public:
-    WindowsConfiguration( ICodesignVerifier& codeSignVerifier )
-    : m_ucidApi(codeSignVerifier) {}
+    WindowsConfiguration(IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier);
     ~WindowsConfiguration() {}
 
     /**
      * TO be deleted? Not sure this is required
      */
-    int32_t GetConfigFileLocation( char* filename, size_t& filenameLength ) override
-    {
-        return -1;
-    }
+    int32_t GetConfigFileLocation( char* filename, size_t& filenameLength ) override;
 
     /**
      * @brief Load the UCID API.
      */
-    bool LoadUcidApi() override
-    {
-        return m_ucidApi.LoadApi();
-    }
+    bool LoadUcidApi() override;
 
     /**
      * @brief Unload the UCID API.
      */
-    void UnloadUcidApi() override
-    {
-        return m_ucidApi.UnloadApi();
-    }
+    void UnloadUcidApi() override;
 
     /**
      * @brief Retrieves the clients identity id.
      */
-    bool GetIdentity( std::string& id ) override
-    {
-        bool ret = false;
-
-        int32_t ucidRet = m_ucidApi.GetId(id);
-
-        if (ucidRet == 0)
-        {
-            ret = true;
-            LOG_DEBUG("GetIdentity: %s", id.c_str());
-        }
-        else
-        {
-            LOG_ERROR("GetIdentity Failed: %d", ucidRet);
-        }
-
-        return ret;
-    }
+    bool GetIdentity( std::string& id ) override;
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
-    bool GetIdentityToken( std::string& token ) override
-    {
-        bool ret = false;
-
-        int32_t ucidRet = m_ucidApi.GetToken(token);
-
-        if (ucidRet == 0)
-        {
-            ret = true;
-            LOG_DEBUG("GetToken: %s", token.c_str());
-        }
-        else
-        {
-            LOG_ERROR("GetToken Failed: %d", ucidRet);
-        }
-
-        return ret;
-    }
+    bool GetIdentityToken( std::string& token ) override;
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
-    bool RefreshIdentityToken() override
-    {
-        bool ret = false;
+    bool RefreshIdentityToken() override;
 
-        int32_t ucidRet = m_ucidApi.RefreshToken();
+    /**
+     * @brief (Optional) Retrieves the clients system certs
+     *   Needed in Windows since curl can't load system certs without schannel
+     *
+     *  @param[in|out] certificates - Array of certs returned. The platfrom should allocated these
+     *  @param[out] certificates - Number to certs returned
+     */
+    int32_t GetSslCertificates( X509*** certificates, size_t& count ) override;
 
-        if (ucidRet == 0)
-        {
-            LOG_DEBUG("RefreshIdentityToken succeeded");
-            ret = true;
-        }
-        else
-        {
-            LOG_ERROR("RefreshIdentityToken Failed: %d", ucidRet);
-        }
-
-        return ret;
-    }
+    /**
+     * @brief (Optional) Frees the cert list allocated by GetSslCertificates
+     *
+     *  @param[in] certificates - The cert array to be freed
+     *  @param[in] certificates - Number to certs in the array
+     */
+    void ReleaseSslCertificates( X509** certificates, size_t count ) override;
 
 private:
+    IWinCertLoader& m_winCertLoader;
     UCIDApiDll m_ucidApi;
 };

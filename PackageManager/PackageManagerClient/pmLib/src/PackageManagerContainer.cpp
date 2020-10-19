@@ -10,6 +10,7 @@
 
 #include <mutex>
 #include <exception>
+#include <curl/curl.h>
 
 static std::mutex gContainerMutex;
 static PackageManagerContainer* gContainer = NULL;
@@ -22,12 +23,12 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_thread( new WorkerThread() )
     , m_pacMan( new PackageManager( *m_config, *m_cloud, *m_manifest, *m_thread ) )
 {
-
+    curl_global_init( CURL_GLOBAL_DEFAULT );
 }
 
 PackageManagerContainer::~PackageManagerContainer()
 {
-
+    curl_global_cleanup();
 }
 
 IPackageManager& PackageManagerContainer::packageManager()

@@ -8,10 +8,12 @@
 #include "PmLogAdapter.h"
 #include "IUcLogger.h"
 #include "CodesignVerifier.h"
+#include "WinCertLoader.h"
 
 PmAgentContainer::PmAgentContainer( const std::wstring& configFilePath ) :
-    m_codeSignVerifer( new CodesignVerifier() )
-    , m_configuration( new WindowsConfiguration( *m_codeSignVerifer.get() ) )
+    m_certLoader( new WinCertLoader() )
+    , m_codeSignVerifer(new CodesignVerifier())
+    , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
     , m_componentMgr( new WindowsComponentManager() )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
     , m_pmLogger( new PmLogAdapter() )

@@ -1,0 +1,15 @@
+{
+    "arch": "x64",
+    "platform": "win",
+    "packages": [
+        {
+            "package": "PACKAGE_NAME/PACKAGE_SYM_VERSION",
+            "configs": [
+                {
+                    "path": "a.xml|a.json|a.txt|a.something",
+                    "sha256": "sha256"
+                }
+            ]
+        }
+    ]
+}

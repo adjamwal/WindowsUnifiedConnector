@@ -42,6 +42,12 @@
     <ClInclude Include="UCIDApiDll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WinCertLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IWinCertLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -60,6 +66,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UCIDApiDll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinCertLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
