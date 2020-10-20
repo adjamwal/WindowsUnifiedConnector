@@ -108,10 +108,13 @@ void PackageManager::PmWorkflowThread()
     if( !PmLoadPackageList() ) {
         LOG_ERROR( "Failed to load PM PackageList" );
     }
-	
-	if (!PmGetUCIDId() ) {
-		LOG_ERROR( "Failed to get UCID Id" );
-	}
+    
+    //get ucid token movee this code to where appropriately needed
+    std::string token;
+    if ( m_dependencies->Configuration().GetIdentityToken( token ) )
+    {
+        LOG_ERROR( "GetIdentityToken: %s", token.c_str() );
+    }
 
     if( !PmCheckin() ) {
         LOG_ERROR( "Package Manager Checkin failed" );
@@ -130,40 +133,6 @@ bool PackageManager::PmLoadPackageList()
 
     //For release this should discover installed packages
     //If empty then add one package... The package manager
-
-    return false;
-}
-
-bool PackageManager::PmGetUCIDId()
-{
-    if (m_dependencies->Configuration().LoadUcidApi())
-    {
-        //refreshh indentity token
-        if (m_dependencies->Configuration().RefreshIdentityToken())
-        {
-            LOG_ERROR("Refreshed UCID Token");
-        }
-
-        //get ucid id
-        std::string id;
-        if (m_dependencies->Configuration().GetIdentity(id))
-        {
-            LOG_ERROR("GetIdentity: %s", id.c_str());
-        }
-
-        //get ucid token 
-        std::string token;
-        if (m_dependencies->Configuration().GetIdentityToken(token))
-        {
-            LOG_ERROR("GetIdentityToken: %s", token.c_str());
-        }
-
-        m_dependencies->Configuration().UnloadUcidApi();
-    }
-    else
-    {
-        LOG_ERROR("Failed to load ucid api");
-    }
 
     return false;
 }
