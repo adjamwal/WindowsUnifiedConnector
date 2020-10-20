@@ -38,7 +38,7 @@ bool WindowsConfiguration::GetIdentityToken( std::string& token )
         //get ucid id
         ucidRet = m_ucidApi.GetId( token );
 
-        if ( ucidRet == 0 )
+        if ( ucidRet != 0 )
         {
             LOG_ERROR( "GetIdentity Failed: %d", ucidRet );
             ret = false;
