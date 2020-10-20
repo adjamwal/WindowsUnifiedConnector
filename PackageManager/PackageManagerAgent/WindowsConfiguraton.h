@@ -18,31 +18,10 @@ public:
     int32_t GetConfigFileLocation( char* filename, size_t& filenameLength ) override;
 
     /**
-     * @brief Load the UCID API.
-     */
-    bool LoadUcidApi() override;
-
-    /**
-     * @brief Unload the UCID API.
-     */
-    void UnloadUcidApi() override;
-
-    /**
-     * @brief Retrieves the clients identity id.
-     */
-    bool GetIdentity( std::string& id ) override;
-
-    /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
     bool GetIdentityToken( std::string& token ) override;
-
-    /**
-     * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
-     *   communicating with the cloud.
-     */
-    bool RefreshIdentityToken() override;
 
     /**
      * @brief (Optional) Retrieves the clients system certs
