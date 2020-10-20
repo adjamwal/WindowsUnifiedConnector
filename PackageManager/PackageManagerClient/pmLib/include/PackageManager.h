@@ -23,7 +23,9 @@ public:
 
     int32_t Start( const char* configFile ) override;
     int32_t Stop() override;
+
     void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) override;
+    int32_t VerifyPacManConfig( const char* configFile ) override;
 
 private:
     IPmConfig& m_config;
