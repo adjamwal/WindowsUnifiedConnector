@@ -206,7 +206,10 @@
             <Component Id="UC_PM.exe" Guid="*">
                 <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />
             </Component>
-
+            <Component Id="PM_Verify.exe" Guid="*">
+              <File Id="PM_Verify.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_Verify.exe" />
+            </Component>
+          
             <Component Id="PM_MCP_config.json" Guid="*">
                 <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\PackageManager\ControlModule\PM_MCP_config.json" />
             </Component>

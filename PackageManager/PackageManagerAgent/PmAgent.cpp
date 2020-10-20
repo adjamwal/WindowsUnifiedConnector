@@ -42,3 +42,12 @@ int32_t PmAgent::Stop()
     LOG_DEBUG( "Stopping Package Manager Client" );
     return m_PacMan->Stop();
 }
+
+int32_t PmAgent::VerifyConfig( const std::wstring& configFilePath )
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    std::string configFile = converter.to_bytes( configFilePath );
+
+    LOG_DEBUG( "Verifing config file %s", configFile.c_str() );
+    return m_PacMan->VerifyPacManConfig( configFile.c_str() );
+}

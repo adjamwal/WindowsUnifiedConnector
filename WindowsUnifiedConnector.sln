@@ -13,11 +13,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCService", "UCService\UCSe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageManagerClient", "PackageManager\PackageManagerClient.vcxproj", "{A3C9E21E-4C04-496C-96B7-D3C68362E25F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ControlModule", "PackageManager\ControlModule\ControlModule.vcxproj", "{E7DB0C5A-D7C4-4E3B-85B6-53758EDE0A23}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dllControlModule", "PackageManager\ControlModule\ControlModule.vcxproj", "{E7DB0C5A-D7C4-4E3B-85B6-53758EDE0A23}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageManager", "PackageManager", "{3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageMananger", "PackageManager\PackageMananger\PackageMananger.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageMananger", "PackageManager\PackageMananger\PackageMananger.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libControlModule", "PackageManager\libControlModule\libControlModule.vcxproj", "{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}"
 EndProject
@@ -47,6 +47,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestVerifier", "SharedLibs\ComponentTestVerifier\ComponentTestVerifier.vcxproj", "{2AA7A34A-8977-439A-B8F3-BDCAC604095C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libWindowsUtilities", "SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj", "{86BFA0BC-6791-44B9-85A8-D0C420F57EE6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageManagerVerifier", "PackageManager\WinPackageManagerVerifier\WinPackageManagerVerifier.vcxproj", "{4AE76955-E581-4BC6-8792-A6A64A87ACD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -158,6 +160,14 @@ Global
 		{86BFA0BC-6791-44B9-85A8-D0C420F57EE6}.Release|x64.Build.0 = Release|x64
 		{86BFA0BC-6791-44B9-85A8-D0C420F57EE6}.Release|x86.ActiveCfg = Release|Win32
 		{86BFA0BC-6791-44B9-85A8-D0C420F57EE6}.Release|x86.Build.0 = Release|Win32
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Debug|x64.ActiveCfg = Debug|x64
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Debug|x64.Build.0 = Debug|x64
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Debug|x86.ActiveCfg = Debug|Win32
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Debug|x86.Build.0 = Debug|Win32
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Release|x64.ActiveCfg = Release|x64
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Release|x64.Build.0 = Release|x64
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Release|x86.ActiveCfg = Release|Win32
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -178,6 +188,7 @@ Global
 		{780B5314-E3CA-4427-96E0-9262F8C7A2CE} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
 		{2AA7A34A-8977-439A-B8F3-BDCAC604095C} = {EA581C03-8594-4E64-A5D7-7D8CA6E48E03}
 		{86BFA0BC-6791-44B9-85A8-D0C420F57EE6} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
+		{4AE76955-E581-4BC6-8792-A6A64A87ACD0} = {3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}
