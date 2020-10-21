@@ -1,6 +1,7 @@
 #include "PackageManagerContainer.h"
 #include "PackageManager.h"
 #include "PmCloud.h"
+#include "PmHttp.h"
 #include "PmConfig.h"
 #include "PmManifest.h"
 #include "WorkerThread.h"
@@ -17,7 +18,8 @@ static PackageManagerContainer* gContainer = NULL;
 
 PackageManagerContainer::PackageManagerContainer() :
     m_fileUtil( new FileUtil() )
-    , m_cloud ( new PmCloud() )
+    , m_http( new PmHttp( *m_fileUtil ) )
+    , m_cloud( new PmCloud( *m_http ) )
     , m_config( new PmConfig( *m_fileUtil ) )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )

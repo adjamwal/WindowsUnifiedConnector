@@ -85,11 +85,11 @@ void UCMCPLoader::UnloadDll()
         return;
     }
 
-    LOG_DEBUG( "UnLoading %s", m_loadedDllName.c_str() );
+    WLOG_DEBUG( L"UnLoading %s", m_loadedDllName.c_str() );
 
     if( FreeLibrary( m_controlLib ) == 0 )
     {
-        LOG_ERROR( "FreeLibrary() call failed. Error %d", GetLastError() );
+        WLOG_ERROR( L"FreeLibrary() call failed. Error %d", GetLastError() );
     }
 
     m_controlLib = 0;
@@ -144,7 +144,7 @@ void UCMCPLoader::LoadControlModule()
     }
     catch( std::exception& ex )
     {
-        WLOG_ERROR( "Exception: %s", ex.what() );
+        LOG_ERROR( "Exception: %s", ex.what() );
     }
 
     m_context.nVersion = PM_MODULE_INTERFACE_VERSION;
