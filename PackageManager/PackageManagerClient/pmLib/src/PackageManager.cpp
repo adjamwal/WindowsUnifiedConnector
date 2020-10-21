@@ -122,7 +122,7 @@ void PackageManager::PmWorkflowThread()
 
     PmPackage package;
     package.Type = PackageType::MSI;
-    package.Path = "C:\\dev\\WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-US";
+    package.Path = "C:\\dev\\WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-US\\";
     package.Name = "Cisco-UC-Installer-x64.msi";
     package.CmdLine = "";
 

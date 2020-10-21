@@ -3,6 +3,7 @@
 #include <Shlobj.h>
 #include <locale>
 #include <codecvt>
+#include <sstream>
 #include <PmTypes.h>
 
 WindowsComponentManager::WindowsComponentManager()
@@ -117,7 +118,13 @@ void WindowsComponentManager::ExecutePackage( std::string executable, std::strin
     }
     else
     {
-        throw std::exception( std::string( "Failed to run package. GetLastError: " + std::to_string( GetLastError() ) ).c_str() );
+        std::stringstream ss;
+        ss << "Failed to run package. " 
+            << "Exe: " << executable
+            << " CmdLine: " << cmdline
+            << " GetLastError: " << std::to_string( GetLastError() );
+
+        throw std::exception( ss.str().c_str() );
     }
 }
 
