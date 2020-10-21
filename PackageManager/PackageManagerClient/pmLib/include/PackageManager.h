@@ -7,8 +7,11 @@
 #include <vector>
 
 class IPmConfig;
-class IPmCloud;
-class IPmManifest;
+class ITokenAdapter;
+class ICertsAdapter;
+class ICheckinManifestRetriever;
+class IManifestProcessor;
+class IComponentPackageProcessor;
 class IWorkerThread;
 
 struct PmComponent;
@@ -18,7 +21,13 @@ struct PmInstalledPackage;
 class PackageManager : public IPackageManager
 {
 public:
-    PackageManager( IPmConfig& config, IPmCloud& cloud, IPmManifest& manifest, IWorkerThread& thread );
+    PackageManager( IPmConfig& config, 
+        ITokenAdapter& tokenAdapter, 
+        ICertsAdapter& certsAdapter,
+        ICheckinManifestRetriever& manifestRetriever,
+        IManifestProcessor& manifestProcessor, 
+        IComponentPackageProcessor& componentProcessor, 
+        IWorkerThread& thread );
     virtual ~PackageManager();
 
     int32_t Start( const char* configFile ) override;
@@ -27,8 +36,11 @@ public:
 
 private:
     IPmConfig& m_config;
-    IPmCloud& m_cloud;
-    IPmManifest& m_manifest;
+    ITokenAdapter& m_tokenAdapter;
+    ICertsAdapter& m_certsAdapter;
+    ICheckinManifestRetriever& m_manifestRetriever;
+    IManifestProcessor& m_manifestProcessor;
+    IComponentPackageProcessor& m_componentProcessor;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
     std::string m_configFilename;

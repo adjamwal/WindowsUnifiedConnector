@@ -6,8 +6,11 @@
 #include "PmLogger.h"
 #include "IWorkerThread.h"
 #include "IPmConfig.h"
-#include "IPmCloud.h"
-#include "IPmManifest.h"
+#include "TokenAdapter.h"
+#include "CertsAdapter.h"
+#include "CheckinManifestRetriever.h"
+#include "ManifestProcessor.h"
+#include "ComponentPackageProcessor.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include "IPmPlatformConfiguration.h"
@@ -21,10 +24,19 @@ void PmVersion( int& major, int &minor)
     minor = PackageManager_VERSION_MINOR;
 }
 
-PackageManager::PackageManager( IPmConfig& config, IPmCloud& cloud, IPmManifest& manifest, IWorkerThread& thread ) :
+PackageManager::PackageManager( IPmConfig& config, 
+    ITokenAdapter& tokenAdapter,
+    ICertsAdapter& certsAdapter,
+    ICheckinManifestRetriever& manifestRetriever,
+    IManifestProcessor& manifestProcessor,
+    IComponentPackageProcessor& componentProcessor, 
+    IWorkerThread& thread ) :
     m_config( config )
-    , m_cloud( cloud )
-    , m_manifest( manifest )
+    , m_tokenAdapter( tokenAdapter )
+    , m_certsAdapter( certsAdapter )
+    , m_manifestRetriever( manifestRetriever )
+    , m_manifestProcessor( manifestProcessor )
+    , m_componentProcessor( componentProcessor )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
