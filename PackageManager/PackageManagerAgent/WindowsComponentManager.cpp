@@ -99,17 +99,17 @@ void WindowsComponentManager::ExecutePackage( std::string executable, std::strin
 
         if ( ret != WAIT_OBJECT_0 )
         {
-            throw std::exception( "WaitForSingleObject Failed with return value: %d", ret );
+            throw std::exception( std::string( "WaitForSingleObject Failed with return value: " + std::to_string( ret ) ).c_str() );
         }
 
         if ( !GetExitCodeProcess( pi.hProcess, &exit_code ) )
         {
-            throw std::exception( "Failed to get last Exit Code for update Exe. GetLastError: %d", GetLastError() );
+            throw std::exception( std::string( "Failed to get last Exit Code for update Exe. GetLastError: " + std::to_string( GetLastError() ) ).c_str() );
         }
 
         if ( exit_code != 0 )
         {
-            throw std::exception( "CreateProcess GetExitCodeProcess returned: %d", exit_code );
+            throw std::exception( std::string( "CreateProcess GetExitCodeProcess returned: " + std::to_string( exit_code ) ).c_str() );
         }
 
         CloseHandle( pi.hProcess );
@@ -117,7 +117,7 @@ void WindowsComponentManager::ExecutePackage( std::string executable, std::strin
     }
     else
     {
-        throw std::exception( "Failed to run package. GetLastError: %d", GetLastError() );
+        throw std::exception( std::string( "Failed to run package. GetLastError: " + std::to_string( GetLastError() ) ).c_str() );
     }
 }
 
@@ -129,7 +129,7 @@ std::string WindowsComponentManager::GetSystemDirectory()
     
     if( ret != S_OK )
     {
-        throw std::exception( "Failed to get system directory: %d", ret );
+        throw std::exception( std::string("Failed to get system directory: " + std::to_string( ret )).c_str() );
     }
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
