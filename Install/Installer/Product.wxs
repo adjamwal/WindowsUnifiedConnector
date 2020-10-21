@@ -29,6 +29,7 @@
             <ComponentGroupRef Id="UCIDx86Components"/>
             <ComponentGroupRef Id="UCIDx64Components"/>
             <ComponentGroupRef Id="UCPMComponents" />
+            <ComponentGroupRef Id="UCConfigComponents" />
         </Feature>
     </Product>
 
@@ -38,6 +39,7 @@
                 <Directory Id="CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
                     <Directory Id="SECUREXYZ_DIRECTORY" Name="$(var.SecureXYZDirectory)">
                         <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
+                            <Directory Id="UC_CONFIG_DIRECTORY" Name="$(var.UCConfigDirectory)" />
                             <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
                                 <Directory Id="UCSERVICE_BASE_DIRECTORY" Name="$(var.ServiceDictory)">
                                     <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.ServiceVersion)" />
@@ -160,9 +162,6 @@
                 <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\UCID\$(var.Platform)\bin\ucidagent.exe" />
             </Component>
 
-            <Component Id="ucid_config.xml" Guid="*">
-                <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\UCID\config.xml" />
-            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
@@ -210,10 +209,6 @@
               <File Id="PM_Verify.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_Verify.exe" />
             </Component>
           
-            <Component Id="PM_MCP_config.json" Guid="*">
-                <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\PackageManager\ControlModule\PM_MCP_config.json" />
-            </Component>
-
             <?if $(var.Configuration) = "Release" ?>
                 <Component Id="UCPMmsvcp140.dll" Guid="*">
                   <File Id="UCPMmsvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
@@ -276,5 +271,23 @@
               </Component>
             <?endif?>
         </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+      <ComponentGroup Id="UCConfigComponents" Directory="UC_CONFIG_DIRECTORY">
+        <Component Id="UC_CONFIG_REGISTRY" Guid="*">
+          <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+            <RegistryValue Type="string" Name="Path" Value="[UC_CONFIG_DIRECTORY]" KeyPath="yes"/>
+          </RegistryKey>
+        </Component>
+        
+        <Component Id="ucid_config.xml" Guid="*">
+          <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\config\UCID_config.xml" />
+        </Component>
+
+        <Component Id="PM_MCP_config.json" Guid="*">
+          <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)\config\PM_MCP_config.json" />
+        </Component>
+      </ComponentGroup>
     </Fragment>
 </Wix>

@@ -17,6 +17,7 @@
     <?define ServiceDictory = "Service" ?>
     <?define UCIDDirectory = "UCID" ?>
     <?define UCPMDirectory = "UCPM" ?>
+    <?define UCConfigDirectory = "Configuration" ?>
 
     <!-- Registry key name used to store installation location -->
     <?define InstallNameKey = "Unified Connector" ?>

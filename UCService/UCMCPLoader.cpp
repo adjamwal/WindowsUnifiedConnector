@@ -124,8 +124,14 @@ void UCMCPLoader::LoadControlModule()
     }
 
     std::wstring pmPath(WindowsUtilities::GetDirPath( dllFullPath ) );
-    std::wstring pmConfigFile( pmPath );
-    pmConfigFile.append( L"\\" );
+    std::wstring pmConfigFile;
+    
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Path", pmConfigFile ) )
+    {
+        WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
+        return;
+    }
+
     pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
 
     if( !WindowsUtilities::FileExists( pmConfigFile.c_str() ) )
