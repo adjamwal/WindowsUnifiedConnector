@@ -191,3 +191,8 @@ bool PackageManager::PmSendEvent( const PmEvent& event )
 {
     return false;
 }
+
+int32_t PackageManager::VerifyPacManConfig( const char* configFile )
+{
+    return m_config.VerifyFileIntegrity( configFile );
+}

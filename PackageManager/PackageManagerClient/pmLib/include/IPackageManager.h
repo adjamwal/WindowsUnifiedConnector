@@ -43,6 +43,13 @@ public:
      *   supplied before starting the package manager
      */
     virtual void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) = 0;
+
+    /**
+     * @brief Verifies the package mamanger config file
+     *
+     * @param[in] configFile - Path to the configuration file.
+     */
+    virtual int32_t VerifyPacManConfig( const char* configFile ) = 0;
 };
 
 /**
