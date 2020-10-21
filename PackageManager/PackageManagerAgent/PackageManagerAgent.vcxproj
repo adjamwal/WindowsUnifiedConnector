@@ -184,6 +184,7 @@
     <ClCompile Include="PmLogAdapter.cpp" />
     <ClCompile Include="UCIDApiDll.cpp" />
     <ClCompile Include="WinCertLoader.cpp" />
+    <ClCompile Include="WindowsComponentManager.cpp" />
     <ClCompile Include="WindowsConfiguration.cpp" />
     <ClCompile Include="WindowsPmDependencies.cpp" />
   </ItemGroup>

@@ -119,6 +119,14 @@ void PackageManager::PmWorkflowThread()
     if( !PmCheckin() ) {
         LOG_ERROR( "Package Manager Checkin failed" );
     }
+
+    PmPackage package;
+    package.Type = PackageType::MSI;
+    package.Path = "C:\\dev\\WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-US";
+    package.Name = "Cisco-UC-Installer-x64.msi";
+    package.CmdLine = "";
+
+    m_dependencies->ComponentManager().UpdateComponent( package );
 }
 
 bool PackageManager::PmLoadConfig()
