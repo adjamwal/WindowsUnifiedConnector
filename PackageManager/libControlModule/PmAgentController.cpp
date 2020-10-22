@@ -294,7 +294,7 @@ PM_STATUS PmAgentController::startProcess()
 
     if( !bRetStatus )
     {
-        LOG_ERROR( "CreateProcess failed for command: %s", tszCmdline );
+        WLOG_ERROR( L"CreateProcess failed for command: %s", tszCmdline );
         status = PM_STATUS::PM_FAIL;
         goto graceful_exit;
     }
