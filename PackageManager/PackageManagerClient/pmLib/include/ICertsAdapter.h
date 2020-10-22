@@ -5,7 +5,6 @@
 class IPmPlatformDependencies;
 struct PmHttpCertList;
 
-//boundary separation from the external IPmPlatformDependencies->Configuration.GetSslCertificates() and ReleaseSslCertificates() for proper mocking
 class ICertsAdapter
 {
 public:

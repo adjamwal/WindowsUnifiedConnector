@@ -9,10 +9,10 @@
 class CheckinManifestRetriever : public ICheckinManifestRetriever
 {
 public:
-    CheckinManifestRetriever( IPmCloud& cloud, ITokenAdapter& tokenAdapter, ICertsAdapter certsAdapter );
+    CheckinManifestRetriever( IPmCloud& cloud, ITokenAdapter& tokenAdapter, ICertsAdapter& certsAdapter );
     virtual ~CheckinManifestRetriever();
 
-    virtual std::string GetCheckinManifestFrom( std::string uri ) override;
+    virtual std::string GetCheckinManifestFrom( std::string uri, std::string payload ) override;
 private:
     IPmCloud& m_cloud;
     ITokenAdapter& m_tokenAdapter;

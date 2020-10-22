@@ -7,7 +7,7 @@
 class ManifestProcessor : public IManifestProcessor
 {
 public:
-    ManifestProcessor( IPmManifest& manifest, IComponentPackageProcessor componentProcessor );
+    ManifestProcessor( IPmManifest& manifest, IComponentPackageProcessor& componentProcessor );
     virtual ~ManifestProcessor();
 
     bool ProcessManifest( std::string checkinManifest ) override;

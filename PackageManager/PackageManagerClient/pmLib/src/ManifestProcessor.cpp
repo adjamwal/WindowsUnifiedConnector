@@ -3,7 +3,7 @@
 
 ManifestProcessor::ManifestProcessor(
     IPmManifest& manifest,
-    IComponentPackageProcessor componentProcessor )
+    IComponentPackageProcessor& componentProcessor )
     : m_manifest( manifest )
     , m_componentProcessor( componentProcessor )
 {
@@ -29,10 +29,9 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
             //PmSendEvent() bad manifest
             throw std::exception( __FUNCTION__": Failed to process component package" );
         }
-        else {
-            //PmSendEvent() success
-        }
     }
+
+    //PmSendEvent() success
 
     return true;
 }

@@ -7,11 +7,12 @@
 #include <vector>
 
 class IPmConfig;
+class IPackageInventoryProvider;
+class ICheckinFormatter;
 class ITokenAdapter;
 class ICertsAdapter;
 class ICheckinManifestRetriever;
 class IManifestProcessor;
-class IComponentPackageProcessor;
 class IWorkerThread;
 
 struct PmComponent;
@@ -22,11 +23,12 @@ class PackageManager : public IPackageManager
 {
 public:
     PackageManager( IPmConfig& config, 
+        IPackageInventoryProvider& packageInventoryProvider,
+        ICheckinFormatter& checkinFormatter,
         ITokenAdapter& tokenAdapter, 
         ICertsAdapter& certsAdapter,
         ICheckinManifestRetriever& manifestRetriever,
         IManifestProcessor& manifestProcessor, 
-        IComponentPackageProcessor& componentProcessor, 
         IWorkerThread& thread );
     virtual ~PackageManager();
 
@@ -38,11 +40,12 @@ public:
 
 private:
     IPmConfig& m_config;
+    IPackageInventoryProvider& m_packageInventoryProvider;
+    ICheckinFormatter& m_checkinFormatter;
     ITokenAdapter& m_tokenAdapter;
     ICertsAdapter& m_certsAdapter;
     ICheckinManifestRetriever& m_manifestRetriever;
     IManifestProcessor& m_manifestProcessor;
-    IComponentPackageProcessor& m_componentProcessor;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
     std::string m_configFilename;
@@ -53,10 +56,5 @@ private:
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
     bool PmLoadConfig();
-    bool PmLoadPackageList();
-    bool PmGetUCIDId();
-    bool PmCheckin();
-    bool PmProcessComponent( const PmComponent& component );
-    bool PmProcessManifest( const std::string& manifest);
     bool PmSendEvent( const PmEvent& event );
 };

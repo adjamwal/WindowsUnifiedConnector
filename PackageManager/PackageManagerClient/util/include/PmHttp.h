@@ -1,3 +1,5 @@
+#pragma once
+
 #include "IPmHttp.h"
 #include <curl/curl.h>
 #include <mutex>

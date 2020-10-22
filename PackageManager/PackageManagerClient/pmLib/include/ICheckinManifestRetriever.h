@@ -8,5 +8,5 @@ public:
     ICheckinManifestRetriever() {}
     virtual ~ICheckinManifestRetriever() {}
 
-    virtual std::string GetCheckinManifestFrom( std::string uri ) = 0;
+    virtual std::string GetCheckinManifestFrom( std::string uri, std::string payload ) = 0;
 };
