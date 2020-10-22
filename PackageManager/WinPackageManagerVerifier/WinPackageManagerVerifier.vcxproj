@@ -21,10 +21,9 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{805379ca-1c31-40a9-b908-8b2a603927f1}</ProjectGuid>
-    <RootNamespace>PackageMananger</RootNamespace>
+    <ProjectGuid>{4ae76955-e581-4bc6-8792-a6a64a87acd0}</ProjectGuid>
+    <RootNamespace>WinPackageManagerVerifier</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>WinPackageMananger</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -75,21 +74,21 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>UC_PM</TargetName>
+    <TargetName>PM_Verify</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>UC_PM</TargetName>
+    <TargetName>PM_Verify</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>UC_PM</TargetName>
+    <TargetName>PM_Verify</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>UC_PM</TargetName>
+    <TargetName>PM_Verify</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -181,27 +180,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
-    <ClInclude Include="PackageMananger.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Version.h" />
+    <ClInclude Include="WinPackageManagerVerifier.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PackageMananger.cpp" />
     <ClCompile Include="pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WinPackageManagerVerifier.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PackageMananger.rc" />
+    <ResourceCompile Include="WinPackageManagerVerifier.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="PackageMananger.ico" />
-    <Image Include="small.ico" />
+    <Image Include="..\PackageMananger\PackageMananger.ico" />
+    <Image Include="..\PackageMananger\small.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libLogger\libLogger.vcxproj">
@@ -215,9 +214,6 @@
     </ProjectReference>
     <ProjectReference Include="..\PackageManagerAgent\PackageManagerAgent.vcxproj">
       <Project>{934a27fe-d684-45d0-b901-562f44e4d66f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\PackageManagerClient.vcxproj">
-      <Project>{a3c9e21e-4c04-496c-96b7-d3c68362e25f}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
