@@ -285,12 +285,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PM_MCP_config.json">
-      <DeploymentContent>true</DeploymentContent>
-      <FileType>Text</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="ControlModule.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
