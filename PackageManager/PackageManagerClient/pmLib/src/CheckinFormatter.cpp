@@ -20,21 +20,27 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
     ss << "\"platform\": \"" << inventory.platform << "\",";
     
     ss << "\"packages\": [";
+    bool firstPackage = true;
     for each( PmInstalledPackage packageDetection in inventory.packages )
     {
+        if( !firstPackage ) ss << ",";
         ss << "{";
         ss << "\"package\": \"" << packageDetection.packageName << "/" << packageDetection.packageVersion << "\",";
 
         ss << "\"configs\": [";
+        bool firstConfig = true;
         for each( PackageConfigInfo packageConfig in packageDetection.configs )
         {
+            if( !firstConfig ) ss << ",";
             ss << "{";
             ss << "\"path\": \"" << packageConfig.path << "\",";
             ss << "\"sha256\": \"" << packageConfig.sha256 << "\"";
-            ss << "},";
+            ss << "}";
+            firstConfig = false;
         }
         ss << "]";
-        ss << "},";
+        ss << "}";
+        firstPackage = false;
     }
     ss << "]";
     ss << "}";
