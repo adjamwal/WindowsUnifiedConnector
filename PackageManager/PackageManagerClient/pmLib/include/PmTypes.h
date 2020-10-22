@@ -3,10 +3,16 @@
 #include <string>
 #include <vector>
 
-//TODO Define these
 struct PmComponent
 {
-    int i;
+    std::string packageName;
+    std::string installerUrl;
+    std::string installerType;
+    std::string installerArgs;
+    std::string installLocation;
+    std::string signerName;
+    std::string installerHash;
+    std::string installerPath;
 };
 
 struct PackageConfigInfo

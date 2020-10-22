@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.10)
 
-add_executable(UnitTests "pmLibTests/TestPmConfig.cpp" "utilTests/TestPmHttp.cpp")
+add_executable(UnitTests "pmLibTests/TestPmConfig.cpp" "utilTests/TestPmHttp.cpp" "pmLibTests/TestPmManifest.cpp" "pmLibTests/TestCheckinFormatter.cpp")
 
 target_include_directories(UnitTests 
     PRIVATE ${curl_INCLUDE_DIRS}

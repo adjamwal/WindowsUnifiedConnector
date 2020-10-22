@@ -1,5 +1,7 @@
 #include "PmManifest.h"
 #include "PmTypes.h"
+#include <json/json.h>
+#include "PmLogger.h"
 
 PmManifest::PmManifest()
 {
@@ -13,15 +15,91 @@ PmManifest::~PmManifest()
 
 int32_t PmManifest::ParseManifest( const std::string& manifestJson )
 {
+    int32_t rtn = -1;
     std::lock_guard<std::mutex> lock( m_mutex );
+    std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
+    Json::Value root;
+    std::string jsonError;
 
-    return -1;
+    m_ComponentList.clear();
+
+    if( manifestJson.empty() ) {
+        LOG_ERROR( "manifest contents is empty" );
+    }
+    else if( !jsonReader->parse( manifestJson.c_str(), manifestJson.c_str() + manifestJson.length(), &root, &jsonError ) ) {
+        LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
+    }
+    else {
+        try {
+            if( root[ "packages" ].isArray() ) {
+                for( Json::Value::ArrayIndex i = 0; i != root[ "packages" ].size(); i++ ) {
+                    AddPackage( root[ "packages" ][ i ] );
+                }
+
+                rtn = 0;
+            }
+            else {
+                LOG_ERROR( "packages array not found" );
+            }
+        }
+        catch( std::exception& ex )
+        {
+            LOG_ERROR( "ParseManifest failed: %s", ex.what() );
+        }
+    }
+
+    return rtn;
 }
 
 std::vector<PmComponent> PmManifest::GetPackageList()
 {
-    std::vector<PmComponent> componentList;
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return componentList;
+    return m_ComponentList;
+}
+
+void PmManifest::AddPackage( Json::Value& packageJson )
+{
+    PmComponent package;
+
+    // Required Data
+    package.packageName = GetJsonStringField( packageJson, "package", true );
+    package.installerUrl = GetJsonStringField( packageJson, "installer_uri", true );
+    //TODO: Change to enum
+    package.installerType = GetJsonStringField( packageJson, "installer_type", true );
+
+    // Optional Data
+    if( packageJson.isMember( "installer_args" ) ) {
+        if( !packageJson[ "installer_args" ].isArray() ) {
+            throw( std::invalid_argument( __FUNCTION__ ": Invalid Content: installer_args" ) );
+        }
+
+        for( Json::Value::ArrayIndex i = 0; i != packageJson[ "installer_args" ].size(); i++ ) {
+            package.installerArgs += packageJson[ "installer_args" ][ i ].asString() + " ";
+        }
+    }
+    package.installLocation = GetJsonStringField( packageJson, "install_location", false );
+    package.signerName = GetJsonStringField( packageJson, "installer_signer_name", false );
+    package.installerHash = GetJsonStringField( packageJson, "installer_hash", false );
+
+    m_ComponentList.push_back( package );
+}
+
+std::string PmManifest::GetJsonStringField( Json::Value& packageJson, const char* field, bool required )
+{
+    if( packageJson.isMember( field ) ) {
+        if( !packageJson[ field ].isString() ) {
+            throw( std::invalid_argument( std::string( __FUNCTION__": Invalid Content: ") + field ) );
+        }
+    }
+    else {
+        if( required ) {
+            throw( std::invalid_argument( std::string( __FUNCTION__": Missing Required Content: ") + field ) );
+        }
+        else {
+            return "";
+        }
+    }
+
+    return packageJson[ field ].asString();
 }
