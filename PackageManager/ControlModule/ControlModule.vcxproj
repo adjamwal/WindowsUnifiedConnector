@@ -138,7 +138,8 @@
       </TreatOutputAsContent>
     </CustomBuildStep>
     <PreLinkEvent>
-      <Command>copy /Y $(ProjectDir)PM_MCP_config.json $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -175,7 +176,8 @@
       </TreatOutputAsContent>
     </CustomBuildStep>
     <PreLinkEvent>
-      <Command>copy /Y $(ProjectDir)PM_MCP_config.json $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -208,7 +210,8 @@
       </TreatOutputAsContent>
     </CustomBuildStep>
     <PreLinkEvent>
-      <Command>copy /Y $(ProjectDir)PM_MCP_config.json $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -249,7 +252,8 @@
       </TreatOutputAsContent>
     </CustomBuildStep>
     <PreLinkEvent>
-      <Command>copy /Y $(ProjectDir)PM_MCP_config.json $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -279,12 +283,6 @@
     <ProjectReference Include="..\libControlModule\libControlModule.vcxproj">
       <Project>{31fc5172-1cdf-40af-9e2c-1ad069ceb772}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PM_MCP_config.json">
-      <DeploymentContent>true</DeploymentContent>
-      <FileType>Text</FileType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ControlModule.rc" />
