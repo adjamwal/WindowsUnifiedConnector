@@ -1,7 +1,7 @@
 #include "CheckinFormatter.h"
 #include "PackageInventoryProvider.h"
 
-#include <stream>
+#include <sstream>
 
 CheckinFormatter::CheckinFormatter()
 {
@@ -14,12 +14,13 @@ CheckinFormatter::~CheckinFormatter()
 std::string CheckinFormatter::GetJson( PackageInventory& inventory )
 {
     std::stringstream ss;
+
     ss << "{";
     ss << "\"arch\": \"" << inventory.architecture << "\",";
     ss << "\"platform\": \"" << inventory.platform << "\",";
     
     ss << "\"packages\": [";
-    for each( PackageDetectionInfo packageDetection in inventory.packages )
+    for each( PmInstalledPackage packageDetection in inventory.packages )
     {
         ss << "{";
         ss << "\"package\": \"" << packageDetection.packageName << "/" << packageDetection.packageVersion << "\",";
@@ -37,4 +38,6 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
     }
     ss << "]";
     ss << "}";
+
+    return ss.str();
 }

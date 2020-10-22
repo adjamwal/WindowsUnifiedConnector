@@ -17,7 +17,7 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
     detectedPackages.architecture = "x64";
     detectedPackages.platform = "win";
 
-    PackageDetectionInfo packageInfo( { 0 } );
+    PmInstalledPackage packageInfo( { 0 } );
     packageInfo.packageName = "UC";
     packageInfo.packageVersion = "1.0.0";
 
@@ -34,8 +34,8 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
     packageConfig.sha256 = "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3";
     packageInfo.configs.push_back( packageConfig );
 
-    detectedPackages.packages.push_back(package);
+    detectedPackages.packages.push_back( packageInfo );
 
     inventory = detectedPackages;
-    return bool;
+    return true;
 }

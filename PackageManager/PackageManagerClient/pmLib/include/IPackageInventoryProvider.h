@@ -4,7 +4,7 @@
 #include <vector>
 
 struct PackageConfigInfo;
-struct PackageDetectionInfo;
+struct PmInstalledPackage;
 struct PackageInventory;
 
 class IPackageInventoryProvider

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ICertsAdapter.h"
-#include "IPmPlatformDependencies.h"
 #include "PmHttp.h"
 #include <mutex>
 

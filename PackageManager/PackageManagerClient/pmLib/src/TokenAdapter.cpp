@@ -1,6 +1,8 @@
 #include "TokenAdapter.h"
 #include "PmLogger.h"
 #include "PmHttp.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformConfiguration.h"
 
 TokenAdapter::TokenAdapter()
     : m_dependencies( nullptr )

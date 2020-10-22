@@ -1,6 +1,8 @@
 #include "CertsAdapter.h"
 #include "PmLogger.h"
 #include "PmHttp.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformConfiguration.h"
 
 CertsAdapter::CertsAdapter()
     : m_dependencies( nullptr )
@@ -11,7 +13,7 @@ CertsAdapter::CertsAdapter()
 CertsAdapter::~CertsAdapter()
 {
     if( m_dependencies ) {
-        m_dependencies->Configuration().ReleaseSslCertificates( &m_certList.certificates, &m_certList.count );
+        m_dependencies->Configuration().ReleaseSslCertificates( m_certList.certificates, m_certList.count );
     }
 }
 
@@ -25,7 +27,7 @@ void CertsAdapter::Initialize( IPmPlatformDependencies* dep )
     }
 
     m_dependencies = dep;
-    m_dependencies->Configuration().GetSslCertificates( &m_certList.certificates, &m_certList.count );
+    m_dependencies->Configuration().GetSslCertificates( &m_certList.certificates, m_certList.count );
 }
 
 PmHttpCertList CertsAdapter::GetCertsList()
