@@ -1,5 +1,6 @@
 #include "CheckinFormatter.h"
 #include "PackageInventoryProvider.h"
+#include <json/json.h>
 
 #include <sstream>
 
@@ -13,37 +14,32 @@ CheckinFormatter::~CheckinFormatter()
 
 std::string CheckinFormatter::GetJson( PackageInventory& inventory )
 {
-    std::stringstream ss;
+    Json::Value root;
 
-    ss << "{";
-    ss << "\"arch\": \"" << inventory.architecture << "\",";
-    ss << "\"platform\": \"" << inventory.platform << "\",";
-    
-    ss << "\"packages\": [";
-    bool firstPackage = true;
-    for each( PmInstalledPackage packageDetection in inventory.packages )
-    {
-        if( !firstPackage ) ss << ",";
-        ss << "{";
-        ss << "\"package\": \"" << packageDetection.packageName << "/" << packageDetection.packageVersion << "\",";
+    root[ "arch" ] = inventory.architecture;
+    root[ "platform" ] = inventory.platform;
 
-        ss << "\"configs\": [";
-        bool firstConfig = true;
-        for each( PackageConfigInfo packageConfig in packageDetection.configs )
-        {
-            if( !firstConfig ) ss << ",";
-            ss << "{";
-            ss << "\"path\": \"" << packageConfig.path << "\",";
-            ss << "\"sha256\": \"" << packageConfig.sha256 << "\"";
-            ss << "}";
-            firstConfig = false;
+    if( inventory.packages.size() ) {
+        Json::Value& packages = root[ "packages" ];
+        for( int i = 0; i < inventory.packages.size(); i++ ) {
+            Json::Value package;
+            PmInstalledPackage& packageDetection = inventory.packages[ i ];
+
+            package[ "package" ] = packageDetection.packageName + "/" + packageDetection.packageVersion;
+            if( packageDetection.configs.size() ) {
+                Json::Value& configs = package[ "configs" ];
+                for( int j = 0; j < packageDetection.configs.size(); j++ ) {
+                    Json::Value config;
+                    PackageConfigInfo& packageConfig = packageDetection.configs[ j ];
+                    config[ "path" ] = packageConfig.path;
+                    config[ "sha256" ] = packageConfig.sha256;
+
+                    configs[ j ] = config;
+                }
+            }
+            packages[ i ] = package;
         }
-        ss << "]";
-        ss << "}";
-        firstPackage = false;
     }
-    ss << "]";
-    ss << "}";
 
-    return ss.str();
+    return Json::writeString( Json::StreamWriterBuilder(), root );
 }
