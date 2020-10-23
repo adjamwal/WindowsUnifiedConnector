@@ -7,35 +7,24 @@
 CertsAdapter::CertsAdapter()
     : m_dependencies( nullptr )
     , m_certList( { 0 } )
+    , m_hasCerts( false )
 {
 }
 
 CertsAdapter::~CertsAdapter()
 {
-    if( m_dependencies ) {
-        try
-        {
-            m_dependencies->Configuration().ReleaseSslCertificates( m_certList.certificates, m_certList.count );
-        }
-        catch( ... )
-        {
-            LOG_ERROR( "Error releasing SSL certs." );
-        }
-    }
+    InternalReleaseCerts();
 }
 
 void CertsAdapter::Initialize( IPmPlatformDependencies* dep )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    //can't allow overwriting if m_certList was already allocated
-    if( m_dependencies ) {
-        LOG_ERROR( "Already initialized." );
-        return;
-    }
+    //release any previously allocated certs
+    InternalReleaseCerts();
 
     m_dependencies = dep;
-    m_dependencies->Configuration().GetSslCertificates( &m_certList.certificates, m_certList.count );
+    InternalGetCerts();
 }
 
 PmHttpCertList CertsAdapter::GetCertsList()
@@ -47,4 +36,36 @@ PmHttpCertList CertsAdapter::GetCertsList()
     }
 
     return m_certList;
+}
+
+void CertsAdapter::InternalGetCerts()
+{
+    if( !m_dependencies || m_hasCerts ) return;
+
+    try
+    {
+        LOG_DEBUG( "Obtaining SSL certs" );
+        m_dependencies->Configuration().GetSslCertificates( &m_certList.certificates, m_certList.count );
+        m_hasCerts = true;
+    }
+    catch( ... )
+    {
+        LOG_ERROR( "Error getting SSL certs." );
+    }
+}
+
+void CertsAdapter::InternalReleaseCerts()
+{
+    if( !m_dependencies || !m_hasCerts ) return;
+    m_hasCerts = false;
+
+    try
+    {
+        LOG_DEBUG( "Releasing SSL certs" );
+        m_dependencies->Configuration().ReleaseSslCertificates( m_certList.certificates, m_certList.count );
+    }
+    catch( ... )
+    {
+        LOG_ERROR( "Error releasing SSL certs." );
+    }
 }

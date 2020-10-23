@@ -23,7 +23,6 @@ PmAgent::PmAgent( const std::wstring& configFilePath, IPmPlatformDependencies& d
 
 PmAgent::~PmAgent()
 {
-    m_PacMan->SetPlatformDependencies( nullptr );
     DeinitPackageManager();
     SetPMLogger( nullptr );
 }
