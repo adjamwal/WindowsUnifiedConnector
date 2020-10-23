@@ -144,13 +144,3 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
 
     return ret;
 }
-
-bool WindowsComponentManager::VerifyComponent( const PmComponent& package )
-{
-    if ( m_codeSignVerifier.Verify( L"C:\\dev\\WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-US\\Cisco-UC-Installer-x64.msi", SIGNER_CISCO, SIGTYPE_DEFAULT ) != CodesignStatus::CODE_SIGNER_SUCCESS ) {
-        //WLOG_ERROR( L"Failed to verify dll signature: %s", dllPath.c_str() );
-        return false;
-    }
-    
-    return true;
-}
