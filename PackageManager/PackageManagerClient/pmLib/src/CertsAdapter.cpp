@@ -21,9 +21,7 @@ void CertsAdapter::Initialize( IPmPlatformDependencies* dep )
     std::lock_guard<std::mutex> lock( m_mutex );
 
     //release any previously allocated certs
-    if( m_dependencies ) {
-        InternalReleaseCerts();
-    }
+    InternalReleaseCerts();
 
     m_dependencies = dep;
     InternalGetCerts();
