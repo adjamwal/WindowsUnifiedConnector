@@ -13,5 +13,6 @@ public:
     int32_t CloseFile( FileUtilHandle* handle ) override;
     int32_t AppendFile( FileUtilHandle* handle, void* data, size_t dataLen ) override;
     std::string GetTempDir() override;
-    virtual int32_t DeleteFile( const std::string& filename ) override;
+    int32_t DeleteFile( const std::string& filename ) override;
+    int32_t Rename( const std::string& oldFilename, const std::string& newDir, const std::string& newName ) override;
 };

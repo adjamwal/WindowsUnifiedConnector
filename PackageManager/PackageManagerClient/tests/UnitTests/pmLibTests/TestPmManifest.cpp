@@ -206,7 +206,7 @@ TEST_F( TestPmManifest, WillGetPackageConfig )
     auto packages = m_patient->GetPackageList();
 
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].contents, "<base64-data>" );
-    EXPECT_EQ( packages[ 0 ].configs[ 0 ].verifyPath, "verify_config.exe" );
+    EXPECT_EQ( packages[ 0 ].configs[ 0 ].verifyBinPath, "verify_config.exe" );
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].path, "uc.json" );
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].sha256, "4d0bc0da51c1aac547c5473ed53413ae9d9d0c8c57c15ec6a2ac6652812058f4" );
 }

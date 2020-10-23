@@ -8,6 +8,7 @@ struct PackageConfigInfo
     std::string path;
     std::string sha256;
     std::string contents;
+    std::string verifyBinPath;
     std::string verifyPath;
 };
 

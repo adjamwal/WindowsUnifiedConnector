@@ -25,8 +25,16 @@ public:
     void ExpectAppendFileNotCalled();
 
     MOCK_METHOD0( GetTempDir, std::string() );
+    void MakeGetTempDirReturn( std::string value );
+    void ExpectGetTempDirNotCalled();
 
     MOCK_METHOD1( DeleteFile, int32_t( const std::string& ) );
+    void MakeDeleteFileReturn( int32_t value );
+    void ExpectDeleteFileNotCalled();
+
+    MOCK_METHOD3( Rename, int32_t( const std::string&, const std::string&, const std::string& ) );
+    void MakeRenameReturn( int32_t value );
+    void ExpectRenameNotCalled();
 
 private:
     std::string m_defaultString;

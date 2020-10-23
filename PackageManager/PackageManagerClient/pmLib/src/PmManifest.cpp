@@ -100,7 +100,7 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     config.path = GetJsonStringField( configJson, "path", true );
 
     config.sha256 = GetJsonStringField( configJson, "sha256", false );
-    config.verifyPath = GetJsonStringField( configJson, "verify_path", false );
+    config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
 
     package.configs.push_back( config );
 }

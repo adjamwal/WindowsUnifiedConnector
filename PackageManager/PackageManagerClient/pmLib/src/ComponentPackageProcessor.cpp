@@ -3,12 +3,16 @@
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include "IFileUtil.h"
+#include "ISslUtil.h"
 #include "PmLogger.h"
 #include <sstream>
 
-ComponentPackageProcessor::ComponentPackageProcessor( IPmCloud& pmCloud, IFileUtil& fileUtil ) :
+ComponentPackageProcessor::ComponentPackageProcessor( IPmCloud& pmCloud, 
+    IFileUtil& fileUtil, 
+    ISslUtil& sslUtil ) :
     m_pmCloud( pmCloud )
     , m_fileUtil( fileUtil )
+    , m_sslUtil( sslUtil )
     , m_dependencies( nullptr )
     , m_fileCount( 0 )
 {
@@ -27,6 +31,7 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
 
 bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentPackage )
 {
+    bool rtn = false;
     std::lock_guard<std::mutex> lock( m_mutex );
 
     if( !m_dependencies ) {
@@ -47,22 +52,62 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
             if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
                 LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
             }
+
+            rtn = true;
         }
     }
 
-    for each( auto config in componentPackage.configs ) {
+    if( !componentPackage.installLocation.empty() ) {
+        for each( auto config in componentPackage.configs ) {
+            rtn = ProcessComponentPackageConfig( componentPackage.installLocation, config );
+        }
+    }
+
+    return rtn;
+}
+
+bool ComponentPackageProcessor::ProcessComponentPackageConfig( const std::string& installDir, PackageConfigInfo& config )
+{
+    bool rtn = false;
+    std::vector<uint8_t> configData;
+    if( installDir.empty() ) {
+        LOG_ERROR( "No install path" );
+    }
+    else if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
+
+    }
+    else {
         std::stringstream ss;
+        FileUtilHandle* handle = NULL;
         ss << m_fileUtil.GetTempDir() << "PMConfig_" << m_fileCount++;
 
-        //base64 decode
+        if( ( handle = m_fileUtil.PmCreateFile( ss.str() ) ) == NULL ) {
+            LOG_ERROR( "Failed to create %s", ss.str().c_str() );
+        }
+        else if( m_fileUtil.AppendFile( handle, configData.data(), configData.size() ) != 0 ) {
+            LOG_ERROR( "Failed to write to %s", ss.str().c_str() );
+        }
+        else {
+            m_fileUtil.CloseFile( handle );
+            config.verifyPath = ss.str();
 
-        //m_dependencies->ComponentManager().DeployConfiguration( PmPackageConfigration );
+            bool moveFile = true;
+            if( !config.verifyBinPath.empty() ) {
+                moveFile = m_dependencies->ComponentManager().DeployConfiguration( config ) == 0;
+            }
 
-        LOG_DEBUG( "Removing %s", ss.str().c_str() );
-        if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
-            LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
+            if( moveFile ) {
+                if( m_fileUtil.Rename( ss.str(), installDir, config.path ) == 0 ) {
+                    rtn = true;
+                }
+            }
+
+            LOG_DEBUG( "Removing %s", ss.str().c_str() );
+            if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
+                LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
+            }
         }
     }
 
-    return true;
+    return rtn;
 }
