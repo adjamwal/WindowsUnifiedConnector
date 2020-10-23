@@ -10,11 +10,11 @@ public:
     MockPmConfig();
     ~MockPmConfig();
 
-    MOCK_METHOD1( Load, int32_t( std::string& ) );
+    MOCK_METHOD1( Load, int32_t( const std::string& ) );
     void MakeLoadReturn( int32_t value );
     void ExpectLoadIsNotCalled();
 
-    MOCK_METHOD1( VerifyFileIntegrity, int32_t( std::string& ) );
+    MOCK_METHOD1( VerifyFileIntegrity, int32_t( const std::string& ) );
     void MakeVerifyFileIntegrityReturn( int32_t value );
     void ExpectVerifyFileIntegrityIsNotCalled();
 

@@ -9,7 +9,7 @@ public:
     MockPmManifest();
     ~MockPmManifest();
 
-    MOCK_METHOD1( ParseManifest, int32_t( std::string& ) );
+    MOCK_METHOD1( ParseManifest, int32_t( const std::string& ) );
     void MakeParseManifestReturn( int32_t value );
     void ExpectParseManifestIsNotCalled();
 

@@ -17,7 +17,7 @@ public:
     void MakeDeinitReturn( int32_t value );
     void ExpectDeinitIsNotCalled();
 
-    MOCK_METHOD1( SetToken, int32_t( std::string& ) );
+    MOCK_METHOD1( SetToken, int32_t( const std::string& ) );
     void MakeSetTokenReturn( int32_t value );
     void ExpectSetTokenIsNotCalled();
 
@@ -25,15 +25,15 @@ public:
     void MakeSetCertsReturn( int32_t value );
     void ExpectSetCertsIsNotCalled();
 
-    MOCK_METHOD3( HttpGet, int32_t( std::string&, std::string&, int32_t& ) );
+    MOCK_METHOD3( HttpGet, int32_t( const std::string&, std::string&, int32_t& ) );
     void MakeHttpGetReturn( int32_t value );
     void ExpectHttpGetIsNotCalled();
 
-    MOCK_METHOD5( HttpPost, int32_t( std::string&, void*, size_t, std::string&, int32_t& ) );
+    MOCK_METHOD5( HttpPost, int32_t( const std::string&, void*, size_t, std::string&, int32_t& ) );
     void MakeHttpPostReturn( int32_t value );
     void ExpectHttpPostIsNotCalled();
 
-    MOCK_METHOD3( HttpDownload, int32_t( std::string&, std::string&, int32_t& ) );
+    MOCK_METHOD3( HttpDownload, int32_t( const std::string&, const std::string&, int32_t& ) );
     void MakeHttpDownloadReturn( int32_t value );
     void ExpectHttpDownloadIsNotCalled();
 
