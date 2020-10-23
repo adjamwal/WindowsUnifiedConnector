@@ -3,6 +3,7 @@
 #include "IManifestProcessor.h"
 #include "IPmManifest.h"
 #include "IComponentPackageProcessor.h"
+#include <mutex>
 
 class ManifestProcessor : public IManifestProcessor
 {
@@ -14,6 +15,7 @@ public:
     bool ProcessManifest( std::string checkinManifest ) override;
 
 private:
+    std::mutex m_mutex;
     IPmManifest& m_manifest;
     IComponentPackageProcessor& m_componentProcessor;
 };

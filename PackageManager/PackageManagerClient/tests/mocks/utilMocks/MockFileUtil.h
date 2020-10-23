@@ -1,3 +1,4 @@
+#pragma once
 #include "MocksCommon.h"
 #include "IFileUtil.h"
 
