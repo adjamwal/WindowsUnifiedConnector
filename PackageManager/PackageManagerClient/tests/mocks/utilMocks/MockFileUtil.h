@@ -23,6 +23,10 @@ public:
     void MakeAppendFileReturn( int32_t value );
     void ExpectAppendFileNotCalled();
 
+    MOCK_METHOD0( GetTempDir, std::string() );
+
+    MOCK_METHOD1( DeleteFile, int32_t( const std::string& ) );
+
 private:
     std::string m_defaultString;
 };

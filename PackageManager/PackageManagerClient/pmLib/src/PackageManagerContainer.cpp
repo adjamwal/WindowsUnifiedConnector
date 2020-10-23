@@ -36,7 +36,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_tokenAdapter( new TokenAdapter() )
     , m_certsAdapter( new CertsAdapter() )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) )
-    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud ) )
+    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(
         new PackageManager( *m_config,

@@ -21,5 +21,6 @@ private:
     std::vector<PmComponent> m_ComponentList;
 
     void AddPackage( Json::Value& package );
+    void AddConfigToPackage( Json::Value& config, PmComponent& package );
     std::string GetJsonStringField( Json::Value& packageJson, const char* field, bool required );
 };

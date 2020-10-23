@@ -3,6 +3,14 @@
 #include <string>
 #include <vector>
 
+struct PackageConfigInfo
+{
+    std::string path;
+    std::string sha256;
+    std::string contents;
+    std::string verifyPath;
+};
+
 struct PmComponent
 {
     std::string packageName;
@@ -13,12 +21,7 @@ struct PmComponent
     std::string signerName;
     std::string installerHash;
     std::string installerPath;
-};
-
-struct PackageConfigInfo
-{
-    std::string path;
-    std::string sha256;
+    std::vector<PackageConfigInfo> configs;
 };
 
 struct PmInstalledPackage

@@ -5,11 +5,12 @@
 #include <mutex>
 
 class IPmCloud;
+class IFileUtil;
 
 class ComponentPackageProcessor : public IComponentPackageProcessor
 {
 public:
-    ComponentPackageProcessor( IPmCloud& pmCloud );
+    ComponentPackageProcessor( IPmCloud& pmCloud, IFileUtil& fileutil );
     virtual ~ComponentPackageProcessor();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
@@ -18,6 +19,7 @@ public:
 private:
     std::mutex m_mutex;
     IPmCloud& m_pmCloud;
+    IFileUtil& m_fileUtil;
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
 };

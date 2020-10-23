@@ -2,12 +2,13 @@
 #include "IPmCloud.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
-#include <filesystem>
+#include "IFileUtil.h"
 #include "PmLogger.h"
 #include <sstream>
 
-ComponentPackageProcessor::ComponentPackageProcessor( IPmCloud& pmCloud ) :
+ComponentPackageProcessor::ComponentPackageProcessor( IPmCloud& pmCloud, IFileUtil& fileUtil ) :
     m_pmCloud( pmCloud )
+    , m_fileUtil( fileUtil )
     , m_dependencies( nullptr )
     , m_fileCount( 0 )
 {
@@ -32,18 +33,33 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         return false;
     }
 
-    std::stringstream ss;
-    //TODO: Should make this more random
-    ss << std::filesystem::temp_directory_path().generic_string();
-    ss << "PMInstaller_" << m_fileCount++ << "." << componentPackage.installerType;
+    if( componentPackage.installerUrl.length() && componentPackage.installerType.length() ) {
+        std::stringstream ss;
+        //TODO: Should make this more random
+        ss << m_fileUtil.GetTempDir() << "PMInstaller_" << m_fileCount++ << "." << componentPackage.installerType;
 
-    if( m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) == 200 ) {
-        componentPackage.installerPath = ss.str();
+        if( m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) == 200 ) {
+            componentPackage.installerPath = ss.str();
 
-        //m_dependencies->ComponentManager().InstallComponent( componentPackage );
+            //m_dependencies->ComponentManager().InstallComponent( componentPackage );
+
+            LOG_DEBUG( "Removing %s", ss.str().c_str() );
+            if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
+                LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
+            }
+        }
+    }
+
+    for each( auto config in componentPackage.configs ) {
+        std::stringstream ss;
+        ss << m_fileUtil.GetTempDir() << "PMConfig_" << m_fileCount++;
+
+        //base64 decode
+
+        //m_dependencies->ComponentManager().DeployConfiguration( PmPackageConfigration );
 
         LOG_DEBUG( "Removing %s", ss.str().c_str() );
-        if( !std::filesystem::remove( std::filesystem::path( ss.str() ) ) ) {
+        if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
             LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
         }
     }

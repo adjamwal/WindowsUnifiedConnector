@@ -2,6 +2,7 @@
 #include "PMLogger.h"
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 
 struct FileUtilHandle
 {
@@ -91,4 +92,14 @@ int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen
     }
 
     return bytesWritten;
+}
+
+std::string FileUtil::GetTempDir()
+{
+    return std::filesystem::temp_directory_path().generic_string();
+}
+
+int32_t FileUtil::DeleteFile( const std::string& filename )
+{
+    return std::filesystem::remove( std::filesystem::path( filename ) ) ? 0 : -1;
 }
