@@ -13,7 +13,14 @@ CertsAdapter::CertsAdapter()
 CertsAdapter::~CertsAdapter()
 {
     if( m_dependencies ) {
-        m_dependencies->Configuration().ReleaseSslCertificates( m_certList.certificates, m_certList.count );
+        try
+        {
+            m_dependencies->Configuration().ReleaseSslCertificates( m_certList.certificates, m_certList.count );
+        }
+        catch( ... )
+        {
+            LOG_ERROR( "Error releasing SSL certs." );
+        }
     }
 }
 
@@ -23,7 +30,8 @@ void CertsAdapter::Initialize( IPmPlatformDependencies* dep )
 
     //can't allow overwriting if m_certList was already allocated
     if( m_dependencies ) {
-        throw std::exception( __FUNCTION__ ": Already initialized." );
+        LOG_ERROR( "Already initialized." );
+        return;
     }
 
     m_dependencies = dep;
