@@ -1,6 +1,4 @@
 #include "MockCertsAdapter.h"
-#include "IPmPlatformDependencies.h"
-#include "IPmPlatformConfiguration.h"
 
 MockCertsAdapter::MockCertsAdapter()
 {

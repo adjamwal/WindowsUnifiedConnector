@@ -9,6 +9,11 @@ MockManifestProcessor::~MockManifestProcessor()
 {
 }
 
+void MockManifestProcessor::ExpectInitializeIsNotCalled()
+{
+    EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
+}
+
 void MockManifestProcessor::MakeProcessManifestReturn( bool value )
 {
     ON_CALL( *this, ProcessManifest( _ ) ).WillByDefault( Return( value ) );

@@ -2,6 +2,7 @@
 #include "MocksCommon.h"
 
 #include "ICertsAdapter.h"
+#include "IPmPlatformDependencies.h"
 #include "IPmHttp.h"
 
 class MockCertsAdapter : public ICertsAdapter
