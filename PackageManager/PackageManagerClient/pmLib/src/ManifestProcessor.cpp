@@ -15,11 +15,15 @@ ManifestProcessor::~ManifestProcessor()
 
 void ManifestProcessor::Initialize( IPmPlatformDependencies* dep )
 {
+    std::lock_guard<std::mutex> lock( m_mutex );
+
     m_componentProcessor.Initialize( dep );
 }
 
 bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
 {
+    std::lock_guard<std::mutex> lock( m_mutex );
+
     if( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
         //PmSendEvent() bad manifest

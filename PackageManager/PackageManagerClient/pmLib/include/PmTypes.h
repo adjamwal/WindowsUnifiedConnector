@@ -20,11 +20,21 @@ struct PackageConfigInfo
     std::string sha256;
 };
 
+struct PmPackageConfigration
+{
+    int i;
+};
+
 struct PmInstalledPackage
 {
     std::string packageName;
     std::string packageVersion;
     std::vector<PackageConfigInfo> configs;
+};
+
+struct PmPackage
+{
+    int i;
 };
 
 struct PackageInventory
@@ -33,4 +43,3 @@ struct PackageInventory
     std::string platform;
     std::vector<PmInstalledPackage> packages;
 };
-
