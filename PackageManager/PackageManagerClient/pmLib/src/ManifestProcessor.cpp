@@ -13,9 +13,14 @@ ManifestProcessor::~ManifestProcessor()
 {
 }
 
+void ManifestProcessor::Initialize( IPmPlatformDependencies* dep )
+{
+    m_componentProcessor.Initialize( dep );
+}
+
 bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
 {
-    if( !m_manifest.ParseManifest( checkinManifest ) )
+    if( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
         //PmSendEvent() bad manifest
         throw std::exception( __FUNCTION__": Failed to process manifest" );

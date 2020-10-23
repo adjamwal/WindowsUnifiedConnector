@@ -52,7 +52,7 @@ FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
             WLOG_ERROR( L"fopen_s failed" );
         }
         else {
-            WLOG_DEBUG( L"Created filed %hs", filename.c_str() );
+            WLOG_DEBUG( L"Created file %hs", filename.c_str() );
         }
     }
 
@@ -84,7 +84,7 @@ int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen
         WLOG_ERROR( L"Invalid file handle" );
     }
     else {
-        bytesWritten = fwrite( data, dataLen, 1, handle->file );
+        bytesWritten = fwrite( data, 1, dataLen, handle->file );
         if( bytesWritten != dataLen ) {
             WLOG_ERROR( L"fwrite failed. Wrote %d bytes. Expected %d", bytesWritten, dataLen );
         }

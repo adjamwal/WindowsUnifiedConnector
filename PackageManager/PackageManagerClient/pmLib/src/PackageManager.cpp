@@ -109,6 +109,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
     {
         m_tokenAdapter.Initialize( m_dependencies );
         m_certsAdapter.Initialize( m_dependencies );
+        m_manifestProcessor.Initialize( m_dependencies );
     }
     catch( std::exception& ex )
     {
@@ -132,7 +133,7 @@ void PackageManager::PmWorkflowThread()
 
     try
     {
-        PackageInventory inventory( { 0 } );
+        PackageInventory inventory;
         m_packageInventoryProvider.GetInventory( inventory );
 
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
@@ -147,6 +148,7 @@ void PackageManager::PmWorkflowThread()
     {
         LOG_ERROR( "Checkin failed: %s", ex.what() );
     }
+
 }
 
 bool PackageManager::PmLoadConfig()

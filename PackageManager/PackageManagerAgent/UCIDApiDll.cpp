@@ -60,12 +60,12 @@ int32_t UCIDApiDll::GetToken(std::string& token )
 
     int bufsz = 0;
 
-    ucid_result_t res = m_getIdFunc(NULL, &bufsz);
+    ucid_result_t res = m_getTokenFunc(NULL, &bufsz);
 
     if (res == UCID_RES_INSUFFICIENT_LEN) {
         char* myucid = (char*)malloc(bufsz);
 
-        res = m_getIdFunc(myucid, &bufsz);
+        res = m_getTokenFunc(myucid, &bufsz);
 
         if (myucid)
         {

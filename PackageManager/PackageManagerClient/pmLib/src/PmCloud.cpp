@@ -53,5 +53,12 @@ int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filenam
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return -1;
+    m_http.Init( NULL, NULL, "" );
+    m_http.SetCerts( m_certs );
+    m_http.SetToken( m_token );
+
+    int32_t respStatus = 0;
+    m_http.HttpDownload( uri, filename, respStatus );
+
+    return respStatus;
 }
