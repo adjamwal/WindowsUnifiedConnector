@@ -86,11 +86,11 @@ void UCIDLoader::UnloadDll()
         return;
     }
 
-    LOG_DEBUG( "UnLoading %s", m_loadedDllName.c_str() );
+    WLOG_DEBUG( L"UnLoading %s", m_loadedDllName.c_str() );
 
     if( FreeLibrary( m_controlLib ) == 0 )
     {
-        LOG_ERROR( "FreeLibrary() call failed. Error %d", GetLastError() );
+        WLOG_ERROR( L"FreeLibrary() call failed. Error %d", GetLastError() );
     }
 
     m_controlLib = 0;
@@ -137,7 +137,13 @@ void UCIDLoader::LoadControlModule()
     }
     dllFullPath.append( L"ucidcontrolplugin.dll" );
 
-    std::wstring ucidConfigFile( ucidDllDir );
+    std::wstring ucidConfigFile;
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Path", ucidConfigFile ) )
+    {
+        WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
+        return;
+    }
+
     ucidConfigFile.append( UCID_MODULE_CONFIG_FILENAME );
 
     if( !WindowsUtilities::FileExists( ucidConfigFile.c_str() ) )
@@ -156,7 +162,7 @@ void UCIDLoader::LoadControlModule()
     }
     catch( std::exception& ex )
     {
-        WLOG_ERROR( "Exception: %s", ex.what() );
+        LOG_ERROR( "Exception: %s", ex.what() );
     }
 
     m_context.nVersion = UCID_MODULE_INTERFACE_VERSION;

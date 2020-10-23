@@ -3,6 +3,10 @@
 #include "IPmManifest.h"
 #include <mutex>
 
+namespace Json {
+    class Value;
+};
+
 class PmManifest : public IPmManifest
 {
 public:
@@ -15,4 +19,7 @@ public:
 private:
     std::mutex m_mutex;
     std::vector<PmComponent> m_ComponentList;
+
+    void AddPackage( Json::Value& package );
+    std::string GetJsonStringField( Json::Value& packageJson, const char* field, bool required );
 };

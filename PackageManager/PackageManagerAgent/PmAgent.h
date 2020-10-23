@@ -15,6 +15,7 @@ public:
 
     int32_t Start();
     int32_t Stop();
+    int32_t VerifyConfig( const std::wstring& configFilePath );
 
 private:
     std::wstring m_configFile;

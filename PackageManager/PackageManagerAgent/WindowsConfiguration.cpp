@@ -35,8 +35,8 @@ bool WindowsConfiguration::GetIdentityToken( std::string& token )
             ret = false;
         }
 
-        //get ucid id
-        ucidRet = m_ucidApi.GetId( token );
+        //get token
+        ucidRet = m_ucidApi.GetToken( token );
 
         if ( ucidRet != 0 )
         {
