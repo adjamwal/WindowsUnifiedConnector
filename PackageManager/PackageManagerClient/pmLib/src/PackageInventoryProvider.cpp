@@ -12,16 +12,16 @@ PackageInventoryProvider::~PackageInventoryProvider()
 
 bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 {
-    PackageInventory detectedPackages( { 0 } );
+    PackageInventory detectedPackages;
 
     detectedPackages.architecture = "x64";
     detectedPackages.platform = "win";
 
-    PmInstalledPackage packageInfo( { 0 } );
+    PmInstalledPackage packageInfo;
     packageInfo.packageName = "UC";
     packageInfo.packageVersion = "1.0.0";
 
-    PackageConfigInfo packageConfig( { 0 } );
+    PackageConfigInfo packageConfig;
     packageConfig.path = "uc.json";
     packageConfig.sha256 = "92753fde4682cf87d2a3c2af46e2f7dd7c2988863eca8390f79d5fb3723a5d2f";
     packageInfo.configs.push_back(packageConfig);

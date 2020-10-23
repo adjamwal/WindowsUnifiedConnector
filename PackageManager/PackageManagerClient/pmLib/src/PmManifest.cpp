@@ -101,5 +101,6 @@ std::string PmManifest::GetJsonStringField( Json::Value& packageJson, const char
         }
     }
 
+    LOG_DEBUG( "%s: %s", field, packageJson[ field ].asString().c_str() );
     return packageJson[ field ].asString();
 }
