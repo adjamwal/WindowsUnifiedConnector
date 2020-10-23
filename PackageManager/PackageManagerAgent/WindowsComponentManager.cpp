@@ -6,8 +6,9 @@
 #include <locale>
 #include <codecvt>
 
-WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper ) :
-    m_winApiWrapper( winApiWrapper )
+WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codesignVerifier ) :
+    m_winApiWrapper( winApiWrapper ),
+    m_codeSignVerifier( codesignVerifier )
 {
 
 }

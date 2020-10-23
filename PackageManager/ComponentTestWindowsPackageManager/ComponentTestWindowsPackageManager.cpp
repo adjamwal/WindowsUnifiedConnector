@@ -4,6 +4,7 @@
 #include "IUcLogger.h"
 #include "PmTypes.h"
 #include "MockWinApiWrapper.h"
+#include "MockCodesignVerifier.h"
 #include <memory>
 
 class ComponentTestWindowsPackageManager : public ::testing::Test
@@ -11,8 +12,9 @@ class ComponentTestWindowsPackageManager : public ::testing::Test
 protected:
     void SetUp()
     {
+        m_mockCodesignVerifier = std::make_unique<NiceMock<MockCodesignVerifier>>();
         m_mockWinApiWrapper = std::make_unique<NiceMock<MockWinApiWrapper>>();
-        m_patient = std::make_unique<WindowsComponentManager>( *m_mockWinApiWrapper );
+        m_patient = std::make_unique<WindowsComponentManager>( *m_mockWinApiWrapper, *m_mockCodesignVerifier );
     }
 
     void TearDown()
@@ -21,6 +23,7 @@ protected:
         m_mockWinApiWrapper.reset();
     }
 
+    std::unique_ptr<MockCodesignVerifier> m_mockCodesignVerifier;
     std::unique_ptr<MockWinApiWrapper> m_mockWinApiWrapper;
     std::unique_ptr<WindowsComponentManager> m_patient;
 };

@@ -3,13 +3,14 @@
 #include "IPmPlatformComponentManager.h"
 #include "IUcLogger.h"
 #include "IWinApiWrapper.h"
+#include "ICodesignVerifier.h"
 #include <string>
 #include <Windows.h>
 
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
 public:
-    WindowsComponentManager( IWinApiWrapper& winApiWrapper );
+    WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codeSignVerifier );
     virtual ~WindowsComponentManager();
 
     /**
@@ -70,7 +71,7 @@ public:
 
 private:
     IWinApiWrapper& m_winApiWrapper;
-
+    ICodesignVerifier& m_codeSignVerifier;
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
 };
 
