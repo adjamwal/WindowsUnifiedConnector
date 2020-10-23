@@ -2,6 +2,7 @@
 #include "MocksCommon.h"
 
 #include "IPmCloud.h"
+#include "IPmHttp.h"
 
 class MockPmCloud : public IPmCloud
 {

@@ -2,6 +2,7 @@
 #include "MocksCommon.h"
 
 #include "IPackageInventoryProvider.h"
+#include "PmTypes.h"
 
 class MockPackageInventoryProvider : public IPackageInventoryProvider
 {

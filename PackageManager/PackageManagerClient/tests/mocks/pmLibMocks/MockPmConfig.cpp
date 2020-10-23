@@ -4,9 +4,9 @@ MockPmConfig::MockPmConfig()
 {
     MakeLoadReturn( int32_t() );
     MakeVerifyFileIntegrityReturn( int32_t() );
-    MakeGetCloudUriReturn( const std::string&() );
+    MakeGetCloudUriReturn( "" );
     MakeGetCloudIntervalReturn( uint32_t() );
-    MakeGetSupportedComponentListReturn( const std::vector<PmComponent>&() );
+    MakeGetSupportedComponentListReturn( {} );
 }
 
 MockPmConfig::~MockPmConfig()
@@ -35,7 +35,7 @@ void MockPmConfig::ExpectVerifyFileIntegrityIsNotCalled()
 
 void MockPmConfig::MakeGetCloudUriReturn( const std::string& value )
 {
-    ON_CALL( *this, GetCloudUri() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, GetCloudUri() ).WillByDefault( ReturnRef( value ) );
 }
 
 void MockPmConfig::ExpectGetCloudUriIsNotCalled()
@@ -55,7 +55,7 @@ void MockPmConfig::ExpectGetCloudIntervalIsNotCalled()
 
 void MockPmConfig::MakeGetSupportedComponentListReturn( const std::vector<PmComponent>& value )
 {
-    ON_CALL( *this, GetSupportedComponentList() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, GetSupportedComponentList() ).WillByDefault( ReturnRef( value ) );
 }
 
 void MockPmConfig::ExpectGetSupportedComponentListIsNotCalled()

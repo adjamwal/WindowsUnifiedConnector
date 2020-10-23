@@ -2,6 +2,7 @@
 #include "MocksCommon.h"
 
 #include "IPmConfig.h"
+#include "PmTypes.h"
 
 class MockPmConfig : public IPmConfig
 {

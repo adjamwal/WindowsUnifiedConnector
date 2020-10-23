@@ -2,8 +2,6 @@
 
 MockPmPlatformDependencies::MockPmPlatformDependencies()
 {
-    MakeConfigurationReturn( IPmPlatformConfiguration&() );
-    MakeComponentManagerReturn( IPmPlatformComponentManager&() );
 }
 
 MockPmPlatformDependencies::~MockPmPlatformDependencies()
@@ -12,7 +10,7 @@ MockPmPlatformDependencies::~MockPmPlatformDependencies()
 
 void MockPmPlatformDependencies::MakeConfigurationReturn( IPmPlatformConfiguration& value )
 {
-    ON_CALL( *this, Configuration() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, Configuration() ).WillByDefault( ReturnRef( value ) );
 }
 
 void MockPmPlatformDependencies::ExpectConfigurationIsNotCalled()
@@ -22,7 +20,7 @@ void MockPmPlatformDependencies::ExpectConfigurationIsNotCalled()
 
 void MockPmPlatformDependencies::MakeComponentManagerReturn( IPmPlatformComponentManager& value )
 {
-    ON_CALL( *this, ComponentManager() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ComponentManager() ).WillByDefault( ReturnRef( value ) );
 }
 
 void MockPmPlatformDependencies::ExpectComponentManagerIsNotCalled()

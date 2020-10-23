@@ -2,6 +2,7 @@
 #include "MocksCommon.h"
 
 #include "IPmPlatformComponentManager.h"
+#include "PmTypes.h"
 
 class MockPmPlatformComponentManager : public IPmPlatformComponentManager
 {

@@ -1,9 +1,10 @@
 #include "MockPmManifest.h"
+#include "PmTypes.h"
 
 MockPmManifest::MockPmManifest()
 {
     MakeParseManifestReturn( int32_t() );
-    MakeGetPackageListReturn( std::vector<PmComponent>() );
+    MakeGetPackageListReturn( {} );
 }
 
 MockPmManifest::~MockPmManifest()

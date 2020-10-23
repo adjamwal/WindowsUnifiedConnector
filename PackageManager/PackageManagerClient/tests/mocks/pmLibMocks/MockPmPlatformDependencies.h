@@ -2,6 +2,8 @@
 #include "MocksCommon.h"
 
 #include "IPmPlatformDependencies.h"
+#include "IPmPlatformComponentManager.h"
+#include "IPmPlatformConfiguration.h"
 
 class MockPmPlatformDependencies : public IPmPlatformDependencies
 {

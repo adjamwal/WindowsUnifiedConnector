@@ -2,6 +2,7 @@
 #include "MocksCommon.h"
 
 #include "IComponentPackageProcessor.h"
+#include "PmTypes.h"
 
 class MockComponentPackageProcessor : public IComponentPackageProcessor
 {
