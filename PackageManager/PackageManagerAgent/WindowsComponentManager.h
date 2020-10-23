@@ -72,6 +72,8 @@ public:
 private:
     IWinApiWrapper& m_winApiWrapper;
     ICodesignVerifier& m_codeSignVerifier;
+
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
+    bool VerifyComponent( const PmComponent& package );
 };
 

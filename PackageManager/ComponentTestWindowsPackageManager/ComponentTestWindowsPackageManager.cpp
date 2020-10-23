@@ -119,3 +119,17 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentExitCodeProcessFailur
     EXPECT_EQ( ret, 5 );
     EXPECT_NE( error, "" );
 }
+
+TEST_F( ComponentTestWindowsPackageManager, UpdateComponentVerifyPackageFailure )
+{
+    std::string error;
+    PmComponent c;
+    c.installerType = "msi";
+
+    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
+
+    int32_t ret = m_patient->UpdateComponent( c, error );
+
+    EXPECT_EQ( ret, 1 );
+    EXPECT_NE( error, "" );
+}

@@ -32,34 +32,50 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 {
     int32_t ret = 0;
 
-    if ( package.installerType == "exe" )
-    {
-        ret = RunPackage( package.installerPath , package.installerArgs, error );
-    }
-    else if ( package.installerType == "msi" )
-    {
-        std::string msiexecFullPath;
-        std::string msiCmdline = "";
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-        if ( WindowsUtilities::GetSysDirectory( m_winApiWrapper, msiexecFullPath ) )
+    CodesignStatus status = m_codeSignVerifier.Verify( 
+        converter.from_bytes( package.installerPath ),
+        converter.from_bytes( package.signerName ), 
+        SIGTYPE_DEFAULT );
+
+    if ( status == CodesignStatus::CODE_SIGNER_SUCCESS )
+    {
+        if ( package.installerType == "exe" )
         {
-            msiexecFullPath.append( "\\msiexec.exe" );
+            ret = RunPackage( package.installerPath, package.installerArgs, error );
+        }
+        else if ( package.installerType == "msi" )
+        {
+            std::string msiexecFullPath;
+            std::string msiCmdline = "";
 
-            msiCmdline = " /package \"" + package.installerPath + "\" /quiet";
+            if ( WindowsUtilities::GetSysDirectory( m_winApiWrapper, msiexecFullPath ) )
+            {
+                msiexecFullPath.append( "\\msiexec.exe" );
 
-            ret = RunPackage( msiexecFullPath, msiCmdline, error );
+                msiCmdline = " /package \"" + package.installerPath + "\" /quiet";
+
+                ret = RunPackage( msiexecFullPath, msiCmdline, error );
+            }
+            else
+            {
+                error = std::string( "Failed to get system directory." );
+                ret = -1;
+            }
         }
         else
         {
-            error = std::string( "Failed to get system directory." );
+            error = std::string( "Invalid Package Type: " + package.installerType );
             ret = -1;
         }
     }
     else
     {
-        error = std::string( "Invalid Package Type: " + package.installerType );
-        ret = -1;
+        error = std::string( "Could not varify Package." );
+        ret = (int32_t)status;
     }
+    
 
     return ret;
 }
@@ -127,4 +143,14 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     }
 
     return ret;
+}
+
+bool WindowsComponentManager::VerifyComponent( const PmComponent& package )
+{
+    if ( m_codeSignVerifier.Verify( L"C:\\dev\\WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-US\\Cisco-UC-Installer-x64.msi", SIGNER_CISCO, SIGTYPE_DEFAULT ) != CodesignStatus::CODE_SIGNER_SUCCESS ) {
+        //WLOG_ERROR( L"Failed to verify dll signature: %s", dllPath.c_str() );
+        return false;
+    }
+    
+    return true;
 }
