@@ -67,7 +67,6 @@ public:
     int32_t DeployConfiguration( const PmPackageConfigration& config ) override;
 
 private:
-    void ExecutePackage(std::string executable, std::string cmdline);
-    std::string GetSystemDirectory();
+    int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
 };
 

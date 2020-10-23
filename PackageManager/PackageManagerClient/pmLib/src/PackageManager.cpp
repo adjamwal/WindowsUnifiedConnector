@@ -100,6 +100,8 @@ void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
+    //TODO check config directory for upgrade file
+
     if( !PmLoadConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
         //Send event? might fail without a config/cloudURL
@@ -126,6 +128,7 @@ void PackageManager::PmWorkflowThread()
     package.Name = "Cisco-UC-Installer-x64.msi";
     package.CmdLine = "";
 
+    //TODO write file to config directory?
     m_dependencies->ComponentManager().UpdateComponent( package );
 }
 

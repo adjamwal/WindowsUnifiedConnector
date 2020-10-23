@@ -1,6 +1,6 @@
 {
 	"cloud": {
 		"CheckinUri": "https://packagemanager.cisco.com/checkin",
-		"CheckinInterval": 300000
+		"CheckinInterval": 5000
 	}
 }

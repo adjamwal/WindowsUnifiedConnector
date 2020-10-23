@@ -23,6 +23,8 @@ protected:
 
 TEST_F( ComponentTestWindowsPackageManager, CanRunUpdate )
 {
+    //mock out windows calls and test all paths
+    //pass interface to WindowsComponentManager
     PmPackage p;
     p.Name = "lol";
     m_patient->UpdateComponent( p );

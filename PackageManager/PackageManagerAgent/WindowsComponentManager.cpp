@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "WindowsComponentManager.h"
-#include <Shlobj.h>
+#include "WindowsUtilities.h"
+#include <PmTypes.h>
+#include <sstream>
 #include <locale>
 #include <codecvt>
-#include <sstream>
-#include <PmTypes.h>
 
 WindowsComponentManager::WindowsComponentManager()
 {
@@ -26,7 +26,7 @@ int32_t WindowsComponentManager::InstallComponent( const PmPackage& package )
     return -1;
 }
 
-int32_t WindowsComponentManager::UpdateComponent( const PmPackage& package )
+int32_t WindowsComponentManager::UpdateComponent( const PmPackage& package )// todo return struct with error info
 {
     LOG_ERROR( "Enter UpdateComponent");
     
@@ -39,18 +39,25 @@ int32_t WindowsComponentManager::UpdateComponent( const PmPackage& package )
         switch ( package.Type )
         {
         case PackageType::EXE:
+            //TODO just append the backslash
             exeFullPath = package.Path + package.Name;
 
-            ExecutePackage( exeFullPath, package.CmdLine );
+            RunPackage( exeFullPath, package.CmdLine );
 
             break;
         case PackageType::MSI:
-            msiexecFullPath = GetSystemDirectory();
-            msiexecFullPath.append( "\\msiexec.exe" );
+            if ( WindowsUtilities::GetSystemDirectory( msiexecFullPath ) )
+            {
+                msiexecFullPath.append( "\\msiexec.exe" );
 
-            cmd = " /package \"" + package.Path + package.Name + "\" /quiet";
+                cmd = " /package \"" + package.Path + package.Name + "\" /quiet";
 
-            ExecutePackage( msiexecFullPath, cmd );
+                RunPackage( msiexecFullPath, cmd );
+            }
+            else
+            {
+                LOG_ERROR( "Failed to get system directory." );
+            }
 
             break;
         default:
@@ -78,9 +85,11 @@ int32_t WindowsComponentManager::DeployConfiguration( const PmPackageConfigratio
     return -1;
 }
 
-void WindowsComponentManager::ExecutePackage( std::string executable, std::string cmdline )
+int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )
 {
-    DWORD ret = 0;
+    int32_t ret = 0;
+
+    DWORD retlol = 0;
     DWORD exit_code = 0;
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -98,19 +107,25 @@ void WindowsComponentManager::ExecutePackage( std::string executable, std::strin
     {
         ret = WaitForSingleObject( pi.hProcess, 300000 );
 
-        if ( ret != WAIT_OBJECT_0 )
+        if ( ret == WAIT_OBJECT_0 )
         {
-            throw std::exception( std::string( "WaitForSingleObject Failed with return value: " + std::to_string( ret ) ).c_str() );
-        }
-
-        if ( !GetExitCodeProcess( pi.hProcess, &exit_code ) )
+            if ( GetExitCodeProcess( pi.hProcess, &exit_code ) )
+            {
+                if ( exit_code != 0 )
+                {
+                    ret = exit_code;
+                    error = std::string( "CreateProcess GetExitCodeProcess returned: " + std::to_string( ret ) );
+                }
+            }
+            else
+            {
+                ret = GetLastError();
+                error = std::string( "Failed to get last Exit Code for update Exe. GetLastError: " + std::to_string( ret ) );
+            }
+        } 
+        else
         {
-            throw std::exception( std::string( "Failed to get last Exit Code for update Exe. GetLastError: " + std::to_string( GetLastError() ) ).c_str() );
-        }
-
-        if ( exit_code != 0 )
-        {
-            throw std::exception( std::string( "CreateProcess GetExitCodeProcess returned: " + std::to_string( exit_code ) ).c_str() );
+            error = std::string( "WaitForSingleObject Failed with return value: " + std::to_string( ret ) );
         }
 
         CloseHandle( pi.hProcess );
@@ -118,29 +133,9 @@ void WindowsComponentManager::ExecutePackage( std::string executable, std::strin
     }
     else
     {
-        std::stringstream ss;
-        ss << "Failed to run package. " 
-            << "Exe: " << executable
-            << " CmdLine: " << cmdline
-            << " GetLastError: " << std::to_string( GetLastError() );
-
-        throw std::exception( ss.str().c_str() );
-    }
-}
-
-std::string WindowsComponentManager::GetSystemDirectory()
-{
-    PWSTR path = nullptr;
-
-    HRESULT ret = SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &path );
-    
-    if( ret != S_OK )
-    {
-        throw std::exception( std::string("Failed to get system directory: " + std::to_string( ret )).c_str() );
+        ret = GetLastError();
+        error = std::string( "Failed to run update. GetLastError: " + std::to_string( ret ) );
     }
 
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring systemPath( path );
-
-    return converter.to_bytes( systemPath );
+    return ret;
 }
