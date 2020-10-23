@@ -2,6 +2,7 @@
 
 #include <string>
 #include <Windows.h>
+#include "IWinApiWrapper.h"
 
 class WindowsUtilities
 {
@@ -12,5 +13,5 @@ public:
     static std::wstring GetDirPath(const std::wstring& path);
     static bool ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data);
     static bool Is64BitWindows();
-    static bool GetSystemDirectory( std::string& path );
+    static bool GetSysDirectory( IWinApiWrapper& winApiWrapper, std::string& path );
 };

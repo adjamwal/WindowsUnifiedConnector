@@ -126,8 +126,6 @@ void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    //TODO check config directory for upgrade file
-
     if( !PmLoadConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
         //Send event? might fail without a config/cloudURL

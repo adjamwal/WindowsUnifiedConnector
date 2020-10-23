@@ -2,12 +2,14 @@
 
 #include "IPmPlatformComponentManager.h"
 #include "IUcLogger.h"
+#include "IWinApiWrapper.h"
 #include <string>
+#include <Windows.h>
 
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
 public:
-    WindowsComponentManager();
+    WindowsComponentManager( IWinApiWrapper& winApiWrapper );
     virtual ~WindowsComponentManager();
 
     /**
@@ -28,7 +30,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was installed. -1 otherwise
      */
-    int32_t InstallComponent( const PmPackage& package ) override;
+    int32_t InstallComponent( const PmComponent& package ) override;
 
     /**
      * @brief This API will be used to update a package. The package will provide the following:
@@ -41,7 +43,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was updated. -1 otherwise
      */
-    int32_t UpdateComponent( const PmPackage& package ) override;
+    int32_t UpdateComponent( const PmComponent& package, std::string& error ) override;
 
     /**
      * @brief This API will be used to remove a package. The package will provide the following:
@@ -53,7 +55,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was removed. -1 otherwise
      */
-    int32_t UninstallComponent( const PmPackage& package ) override;
+    int32_t UninstallComponent( const PmComponent& package ) override;
 
     /**
      * @brief This API will be used to deploy a configuration file for a package. The configuration will provide the
@@ -67,6 +69,8 @@ public:
     int32_t DeployConfiguration( const PmPackageConfigration& config ) override;
 
 private:
+    IWinApiWrapper& m_winApiWrapper;
+
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
 };
 

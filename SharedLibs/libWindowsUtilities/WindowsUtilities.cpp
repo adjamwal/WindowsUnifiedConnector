@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "WindowsUtilities.h"
-#include <Shlobj.h>
 #include <locale>
 #include <codecvt>
 
@@ -81,19 +80,23 @@ bool WindowsUtilities::Is64BitWindows()
 #endif
 }
 
-bool WindowsUtilities::GetSystemDirectory( std::string& path )
+bool WindowsUtilities::GetSysDirectory( IWinApiWrapper& winApiWrapper, std::string& path )
 {
     bool ret = false;
     PWSTR tmpPath = nullptr;
 
-    HRESULT result = SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &tmpPath );
+    HRESULT result = winApiWrapper.SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &tmpPath );
 
     if ( SUCCEEDED( result ) )
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        std::wstring systemPath( tmpPath );
+        if ( tmpPath != nullptr )
+        {
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            std::wstring systemPath( tmpPath );
 
-        path = converter.to_bytes( systemPath );
+            path = converter.to_bytes( systemPath );
+        }
+        
         ret = true;
     }
     

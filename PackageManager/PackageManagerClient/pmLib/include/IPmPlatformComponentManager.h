@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 struct PmComponent;
 struct PmPackageConfigration;
@@ -48,7 +49,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was updated. -1 otherwise
      */
-    virtual int32_t UpdateComponent( const PmComponent& package ) = 0;
+    virtual int32_t UpdateComponent( const PmComponent& package, std::string& error ) = 0;
 
     /**
      * @brief This API will be used to remove a package. The package will provide the following:

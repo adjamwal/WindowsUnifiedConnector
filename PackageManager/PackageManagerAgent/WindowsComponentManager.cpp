@@ -6,7 +6,8 @@
 #include <locale>
 #include <codecvt>
 
-WindowsComponentManager::WindowsComponentManager()
+WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper ) :
+    m_winApiWrapper( winApiWrapper )
 {
 
 }
@@ -21,61 +22,48 @@ int32_t WindowsComponentManager::GetInstalledPackages( PmInstalledPackage* packa
     return -1;
 }
 
-int32_t WindowsComponentManager::InstallComponent( const PmPackage& package )
+int32_t WindowsComponentManager::InstallComponent( const PmComponent& package )
 {
     return -1;
 }
 
-int32_t WindowsComponentManager::UpdateComponent( const PmPackage& package )// todo return struct with error info
+int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, std::string& error )
 {
-    LOG_ERROR( "Enter UpdateComponent");
-    
-    try
+    int32_t ret = 0;
+
+    if ( package.installerType == "exe" )
     {
-        std::string exeFullPath;
+        ret = RunPackage( package.installerPath , package.installerArgs, error );
+    }
+    else if ( package.installerType == "msi" )
+    {
         std::string msiexecFullPath;
-        std::string cmd;
+        std::string msiCmdline = "";
 
-        switch ( package.Type )
+        if ( WindowsUtilities::GetSysDirectory( m_winApiWrapper, msiexecFullPath ) )
         {
-        case PackageType::EXE:
-            //TODO just append the backslash
-            exeFullPath = package.Path + package.Name;
+            msiexecFullPath.append( "\\msiexec.exe" );
 
-            RunPackage( exeFullPath, package.CmdLine );
+            msiCmdline = " /package \"" + package.installerPath + "\" /quiet";
 
-            break;
-        case PackageType::MSI:
-            if ( WindowsUtilities::GetSystemDirectory( msiexecFullPath ) )
-            {
-                msiexecFullPath.append( "\\msiexec.exe" );
-
-                cmd = " /package \"" + package.Path + package.Name + "\" /quiet";
-
-                RunPackage( msiexecFullPath, cmd );
-            }
-            else
-            {
-                LOG_ERROR( "Failed to get system directory." );
-            }
-
-            break;
-        default:
-            LOG_ERROR( "Invalid Package Type: %d", package.Type );
-            break;
+            ret = RunPackage( msiexecFullPath, msiCmdline, error );
+        }
+        else
+        {
+            error = std::string( "Failed to get system directory." );
+            ret = -1;
         }
     }
-    catch ( std::exception& ex )
+    else
     {
-        LOG_ERROR( "Exception during update: %s", ex.what() );
+        error = std::string( "Invalid Package Type: " + package.installerType );
+        ret = -1;
     }
 
-    LOG_ERROR( "Exit UpdateComponent" );
-
-    return -1;
+    return ret;
 }
 
-int32_t WindowsComponentManager::UninstallComponent( const PmPackage& package )
+int32_t WindowsComponentManager::UninstallComponent( const PmComponent& package )
 {
     return -1;
 }
@@ -103,13 +91,13 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     si.cb = sizeof( si );
     ZeroMemory( &pi, sizeof( pi ) );
 
-    if ( CreateProcess( &exe[0], &cmd[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi ) )
+    if ( m_winApiWrapper.CreateProcessW( &exe[0], &cmd[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi ) )
     {
-        ret = WaitForSingleObject( pi.hProcess, 300000 );
+        ret = m_winApiWrapper.WaitForSingleObject( pi.hProcess, 300000 );
 
         if ( ret == WAIT_OBJECT_0 )
         {
-            if ( GetExitCodeProcess( pi.hProcess, &exit_code ) )
+            if ( m_winApiWrapper.GetExitCodeProcess( pi.hProcess, &exit_code ) )
             {
                 if ( exit_code != 0 )
                 {
@@ -119,7 +107,7 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
             }
             else
             {
-                ret = GetLastError();
+                ret = m_winApiWrapper.GetLastError();
                 error = std::string( "Failed to get last Exit Code for update Exe. GetLastError: " + std::to_string( ret ) );
             }
         } 
@@ -133,7 +121,7 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     }
     else
     {
-        ret = GetLastError();
+        ret = m_winApiWrapper.GetLastError();
         error = std::string( "Failed to run update. GetLastError: " + std::to_string( ret ) );
     }
 

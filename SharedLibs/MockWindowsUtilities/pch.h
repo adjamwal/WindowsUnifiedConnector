@@ -10,4 +10,3 @@
 
 using ::testing::Return;
 using ::testing::_;
-using ::testing::NiceMock;
