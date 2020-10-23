@@ -20,7 +20,7 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
     root[ "platform" ] = inventory.platform;
 
     if( inventory.packages.size() ) {
-        Json::Value& packages = root[ "packages" ];
+        Json::Value& packages = root[ "installed" ];
         for( int i = 0; i < inventory.packages.size(); i++ ) {
             Json::Value package;
             PmInstalledPackage& packageDetection = inventory.packages[ i ];
