@@ -14,7 +14,8 @@ if(NOT googletest_POPULATED)
   # Replace install() to do-nothing macro.
   macro(install)
   endmacro()
-  add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  #add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  add_definitions(-DGTEST_LANG_CXX11=1) 
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
   # Restore original install() behavior.
   macro(install)

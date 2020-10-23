@@ -41,5 +41,5 @@ public:
     virtual int32_t SetCerts( const PmHttpCertList& cert ) = 0;
     virtual int32_t HttpGet( const std::string &url, std::string &response, int32_t &httpReturn ) = 0;
     virtual int32_t HttpPost( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t &httpReturn ) = 0;
-    virtual int32_t HttpDownload( const std::string& url, std::string& filepath, int32_t &httpReturn ) = 0;
+    virtual int32_t HttpDownload( const std::string& url, const std::string& filepath, int32_t &httpReturn ) = 0;
 };
