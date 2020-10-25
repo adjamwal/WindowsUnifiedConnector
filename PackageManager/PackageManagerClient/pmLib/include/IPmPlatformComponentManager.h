@@ -4,7 +4,7 @@
 #include <string>
 
 struct PmComponent;
-struct PmPackageConfigration;
+struct PackageConfigInfo;
 struct PmInstalledPackage;
 
 /**
