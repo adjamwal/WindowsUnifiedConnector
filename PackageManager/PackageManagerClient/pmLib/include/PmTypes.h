@@ -24,21 +24,11 @@ struct PmComponent
     std::vector<PackageConfigInfo> configs;
 };
 
-struct PmPackageConfigration
-{
-    int i;
-};
-
 struct PmInstalledPackage
 {
     std::string packageName;
     std::string packageVersion;
     std::vector<PackageConfigInfo> configs;
-};
-
-struct PmPackage
-{
-    int i;
 };
 
 struct PackageInventory

@@ -47,34 +47,49 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
             componentPackage.installerPath = ss.str();
 
             std::string errorText;
-            int32_t ret = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
+            int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
 
-            if( ret != 0 )
+            if( updated != 0 )
             {
-                LOG_ERROR( "Failed to Update Component: (%d) %s", ret, errorText.c_str() );
+                LOG_ERROR( "Failed to Update Component: (%d) %s", updated, errorText.c_str() );
                 //TODO: Report error
             }
-
+            else {
+                rtn = ProcessComponentPackageConfigs( componentPackage );
+            }
 
             LOG_DEBUG( "Removing %s", ss.str().c_str() );
             if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
                 LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
             }
-
-            rtn = true;
         }
     }
-
-    if( !componentPackage.installLocation.empty() ) {
-        for each( auto config in componentPackage.configs ) {
-            rtn = ProcessComponentPackageConfig( componentPackage.installLocation, config );
-        }
+    else {
+        rtn = ProcessComponentPackageConfigs( componentPackage );
     }
+
 
     return rtn;
 }
 
-bool ComponentPackageProcessor::ProcessComponentPackageConfig( const std::string& installDir, PackageConfigInfo& config )
+bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& componentPackage )
+{
+    bool rtn = false;
+
+    if( !componentPackage.installLocation.empty() ) {
+        for each( auto config in componentPackage.configs ) {
+            rtn = ProcessComponentConfig( componentPackage.installLocation, config );
+        }
+    }
+    else {
+        rtn = true;
+    }
+
+
+    return rtn;
+}
+
+bool ComponentPackageProcessor::ProcessComponentConfig( const std::string& installDir, PackageConfigInfo& config )
 {
     bool rtn = false;
     std::vector<uint8_t> configData;
@@ -82,7 +97,7 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfig( const std::string
         LOG_ERROR( "No install path" );
     }
     else if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
-
+        LOG_ERROR( "Failed to decode %s", config.contents );
     }
     else {
         std::stringstream ss;
@@ -94,6 +109,12 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfig( const std::string
         }
         else if( m_fileUtil.AppendFile( handle, configData.data(), configData.size() ) != 0 ) {
             LOG_ERROR( "Failed to write to %s", ss.str().c_str() );
+            m_fileUtil.CloseFile( handle );
+
+            LOG_DEBUG( "Removing %s", ss.str().c_str() );
+            if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
+                LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
+            }
         }
         else {
             m_fileUtil.CloseFile( handle );
@@ -108,11 +129,6 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfig( const std::string
                 if( m_fileUtil.Rename( ss.str(), installDir, config.path ) == 0 ) {
                     rtn = true;
                 }
-            }
-
-            LOG_DEBUG( "Removing %s", ss.str().c_str() );
-            if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
-                LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
             }
         }
     }

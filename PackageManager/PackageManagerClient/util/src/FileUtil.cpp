@@ -104,7 +104,7 @@ int32_t FileUtil::DeleteFile( const std::string& filename )
     return ::std::filesystem::remove( ::std::filesystem::path( filename ) ) ? 0 : -1;
 }
 
-int32_t Rename( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
 {
     int32_t rtn = -1;
 

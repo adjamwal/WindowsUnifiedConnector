@@ -97,8 +97,9 @@ int32_t SslUtil::DecodeBase64( const std::string& base64Str, std::vector<uint8_t
     }
     else {
         LOG_DEBUG( "Succesfully decoded pInputBuffer into pOutputBuffer" );
-        output.reserve( tempOutputBufferSize );
+        output.resize( tempOutputBufferSize );
         memcpy( output.data(), pTempOutputBuffer, tempOutputBufferSize );
+        
         pTempOutputBuffer = NULL;
         functionStatus = 0;
     }

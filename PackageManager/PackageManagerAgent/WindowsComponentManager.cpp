@@ -85,7 +85,7 @@ int32_t WindowsComponentManager::UninstallComponent( const PmComponent& package 
     return -1;
 }
 
-int32_t WindowsComponentManager::DeployConfiguration( const PmPackageConfigration& config )
+int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& config )
 {
     return -1;
 }

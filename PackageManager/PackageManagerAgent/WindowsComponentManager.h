@@ -67,7 +67,7 @@ public:
      *
      * @return 0 if the configuration was deployed. -1 otherwise
      */
-    int32_t DeployConfiguration( const PmPackageConfigration& config ) override;
+    int32_t DeployConfiguration( const PackageConfigInfo& config ) override;
 
 private:
     IWinApiWrapper& m_winApiWrapper;

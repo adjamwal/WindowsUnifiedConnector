@@ -87,7 +87,7 @@ void PmManifest::AddPackage( Json::Value& packageJson )
         }
     }
     else {
-        LOG_ERROR( "packages array not found" );
+        LOG_DEBUG( "config array not found" );
     }
     m_ComponentList.push_back( package );
 }

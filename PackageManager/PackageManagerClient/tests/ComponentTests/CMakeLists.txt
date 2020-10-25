@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.10)
 
-add_executable(ComponentTests "utilTests/ComponentTestPmHttp.cpp" "utilTests/WindowsCertStore.h" "utilTests/WindowsCertStore.cpp")
+file(GLOB_RECURSE test_sources ./**.cpp ./**.h)
+add_executable(ComponentTests ${test_sources})
 
 target_include_directories(ComponentTests 
     PRIVATE ${curl_INCLUDE_DIRS}

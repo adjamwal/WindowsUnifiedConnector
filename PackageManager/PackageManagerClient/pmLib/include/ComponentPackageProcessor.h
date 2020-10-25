@@ -25,5 +25,6 @@ private:
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
 
-    bool ProcessComponentPackageConfig( const std::string& installDir, PackageConfigInfo& config );
+    bool ProcessComponentPackageConfigs( PmComponent& componentPackage );
+    bool ProcessComponentConfig( const std::string& installDir, PackageConfigInfo& config );
 };
