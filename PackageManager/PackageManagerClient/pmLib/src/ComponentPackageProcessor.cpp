@@ -46,7 +46,15 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         if( m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) == 200 ) {
             componentPackage.installerPath = ss.str();
 
-            //m_dependencies->ComponentManager().InstallComponent( componentPackage );
+            std::string errorText;
+            int32_t ret = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
+
+            if( ret != 0 )
+            {
+                LOG_ERROR( "Failed to Update Component: (%d) %s", ret, errorText.c_str() );
+                //TODO: Report error
+            }
+
 
             LOG_DEBUG( "Removing %s", ss.str().c_str() );
             if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "WindowsUtilities.h"
+#include <locale>
+#include <codecvt>
 
 bool WindowsUtilities::FileExists(const WCHAR* filename)
 {
@@ -76,4 +78,27 @@ bool WindowsUtilities::Is64BitWindows()
 #else
     return FALSE; // Win64 does not support Win16
 #endif
+}
+
+bool WindowsUtilities::GetSysDirectory( IWinApiWrapper& winApiWrapper, std::string& path )
+{
+    bool ret = false;
+    PWSTR tmpPath = nullptr;
+
+    HRESULT result = winApiWrapper.SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &tmpPath );
+
+    if ( SUCCEEDED( result ) )
+    {
+        if ( tmpPath != nullptr )
+        {
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            std::wstring systemPath( tmpPath );
+
+            path = converter.to_bytes( systemPath );
+        }
+        
+        ret = true;
+    }
+    
+    return ret;
 }
