@@ -64,11 +64,10 @@ void PmManifest::AddPackage( Json::Value& packageJson )
 
     // Required Data
     package.packageName = GetJsonStringField( packageJson, "package", true );
-    package.installerUrl = GetJsonStringField( packageJson, "installer_uri", true );
-    //TODO: Change to enum
-    package.installerType = GetJsonStringField( packageJson, "installer_type", true );
 
     // Optional Data
+    package.installerUrl = GetJsonStringField( packageJson, "installer_uri", false );
+    package.installerType = GetJsonStringField( packageJson, "installer_type", false );
     if( packageJson.isMember( "installer_args" ) ) {
         if( !packageJson[ "installer_args" ].isArray() ) {
             throw( std::invalid_argument( __FUNCTION__ ": Invalid Content: installer_args" ) );
@@ -82,7 +81,28 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     package.signerName = GetJsonStringField( packageJson, "installer_signer_name", false );
     package.installerHash = GetJsonStringField( packageJson, "installer_hash", false );
 
+    if( packageJson[ "configs" ].isArray() ) {
+        for( Json::Value::ArrayIndex i = 0; i != packageJson[ "configs" ].size(); i++ ) {
+            AddConfigToPackage( packageJson[ "configs" ][ i ], package );
+        }
+    }
+    else {
+        LOG_DEBUG( "config array not found" );
+    }
     m_ComponentList.push_back( package );
+}
+
+void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& package )
+{
+    PackageConfigInfo config;
+
+    config.contents = GetJsonStringField( configJson, "contents", true );
+    config.path = GetJsonStringField( configJson, "path", true );
+
+    config.sha256 = GetJsonStringField( configJson, "sha256", false );
+    config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
+
+    package.configs.push_back( config );
 }
 
 std::string PmManifest::GetJsonStringField( Json::Value& packageJson, const char* field, bool required )

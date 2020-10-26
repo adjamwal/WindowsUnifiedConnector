@@ -111,7 +111,7 @@ TEST_F( TestCheckinFormatter, WillBuildPackage )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "packages" ][ 0 ][ "package" ], m_inventory->packages.front().packageName + "/"  + m_inventory->packages.front().packageVersion );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "package" ], m_inventory->packages.front().packageName + "/"  + m_inventory->packages.front().packageVersion );
 }
 
 TEST_F( TestCheckinFormatter, WillBuildPackageConfig )
@@ -124,8 +124,8 @@ TEST_F( TestCheckinFormatter, WillBuildPackageConfig )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "packages" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().path );
-    EXPECT_EQ( root[ "packages" ][ 0 ][ "configs" ][ 0 ][ "sha256" ], m_inventory->packages.front().configs.front().sha256 );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().path );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "sha256" ], m_inventory->packages.front().configs.front().sha256 );
 }
 
 TEST_F( TestCheckinFormatter, WillBuildMultiPackageJson )
@@ -138,7 +138,7 @@ TEST_F( TestCheckinFormatter, WillBuildMultiPackageJson )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "packages" ].size(), 2 );
-    EXPECT_EQ( root[ "packages" ][ 0 ][ "configs" ].size(), 2 );
-    EXPECT_EQ( root[ "packages" ][ 1 ][ "configs" ].size(), 2 );
+    EXPECT_EQ( root[ "installed" ].size(), 2 );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ].size(), 2 );
+    EXPECT_EQ( root[ "installed" ][ 1 ][ "configs" ].size(), 2 );
 }

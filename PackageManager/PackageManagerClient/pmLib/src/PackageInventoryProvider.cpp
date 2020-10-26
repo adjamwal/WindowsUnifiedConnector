@@ -18,8 +18,8 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
     detectedPackages.platform = "win";
 
     PmInstalledPackage packageInfo;
-    packageInfo.packageName = "UC";
-    packageInfo.packageVersion = "1.0.0";
+    packageInfo.packageName = "uc";
+    packageInfo.packageVersion = "0.0.1";
 
     PackageConfigInfo packageConfig;
     packageConfig.path = "uc.json";
