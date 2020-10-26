@@ -44,7 +44,7 @@ protected:
     std::unique_ptr<PmHttp> m_patient;
 };
 
-TEST_F( ComponentTestPmHttp, CanPostToCheckinURL )
+TEST_F( ComponentTestPmHttp, DISABLED__CanPostToCheckinURL )
 {
     std::string response;
     int32_t rtn = 0;

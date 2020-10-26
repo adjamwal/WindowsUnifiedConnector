@@ -4,7 +4,7 @@
 #include <string>
 
 struct PmComponent;
-struct PmPackageConfigration;
+struct PackageConfigInfo;
 struct PmInstalledPackage;
 
 /**
@@ -72,5 +72,5 @@ public:
      *
      * @return 0 if the configuration was deployed. -1 otherwise
      */
-    virtual int32_t DeployConfiguration( const PmPackageConfigration& config ) = 0;
+    virtual int32_t DeployConfiguration( const PackageConfigInfo& config ) = 0;
 };

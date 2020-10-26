@@ -16,6 +16,7 @@ class ICertsAdapter;
 class ICheckinManifestRetriever;
 class IComponentPackageProcessor;
 class IManifestProcessor;
+class ISslUtil;
 
 class PackageManagerContainer
 {
@@ -27,6 +28,7 @@ public:
 
 private:
     std::unique_ptr<IFileUtil> m_fileUtil;
+    std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;
     std::unique_ptr<IPmConfig> m_config;

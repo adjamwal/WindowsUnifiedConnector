@@ -15,6 +15,7 @@
 #include "ManifestProcessor.h"
 
 #include "FileUtil.h"
+#include "SslUtil.h"
 #include "PmLogger.h"
 
 #include <mutex>
@@ -26,6 +27,7 @@ static PackageManagerContainer* gContainer = NULL;
 
 PackageManagerContainer::PackageManagerContainer() :
     m_fileUtil( new FileUtil() )
+    , m_sslUtil( new SslUtil() )
     , m_http( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )
     , m_config( new PmConfig( *m_fileUtil ) )
@@ -36,7 +38,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_tokenAdapter( new TokenAdapter() )
     , m_certsAdapter( new CertsAdapter() )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) )
-    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud ) )
+    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(
         new PackageManager( *m_config,

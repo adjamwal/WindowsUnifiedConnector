@@ -35,12 +35,12 @@ void MockPmPlatformComponentManager::ExpectInstallComponentIsNotCalled()
 
 void MockPmPlatformComponentManager::MakeUpdateComponentReturn( int32_t value )
 {
-    ON_CALL( *this, UpdateComponent( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, UpdateComponent( _, _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockPmPlatformComponentManager::ExpectUpdateComponentIsNotCalled()
 {
-    EXPECT_CALL( *this, UpdateComponent( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, UpdateComponent( _, _ ) ).Times( 0 );
 }
 
 void MockPmPlatformComponentManager::MakeUninstallComponentReturn( int32_t value )
