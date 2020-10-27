@@ -28,7 +28,9 @@ std::string CheckinManifestRetriever::GetCheckinManifestFrom( std::string uri, s
 
     if( respStatus != 200 )
     {
-        throw std::exception( __FUNCTION__ ": HttpPost error status %d", respStatus );
+        std::string s = __FUNCTION__ ": Http Post status ";
+        s += std::to_string( respStatus );
+        throw std::exception( s.c_str() );
     }
 
     return response;
