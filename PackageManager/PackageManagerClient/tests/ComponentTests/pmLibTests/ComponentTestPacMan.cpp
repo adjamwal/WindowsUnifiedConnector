@@ -202,9 +202,20 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
 
-    EXPECT_CALL( *m_sslUtil, DecodeBase64( _, _ ) ).WillOnce( Invoke(
-        [this, &pass]( const std::string& base64Str, std::vector<uint8_t>& output )
+    ON_CALL( *m_sslUtil, DecodeBase64( _, _ ) ).WillByDefault( Invoke(
+        []( const std::string& base64Str, std::vector<uint8_t>& output )
         {
+            SslUtil sslUtil;
+            return sslUtil.DecodeBase64( base64Str, output );
+        }
+    ) );
+
+    EXPECT_CALL( *m_fileUtil, AppendFile( _, _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( FileUtilHandle* handle, void* data, size_t dataLen )
+        {
+            std::string strData( ( char* )data, dataLen );
+            EXPECT_EQ( _decodedConfig, strData );
+
             m_cv.notify_one();
 
             pass = true;
