@@ -157,7 +157,17 @@ bool ComponentPackageProcessor::ProcessComponentConfig( PackageConfigInfo& confi
             config.verifyPath = ss.str();
 
             bool moveFile = true;
-            if( !config.verifyBinPath.empty() ) {
+
+            // only validate hash if installerHash is not empty
+            if( !config.sha256.empty() )
+            {
+                auto sha256 = m_sslUtil.CalculateSHA256( config.verifyPath );
+                if( sha256 != config.sha256 ) {
+                    moveFile = false;
+                }
+            }
+
+            if( moveFile && !config.verifyBinPath.empty() ) {
                 moveFile = m_dependencies->ComponentManager().DeployConfiguration( config ) == 0;
             }
 

@@ -164,6 +164,23 @@ TEST_F( TestComponentPackageProcessor, WillTempConfigFile )
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }
 
+TEST_F( TestComponentPackageProcessor, WillVerifyConfigFileHash )
+{
+    SetupComponentPackageWithConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 0 );
+
+    EXPECT_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillOnce( Return( m_expectedComponentPackage.installerHash ) );
+    //Only care about this EXPECT_CALL
+    EXPECT_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillOnce( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
+
+    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+}
+
 TEST_F( TestComponentPackageProcessor, WillVerifyConfigFile )
 {
     SetupComponentPackageWithConfig();
@@ -173,6 +190,8 @@ TEST_F( TestComponentPackageProcessor, WillVerifyConfigFile )
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( m_expectedComponentPackage.installerHash ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
 
     EXPECT_CALL( *m_pmComponentManager, DeployConfiguration( _ ) );
 
@@ -189,6 +208,8 @@ TEST_F( TestComponentPackageProcessor, WillMoveConfigFile )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
     m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( m_expectedComponentPackage.installerHash ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
 
     EXPECT_CALL( *m_fileUtil, Rename( _, _, _) );
 
@@ -205,6 +226,8 @@ TEST_F( TestComponentPackageProcessor, WillMoveConfigWhenVerificationIsNotRequir
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( m_expectedComponentPackage.installerHash ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
     
     m_pmComponentManager->ExpectDeployConfigurationIsNotCalled();
     EXPECT_CALL( *m_fileUtil, Rename( _, _, _ ) );
@@ -222,6 +245,8 @@ TEST_F( TestComponentPackageProcessor, WillRemoveTempConfig )
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( -1 );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( m_expectedComponentPackage.installerHash ) );
+
 
     EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) ).Times( 2 );
 
