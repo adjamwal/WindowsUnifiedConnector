@@ -78,7 +78,7 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& com
 
     if( !componentPackage.installLocation.empty() ) {
         for each( auto config in componentPackage.configs ) {
-            rtn = ProcessComponentConfig( componentPackage.installLocation, config );
+            rtn = ProcessComponentConfig( config );
         }
     }
     else {
@@ -89,11 +89,11 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& com
     return rtn;
 }
 
-bool ComponentPackageProcessor::ProcessComponentConfig( const std::string& installDir, PackageConfigInfo& config )
+bool ComponentPackageProcessor::ProcessComponentConfig( PackageConfigInfo& config )
 {
     bool rtn = false;
     std::vector<uint8_t> configData;
-    if( installDir.empty() ) {
+    if( config.installLocation.empty() ) {
         LOG_ERROR( "No install path" );
     }
     else if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
@@ -126,7 +126,7 @@ bool ComponentPackageProcessor::ProcessComponentConfig( const std::string& insta
             }
 
             if( moveFile ) {
-                if( m_fileUtil.Rename( ss.str(), installDir, config.path ) == 0 ) {
+                if( m_fileUtil.Rename( ss.str(), config.installLocation, config.path ) == 0 ) {
                     rtn = true;
                 }
             }

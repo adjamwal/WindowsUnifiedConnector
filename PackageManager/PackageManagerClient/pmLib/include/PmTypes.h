@@ -9,6 +9,8 @@ struct PackageConfigInfo
     std::string contents;
     std::string verifyBinPath;
     std::string verifyPath;
+    std::string installLocation;
+    std::string signerName;
 };
 
 struct PmComponent

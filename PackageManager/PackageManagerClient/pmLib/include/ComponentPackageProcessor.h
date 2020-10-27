@@ -26,5 +26,5 @@ private:
     uint32_t m_fileCount;
 
     bool ProcessComponentPackageConfigs( PmComponent& componentPackage );
-    bool ProcessComponentConfig( const std::string& installDir, PackageConfigInfo& config );
+    bool ProcessComponentConfig( PackageConfigInfo& config );
 };

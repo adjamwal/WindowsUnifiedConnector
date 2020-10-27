@@ -96,6 +96,7 @@ int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen
 
 std::string FileUtil::GetTempDir()
 {
+
     return ::std::filesystem::temp_directory_path().generic_string();
 }
 

@@ -54,7 +54,9 @@ protected:
             "configsha256",
             "configcontents",
             "configverifyBinPath",
-            "configverifyPath"
+            "configverifyPath",
+            "installLocation",
+            "signerName",
         } );
     }
 

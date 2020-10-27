@@ -72,7 +72,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
     }
     else
     {
-        error = std::string( "Could not varify Package." );
+        error = std::string( "Could not verify Package." );
         ret = (int32_t)status;
     }
     
@@ -87,7 +87,27 @@ int32_t WindowsComponentManager::UninstallComponent( const PmComponent& package 
 
 int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& config )
 {
-    return -1;
+    int32_t ret = 0;
+
+    std::string verifyFullPath = config.installLocation + "\\" + config.verifyBinPath;
+    std::string verifyCmdLine = "--config-path " + config.verifyPath;
+    std::string errorStr;
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    CodesignStatus status = m_codeSignVerifier.Verify(
+        converter.from_bytes( verifyFullPath ),
+        converter.from_bytes( config.signerName ),
+        SIGTYPE_DEFAULT );
+
+    if( status == CodesignStatus::CODE_SIGNER_SUCCESS ) {
+        ret = RunPackage( config.verifyBinPath, verifyCmdLine, errorStr );
+    }
+    else {
+        ret = ( int32_t )status;
+    }
+
+    return ret;
 }
 
 int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )
