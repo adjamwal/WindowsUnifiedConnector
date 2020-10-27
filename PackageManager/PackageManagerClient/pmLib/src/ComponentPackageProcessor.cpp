@@ -46,10 +46,11 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         if( m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) == 200 ) {
             componentPackage.installerPath = ss.str();
 
-            std::string sha256;
-            if ( m_sslUtil.CalculateSHA256( ss.str(), sha256 ) )
+            auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
+
+            if ( sha256.has_value() )
             {
-                if ( sha256 == componentPackage.installerHash )
+                if ( sha256.value() == componentPackage.installerHash )
                 {
                     std::string errorText;
                     int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );

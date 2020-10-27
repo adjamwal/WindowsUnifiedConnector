@@ -124,13 +124,13 @@ abort:
 }
 
 static const int K_READ_BUF_SIZE{ 1024 * 16 };
-bool SslUtil::CalculateSHA256( const std::string filename, std::string& sha256 )
+std::optional<std::string> SslUtil::CalculateSHA256( const std::string filename )
 {
     // Initialize openssl
     SHA256_CTX context;
     if ( !SHA256_Init( &context ) )
     {
-        return false;
+        return std::nullopt;
     }
 
     // Read file and update calculated SHA
@@ -141,7 +141,7 @@ bool SslUtil::CalculateSHA256( const std::string filename, std::string& sha256 )
         file.read( buf, sizeof( buf ) );
         if ( !SHA256_Update( &context, buf, file.gcount() ) )
         {
-            return false;
+            return std::nullopt;
         }
     }
 
@@ -149,7 +149,7 @@ bool SslUtil::CalculateSHA256( const std::string filename, std::string& sha256 )
     unsigned char result[SHA256_DIGEST_LENGTH];
     if ( !SHA256_Final( result, &context ) )
     {
-        return false;
+        return std::nullopt;
     }
 
     std::stringstream ss;
@@ -158,7 +158,5 @@ bool SslUtil::CalculateSHA256( const std::string filename, std::string& sha256 )
         ss << std::hex << std::setw( 2 ) << std::setfill( '0' ) << (int)result[i];
     }
 
-    sha256 = ss.str();
-
-    return true;
+    return ss.str();
 }
