@@ -89,7 +89,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,7 +112,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -135,7 +135,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -161,7 +161,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -196,18 +196,18 @@
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libLogger\libLogger.vcxproj">
-      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\SharedLibs\LibVerifier\LibVerifier.vcxproj">
-      <Project>{780b5314-e3ca-4427-96e0-9262f8c7a2ce}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
-      <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
-    </ProjectReference>
+    <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="UCService.rc" />
+    <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
+      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SharedLibs\LibVerifier\LibVerifier.vcxproj">
+      <Project>{780b5314-e3ca-4427-96e0-9262f8c7a2ce}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
+      <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

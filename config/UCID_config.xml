@@ -1,5 +1,0 @@
-<identity_config>
-    <business_id>demo-bus-id</business_id>
-    <installer_key>11111111-1111-1111-1111-111111111111</installer_key>
-    <url>https://4m2294wzqf.execute-api.us-west-1.amazonaws.com/dev/identify</url>
-</identity_config>
