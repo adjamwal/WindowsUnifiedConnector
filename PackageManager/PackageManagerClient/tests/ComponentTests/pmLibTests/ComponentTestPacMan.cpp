@@ -236,6 +236,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     EXPECT_CALL( *m_platformComponentManager, DeployConfiguration( _ ) ).WillOnce( Invoke(
         [this, &pass]( const PackageConfigInfo& config )
@@ -265,6 +266,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
@@ -307,6 +309,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     m_platformComponentManager->ExpectDeployConfigurationIsNotCalled();
     EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
@@ -361,7 +364,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
@@ -461,7 +465,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_2" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_3" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_4" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_5" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) )
         .WillOnce( Invoke(

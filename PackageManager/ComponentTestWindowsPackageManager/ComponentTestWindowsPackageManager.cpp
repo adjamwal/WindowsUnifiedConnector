@@ -7,6 +7,8 @@
 #include "MockCodesignVerifier.h"
 #include <memory>
 
+using ::testing::StrEq;
+
 class ComponentTestWindowsPackageManager : public ::testing::Test
 {
 protected:
@@ -130,6 +132,68 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentVerifyPackageFailure 
 
     int32_t ret = m_patient->UpdateComponent( c, error );
 
-    EXPECT_EQ( ret, 1 );
+    EXPECT_EQ( ( CodesignStatus )ret, CodesignStatus::CODE_SIGNER_ERROR );
     EXPECT_NE( error, "" );
+}
+
+#define TEST_INSTALL_PATH "INSTALL PATH"
+#define TEST_VERIFY_BIN_PATH "TestVerifyBin.exe"
+#define TEST_VERIFY_SIGNER "TEST SIGNER"
+#define TEST_VERIFY_PATH "TestVerifyPath"
+TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillVerifySigner )
+{
+    std::string error;
+    PackageConfigInfo c;
+    c.installLocation = TEST_INSTALL_PATH;
+    c.signerName = TEST_VERIFY_SIGNER;
+    c.verifyBinPath = TEST_VERIFY_BIN_PATH;
+
+    EXPECT_CALL( *m_mockCodesignVerifier, Verify( 
+        std::wstring( _T( TEST_INSTALL_PATH "\\" TEST_VERIFY_BIN_PATH ) ),
+        std::wstring( _T( TEST_VERIFY_SIGNER ) ), 
+        _ ) );
+
+    m_patient->DeployConfiguration( c  );
+}
+
+TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillReturnVerifyFailure )
+{
+    PackageConfigInfo c;
+
+    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
+
+    int32_t ret = m_patient->DeployConfiguration( c );
+
+    EXPECT_EQ( ( CodesignStatus )ret, CodesignStatus::CODE_SIGNER_ERROR );
+}
+
+TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillBuildCommandLine )
+{
+    PackageConfigInfo c;
+
+    c.verifyPath = TEST_VERIFY_PATH;
+    std::wstring expectedArg = L"--config-path " + std::wstring(_T( TEST_VERIFY_PATH ) );
+    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
+
+    EXPECT_CALL( *m_mockWinApiWrapper, CreateProcessW( _,
+        StrEq( expectedArg.c_str() ),
+        _, _, _, _, _, _, _, _ ) );
+
+    m_patient->DeployConfiguration( c );
+}
+
+TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationSuccess )
+{
+    PackageConfigInfo c;
+
+    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
+    m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
+    m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
+    m_mockWinApiWrapper->MakeSHGetKnownFolderPathReturn( 0 );
+    m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
+    m_mockWinApiWrapper->MakeGetLastErrorReturn( 0 );
+
+    int32_t ret = m_patient->DeployConfiguration( c );
+
+    EXPECT_EQ( ret, 0 );
 }

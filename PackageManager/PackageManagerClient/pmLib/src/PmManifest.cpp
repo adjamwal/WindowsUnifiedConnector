@@ -102,6 +102,9 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     config.sha256 = GetJsonStringField( configJson, "sha256", false );
     config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
 
+    config.installLocation = package.installLocation;
+    config.signerName = package.signerName;
+
     package.configs.push_back( config );
 }
 
