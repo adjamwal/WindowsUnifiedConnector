@@ -46,36 +46,54 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         if( m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) == 200 ) {
             componentPackage.installerPath = ss.str();
 
-            auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
-
-            if ( sha256.has_value() )
+            // only validate hash if installerHash is not empty
+            if ( !componentPackage.installerHash.empty() )
             {
-                if ( sha256.value() == componentPackage.installerHash )
-                {
-                    std::string errorText;
-                    int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
+                auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
 
-                    if ( updated != 0 )
+                if ( sha256.has_value() )
+                {
+                    if ( sha256.value() == componentPackage.installerHash )
                     {
-                        LOG_ERROR( "Failed to Update Component: (%d) %s", updated, errorText.c_str() );
-                        //TODO: Report error
+                        std::string errorText;
+                        int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
+
+                        if ( updated != 0 )
+                        {
+                            LOG_ERROR( "Failed to Update Component: (%d) %s", updated, errorText.c_str() );
+                            //TODO: Report error
+                        }
+                        else {
+                            rtn = ProcessComponentPackageConfigs( componentPackage );
+                        }
                     }
-                    else {
-                        rtn = ProcessComponentPackageConfigs( componentPackage );
+                    else
+                    {
+                        LOG_ERROR( "Failed to match hash of download. Calculate Hash: %s Cloud Hash: %s", sha256, componentPackage.installerHash );
+                        //TODO: Report error
                     }
                 }
                 else
                 {
-                    LOG_ERROR( "Failed to match hash of download. Calculate Hash: %s Cloud Hash: %s", sha256, componentPackage.installerHash );
+                    LOG_ERROR( "Failed to calculate sha256 of %s", ss.str().c_str() );
                     //TODO: Report error
                 }
             }
             else
             {
-                LOG_ERROR( "Failed to calculate sha256 of %s", ss.str().c_str() );
-                //TODO: Report error
-            }
+                std::string errorText;
+                int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
 
+                if ( updated != 0 )
+                {
+                    LOG_ERROR( "Failed to Update Component: (%d) %s", updated, errorText.c_str() );
+                    //TODO: Report error
+                }
+                else {
+                    rtn = ProcessComponentPackageConfigs( componentPackage );
+                }
+            }
+            
             LOG_DEBUG( "Removing %s", ss.str().c_str() );
             if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
                 LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
