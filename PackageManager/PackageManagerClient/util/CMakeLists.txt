@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.17)
 
 file(GLOB_RECURSE util_sources ./**.cpp ./**.h)
 add_library (utilLib ${util_sources})
