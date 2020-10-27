@@ -65,6 +65,7 @@ protected:
         SetupComponentPackage();
         m_patient->Initialize( m_dep.get() );
         m_cloud->MakeDownloadFileReturn( 200 );
+        m_sslUtil->MakeCalculateSHA256Return( "installerHash" );
         m_pmComponentManager->MakeUpdateComponentReturn( 0 );
     }
 
@@ -89,10 +90,8 @@ TEST_F( TestComponentPackageProcessor, WillTryToDownloadIfInitialized )
 
 TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
 {
-    SetupComponentPackage();
-    m_patient->Initialize( m_dep.get() );
+    SetupComponentPackageWithConfig();
 
-    m_cloud->MakeDownloadFileReturn( 200 );
     EXPECT_CALL( *m_pmComponentManager, UpdateComponent( _, _ ) );
 
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );

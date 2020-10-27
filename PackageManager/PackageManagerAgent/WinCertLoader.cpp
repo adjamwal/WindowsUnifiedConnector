@@ -145,6 +145,7 @@ void WinCertLoader::FreeCerts( X509** trusted_certificates, size_t cert_count )
         }
 
         free( m_certificates );
+        m_certificates = NULL;
     }
 }
 
