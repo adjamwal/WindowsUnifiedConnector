@@ -1,6 +1,11 @@
 #include "SslUtil.h"
 #include "PmLogger.h"
 #include <openssl/ssl.h>
+#include <openssl/sha.h>
+#include <fstream>
+#include <string>
+#include <iomanip>
+#include <sstream>
 
 SslUtil::SslUtil()
 {
@@ -116,4 +121,42 @@ abort:
     }
 
     return functionStatus;
+}
+
+static const int K_READ_BUF_SIZE{ 1024 * 16 };
+std::optional<std::string> SslUtil::CalculateSHA256( const std::string filename )
+{
+    // Initialize openssl
+    SHA256_CTX context;
+    if ( !SHA256_Init( &context ) )
+    {
+        return std::nullopt;
+    }
+
+    // Read file and update calculated SHA
+    char buf[K_READ_BUF_SIZE];
+    std::ifstream file( filename, std::ifstream::binary );
+    while ( file.good() )
+    {
+        file.read( buf, sizeof( buf ) );
+        if ( !SHA256_Update( &context, buf, file.gcount() ) )
+        {
+            return std::nullopt;
+        }
+    }
+
+    // Get Final SHA
+    unsigned char result[SHA256_DIGEST_LENGTH];
+    if ( !SHA256_Final( result, &context ) )
+    {
+        return std::nullopt;
+    }
+
+    std::stringstream ss;
+    for ( int i = 0; i < SHA256_DIGEST_LENGTH; i++ )
+    {
+        ss << std::hex << std::setw( 2 ) << std::setfill( '0' ) << (int)result[i];
+    }
+
+    return ss.str();
 }

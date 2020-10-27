@@ -19,6 +19,7 @@
 #include "MockPmPlatformConfiguration.h"
 #include "MockPmPlatformComponentManager.h"
 #include "MockPmPlatformDependencies.h"
+#include "MockSslUtil.h"
 
 class ComponentTestPacMan : public ::testing::Test
 {
@@ -33,8 +34,8 @@ protected:
         m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
         m_platformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
+        m_sslUtil.reset( new NiceMock<MockSslUtil>() );
 
-        m_sslUtil.reset( new SslUtil() );
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
         m_packageInventoryProvider.reset( new PackageInventoryProvider() );
@@ -104,8 +105,8 @@ protected:
     std::unique_ptr<MockPmPlatformConfiguration> m_platformConfiguration;
     std::unique_ptr<MockPmPlatformComponentManager> m_platformComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_deps;
-
-    std::unique_ptr<SslUtil> m_sslUtil;
+    std::unique_ptr<MockSslUtil> m_sslUtil;
+    
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
@@ -142,6 +143,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 {
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+
+    m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke( 
         [this, &pass ]( const PmComponent& package, std::string& error )
@@ -195,8 +198,17 @@ std::string _decodedConfig( R"({
 TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 {
     bool pass = false;
+
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+
+    ON_CALL( *m_sslUtil, DecodeBase64( _, _ ) ).WillByDefault( Invoke(
+        []( const std::string& base64Str, std::vector<uint8_t>& output )
+        {
+            SslUtil sslUtil;
+            return sslUtil.DecodeBase64( base64Str, output );
+        }
+    ) );
 
     EXPECT_CALL( *m_fileUtil, AppendFile( _, _, _ ) ).WillOnce( Invoke(
         [this, &pass]( FileUtilHandle* handle, void* data, size_t dataLen )
@@ -349,6 +361,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
@@ -448,6 +461,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) )
         .WillOnce( Invoke(
