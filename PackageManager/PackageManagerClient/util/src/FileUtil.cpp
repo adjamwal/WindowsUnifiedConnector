@@ -96,8 +96,14 @@ int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen
 
 std::string FileUtil::GetTempDir()
 {
+    auto path = std::filesystem::temp_directory_path();
 
-    return ::std::filesystem::temp_directory_path().generic_string();
+    //make_preferred will use the prefered sepeartor for the operating system
+    // "//" for windows "/" for linux 
+    path.make_preferred();
+
+    // string() will return the path with the prefered sepeartor
+    return path.string();
 }
 
 int32_t FileUtil::DeleteFile( const std::string& filename )
