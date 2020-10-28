@@ -5,6 +5,14 @@
 #include "IUcLogger.h"
 #include <iostream>
 #include <tchar.h>
+#include <Windows.h>
+#include <Psapi.h>
+
+#define MAX_PROC_LIMIT 1024
+#define MAX_RETRY_COUNT 3
+#define RESTART_DELAY_CHRONO 2s
+
+using namespace std::chrono_literals;
 
 PmAgentController::PmAgentController( ICodesignVerifier& codeSignVerifier, const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath ) :
     m_codesignVerifier( codeSignVerifier )
@@ -85,16 +93,13 @@ void PmAgentController::monitorProcess()
         {
             break;
         }
+
         LOG_WARNING( "Child process terminated. Starting it again." );
+        std::this_thread::sleep_for( RESTART_DELAY_CHRONO );
         startProcess();
     }
     LOG_DEBUG( "Exiting monitor thread" );
 }
-
-#include <Windows.h>
-#include <Psapi.h>
-#define MAX_PROC_LIMIT 1024
-#define MAX_RETRY_COUNT 3
 
 void PmAgentController::cleanup()
 {
