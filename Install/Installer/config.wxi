@@ -19,6 +19,11 @@
     <?define UCPMDirectory = "UCPM" ?>
     <?define UCConfigDirectory = "Configuration" ?>
 
+    <!-- Config File Information -->
+    <?define UCServiceConfigName = "UCService_config.json" ?>
+    <?define UCIDConfigName = "config.xml" ?>
+    <?define UCPMConfigName = "PM_MCP_config.json" ?>
+
     <!-- Registry key name used to store installation location -->
     <?define InstallNameKey = "Unified Connector" ?>
 

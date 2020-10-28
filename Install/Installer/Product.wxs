@@ -17,20 +17,24 @@
 
         <MajorUpgrade AllowDowngrades="no"
 					  AllowSameVersionUpgrades="yes"
+                      Schedule="afterInstallExecute"
 					  DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         
         <MediaTemplate EmbedCab="yes" />
 
         <Feature Id="UnifiedConnector" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentGroupRef Id="UnifiedConnectorComponents"/>
-            <ComponentGroupRef Id="VCRedistComponents"/>
             <ComponentGroupRef Id="UCServiceComponents" />
             <ComponentGroupRef Id="UCIDComponents" />
             <ComponentGroupRef Id="UCIDx86Components"/>
             <ComponentGroupRef Id="UCIDx64Components"/>
             <ComponentGroupRef Id="UCPMComponents" />
-            <ComponentGroupRef Id="UCConfigComponents" />
+            <ComponentGroupRef Id="CG.ConfigFiles" />
         </Feature>
+
+        <Property Id="UC_BASE_DIRECTORY">
+            <RegistrySearch Key="Software\Cisco\SecureXYZ\UnifiedConnector" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
+        </Property>
     </Product>
 
     <Fragment>
@@ -62,18 +66,40 @@
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_DIRECTORY">
+        <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\SecureXYZ\UnifiedConnector">
                     <RegistryValue Type="string" Name="ProductCode" Value="[ProductCode]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
+
+            <Component Id="C.RemoveFiles">
+                <RegistryValue Root="HKLM" 
+                               Key="Software\Cisco\SecureXYZ\UnifiedConnector" 
+                               Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
+                <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
+            </Component>
         </ComponentGroup>
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="VCRedistComponents" Directory="UCSERVICE_DIRECTORY">
+        <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
+            <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCSERVICE">
+                    <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+        
+            <Component Id="UCService.exe" Guid="*">
+                <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
+                <ServiceControl Id="StartService" Name="CiscoUnifiedConnector" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+                <ServiceInstall Id="ServiceInstaller" Name="CiscoUnifiedConnector" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
+                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+                </ServiceInstall>
+            </Component>
+
             <?if $(var.Configuration) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
                     <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
@@ -88,7 +114,7 @@
                     <File Id="vcruntime140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\vcruntime140.dll" />
                 </Component>
                 <?if $(var.Platform) = "x64" ?>
-                <!-- vcruntime140_1.dll does not have a x86 version, so only install it for x64 -->
+                    <!-- vcruntime140_1.dll does not have a x86 version, so only install it for x64 -->
                     <Component Id="vcruntime140_1.dll" Guid="*">
                         <File Id="vcruntime140_1.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\x64\bin\VC\vcruntime140_1.dll" />
                     </Component>
@@ -119,26 +145,7 @@
                 <Component Id="ucrtbased.dll" Guid="*">
                     <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
-            <?endif?>  
-        </ComponentGroup>
-    </Fragment>
-    
-    <Fragment>
-        <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
-            <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
-                <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCSERVICE">
-                    <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
-                </RegistryKey>
-            </Component>
-        
-            <Component Id="UCService.exe" Guid="*">
-                <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
-                <ServiceControl Id="StartService" Name="CiscoUnifiedConnector" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
-                <ServiceInstall Id="ServiceInstaller" Name="CiscoUnifiedConnector" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
-                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
-                </ServiceInstall>
-            </Component>
+            <?endif?>
         </ComponentGroup>
     </Fragment>
 
@@ -274,20 +281,56 @@
     </Fragment>
 
     <Fragment>
-      <ComponentGroup Id="UCConfigComponents" Directory="UC_CONFIG_DIRECTORY">
-        <Component Id="UC_CONFIG_REGISTRY" Guid="*">
-          <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
-            <RegistryValue Type="string" Name="Path" Value="[UC_CONFIG_DIRECTORY]" KeyPath="yes"/>
-          </RegistryKey>
-        </Component>
-        
-        <Component Id="ucid_config.xml" Guid="*">
-          <File Id="ucid_config.xml" Name="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\UCID_config.xml" />
-        </Component>
+        <ComponentGroup Id="CG.ConfigFiles" Directory="UC_CONFIG_DIRECTORY">
+            <!-- Registry Keys That point to each Config File -->
+            <!-- The Registry key will still be writen if the file doesnt exist -->
+            <Component Id="C.Registry.ServiceConfig" Guid="*">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                    <RegistryValue Type="string" Name="Service" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+            
+            <Component Id="C.Registry.UCIDConfig" Guid="*">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCIDConfigName)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
 
-        <Component Id="PM_MCP_config.json" Guid="*">
-          <File Id="PM_MCP_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\PM_MCP_config.json" />
-        </Component>
-      </ComponentGroup>
+            <Component Id="C.Registry.UCPMConfig" Guid="*">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                    <RegistryValue Type="string" Name="UCPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCPMConfigName)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
+            <!-- UCService Config Management -->
+            <Component Id="C.UCServiceConfig" Guid="3D8A1726-FCE9-4E4A-BA9E-07F3CF732617">
+                <CopyFile Id="CF.UCServiceConfig" SourceProperty="SERVICE_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.UCServiceConfigName)"/>
+                <Condition>SERVICE_CONFIG</Condition>
+            </Component>
+
+            <Component Id="C.Remove.UCServiceConfig" Guid="D37A0F1E-EF10-479F-B1EF-D48D29A20086">
+                <RemoveFile Id="RF.UCServiceConfig" Name="$(var.UCServiceConfigName)" On="uninstall"/>
+            </Component>
+            
+            <!-- UCID Config Management -->
+            <Component Id="C.UCIDConfig" Guid="8D5CB96C-4577-4A84-9982-C75C61EBDBE8">
+                <CopyFile Id="CF.UCID_CONFIG" SourceProperty="ID_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.UCIDConfigName)"/>
+                <Condition>ID_CONFIG</Condition>
+            </Component>
+
+            <Component Id="C.Remove.UCIDConfig" Guid="0EB6EE70-EB3E-4154-9EFE-88C57F9F1D9C">
+                <RemoveFile Id="RF.UCIDConfig" Name="$(var.UCIDConfigName)" On="uninstall"/>
+            </Component>
+
+            <!-- UCPM Config Management -->
+            <Component Id="C.PMConfig" Guid="7729ECE7-B813-4971-AAA4-87C9588D6E34">
+                <CopyFile Id="CF.UCPMConfig" SourceProperty="PM_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.UCPMConfigName)"/>
+                <Condition>PM_CONFIG</Condition>
+            </Component>
+            
+            <Component Id="C.Remove.UCPMConfig" Guid="1F213970-38B3-4EB8-9E20-38ADD4EFFA31">
+                <RemoveFile Id="RF.UCPMConfig" Name="$(var.UCPMConfigName)" On="uninstall"/>
+            </Component>
+        </ComponentGroup>
     </Fragment>
 </Wix>
