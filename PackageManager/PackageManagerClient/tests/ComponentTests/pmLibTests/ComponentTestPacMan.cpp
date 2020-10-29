@@ -156,9 +156,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
             EXPECT_EQ( package.packageName, "uc/0.0.1" );
-            m_cv.notify_one();
 
             pass = true;
+            m_cv.notify_one();
             return 0;
         } ) );
 
@@ -216,9 +216,8 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
             std::string strData( ( char* )data, dataLen );
             EXPECT_EQ( _decodedConfig, strData );
 
-            m_cv.notify_one();
-
             pass = true;
+            m_cv.notify_one();
             return 0;
         } ) );
 
@@ -245,9 +244,8 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
             EXPECT_EQ( config.verifyBinPath, "verify.exe" );
             EXPECT_NE( config.verifyPath.find( "PMConfig_" ), std::string::npos );
 
-            m_cv.notify_one();
-
             pass = true;
+            m_cv.notify_one();
             return 0;
         } ) );
 
@@ -271,9 +269,8 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
         {
-            m_cv.notify_one();
-
             pass = true;
+            m_cv.notify_one();
             return 0;
         } ) );
 
@@ -315,9 +312,8 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
         {
-            m_cv.notify_one();
-
             pass = true;
+            m_cv.notify_one();
             return 0;
         } ) );
 
