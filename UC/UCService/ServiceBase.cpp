@@ -6,6 +6,7 @@
 #include <fstream>  
 
 #include "ServiceBase.h"
+#include "IUcLogger.h"
 
 //
 // UC Service trace event provider
@@ -86,8 +87,7 @@ ServiceBase::ServiceBase(
     BOOL fCanShutdown,
     BOOL fCanPauseContinue )
     : m_serviceName( pszServiceName )
-    , m_logFile( nullptr )
-    , m_logger( nullptr )
+    , m_logMgr( nullptr )
     , m_etwRegHandle( 0 )
     , m_statusHandle( nullptr )
 {
@@ -127,7 +127,7 @@ void ServiceBase::Start( DWORD dwArgc, PWSTR* pszArgv )
 
 void ServiceBase::OnStart( DWORD dwArgc, PWSTR* pszArgv )
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ );
+    WLOG_DEBUG( L"Enter" );
 }
 
 void ServiceBase::Stop()
@@ -155,7 +155,7 @@ void ServiceBase::Stop()
 
 void ServiceBase::OnStop()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ );
+    WLOG_DEBUG( L"Enter" );
 }
 
 void ServiceBase::Pause()
@@ -181,7 +181,7 @@ void ServiceBase::Pause()
 
 void ServiceBase::OnPause()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ );
+    WLOG_DEBUG( L"Enter" );
 }
 
 void ServiceBase::Continue()
@@ -207,7 +207,7 @@ void ServiceBase::Continue()
 
 void ServiceBase::OnContinue()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ );
+    WLOG_DEBUG( L"Enter" );
 }
 
 void ServiceBase::Shutdown()
@@ -230,7 +230,7 @@ void ServiceBase::Shutdown()
 
 void ServiceBase::OnShutdown()
 {
-    m_logger->Log( IUcLogger::LOG_DEBUG, __FUNCTIONW__ );
+    WLOG_DEBUG( L"Enter" );
 }
 
 #pragma endregion
@@ -256,12 +256,8 @@ void ServiceBase::SetServiceStatus( _In_ DWORD dwCurrentState, _In_ DWORD dwWin3
 
 void ServiceBase::InitializeLogging( BOOL fCanStop, BOOL fCanShutdown, BOOL fCanPauseContinue )
 {
-    m_logFile = std::unique_ptr<IUcLogFile>( new UcLogFile() );
-    m_logFile->Init( NULL ); //log file name is generated here
-    m_logger = std::unique_ptr<UcLogger>( new UcLogger( *m_logFile ) );
-    m_logger->SetLogLevel( IUcLogger::LOG_DEBUG );
-
-    SetUcLogger( m_logger.get() );
+    m_logMgr.reset( new ServiceLogManager() );
+    m_logMgr->Start();
 
     m_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     m_status.dwCurrentState = SERVICE_START_PENDING;
@@ -301,8 +297,7 @@ void ServiceBase::DeinitializeLogging()
 {
     try
     {
-        m_logger.reset();
-        m_logFile.reset();
+        m_logMgr.reset();
 
         if( m_etwRegHandle != 0 )
         {

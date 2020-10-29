@@ -17,8 +17,8 @@ UCService::UCService(
     BOOL fCanPauseContinue )
     : ServiceBase( pszServiceName, fCanStop, fCanShutdown, fCanPauseContinue )
     , m_codeSignVerifer()
-    , m_ucidLoader( m_codeSignVerifer, *m_logger )
-    , m_ucmcpLoader( m_codeSignVerifer, *m_logger )
+    , m_ucidLoader( m_codeSignVerifer )
+    , m_ucmcpLoader( m_codeSignVerifer )
 {
     WLOG_DEBUG( L"created" );
 }

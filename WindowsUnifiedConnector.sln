@@ -56,9 +56,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MockVerifier", "SharedLibs\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{CF7C8756-AC8F-429A-BF46-930AEEA45F0D}"
 	ProjectSection(SolutionItems) = preProject
-		config\PM_MCP_config.json = config\PM_MCP_config.json
-		config\UCID_config.xml = config\UCID_config.xml
-		config\UCService_config.json = config\UCService_config.json
+		Resources\config\PM_MCP_config.json = Resources\config\PM_MCP_config.json
+		Resources\config\UCID_config.xml = Resources\config\UCID_config.xml
+		Resources\config\UCService_config.json = Resources\config\UCService_config.json
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCService", "UC\UCService\UCService.vcxproj", "{ED56F555-F214-4B00-805E-E6564E9C1BF2}"

@@ -30,6 +30,14 @@ std::string WindowsUtilities::ReadFileContents( const WCHAR* filename )
     return contents;
 }
 
+uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
+{
+    struct _stat stFileInfo = { 0 };
+    _wstat( filename, &stFileInfo );
+
+    return stFileInfo.st_mtime;
+}
+
 bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)
 {
     DWORD ftyp = GetFileAttributes(dirname);

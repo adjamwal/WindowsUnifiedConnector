@@ -126,7 +126,16 @@ UcLogger::~UcLogger()
 
 void UcLogger::SetLogLevel( Severity logLevel )
 {
-    m_logLevel = logLevel;
+    if( ( logLevel >= LOG_EMERGENCY ) && ( logLevel <= LOG_DEBUG ) ) {
+        if( m_logLevel != logLevel ) {
+            m_logLevel = logLevel;
+            Log( m_logLevel, "Set Debug Level to %d", m_logLevel );
+        }
+    }
+    else
+    {
+        Log( LOG_ERROR, "Invalid Debug level %d", logLevel );
+    }
 }
 
 void UcLogger::Log( Severity serverity, const char* msgFormatter, ... )
