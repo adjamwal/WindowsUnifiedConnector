@@ -3,6 +3,7 @@
 #include <locale>
 #include <codecvt>
 #include <fstream>
+#include <ShlObj.h>
 
 bool WindowsUtilities::FileExists(const WCHAR* filename)
 {
@@ -109,12 +110,12 @@ bool WindowsUtilities::Is64BitWindows()
 #endif
 }
 
-bool WindowsUtilities::GetSysDirectory( IWinApiWrapper& winApiWrapper, std::string& path )
+bool WindowsUtilities::GetSysDirectory( std::string& path )
 {
     bool ret = false;
     PWSTR tmpPath = nullptr;
 
-    HRESULT result = winApiWrapper.SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &tmpPath );
+    HRESULT result = ::SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &tmpPath );
 
     if ( SUCCEEDED( result ) )
     {

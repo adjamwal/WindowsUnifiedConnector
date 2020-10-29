@@ -5,6 +5,7 @@
 #include "PmTypes.h"
 #include "MockWinApiWrapper.h"
 #include "MockCodesignVerifier.h"
+#include "MockWindowsUtilities.h"
 #include <memory>
 
 using ::testing::StrEq;
@@ -14,6 +15,7 @@ class ComponentTestWindowsPackageManager : public ::testing::Test
 protected:
     void SetUp()
     {
+        MockWindowsUtilities::InitMock();
         m_mockCodesignVerifier = std::make_unique<NiceMock<MockCodesignVerifier>>();
         m_mockWinApiWrapper = std::make_unique<NiceMock<MockWinApiWrapper>>();
         m_patient = std::make_unique<WindowsComponentManager>( *m_mockWinApiWrapper, *m_mockCodesignVerifier );
@@ -23,6 +25,8 @@ protected:
     {
         m_patient.reset();
         m_mockWinApiWrapper.reset();
+        m_mockCodesignVerifier.reset();
+        MockWindowsUtilities::DeinitMock();
     }
 
     std::unique_ptr<MockCodesignVerifier> m_mockCodesignVerifier;
@@ -36,9 +40,9 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentSuccess )
     PmComponent c;
     c.installerType = "msi";
 
+    MockWindowsUtilities::GetMockWindowUtilities().MakeGetSysDirectoryReturn( true );
     m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
     m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
-    m_mockWinApiWrapper->MakeSHGetKnownFolderPathReturn( 0 );
     m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
     m_mockWinApiWrapper->MakeGetLastErrorReturn( 0 );
 
@@ -66,8 +70,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentFailureToGetSystemDir
     PmComponent c;
     c.installerType = "msi";
 
-    m_mockWinApiWrapper->MakeSHGetKnownFolderPathReturn( -1 );
-
+    MockWindowsUtilities::GetMockWindowUtilities().MakeGetSysDirectoryReturn( false );
     int32_t ret = m_patient->UpdateComponent( c, error );
 
     EXPECT_NE( ret, 0 );
@@ -81,6 +84,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentCreateProcessFailure 
     PmComponent c;
     c.installerType = "msi";
 
+    MockWindowsUtilities::GetMockWindowUtilities().MakeGetSysDirectoryReturn( true );
     m_mockWinApiWrapper->MakeCreateProcessWReturn( FALSE );
     m_mockWinApiWrapper->MakeGetLastErrorReturn( 5 );
 
@@ -111,6 +115,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentExitCodeProcessFailur
     PmComponent c;
     c.installerType = "msi";
 
+    MockWindowsUtilities::GetMockWindowUtilities().MakeGetSysDirectoryReturn( true );
     m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
     m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
     m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( FALSE );
@@ -187,9 +192,9 @@ TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationSuccess )
     PackageConfigInfo c;
 
     m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
+    MockWindowsUtilities::GetMockWindowUtilities().MakeGetSysDirectoryReturn( true );
     m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
     m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
-    m_mockWinApiWrapper->MakeSHGetKnownFolderPathReturn( 0 );
     m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
     m_mockWinApiWrapper->MakeGetLastErrorReturn( 0 );
 

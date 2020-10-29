@@ -50,7 +50,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
             std::string msiexecFullPath;
             std::string msiCmdline = "";
 
-            if ( WindowsUtilities::GetSysDirectory( m_winApiWrapper, msiexecFullPath ) )
+            if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
                 msiexecFullPath.append( "\\msiexec.exe" );
 

@@ -34,10 +34,13 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClInclude Include="MockWinApiWrapper.h" />
+    <ClInclude Include="MockWindowsUtilities.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FakeWindowsUtilities.cpp" />
     <ClCompile Include="MockWinApiWrapper.cpp" />
+    <ClCompile Include="MockWindowsUtilities.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -47,11 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\libWindowsUtilities\libWindowsUtilities.vcxproj">
-      <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
