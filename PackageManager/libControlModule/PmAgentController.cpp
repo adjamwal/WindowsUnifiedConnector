@@ -10,7 +10,7 @@
 
 #define MAX_PROC_LIMIT 1024
 #define MAX_RETRY_COUNT 3
-#define RESTART_DELAY_CHRONO 2s
+#define RESTART_DELAY_CHRONO 30s
 
 using namespace std::chrono_literals;
 
