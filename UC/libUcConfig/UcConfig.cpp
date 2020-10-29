@@ -46,7 +46,10 @@ bool UcConfig::LoadConfig()
         }
     }
     catch( std::exception ex ) {
-        LOG_ERROR( "LoadConfig Failed: %s", ex.what() );
+        LOG_WARNING( "LoadConfig Failed: %s", ex.what() );
+        LOG_WARNING( "Restoring defaul configs ");
+        m_logLevel = ( uint32_t )IUcLogger::LOG_ERROR;
+        m_fileModifyTime = 0;
     }
 
     return rtn;

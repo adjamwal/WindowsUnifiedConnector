@@ -132,8 +132,7 @@ void UcLogger::SetLogLevel( Severity logLevel )
             Log( m_logLevel, "Set Debug Level to %d", m_logLevel );
         }
     }
-    else
-    {
+    else {
         Log( LOG_ERROR, "Invalid Debug level %d", logLevel );
     }
 }
