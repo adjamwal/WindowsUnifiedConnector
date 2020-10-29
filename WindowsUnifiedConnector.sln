@@ -65,6 +65,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCService", "UC\UCService\U
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libLogger", "SharedLibs\libLogger\libLogger.vcxproj", "{822CCD07-F01C-4DD7-A587-0A241953FB62}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libUcConfig", "UC\libUcConfig\libUcConfig.vcxproj", "{1A45E256-8923-49BA-95DB-F778DDCEFA31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -207,6 +209,14 @@ Global
 		{822CCD07-F01C-4DD7-A587-0A241953FB62}.Release|x64.Build.0 = Release|x64
 		{822CCD07-F01C-4DD7-A587-0A241953FB62}.Release|x86.ActiveCfg = Release|Win32
 		{822CCD07-F01C-4DD7-A587-0A241953FB62}.Release|x86.Build.0 = Release|Win32
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Debug|x64.ActiveCfg = Debug|x64
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Debug|x64.Build.0 = Debug|x64
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Debug|x86.ActiveCfg = Debug|Win32
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Debug|x86.Build.0 = Debug|Win32
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Release|x64.ActiveCfg = Release|x64
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Release|x64.Build.0 = Release|x64
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Release|x86.ActiveCfg = Release|Win32
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -233,6 +243,7 @@ Global
 		{CF7C8756-AC8F-429A-BF46-930AEEA45F0D} = {C8505725-0B3E-4425-9EB7-55785D1CCC9D}
 		{ED56F555-F214-4B00-805E-E6564E9C1BF2} = {D99E33CC-A481-41A0-A01C-C5F04722912D}
 		{822CCD07-F01C-4DD7-A587-0A241953FB62} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
+		{1A45E256-8923-49BA-95DB-F778DDCEFA31} = {D99E33CC-A481-41A0-A01C-C5F04722912D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

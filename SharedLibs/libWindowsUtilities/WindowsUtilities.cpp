@@ -2,11 +2,32 @@
 #include "WindowsUtilities.h"
 #include <locale>
 #include <codecvt>
+#include <fstream>
 
 bool WindowsUtilities::FileExists(const WCHAR* filename)
 {
     struct _stat stFileInfo;
     return (_wstat(filename, &stFileInfo) == 0);
+}
+
+std::string WindowsUtilities::ReadFileContents( const WCHAR* filename )
+{
+    std::string contents;
+
+    if( FileExists( filename ) ) {
+        std::ifstream file( filename );
+
+        if( file.is_open() ) {
+            file.seekg( 0, std::ios::end );
+            contents.resize( file.tellg() );
+            file.seekg( 0, std::ios::beg );
+
+            file.read( &contents[ 0 ], contents.size() );
+        }
+
+    }
+
+    return contents;
 }
 
 bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)

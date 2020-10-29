@@ -8,6 +8,7 @@ class WindowsUtilities
 {
 public:
     static bool FileExists(const WCHAR* filename);
+    static std::string ReadFileContents( const WCHAR* filename );
     static bool DirectoryExists(const WCHAR* dirname);
     static std::wstring GetExePath();
     static std::wstring GetDirPath(const std::wstring& path);
