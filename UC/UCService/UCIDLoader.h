@@ -11,7 +11,7 @@ class ICodesignVerifier;
 class UCIDLoader
 {
 public:
-    UCIDLoader( ICodesignVerifier& codeSignVerifier, IUcLogger& logger );
+    UCIDLoader( ICodesignVerifier& codeSignVerifier );
     virtual ~UCIDLoader();
 
     void LoadControlModule();
@@ -28,7 +28,6 @@ private:
     PM_MODULE_RESULT_T ReleaseModule( PM_MODULE_CTX_T* pPM_MODULE_CTX );
 
     ICodesignVerifier& m_codeSignVerifier;
-    IUcLogger& m_logger;
     HMODULE m_controlLib;
     CreateModuleFunc m_createModule;
     ReleaseModuleFunc m_releaseModule;

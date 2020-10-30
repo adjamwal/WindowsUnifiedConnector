@@ -4,8 +4,7 @@
 #include <fstream>  
 #include <Evntrace.h>
 #include <memory>
-#include "UcLogFile.h"
-#include "UcLogger.h"
+#include "ServiceLogManager.h"
 
 class ServiceBase
 {
@@ -33,8 +32,7 @@ protected:
         DWORD dwWaitHint = 0 );
 
     PWSTR m_serviceName;
-    std::unique_ptr<IUcLogFile> m_logFile;
-    std::unique_ptr<UcLogger> m_logger;
+    std::unique_ptr<ServiceLogManager> m_logMgr;
     REGHANDLE m_etwRegHandle;
 private:
 

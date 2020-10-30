@@ -6,6 +6,7 @@
 #include "UCIDLoader.h"
 #include "UCMCPLoader.h"
 #include "CodesignVerifier.h"
+#include "UcConfig.h"
 
 class UCService : public ServiceBase
 {
@@ -25,4 +26,5 @@ private:
     CodesignVerifier m_codeSignVerifer;
     UCIDLoader m_ucidLoader;
     UCMCPLoader m_ucmcpLoader;
+    UcConfig m_ucConfig;
 };
