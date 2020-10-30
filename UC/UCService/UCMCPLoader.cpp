@@ -5,8 +5,6 @@
 #include "ICodeSignVerifier.h"
 #include "WindowsUtilities.h"
 
-#define PM_MCP_CONFIG_FILENAME L"PM_MCP_config.json"
-
 UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
     , m_controlLib( 0 )
@@ -125,13 +123,11 @@ void UCMCPLoader::LoadControlModule()
     std::wstring pmPath(WindowsUtilities::GetDirPath( dllFullPath ) );
     std::wstring pmConfigFile;
     
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Path", pmConfigFile ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"UCPM", pmConfigFile ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
         return;
     }
-
-    pmConfigFile.append( PM_MCP_CONFIG_FILENAME );
 
     if( !WindowsUtilities::FileExists( pmConfigFile.c_str() ) )
     {

@@ -11,12 +11,9 @@ UcConfig::UcConfig() :
     m_logLevel( ( uint32_t )IUcLogger::LOG_ERROR )
     , m_fileModifyTime( 0 )
 {
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Path", m_path ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Service", m_path ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
-    }
-    else {
-        m_path.append( UC_CONFIG_FILENAME );
     }
 }
 

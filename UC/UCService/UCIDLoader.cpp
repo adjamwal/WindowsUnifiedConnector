@@ -6,7 +6,6 @@
 #include "WindowsUtilities.h"
 
 #define UCID_MODULE_INTERFACE_VERSION 1u
-#define UCID_MODULE_CONFIG_FILENAME L"config.xml"
 
 UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
@@ -137,13 +136,11 @@ void UCIDLoader::LoadControlModule()
     dllFullPath.append( L"ucidcontrolplugin.dll" );
 
     std::wstring ucidConfigFile;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Path", ucidConfigFile ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"UCID", ucidConfigFile ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
         return;
     }
-
-    ucidConfigFile.append( UCID_MODULE_CONFIG_FILENAME );
 
     if( !WindowsUtilities::FileExists( ucidConfigFile.c_str() ) )
     {
