@@ -8,9 +8,8 @@
 #define UCID_MODULE_INTERFACE_VERSION 1u
 #define UCID_MODULE_CONFIG_FILENAME L"config.xml"
 
-UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier, IUcLogger& logger )
+UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
-    , m_logger( logger )
     , m_controlLib( 0 )
     , m_createModule( NULL )
     , m_releaseModule( NULL )

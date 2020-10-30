@@ -7,9 +7,8 @@
 
 #define PM_MCP_CONFIG_FILENAME L"PM_MCP_config.json"
 
-UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier, IUcLogger& logger )
+UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
-    , m_logger( logger )
     , m_controlLib( 0 )
     , m_createModule( NULL )
     , m_releaseModule( NULL )
@@ -167,7 +166,7 @@ void UCMCPLoader::LoadControlModule()
         return;
     }
 
-    if( ( result = m_context.fpSetOption( PM_MODULE_OPTION_LOG_LEVEL, &m_logger, sizeof( &m_logger ) ) ) != PM_MODULE_SUCCESS ) {
+    if( ( result = m_context.fpSetOption( PM_MODULE_OPTION_LOG_LEVEL, GetUcLogger(), sizeof( GetUcLogger() ) ) ) != PM_MODULE_SUCCESS ) {
         WLOG_ERROR( L"Failed to set option PM_MODULE_OPTION_LOG_LEVEL", result );
     }
 
