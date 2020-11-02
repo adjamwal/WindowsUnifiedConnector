@@ -1,6 +1,8 @@
 #pragma once
 
-#include "pch.h"
+#include <Windows.h>
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 #include "IWinApiWrapper.h"
 
 class MockWinApiWrapper : public IWinApiWrapper
@@ -9,7 +11,7 @@ public:
     MockWinApiWrapper();
     ~MockWinApiWrapper();
 
-    MOCK_METHOD( BOOL, CreateProcessW, ( LPCWSTR lpApplicationName,
+    MOCK_METHOD10( CreateProcessW, BOOL( LPCWSTR lpApplicationName,
         LPWSTR lpCommandLine,
         LPSECURITY_ATTRIBUTES lpProcessAttributes,
         LPSECURITY_ATTRIBUTES lpThreadAttributes,
@@ -21,15 +23,15 @@ public:
         LPPROCESS_INFORMATION lpProcessInformation ) );
     void MakeCreateProcessWReturn( BOOL value );
 
-    MOCK_METHOD( DWORD, WaitForSingleObject, ( HANDLE, DWORD ) );
+    MOCK_METHOD2( WaitForSingleObject, DWORD( HANDLE, DWORD ) );
     void MakeWaitForSingleObjectReturn( DWORD value );
 
-    MOCK_METHOD( BOOL, GetExitCodeProcess, ( HANDLE hProcess, LPDWORD lpExitCode ) );
+    MOCK_METHOD2( GetExitCodeProcess, BOOL( HANDLE hProcess, LPDWORD lpExitCode ) );
     void MakeGetExitCodeProcessReturn( BOOL value );
 
-    MOCK_METHOD( DWORD, GetLastError, ( ) );
+    MOCK_METHOD0( GetLastError, DWORD( ) );
     void MakeGetLastErrorReturn( DWORD );
 
-    MOCK_METHOD( HRESULT, SHGetKnownFolderPath, ( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath) );
+    MOCK_METHOD4( SHGetKnownFolderPath, HRESULT( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath) );
     void MakeSHGetKnownFolderPathReturn( HRESULT );
 };

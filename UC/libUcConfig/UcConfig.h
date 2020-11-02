@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IUcConfig.h"
+#include "IUcLogger.h"
 #include <mutex>
 #include <json/json.h>
 
@@ -16,6 +17,8 @@ public:
     uint32_t GetLogLevel() override;
 
 private:
+    static const IUcLogger::Severity DEFAULT_LOG_LEVEL = IUcLogger::LOG_ERROR;
+
     std::mutex m_mutex;
     uint32_t m_logLevel;
     uint32_t m_fileModifyTime;
