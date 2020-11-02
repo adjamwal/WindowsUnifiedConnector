@@ -8,7 +8,7 @@
 #define UC_CONFIG_FILENAME  L"UCService_config.json"
 
 UcConfig::UcConfig() :
-    m_logLevel( ( uint32_t )IUcLogger::LOG_ERROR )
+    m_logLevel( ( uint32_t )DEFAULT_LOG_LEVEL )
     , m_fileModifyTime( 0 )
 {
     if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Path", m_path ) )
@@ -37,18 +37,14 @@ bool UcConfig::LoadConfig()
             m_fileModifyTime = modifyTime;
             Json::Value root = GetJsonFromFile( m_path );
 
-            if( root.isMember( "uc_service" ) ) {
-                if( root[ "uc_service" ][ "log_level" ].isInt() ) {
-                    m_logLevel = root[ "uc_service" ][ "log_level" ].asInt();
-                    rtn = true;
-                }
-            }
+            m_logLevel = root[ "uc_service" ][ "log_level" ].asInt();
+            rtn = true;
         }
     }
     catch( std::exception ex ) {
         LOG_WARNING( "LoadConfig Failed: %s", ex.what() );
-        LOG_WARNING( "Restoring defaul configs ");
-        m_logLevel = ( uint32_t )IUcLogger::LOG_ERROR;
+        LOG_WARNING( "Restoring default configs ");
+        m_logLevel = ( uint32_t )DEFAULT_LOG_LEVEL;
         m_fileModifyTime = 0;
     }
 
@@ -85,6 +81,12 @@ Json::Value UcConfig::GetJsonFromFile( const std::wstring& path )
     else if( !jsonReader->parse( contents.c_str(), contents.c_str() + contents.length(), &root, &jsonError ) ) {
         jsonError = std::string( __FUNCTION__ ) + ": " + jsonError;
         throw( std::exception(  jsonError.c_str()  ) );
+    }
+    else if( !root.isMember( "uc_service" ) ) {
+        throw( std::exception( __FUNCTION__ ": missing uc_service element" ) );
+    }
+    else if( !root[ "uc_service" ][ "log_level" ].isInt() ) {
+        throw( std::exception( __FUNCTION__ ": log_level is missing or invalid" ) );
     }
 
     return root;

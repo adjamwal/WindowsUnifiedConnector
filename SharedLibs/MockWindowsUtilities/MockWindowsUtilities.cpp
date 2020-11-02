@@ -4,17 +4,7 @@
 MockWindowsUtilities* MockWindowsUtilities::s_mock = nullptr;
 std::mutex MockWindowsUtilities::s_mutex;
 
-MockWindowsUtilities& MockWindowsUtilities::GetMockWindowUtilities()
-{
-    std::lock_guard<std::mutex> lock( s_mutex );
-    if( !s_mock ) {
-        throw( std::exception( "Mock not initiailzed" ) );
-    }
-
-    return *s_mock;
-}
-
-void MockWindowsUtilities::InitMock()
+void MockWindowsUtilities::Init()
 {
     std::lock_guard<std::mutex> lock( s_mutex );
     if( !s_mock ) {
@@ -22,17 +12,27 @@ void MockWindowsUtilities::InitMock()
     }
 }
 
-void MockWindowsUtilities::DeinitMock() 
+void MockWindowsUtilities::Deinit()
 {
-    std::lock_guard<std::mutex> lock( s_mutex );
     if( s_mock ) {
         delete s_mock;
         s_mock = nullptr;
     }
 }
 
+MockWindowsUtilities* MockWindowsUtilities::GetMockWindowUtilities()
+{
+    std::lock_guard<std::mutex> lock( s_mutex );
+    if( !s_mock ) {
+        throw( std::exception( "Mock not initiailzed" ) );
+    }
+
+    return s_mock;
+}
+
 MockWindowsUtilities::MockWindowsUtilities()
 {
+    MakeReadFileContentsReturn( "" );
     MakeGetExePathReturn( L"" );
     MakeGetDirPathReturn( L"" );
 }
@@ -50,6 +50,26 @@ void MockWindowsUtilities::MakeFileExistsReturn( bool value )
 void MockWindowsUtilities::ExpectFileExistsIsNotCalled()
 {
     EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeReadFileContentsReturn( std::string value )
+{
+    ON_CALL( *this, ReadFileContents( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectReadFileContentsIsNotCalled()
+{
+    EXPECT_CALL( *this, ReadFileContents( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeGetFileModifyTimeReturn( uint32_t value )
+{
+    ON_CALL( *this, GetFileModifyTime( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectGetFileModifyTimeIsNotCalled()
+{
+    EXPECT_CALL( *this, GetFileModifyTime( _ ) ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeDirectoryExistsReturn( bool value )
