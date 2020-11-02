@@ -187,9 +187,9 @@ pipeline {
             script {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x86\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console Win32\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console Win32\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
               }                
             }
