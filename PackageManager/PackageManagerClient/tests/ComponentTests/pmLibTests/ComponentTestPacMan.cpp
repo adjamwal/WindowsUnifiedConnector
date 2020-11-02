@@ -380,9 +380,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
         [this, &configUpdated]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
         {
+            configUpdated = true;
             m_cv.notify_one();
 
-            configUpdated = true;
             return 0;
         } ) );
 
@@ -527,9 +527,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
             {
                 EXPECT_EQ( newDir, "/install/location" );
                 EXPECT_EQ( newName, "p2_config2.json" );
-
+                configUpdated++;
                 m_cv.notify_one();
-                configUpdated ++;
+
                 return 0;
             } ) );
 
