@@ -48,6 +48,7 @@ TEST_F( TestUcConfig, DefaultLogLevelIsError )
 
 TEST_F( TestUcConfig, WillLoadLogLevel )
 {
+    m_windowsUtils->MakeFileExistsReturn( true );
     m_windowsUtils->MakeGetFileModifyTimeReturn( 1 );
     m_windowsUtils->MakeReadFileContentsReturn( configData );
     m_patient->LoadConfig();
@@ -57,6 +58,7 @@ TEST_F( TestUcConfig, WillLoadLogLevel )
 
 TEST_F( TestUcConfig, LoadWillFailOnInvalidJson )
 {
+    m_windowsUtils->MakeFileExistsReturn( true );
     m_windowsUtils->MakeGetFileModifyTimeReturn( 1 );
     m_windowsUtils->MakeReadFileContentsReturn( invalidConfigData );
     
@@ -65,6 +67,7 @@ TEST_F( TestUcConfig, LoadWillFailOnInvalidJson )
 
 TEST_F( TestUcConfig, LoadInvalidConfigWillResetLogLevel )
 {
+    m_windowsUtils->MakeFileExistsReturn( true );
     m_windowsUtils->MakeGetFileModifyTimeReturn( 1 );
     m_windowsUtils->MakeReadFileContentsReturn( configData );
     m_patient->LoadConfig();
@@ -78,6 +81,7 @@ TEST_F( TestUcConfig, LoadInvalidConfigWillResetLogLevel )
 
 TEST_F( TestUcConfig, WillNotLoadIfFileNotModified )
 {
+    m_windowsUtils->MakeFileExistsReturn( true );
     m_windowsUtils->MakeGetFileModifyTimeReturn( 0 );
 
     m_windowsUtils->ExpectReadFileContentsIsNotCalled();
@@ -97,4 +101,11 @@ TEST_F( TestUcConfig, VerifyWillFailOnInvalidJson )
     m_windowsUtils->MakeReadFileContentsReturn( invalidConfigData );
 
     EXPECT_FALSE( m_patient->VerifyConfig( L"file.json" ) );
+}
+
+TEST_F( TestUcConfig, FailWhenConfigFileIsMissing )
+{
+    m_windowsUtils->MakeFileExistsReturn( false );
+
+    EXPECT_FALSE( m_patient->LoadConfig() );
 }

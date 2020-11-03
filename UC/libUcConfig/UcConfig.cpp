@@ -31,6 +31,10 @@ bool UcConfig::LoadConfig()
     bool rtn = false;
 
     try {
+        if( !WindowsUtilities::FileExists( m_path.c_str() ) ) {
+            throw( std::exception( __FUNCTION__ ": config file is missing" ) );
+        }
+
         uint32_t modifyTime = WindowsUtilities::GetFileModifyTime( m_path.c_str() );
 
         if( modifyTime > m_fileModifyTime ) {
