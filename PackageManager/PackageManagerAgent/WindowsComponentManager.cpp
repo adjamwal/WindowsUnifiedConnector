@@ -110,6 +110,38 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
     return ret;
 }
 
+std::string WindowsComponentManager::ResolvePath( const std::string& basePath, const std::string& configPath )
+{
+    std::string path;
+
+    if( configPath.empty() ) {
+        WLOG_ERROR( L"configPath is empty" );
+    } 
+    else if( basePath.empty() ) {
+        // Simple test for abosolute path;
+        if( configPath.find( ":\\" ) != std::string::npos ) {
+            path = configPath;
+        }
+        else {
+            WLOG_ERROR( L"basePath is empty and configPath is not absolute" );
+        }
+    }
+    else if( basePath.find( ":\\" ) == std::string::npos ) {
+        LOG_ERROR( L"basePath %s is not valid", basePath.c_str() );
+    }
+    else {
+        path = basePath;
+        if( path.back() != '\\' && configPath.front() != '\\') {
+            path += "\\";
+        }
+        path += configPath;
+    }
+
+    LOG_DEBUG( "Path resolved to %s", path.c_str() );
+
+    return path;
+}
+
 int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )
 {
     int32_t ret = 0;

@@ -75,10 +75,10 @@ void MockFileUtil::ExpectDeleteFileNotCalled()
 
 void MockFileUtil::MakeRenameReturn( int32_t value )
 {
-    ON_CALL( *this, Rename( _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, Rename( _, _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockFileUtil::ExpectRenameNotCalled()
 {
-    EXPECT_CALL( *this, Rename( _, _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, Rename( _, _ ) ).Times( 0 );
 }

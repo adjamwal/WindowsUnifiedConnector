@@ -74,7 +74,7 @@ static std::string _validPackageConfigManifest( R"(
   "packages": [
     {
       "package": "package name",
-      "configs": [
+      "files": [
         {
           "path": "uc.json",
           "contents": "<base64-data>",

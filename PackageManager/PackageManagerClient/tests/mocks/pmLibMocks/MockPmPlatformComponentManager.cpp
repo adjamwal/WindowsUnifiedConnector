@@ -7,6 +7,7 @@ MockPmPlatformComponentManager::MockPmPlatformComponentManager()
     MakeUpdateComponentReturn( int32_t() );
     MakeUninstallComponentReturn( int32_t() );
     MakeDeployConfigurationReturn( int32_t() );
+    MakeResolvePathReturn( "" );
 }
 
 MockPmPlatformComponentManager::~MockPmPlatformComponentManager()
@@ -63,3 +64,11 @@ void MockPmPlatformComponentManager::ExpectDeployConfigurationIsNotCalled()
     EXPECT_CALL( *this, DeployConfiguration( _ ) ).Times( 0 );
 }
 
+void MockPmPlatformComponentManager::MakeResolvePathReturn( std::string value )
+{
+    ON_CALL( *this, ResolvePath( _, _ ) ).WillByDefault( Return( value ) );
+}
+void MockPmPlatformComponentManager::ExpectResolvePathIsNotCalled()
+{
+    EXPECT_CALL( *this, ResolvePath( _, _ ) ).Times( 0 );
+}

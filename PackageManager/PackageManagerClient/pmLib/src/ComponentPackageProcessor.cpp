@@ -110,18 +110,12 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
 
 bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& componentPackage )
 {
-    bool rtn = false;
+    bool rtn = true;
 
-    if( !componentPackage.installLocation.empty() ) {
-        for each( auto config in componentPackage.configs ) {
-            rtn = ProcessComponentConfig( config );
-        }
+    for each( auto config in componentPackage.configs ) {
+        rtn = ProcessComponentConfig( config );
     }
-    else {
-        rtn = true;
-    }
-
-
+    
     return rtn;
 }
 
@@ -129,10 +123,8 @@ bool ComponentPackageProcessor::ProcessComponentConfig( PackageConfigInfo& confi
 {
     bool rtn = false;
     std::vector<uint8_t> configData;
-    if( config.installLocation.empty() ) {
-        LOG_ERROR( "No install path" );
-    }
-    else if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
+    
+    if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
         LOG_ERROR( "Failed to decode %s", config.contents );
     }
     else {
@@ -143,7 +135,7 @@ bool ComponentPackageProcessor::ProcessComponentConfig( PackageConfigInfo& confi
         if( ( handle = m_fileUtil.PmCreateFile( ss.str() ) ) == NULL ) {
             LOG_ERROR( "Failed to create %s", ss.str().c_str() );
         }
-        else if( m_fileUtil.AppendFile( handle, configData.data(), configData.size() ) != 0 ) {
+        else if( m_fileUtil.AppendFile( handle, configData.data(), configData.size() ) == 0 ) {
             LOG_ERROR( "Failed to write to %s", ss.str().c_str() );
             m_fileUtil.CloseFile( handle );
 
@@ -172,8 +164,16 @@ bool ComponentPackageProcessor::ProcessComponentConfig( PackageConfigInfo& confi
             }
 
             if( moveFile ) {
-                if( m_fileUtil.Rename( ss.str(), config.installLocation, config.path ) == 0 ) {
+                std::string location = m_dependencies->ComponentManager().ResolvePath( config.installLocation, config.path );
+
+                if( m_fileUtil.Rename( ss.str(), location ) == 0 ) {
                     rtn = true;
+                }
+                else {
+                    LOG_ERROR( "Rename Failed. Removing %s", ss.str().c_str() );
+                    if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
+                        LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
+                    }
                 }
             }
         }

@@ -98,7 +98,7 @@ TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }
 
-TEST_F( TestComponentPackageProcessor, WillRemoteFileWhenDownloadIsSuccesful )
+TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
 {
     SetupComponentPackage();
     m_patient->Initialize( m_dep.get() );
@@ -147,7 +147,7 @@ TEST_F( TestComponentPackageProcessor, WillNotCreateConfigWhenDecodeFails )
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }
 
-TEST_F( TestComponentPackageProcessor, WillTempConfigFile )
+TEST_F( TestComponentPackageProcessor, WillCreateTempConfigFile )
 {
     SetupComponentPackageWithConfig();
     std::string tempDir( "TempDir" );
@@ -173,7 +173,7 @@ TEST_F( TestComponentPackageProcessor, WillVerifyConfigFileHash )
 
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
 
     EXPECT_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillOnce( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
 
@@ -188,7 +188,7 @@ TEST_F( TestComponentPackageProcessor, WillVerifyConfigFile )
 
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     ON_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
 
     EXPECT_CALL( *m_pmComponentManager, DeployConfiguration( _ ) );
@@ -204,29 +204,11 @@ TEST_F( TestComponentPackageProcessor, WillMoveConfigFile )
 
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
 
-    EXPECT_CALL( *m_fileUtil, Rename( _, _, _) );
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillMoveConfigWhenVerificationIsNotRequired )
-{
-    SetupComponentPackageWithConfig();
-    m_expectedComponentPackage.configs.front().verifyBinPath = "";
-
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
-    
-    m_pmComponentManager->ExpectDeployConfigurationIsNotCalled();
-    EXPECT_CALL( *m_fileUtil, Rename( _, _, _ ) );
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) );
 
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }
@@ -257,7 +239,7 @@ TEST_F( TestComponentPackageProcessor, WillRemoveTempConfig )
 
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( -1 );
+    m_fileUtil->MakeAppendFileReturn( 0 );
 
     EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) ).Times( 2 );
 

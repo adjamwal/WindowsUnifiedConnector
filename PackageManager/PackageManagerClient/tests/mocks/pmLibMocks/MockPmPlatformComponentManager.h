@@ -30,4 +30,7 @@ public:
     void MakeDeployConfigurationReturn( int32_t value );
     void ExpectDeployConfigurationIsNotCalled();
 
+    MOCK_METHOD2( ResolvePath, std::string( const std::string&, const std::string&) );
+    void MakeResolvePathReturn( std::string value );
+    void ExpectResolvePathIsNotCalled();
 };
