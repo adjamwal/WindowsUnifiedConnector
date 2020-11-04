@@ -176,7 +176,7 @@ std::string _ucReponseConfigOnly( R"(
     {
       "package": "uc/0.0.1",
       "install_location": "/install/location",
-      "configs": [
+      "files": [
         {
           "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
           "path": "config.json",
@@ -234,7 +234,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     EXPECT_CALL( *m_platformComponentManager, DeployConfiguration( _ ) ).WillOnce( Invoke(
@@ -262,13 +262,16 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
-    EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
-        [this, &pass]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+    EXPECT_CALL( *m_platformComponentManager, ResolvePath( "/install/location", "config.json" ) )
+        .WillOnce( Return( "/install/location/config.json" ) );
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const std::string& oldFilename, const std::string& newName )
         {
+            EXPECT_EQ( newName, "/install/location/config.json" );
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -288,7 +291,7 @@ std::string _ucReponseConfigWithoutVerify( R"(
     {
       "package": "uc/0.0.1",
       "install_location": "/install/location",
-      "configs": [
+      "files": [
         {
           "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
           "path": "config.json",
@@ -305,13 +308,16 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     m_platformComponentManager->ExpectDeployConfigurationIsNotCalled();
-    EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
-        [this, &pass]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+    EXPECT_CALL( *m_platformComponentManager, ResolvePath( "/install/location", "config.json" ) )
+        .WillOnce( Return( "/install/location/config.json" ) );
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const std::string& oldFilename, const std::string& newName )
         {
+            EXPECT_EQ( newName, "/install/location/config.json" );
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -339,7 +345,7 @@ std::string _ucReponseWithConfig( R"(
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
-      "configs": [
+      "files": [
         {
           "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
           "path": "config.json",
@@ -358,7 +364,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     bool configUpdated = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfig ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -377,8 +383,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
             packageUpdated = true;
             return 0;
         } ) );
-    EXPECT_CALL( *m_fileUtil, Rename( _, "/install/location", "config.json" ) ).WillOnce( Invoke(
-        [this, &configUpdated]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+        [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
         {
             configUpdated = true;
             m_cv.notify_one();
@@ -408,7 +414,7 @@ std::string _ucReponseMultiPackageAndConfig( R"(
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
-      "configs": [
+      "files": [
         {
           "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
           "path": "p1_config1.json",
@@ -434,7 +440,7 @@ std::string _ucReponseMultiPackageAndConfig( R"(
       "installer_type": "exe",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc2/0.0.1",
-      "configs": [
+      "files": [
         {
           "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
           "path": "p2_config1.json",
@@ -459,7 +465,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     int configUpdated = 0;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseMultiPackageAndConfig ), Return( 200 ) ) );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -467,6 +473,10 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_3" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_4" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_5" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+        {
+            return oldFilename + '/' + newName;
+        } ) );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) )
         .WillOnce( Invoke(
@@ -497,36 +507,32 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 packageUpdated++;
                 return 0;
             } ) );
-    EXPECT_CALL( *m_fileUtil, Rename( _, _, _ ) )
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) )
         .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
             {
-                EXPECT_EQ( newDir, "/install/location" );
-                EXPECT_EQ( newName, "p1_config1.json" );
+                EXPECT_EQ( newName, "/install/location/p1_config1.json" );
                 configUpdated++;
                 return 0;
             } ) )
         .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
             {
-                EXPECT_EQ( newDir, "/install/location" );
-                EXPECT_EQ( newName, "p1_config2.json" );
+                EXPECT_EQ( newName, "/install/location/p1_config2.json" );
                 configUpdated++;
                 return 0;
             } ) )
         .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
             {
-                EXPECT_EQ( newDir, "/install/location" );
-                EXPECT_EQ( newName, "p2_config1.json" );
+                EXPECT_EQ( newName, "/install/location/p2_config1.json" );
                 configUpdated++;
                 return 0;
             } ) )
         .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newDir, const std::string& newName )
+            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
             {
-                EXPECT_EQ( newDir, "/install/location" );
-                EXPECT_EQ( newName, "p2_config2.json" );
+                EXPECT_EQ( newName, "/install/location/p2_config2.json" );
                 configUpdated++;
                 m_cv.notify_one();
 
@@ -541,4 +547,73 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
 
     EXPECT_EQ( packageUpdated, 2 );
     EXPECT_EQ( configUpdated, 4 );
+}
+
+std::string _ucReponseWithConfigCloudData( R"(
+{
+  "packages": [
+    {
+      "installer_args": [
+        "/S",
+        "/Q"
+      ],
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
+      "package": "uc/0.0.1",
+      "files": [
+        {
+          "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
+          "path": "C:\\Program Files\\Cisco\\SecureXYZ\\UnifiedConnector\\Configuration\\uc.json"
+        }
+      ]
+    }
+  ]
+}
+)" );
+
+TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
+{
+    bool packageUpdated = false;
+    bool configUpdated = false;
+    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfigCloudData ), Return( 200 ) ) );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+    m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+        {
+            return newName;
+        } ) );
+
+    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+        [this, &packageUpdated]( const PmComponent& package, std::string& error )
+        {
+            EXPECT_EQ( package.installerArgs, "/S /Q " );
+            EXPECT_EQ( package.installerHash, "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+            EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
+            EXPECT_EQ( package.installerType, "msi" );
+            EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
+            EXPECT_EQ( package.packageName, "uc/0.0.1" );
+
+            packageUpdated = true;
+            return 0;
+        } ) );
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+        [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+        {
+            EXPECT_EQ( newName, "C:\\Program Files\\Cisco\\SecureXYZ\\UnifiedConnector\\Configuration\\uc.json" );
+            configUpdated = true;
+            m_cv.notify_one();
+
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+
+    EXPECT_TRUE( packageUpdated && configUpdated );
 }

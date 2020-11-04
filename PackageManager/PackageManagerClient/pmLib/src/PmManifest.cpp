@@ -81,9 +81,9 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     package.signerName = GetJsonStringField( packageJson, "installer_signer_name", false );
     package.installerHash = GetJsonStringField( packageJson, "installer_hash", false );
 
-    if( packageJson[ "configs" ].isArray() ) {
-        for( Json::Value::ArrayIndex i = 0; i != packageJson[ "configs" ].size(); i++ ) {
-            AddConfigToPackage( packageJson[ "configs" ][ i ], package );
+    if( packageJson[ "files" ].isArray() ) {
+        for( Json::Value::ArrayIndex i = 0; i != packageJson[ "files" ].size(); i++ ) {
+            AddConfigToPackage( packageJson[ "files" ][ i ], package );
         }
     }
     else {
@@ -96,16 +96,21 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
 {
     PackageConfigInfo config;
 
-    config.contents = GetJsonStringField( configJson, "contents", true );
-    config.path = GetJsonStringField( configJson, "path", true );
+    try {
+        config.contents = GetJsonStringField( configJson, "contents", true );
+        config.path = GetJsonStringField( configJson, "path", true );
 
-    config.sha256 = GetJsonStringField( configJson, "sha256", false );
-    config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
+        config.sha256 = GetJsonStringField( configJson, "sha256", false );
+        config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
 
-    config.installLocation = package.installLocation;
-    config.signerName = package.signerName;
+        config.installLocation = package.installLocation;
+        config.signerName = package.signerName;
 
-    package.configs.push_back( config );
+        package.configs.push_back( config );
+    }
+    catch( std::exception ex ) {
+        LOG_ERROR( "Invalid Config file: %s", ex.what() );
+    }
 }
 
 std::string PmManifest::GetJsonStringField( Json::Value& packageJson, const char* field, bool required )

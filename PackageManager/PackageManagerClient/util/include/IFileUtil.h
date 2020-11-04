@@ -16,5 +16,5 @@ public:
     virtual int32_t AppendFile( FileUtilHandle* handle, void* data, size_t dataLen ) = 0;
     virtual std::string GetTempDir() = 0;
     virtual int32_t DeleteFile( const std::string& filename ) = 0;
-    virtual int32_t Rename( const std::string& oldFilename, const std::string& newDir, const std::string& newName ) = 0;
+    virtual int32_t Rename( const std::string& oldFilename, const std::string& newName ) = 0;
 };

@@ -73,4 +73,14 @@ public:
      * @return 0 if the configuration was deployed. -1 otherwise
      */
     virtual int32_t DeployConfiguration( const PackageConfigInfo& config ) = 0;
+
+    /**
+     * @brief This API will be used to resolve the config file path
+     *   The config path could be absolute
+     *   The config path could be relative to the base path
+     *   The config path could contain platform specific content ( Windows KNOWN_FOLDER_ID )
+     *
+     * @return string containing the absolute path where the file should be deployed
+     */
+    virtual std::string ResolvePath( const std::string& basePath, const std::string& configPath ) = 0;
 };

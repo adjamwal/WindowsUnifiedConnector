@@ -32,7 +32,7 @@ public:
     void MakeDeleteFileReturn( int32_t value );
     void ExpectDeleteFileNotCalled();
 
-    MOCK_METHOD3( Rename, int32_t( const std::string&, const std::string&, const std::string& ) );
+    MOCK_METHOD2( Rename, int32_t( const std::string&, const std::string& ) );
     void MakeRenameReturn( int32_t value );
     void ExpectRenameNotCalled();
 
