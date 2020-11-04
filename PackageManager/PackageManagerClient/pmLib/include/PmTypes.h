@@ -11,6 +11,7 @@ struct PackageConfigInfo
     std::string verifyPath;
     std::string installLocation;
     std::string signerName;
+    bool deleteConfig;
 };
 
 struct PmComponent

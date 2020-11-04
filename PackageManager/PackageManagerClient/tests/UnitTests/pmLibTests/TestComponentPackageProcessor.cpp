@@ -5,6 +5,7 @@
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
 #include "MockSslUtil.h"
+#include "MockPackageConfigProcessor.h"
 
 #include <memory>
 
@@ -18,7 +19,9 @@ protected:
         m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
-        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil ) );
+        m_configProcessor.reset( new NiceMock<MockPackageConfigProcessor>() );
+
+        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcessor ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -26,11 +29,13 @@ protected:
     void TearDown()
     {
         m_patient.reset();
+
         m_cloud.reset();
         m_fileUtil.reset();
         m_dep.reset();
         m_pmComponentManager.reset();
         m_sslUtil.reset();
+        m_configProcessor.reset();
 
         m_expectedComponentPackage = {};
     }
@@ -57,6 +62,7 @@ protected:
             "configverifyPath",
             "installLocation",
             "signerName",
+            false
         } );
     }
 
@@ -76,7 +82,10 @@ protected:
     std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;
+    std::unique_ptr<MockPackageConfigProcessor> m_configProcessor;
+
     std::unique_ptr<ComponentPackageProcessor> m_patient;
+
 };
 
 TEST_F( TestComponentPackageProcessor, WillTryToDownloadIfInitialized )
@@ -116,132 +125,11 @@ TEST_F( TestComponentPackageProcessor, WillNotProcessComponentPackageIfNotInitia
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }
 
-TEST_F( TestComponentPackageProcessor, WillDecodeConfigFile )
+TEST_F( TestComponentPackageProcessor, WillProcessConfig )
 {
     SetupComponentPackageWithConfig();
 
-    EXPECT_CALL( *m_sslUtil, DecodeBase64( _, _ ) );
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillFailIfDecodeConfigFileFails )
-{
-    SetupComponentPackageWithConfig();
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( -1 );
-
-    EXPECT_FALSE( m_patient->ProcessComponentPackage( m_expectedComponentPackage ) );
-}
-
-TEST_F( TestComponentPackageProcessor, WillNotCreateConfigWhenDecodeFails )
-{
-    SetupComponentPackageWithConfig();
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( -1 );
-    
-    m_fileUtil->ExpectCloseFileNotCalled();
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillCreateTempConfigFile )
-{
-    SetupComponentPackageWithConfig();
-    std::string tempDir( "TempDir" );
-       
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakeGetTempDirReturn( tempDir );
-    EXPECT_CALL( *m_fileUtil, PmCreateFile( _ ) ).WillOnce( Invoke( [tempDir]( const std::string& filename )
-        {
-            EXPECT_EQ( filename.find( tempDir ), 0 );
-            return (FileUtilHandle*)1;
-        } ) );
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillVerifyConfigFileHash )
-{
-    SetupComponentPackageWithConfig();
-
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-
-    EXPECT_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillOnce( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillVerifyConfigFile )
-{
-    SetupComponentPackageWithConfig();
-
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
-
-    EXPECT_CALL( *m_pmComponentManager, DeployConfiguration( _ ) );
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillMoveConfigFile )
-{
-    SetupComponentPackageWithConfig();
-
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillByDefault( Return( m_expectedComponentPackage.configs[ 0 ].sha256 ) );
-
-    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) );
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-TEST_F( TestComponentPackageProcessor, WillNotVerifyConfigHashIfNotProvided )
-{
-    SetupComponentPackageWithConfig();
-    m_expectedComponentPackage.configs.front().sha256 = "";
-
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
-
-    m_sslUtil->ExpectCalculateSHA256NotCalled();
-
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
-}
-
-
-TEST_F( TestComponentPackageProcessor, WillRemoveTempConfig )
-{
-    SetupComponentPackageWithConfig();
-    m_expectedComponentPackage.configs.front().verifyBinPath = "";
-
-    m_patient->Initialize( m_dep.get() );
-
-    m_sslUtil->MakeDecodeBase64Return( 0 );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 0 );
-
-    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) ).Times( 2 );
+    EXPECT_CALL( *m_configProcessor, ProcessConfig( _ ) );
 
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }

@@ -10,7 +10,7 @@ public:
     MockPmPlatformComponentManager();
     ~MockPmPlatformComponentManager();
 
-    MOCK_METHOD2( GetInstalledPackages, int32_t( PmInstalledPackage*, size_t& ) );
+    MOCK_METHOD1( GetInstalledPackages, int32_t( PackageInventory& ) );
     void MakeGetInstalledPackagesReturn( int32_t value );
     void ExpectGetInstalledPackagesIsNotCalled();
 

@@ -36,6 +36,10 @@ public:
     void MakeRenameReturn( int32_t value );
     void ExpectRenameNotCalled();
 
+    MOCK_METHOD1( FileExists, bool( const std::string& ) );
+    void MakeFileExistsReturn( bool value );
+    void ExpectFileExistsNotCalled();
+
 private:
     std::string m_defaultString;
 };

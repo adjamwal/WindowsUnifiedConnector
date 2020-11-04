@@ -1,6 +1,14 @@
 #include "PackageInventoryProvider.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformComponentManager.h"
+#include "IFileUtil.h"
+#include "ISslUtil.h"
+#include "PmLogger.h"
 
-PackageInventoryProvider::PackageInventoryProvider()
+PackageInventoryProvider::PackageInventoryProvider( IFileUtil& fileUtil, ISslUtil& sslUtil ) :
+    m_fileUtil( fileUtil )
+    ,m_sslUtil( sslUtil )
+    , m_dependencies( nullptr )
 {
 
 }
@@ -10,32 +18,39 @@ PackageInventoryProvider::~PackageInventoryProvider()
 
 }
 
+void PackageInventoryProvider::Initialize( IPmPlatformDependencies* dep )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    m_dependencies = dep;
+}
+
 bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 {
+    bool rtn = false;
     PackageInventory detectedPackages;
+    std::lock_guard<std::mutex> lock( m_mutex );
 
-    detectedPackages.architecture = "x64";
-    detectedPackages.platform = "win";
+    if( !m_dependencies ) {
+        return false;
+    }
 
-    PmInstalledPackage packageInfo;
-    packageInfo.packageName = "uc";
-    packageInfo.packageVersion = "0.0.1";
+    if( m_dependencies->ComponentManager().GetInstalledPackages( detectedPackages ) == 0 ) {
+        for( auto &package : detectedPackages.packages ) {
+            for( auto it = package.configs.begin(); it < package.configs.end(); it++ ) {
+                if( m_fileUtil.FileExists( it->path ) ) {
+                    auto sha256 = m_sslUtil.CalculateSHA256( it->path );
+                    it->sha256 = sha256.value();
+                }
+                else {
+                    LOG_DEBUG( "Drop missing config %s", it->path.c_str() );
+                    package.configs.erase( it-- );
+                }
+            }
+        }
+        inventory = detectedPackages;
+        rtn = true;
+    }
 
-    PackageConfigInfo packageConfig;
-    packageConfig.path = "uc.json";
-    packageConfig.sha256 = "92753fde4682cf87d2a3c2af46e2f7dd7c2988863eca8390f79d5fb3723a5d2f";
-    packageInfo.configs.push_back(packageConfig);
-
-    packageConfig.path = "pm.json";
-    packageConfig.sha256 = "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4";
-    packageInfo.configs.push_back( packageConfig );
-
-    packageConfig.path = "id.json";
-    packageConfig.sha256 = "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3";
-    packageInfo.configs.push_back( packageConfig );
-
-    detectedPackages.packages.push_back( packageInfo );
-
-    inventory = detectedPackages;
-    return true;
+    return rtn;
 }

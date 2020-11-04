@@ -95,22 +95,26 @@ void PmManifest::AddPackage( Json::Value& packageJson )
 void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& package )
 {
     PackageConfigInfo config;
+    config.deleteConfig = false;
 
-    try {
-        config.contents = GetJsonStringField( configJson, "contents", true );
-        config.path = GetJsonStringField( configJson, "path", true );
+    config.path = GetJsonStringField( configJson, "path", true );
 
-        config.sha256 = GetJsonStringField( configJson, "sha256", false );
-        config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
+    config.contents = GetJsonStringField( configJson, "contents", false );
+    config.sha256 = GetJsonStringField( configJson, "sha256", false );
+    config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
 
-        config.installLocation = package.installLocation;
-        config.signerName = package.signerName;
+    config.installLocation = package.installLocation;
+    config.signerName = package.signerName;
 
-        package.configs.push_back( config );
+    if( configJson.isMember( "delete" ) && configJson[ "delete" ].isBool() ) {
+        config.deleteConfig = configJson[ "delete" ].asBool();
     }
-    catch( std::exception ex ) {
-        LOG_ERROR( "Invalid Config file: %s", ex.what() );
+
+    if( !config.contents.empty() && config.deleteConfig ) {
+        throw( std::invalid_argument( std::string( __FUNCTION__": Invalid config. Content provided and delete requested" ) ) );
     }
+
+    package.configs.push_back( config );
 }
 
 std::string PmManifest::GetJsonStringField( Json::Value& packageJson, const char* field, bool required )
