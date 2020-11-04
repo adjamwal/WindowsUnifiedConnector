@@ -10,7 +10,7 @@
 
 using ::testing::StrEq;
 
-class ComponentTestWindowsPackageManager : public ::testing::Test
+class TestWindowsPackageManager : public ::testing::Test
 {
 protected:
     void SetUp()
@@ -34,7 +34,7 @@ protected:
     std::unique_ptr<WindowsComponentManager> m_patient;
 };
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateComponentSuccess )
+TEST_F( TestWindowsPackageManager, UpdateComponentSuccess )
 {
     std::string error;
     PmComponent c;
@@ -52,7 +52,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentSuccess )
     EXPECT_EQ( error, "" );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateComponentInvalidPackageType )
+TEST_F( TestWindowsPackageManager, UpdateComponentInvalidPackageType )
 {
     std::string error;
     PmComponent c;
@@ -64,7 +64,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentInvalidPackageType )
     EXPECT_NE( error, "" );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateComponentFailureToGetSystemDirectory )
+TEST_F( TestWindowsPackageManager, UpdateComponentFailureToGetSystemDirectory )
 {
     std::string error;
     PmComponent c;
@@ -78,7 +78,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentFailureToGetSystemDir
 }
 
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateComponentCreateProcessFailure )
+TEST_F( TestWindowsPackageManager, UpdateComponentCreateProcessFailure )
 {
     std::string error;
     PmComponent c;
@@ -94,7 +94,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentCreateProcessFailure 
     EXPECT_NE( error, "" );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateWaitForSingleObjectFailure )
+TEST_F( TestWindowsPackageManager, UpdateWaitForSingleObjectFailure )
 {
     std::string error;
     PmComponent c;
@@ -109,7 +109,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateWaitForSingleObjectFailure )
     EXPECT_NE( error, "" );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateComponentExitCodeProcessFailure )
+TEST_F( TestWindowsPackageManager, UpdateComponentExitCodeProcessFailure )
 {
     std::string error;
     PmComponent c;
@@ -127,7 +127,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentExitCodeProcessFailur
     EXPECT_NE( error, "" );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, UpdateComponentVerifyPackageFailure )
+TEST_F( TestWindowsPackageManager, UpdateComponentVerifyPackageFailure )
 {
     std::string error;
     PmComponent c;
@@ -145,7 +145,7 @@ TEST_F( ComponentTestWindowsPackageManager, UpdateComponentVerifyPackageFailure 
 #define TEST_VERIFY_BIN_PATH "TestVerifyBin.exe"
 #define TEST_VERIFY_SIGNER "TEST SIGNER"
 #define TEST_VERIFY_PATH "TestVerifyPath"
-TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillVerifySigner )
+TEST_F( TestWindowsPackageManager, DeployConfigurationWillVerifySigner )
 {
     std::string error;
     PackageConfigInfo c;
@@ -161,7 +161,7 @@ TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillVerifySigner 
     m_patient->DeployConfiguration( c  );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillReturnVerifyFailure )
+TEST_F( TestWindowsPackageManager, DeployConfigurationWillReturnVerifyFailure )
 {
     PackageConfigInfo c;
 
@@ -172,7 +172,7 @@ TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillReturnVerifyF
     EXPECT_EQ( ( CodesignStatus )ret, CodesignStatus::CODE_SIGNER_ERROR );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillBuildCommandLine )
+TEST_F( TestWindowsPackageManager, DeployConfigurationWillBuildCommandLine )
 {
     PackageConfigInfo c;
 
@@ -187,7 +187,7 @@ TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationWillBuildCommandL
     m_patient->DeployConfiguration( c );
 }
 
-TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationSuccess )
+TEST_F( TestWindowsPackageManager, DeployConfigurationSuccess )
 {
     PackageConfigInfo c;
 
@@ -201,4 +201,38 @@ TEST_F( ComponentTestWindowsPackageManager, DeployConfigurationSuccess )
     int32_t ret = m_patient->DeployConfiguration( c );
 
     EXPECT_EQ( ret, 0 );
+}
+
+TEST_F( TestWindowsPackageManager, GetInstalledPackagesSucceed )
+{
+    PackageInventory installedPackages;
+
+    int32_t ret = m_patient->GetInstalledPackages( installedPackages );
+
+    EXPECT_EQ( ret, 0 );
+}
+
+TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillSetOS )
+{
+    PackageInventory installedPackages;
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+
+    m_patient->GetInstalledPackages( installedPackages );
+
+    EXPECT_EQ( installedPackages.architecture, "x64" );
+    EXPECT_EQ( installedPackages.platform, "win" );
+}
+
+
+TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillGetUC )
+{
+    PackageInventory installedPackages;
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+
+    m_patient->GetInstalledPackages( installedPackages );
+
+    EXPECT_EQ( installedPackages.packages.front().packageName, "uc" );
+    EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
 }

@@ -16,12 +16,12 @@ MockPmPlatformComponentManager::~MockPmPlatformComponentManager()
 
 void MockPmPlatformComponentManager::MakeGetInstalledPackagesReturn( int32_t value )
 {
-    ON_CALL( *this, GetInstalledPackages( _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, GetInstalledPackages( _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockPmPlatformComponentManager::ExpectGetInstalledPackagesIsNotCalled()
 {
-    EXPECT_CALL( *this, GetInstalledPackages( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, GetInstalledPackages( _ ) ).Times( 0 );
 }
 
 void MockPmPlatformComponentManager::MakeInstallComponentReturn( int32_t value )

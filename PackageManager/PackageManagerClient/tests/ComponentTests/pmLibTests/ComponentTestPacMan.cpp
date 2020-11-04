@@ -8,6 +8,7 @@
 #include "CertsAdapter.h"
 #include "CheckinManifestRetriever.h"
 #include "ComponentPackageProcessor.h"
+#include "PackageConfigProcessor.h"
 #include "ManifestProcessor.h"
 #include "WorkerThread.h"
 #include "PmManifest.h"
@@ -38,12 +39,13 @@ protected:
 
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
-        m_packageInventoryProvider.reset( new PackageInventoryProvider() );
+        m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) );
         m_checkinFormatter.reset( new CheckinFormatter() );
         m_tokenAdapter.reset( new TokenAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) );
-        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil ) );
+        m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
+        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
@@ -66,6 +68,7 @@ protected:
 
         m_manifestProcessor.reset();
         m_componentPackageProcessor.reset();
+        m_configProcesor.reset();
         m_checkinManifestRetriever.reset();
         m_certsAdapter.reset();
         m_tokenAdapter.reset();
@@ -116,6 +119,7 @@ protected:
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
+    std::unique_ptr<IPackageConfigProcessor> m_configProcesor;
 
     std::unique_ptr<IPackageManager> m_patient;
 };
@@ -366,8 +370,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_0" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
@@ -467,12 +471,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_1" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_2" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_3" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_4" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_5" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
     ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return oldFilename + '/' + newName;

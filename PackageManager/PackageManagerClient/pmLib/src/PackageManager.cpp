@@ -110,6 +110,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_tokenAdapter.Initialize( m_dependencies );
         m_certsAdapter.Initialize( m_dependencies );
         m_manifestProcessor.Initialize( m_dependencies );
+        m_packageInventoryProvider.Initialize( m_dependencies );
     }
     catch( std::exception& ex )
     {

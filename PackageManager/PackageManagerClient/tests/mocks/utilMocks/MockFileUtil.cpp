@@ -82,3 +82,13 @@ void MockFileUtil::ExpectRenameNotCalled()
 {
     EXPECT_CALL( *this, Rename( _, _ ) ).Times( 0 );
 }
+
+void MockFileUtil::MakeFileExistsReturn( bool value )
+{
+    ON_CALL( *this, FileExists ( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectFileExistsNotCalled()
+{
+    EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
+}

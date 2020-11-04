@@ -126,3 +126,8 @@ int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& new
 
     return rtn;
 }
+
+bool FileUtil::FileExists( const std::string& filename )
+{
+    return ::std::filesystem::exists( filename );
+}

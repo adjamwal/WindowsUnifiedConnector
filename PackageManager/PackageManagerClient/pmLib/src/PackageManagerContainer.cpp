@@ -13,6 +13,7 @@
 #include "CheckinManifestRetriever.h"
 #include "ComponentPackageProcessor.h"
 #include "ManifestProcessor.h"
+#include "PackageConfigProcessor.h"
 
 #include "FileUtil.h"
 #include "SslUtil.h"
@@ -33,12 +34,13 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_config( new PmConfig( *m_fileUtil ) )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
-    , m_packageInventoryProvider( new PackageInventoryProvider() )
+    , m_packageInventoryProvider( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) )
     , m_checkinFormatter( new CheckinFormatter() )
     , m_tokenAdapter( new TokenAdapter() )
     , m_certsAdapter( new CertsAdapter() )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) )
-    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil ) )
+    , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) )
+    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_packageConfigProcessor ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(
         new PackageManager( *m_config,

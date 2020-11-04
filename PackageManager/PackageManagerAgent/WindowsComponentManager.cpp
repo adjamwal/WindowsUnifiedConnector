@@ -5,6 +5,7 @@
 #include <sstream>
 #include <locale>
 #include <codecvt>
+#include "..\..\GlobalVersion.h"
 
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codesignVerifier ) :
     m_winApiWrapper( winApiWrapper ),
@@ -18,9 +19,42 @@ WindowsComponentManager::~WindowsComponentManager()
 
 }
 
-int32_t WindowsComponentManager::GetInstalledPackages( PmInstalledPackage* packages, size_t& packagesLen )
+int32_t WindowsComponentManager::GetInstalledPackages( PackageInventory& packages )
 {
-    return -1;
+    packages.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
+    packages.platform = "win";
+    
+    packages.packages.push_back( BuildUcPackage() );
+
+    //TODO: Discover other packages
+
+    return 0;
+}
+
+PmInstalledPackage WindowsComponentManager::BuildUcPackage()
+{
+    PmInstalledPackage ucPackage;
+    PackageConfigInfo ucConfig;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    ucPackage.packageName = "uc";
+    ucPackage.packageVersion = converter.to_bytes( STRFORMATPRODVER );
+    //TODO: Removes the buid number. Should the cloud accept the build number?
+    ucPackage.packageVersion.erase( ucPackage.packageVersion.find_last_of( "." ) );
+
+    ucConfig.deleteConfig = false;
+
+    //TODO: Get these from somewhere. Possibly registry keys
+    ucConfig.path = "C:\\Program Files\\Cisco\\SecureXYZ\\Unified Connector\\Configuration\\id.json";
+    ucPackage.configs.push_back( ucConfig );
+
+    ucConfig.path = "C:\\Program Files\\Cisco\\SecureXYZ\\Unified Connector\\Configuration\\pm.json";
+    ucPackage.configs.push_back( ucConfig );
+
+    ucConfig.path = "C:\\Program Files\\Cisco\\SecureXYZ\\Unified Connector\\Configuration\\uc.json";
+    ucPackage.configs.push_back( ucConfig );
+
+    return ucPackage;
 }
 
 int32_t WindowsComponentManager::InstallComponent( const PmComponent& package )

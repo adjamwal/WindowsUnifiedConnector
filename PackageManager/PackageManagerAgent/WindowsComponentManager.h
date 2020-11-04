@@ -19,7 +19,7 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    int32_t GetInstalledPackages( PmInstalledPackage* packages, size_t& packagesLen ) override;
+    int32_t GetInstalledPackages( PackageInventory& packages ) override;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:
@@ -84,5 +84,6 @@ private:
     ICodesignVerifier& m_codeSignVerifier;
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
+    PmInstalledPackage BuildUcPackage();
 };
 

@@ -15,4 +15,5 @@ public:
     std::string GetTempDir() override;
     int32_t DeleteFile( const std::string& filename ) override;
     int32_t Rename( const std::string& oldFilename, const std::string& newName ) override;
+    bool FileExists( const std::string& filename ) override;
 };

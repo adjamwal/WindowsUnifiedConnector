@@ -15,6 +15,7 @@ class ITokenAdapter;
 class ICertsAdapter;
 class ICheckinManifestRetriever;
 class IComponentPackageProcessor;
+class IPackageConfigProcessor;
 class IManifestProcessor;
 class ISslUtil;
 
@@ -39,6 +40,7 @@ private:
     std::unique_ptr<ITokenAdapter> m_tokenAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
+    std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
 

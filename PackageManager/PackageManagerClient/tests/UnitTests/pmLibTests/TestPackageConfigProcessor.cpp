@@ -1,0 +1,253 @@
+#include "MocksCommon.h"
+#include "PackageConfigProcessor.h"
+#include "MockFileUtil.h"
+#include "MockPmPlatformDependencies.h"
+#include "MockPmPlatformComponentManager.h"
+#include "MockSslUtil.h"
+
+#include <memory>
+
+class TestPackageConfigProcessor : public ::testing::Test
+{
+protected:
+    void SetUp()
+    {
+        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
+        m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
+        m_sslUtil.reset( new NiceMock<MockSslUtil>() );
+
+        m_patient.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
+
+        m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
+    }
+
+    void TearDown()
+    {
+        m_patient.reset();
+
+        m_fileUtil.reset();
+        m_dep.reset();
+        m_pmComponentManager.reset();
+        m_sslUtil.reset();
+
+        m_configInfo = {};
+    }
+
+    void SetupConfig()
+    {
+        m_configInfo = {
+            "configpath",
+            "configsha256",
+            "configcontents",
+            "configverifyBinPath",
+            "configverifyPath",
+            "installLocation",
+            "signerName",
+            false
+            };
+    }
+
+    PackageConfigInfo m_configInfo;
+
+    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
+    std::unique_ptr<MockPmPlatformDependencies> m_dep;
+    std::unique_ptr<MockSslUtil> m_sslUtil;
+
+    std::unique_ptr<PackageConfigProcessor> m_patient;
+};
+
+TEST_F( TestPackageConfigProcessor, WillDecodeConfigFile )
+{
+    SetupConfig();
+
+    EXPECT_CALL( *m_sslUtil, DecodeBase64( _, _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillFailIfDecodeConfigFileFails )
+{
+    SetupConfig();
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( -1 );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillNotCreateConfigWhenDecodeFails )
+{
+    SetupConfig();
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( -1 );
+
+    m_fileUtil->ExpectCloseFileNotCalled();
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillCreateTempConfigFile )
+{
+    SetupConfig();
+    std::string tempDir( "TempDir" );
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakeGetTempDirReturn( tempDir );
+    EXPECT_CALL( *m_fileUtil, PmCreateFile( _ ) ).WillOnce( Invoke( [tempDir]( const std::string& filename )
+        {
+            EXPECT_EQ( filename.find( tempDir ), 0 );
+            return ( FileUtilHandle* )1;
+        } ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillVerifyConfigFileHash )
+{
+    SetupConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+
+    m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillVerifyConfigFile )
+{
+    SetupConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+    m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
+
+    EXPECT_CALL( *m_pmComponentManager, DeployConfiguration( _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillMoveConfigFile )
+{
+    SetupConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+    m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
+
+    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, AddFileWillSucceed )
+{
+    SetupConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+    m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
+    m_fileUtil->MakeRenameReturn( 0 );
+
+    EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
+}
+
+TEST_F( TestPackageConfigProcessor, WillNotVerifyConfigHashIfNotProvided )
+{
+    SetupConfig();
+    m_configInfo.sha256 = "";
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 0 );
+
+    m_sslUtil->ExpectCalculateSHA256NotCalled();
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+
+TEST_F( TestPackageConfigProcessor, WillRemoveTempConfig )
+{
+    SetupConfig();
+    m_configInfo.verifyBinPath = "";
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 0 );
+
+    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillDeleteConfig )
+{
+    SetupConfig();
+    m_configInfo.deleteConfig = true;
+    m_patient->Initialize( m_dep.get() );
+
+    m_pmComponentManager->MakeResolvePathReturn( m_configInfo.path );
+
+    EXPECT_CALL( *m_fileUtil, DeleteFile( m_configInfo.path ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, RemoveConfigWillSucceed )
+{
+    SetupConfig();
+    m_configInfo.deleteConfig = true;
+    m_patient->Initialize( m_dep.get() );
+
+    m_pmComponentManager->MakeResolvePathReturn( m_configInfo.path );
+
+    EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
+}
+
+TEST_F( TestPackageConfigProcessor, WillNotDeleteConfigWithoutValidPath )
+{
+    SetupConfig();
+    m_configInfo.deleteConfig = true;
+    m_patient->Initialize( m_dep.get() );
+
+    m_pmComponentManager->MakeResolvePathReturn( "" );
+
+    m_fileUtil->ExpectDeleteFileNotCalled();
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, RemoveConfigWillFail )
+{
+    SetupConfig();
+    m_configInfo.deleteConfig = true;
+    m_patient->Initialize( m_dep.get() );
+
+    m_pmComponentManager->MakeResolvePathReturn( "" );
+
+    EXPECT_FALSE( m_patient->ProcessConfig( m_configInfo ) );
+}
