@@ -4,10 +4,10 @@ file(GLOB_RECURSE test_sources ./**.cpp ./**.h)
 add_executable(UnitTests ${test_sources})
 
 target_include_directories(UnitTests 
-    PRIVATE ${curl_INCLUDE_DIRS}
+    PRIVATE ${curl_INCLUDE_DIRS} "${gtest_INCLUDE_DIRS}"
     )
 
-target_link_directories(UnitTests PRIVATE ${jsoncpp_LIBRARY} )
+target_link_directories(UnitTests PRIVATE ${jsoncpp_LIBRARY} ${gtest_LIBRARY} )
 target_link_libraries(UnitTests gtest gmock gtest_main pmlib jsoncpp mockLib )
 
 if(MSVC) 

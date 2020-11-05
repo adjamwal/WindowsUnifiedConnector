@@ -1,7 +1,7 @@
 #pragma once
 
 struct PackageConfigInfo;
-struct IPmPlatformDependencies;
+class IPmPlatformDependencies;
 
 class IPackageConfigProcessor
 {
