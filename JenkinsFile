@@ -135,6 +135,8 @@ pipeline {
               CheckoutDependencies()
               dir('WindowsUnifiedConnector') {
                 powershell "git clean -dfx"
+                powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
+                powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
               }
               SetupVersion(false)
             }
