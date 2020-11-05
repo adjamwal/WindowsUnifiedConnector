@@ -2,6 +2,7 @@
 #include "PMLogger.h"
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 
 struct FileUtilHandle
 {
@@ -52,7 +53,7 @@ FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
             WLOG_ERROR( L"fopen_s failed" );
         }
         else {
-            WLOG_DEBUG( L"Created filed %hs", filename.c_str() );
+            WLOG_DEBUG( L"Created file %hs", filename.c_str() );
         }
     }
 
@@ -84,11 +85,49 @@ int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen
         WLOG_ERROR( L"Invalid file handle" );
     }
     else {
-        bytesWritten = fwrite( data, dataLen, 1, handle->file );
+        bytesWritten = fwrite( data, 1, dataLen, handle->file );
         if( bytesWritten != dataLen ) {
             WLOG_ERROR( L"fwrite failed. Wrote %d bytes. Expected %d", bytesWritten, dataLen );
         }
     }
 
     return bytesWritten;
+}
+
+std::string FileUtil::GetTempDir()
+{
+    auto path = std::filesystem::temp_directory_path();
+
+    //make_preferred will use the prefered sepeartor for the operating system
+    // "//" for windows "/" for linux 
+    path.make_preferred();
+
+    // string() will return the path with the prefered sepeartor
+    return path.string();
+}
+
+int32_t FileUtil::DeleteFile( const std::string& filename )
+{
+    return ::std::filesystem::remove( ::std::filesystem::path( filename ) ) ? 0 : -1;
+}
+
+int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& newName )
+{
+    int32_t rtn = -1;
+
+    try {
+        ::std::filesystem::path target( newName );
+        ::std::filesystem::rename( ::std::filesystem::path( oldFilename ), target );
+        rtn = 0;
+    }
+    catch( std::filesystem::filesystem_error ex ) {
+        LOG_ERROR( "%s", ex.what() );
+    }
+
+    return rtn;
+}
+
+bool FileUtil::FileExists( const std::string& filename )
+{
+    return ::std::filesystem::exists( filename );
 }

@@ -10,6 +10,7 @@ class WindowsPmDependencies;
 class IPMLogger;
 class ICodesignVerifier;
 class IWinCertLoader;
+class IWinApiWrapper;
 
 class PmAgentContainer
 {
@@ -20,6 +21,7 @@ public:
     PmAgent& pmAgent();
 
 private:
+    std::unique_ptr<IWinApiWrapper> m_winApiWrapper;
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
     std::unique_ptr<IWinCertLoader> m_certLoader;
     std::unique_ptr<WindowsConfiguration> m_configuration;

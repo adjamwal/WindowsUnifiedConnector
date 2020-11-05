@@ -14,7 +14,7 @@ protected:
     {
         m_controlLib = LoadLibrary( L"PM_MCP.dll" );
         if( !m_controlLib ) {
-            printf("Unable to load %ls. Errno=%lu\n", "PM_MCP", GetLastError() );
+            printf("Unable to load %s. Errno=%lu\n", "PM_MCP", GetLastError() );
         }
         else {
             m_createModule = ( CreateModule )GetProcAddress( m_controlLib, "CreateModuleInstance" );

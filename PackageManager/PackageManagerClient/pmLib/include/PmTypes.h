@@ -1,17 +1,42 @@
 #pragma once
+#include <string>
+#include <vector>
 
-//TODO Define these
+struct PackageConfigInfo
+{
+    std::string path;
+    std::string sha256;
+    std::string contents;
+    std::string verifyBinPath;
+    std::string verifyPath;
+    std::string installLocation;
+    std::string signerName;
+    bool deleteConfig;
+};
+
 struct PmComponent
 {
-    int i;
+    std::string packageName;
+    std::string installerUrl;
+    std::string installerType;
+    std::string installerArgs;
+    std::string installLocation;
+    std::string signerName;
+    std::string installerHash;
+    std::string installerPath;
+    std::vector<PackageConfigInfo> configs;
 };
 
 struct PmInstalledPackage
 {
-
+    std::string packageName;
+    std::string packageVersion;
+    std::vector<PackageConfigInfo> configs;
 };
 
-struct PmPackageConfigration
+struct PackageInventory
 {
-
+    std::string architecture;
+    std::string platform;
+    std::vector<PmInstalledPackage> packages;
 };

@@ -1,0 +1,6 @@
+{
+	"cloud": {
+		"CheckinUri": "https://z0w2hzsjcg.execute-api.us-west-1.amazonaws.com/dev/checkin",
+		"CheckinInterval": 300000
+	}
+}

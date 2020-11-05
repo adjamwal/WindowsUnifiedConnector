@@ -19,70 +19,34 @@ int32_t WindowsConfiguration::GetConfigFileLocation( char* filename, size_t& fil
     return -1;
 }
 
-bool WindowsConfiguration::LoadUcidApi()
-{
-    return m_ucidApi.LoadApi();
-}
-
-void WindowsConfiguration::UnloadUcidApi()
-{
-    return m_ucidApi.UnloadApi();
-}
-
-bool WindowsConfiguration::GetIdentity( std::string& id )
-{
-    bool ret = false;
-
-    int32_t ucidRet = m_ucidApi.GetId(id);
-
-    if (ucidRet == 0)
-    {
-        ret = true;
-        LOG_DEBUG("GetIdentity: %s", id.c_str());
-    }
-    else
-    {
-        LOG_ERROR("GetIdentity Failed: %d", ucidRet);
-    }
-
-    return ret;
-}
-
 bool WindowsConfiguration::GetIdentityToken( std::string& token )
 {
-    bool ret = false;
+    bool ret = true;
+    int32_t ucidRet = 0;
 
-    int32_t ucidRet = m_ucidApi.GetToken(token);
-
-    if (ucidRet == 0)
+    if ( m_ucidApi.LoadApi() )
     {
-        ret = true;
-        LOG_DEBUG("GetToken: %s", token.c_str());
+        //refreshh indentity token
+        ucidRet = m_ucidApi.RefreshToken();
+
+        if ( ucidRet != 0 )
+        {
+            LOG_ERROR( "RefreshIdentityToken Failed: %d", ucidRet );
+            ret = false;
+        }
+
+        //get token
+        ucidRet = m_ucidApi.GetToken( token );
+
+        if ( ucidRet != 0 )
+        {
+            LOG_ERROR( "GetIdentity Failed: %d", ucidRet );
+            ret = false;
+        }
+
+        m_ucidApi.UnloadApi();
     }
-    else
-    {
-        LOG_ERROR("GetToken Failed: %d", ucidRet);
-    }
-
-    return ret;
-}
-
-bool WindowsConfiguration::RefreshIdentityToken()
-{
-    bool ret = false;
-
-    int32_t ucidRet = m_ucidApi.RefreshToken();
-
-    if (ucidRet == 0)
-    {
-        LOG_DEBUG("RefreshIdentityToken succeeded");
-        ret = true;
-    }
-    else
-    {
-        LOG_ERROR("RefreshIdentityToken Failed: %d", ucidRet);
-    }
-
+    
     return ret;
 }
 

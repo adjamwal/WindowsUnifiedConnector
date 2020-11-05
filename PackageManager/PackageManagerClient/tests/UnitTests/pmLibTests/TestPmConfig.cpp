@@ -72,39 +72,6 @@ TEST_F( TestPmConfig, LoadWillSucceed )
     EXPECT_EQ( m_patient->Load( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, LoadWillFailOnEmptyContents )
-{
-    m_fileUtil->MakeReadFileReturn( "" );
-
-    EXPECT_NE( m_patient->Load( "filename" ), 0 );
-}
-
-TEST_F( TestPmConfig, LoadWillNotAcceptInvalidJson )
-{
-    m_fileUtil->MakeReadFileReturn( R"(
-{
-    "cloud": {
-        "CheckinUri": "https://packagemanager.cisco.com/checkin"
-    }
-)" );
-
-    EXPECT_NE( m_patient->Load( "filename" ), 0 );
-}
-
-TEST_F( TestPmConfig, LoadWillNotAcceptInvalidURL )
-{
-    m_fileUtil->MakeReadFileReturn( R"(
-{
-    "cloud": {
-        "CheckinUri": 1,
-        "CheckinInterval": 1000
-    }
-}
-)" );
-
-    EXPECT_NE( m_patient->Load( "filename" ), 0 );
-}
-
 TEST_F( TestPmConfig, LoadWillTryBackupFile )
 {
     std::string filename( "filename" );
@@ -115,4 +82,44 @@ TEST_F( TestPmConfig, LoadWillTryBackupFile )
     EXPECT_CALL( *m_fileUtil, ReadFile( filename + ".bak" ) ).WillOnce( Return( "" ) );
 
     m_patient->Load( filename );
+}
+
+TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceed )
+{
+    MakeLoadReadFileSucceed();
+
+    EXPECT_EQ( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillFailOnEmptyContents )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    EXPECT_NE( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidJson )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "cloud": {
+        "CheckinUri": "https://packagemanager.cisco.com/checkin"
+    }
+)" );
+
+    EXPECT_NE( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "cloud": {
+        "CheckinUri": 1,
+        "CheckinInterval": 1000
+    }
+}
+)" );
+
+    EXPECT_NE( m_patient->VerifyFileIntegrity( "filename" ), 0 );
 }

@@ -6,8 +6,12 @@
 #include "PmLogger.h"
 #include "IWorkerThread.h"
 #include "IPmConfig.h"
-#include "IPmCloud.h"
-#include "IPmManifest.h"
+#include "PackageInventoryProvider.h"
+#include "CheckinFormatter.h"
+#include "TokenAdapter.h"
+#include "CertsAdapter.h"
+#include "CheckinManifestRetriever.h"
+#include "ManifestProcessor.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include "IPmPlatformConfiguration.h"
@@ -15,16 +19,27 @@
 
 using namespace std;
 
-void PmVersion( int& major, int &minor)
+void PmVersion( int& major, int& minor )
 {
     major = PackageManager_VERSION_MAJOR;
     minor = PackageManager_VERSION_MINOR;
 }
 
-PackageManager::PackageManager( IPmConfig& config, IPmCloud& cloud, IPmManifest& manifest, IWorkerThread& thread ) :
+PackageManager::PackageManager( IPmConfig& config,
+    IPackageInventoryProvider& packageInventoryProvider,
+    ICheckinFormatter& checkinFormatter,
+    ITokenAdapter& tokenAdapter,
+    ICertsAdapter& certsAdapter,
+    ICheckinManifestRetriever& manifestRetriever,
+    IManifestProcessor& manifestProcessor,
+    IWorkerThread& thread ) :
     m_config( config )
-    , m_cloud( cloud )
-    , m_manifest( manifest )
+    , m_packageInventoryProvider( packageInventoryProvider )
+    , m_checkinFormatter( checkinFormatter )
+    , m_tokenAdapter( tokenAdapter )
+    , m_certsAdapter( certsAdapter )
+    , m_manifestRetriever( manifestRetriever )
+    , m_manifestProcessor( manifestProcessor )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
@@ -89,6 +104,18 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     m_dependencies = dependecies;
+
+    try
+    {
+        m_tokenAdapter.Initialize( m_dependencies );
+        m_certsAdapter.Initialize( m_dependencies );
+        m_manifestProcessor.Initialize( m_dependencies );
+        m_packageInventoryProvider.Initialize( m_dependencies );
+    }
+    catch( std::exception& ex )
+    {
+        LOG_ERROR( "Initialization failed: %s", ex.what() );
+    }
 }
 
 std::chrono::milliseconds PackageManager::PmThreadWait()
@@ -105,17 +132,24 @@ void PackageManager::PmWorkflowThread()
         //Send event? might fail without a config/cloudURL
     }
 
-    if( !PmLoadPackageList() ) {
-        LOG_ERROR( "Failed to load PM PackageList" );
-    }
-	
-	if (!PmGetUCIDId() ) {
-		LOG_ERROR( "Failed to get UCID Id" );
-	}
+    try
+    {
+        PackageInventory inventory;
+        m_packageInventoryProvider.GetInventory( inventory );
 
-    if( !PmCheckin() ) {
-        LOG_ERROR( "Package Manager Checkin failed" );
+        std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
+            m_config.GetCloudUri(),
+            m_checkinFormatter.GetJson( inventory )
+        );
+
+        LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
+        m_manifestProcessor.ProcessManifest( manifest );
     }
+    catch( std::exception& ex )
+    {
+        LOG_ERROR( "Checkin failed: %s", ex.what() );
+    }
+
 }
 
 bool PackageManager::PmLoadConfig()
@@ -123,102 +157,12 @@ bool PackageManager::PmLoadConfig()
     return m_config.Load( m_configFilename ) == 0;
 }
 
-bool PackageManager::PmLoadPackageList()
-{
-    //Initial implementation
-    //Load packages from file
-
-    //For release this should discover installed packages
-    //If empty then add one package... The package manager
-
-    return false;
-}
-
-bool PackageManager::PmGetUCIDId()
-{
-    if (m_dependencies->Configuration().LoadUcidApi())
-    {
-        //refreshh indentity token
-        if (m_dependencies->Configuration().RefreshIdentityToken())
-        {
-            LOG_ERROR("Refreshed UCID Token");
-        }
-
-        //get ucid id
-        std::string id;
-        if (m_dependencies->Configuration().GetIdentity(id))
-        {
-            LOG_ERROR("GetIdentity: %s", id.c_str());
-        }
-
-        //get ucid token 
-        std::string token;
-        if (m_dependencies->Configuration().GetIdentityToken(token))
-        {
-            LOG_ERROR("GetIdentityToken: %s", token.c_str());
-        }
-
-        m_dependencies->Configuration().UnloadUcidApi();
-    }
-    else
-    {
-        LOG_ERROR("Failed to load ucid api");
-    }
-
-    return false;
-}
-
-bool PackageManager::PmCheckin()
-{
-    bool rtn = false;
-    std::string payload, response;
-    //Convert m_packages to string;
-
-    if( m_cloud.Checkin( payload, response ) != 0 ) {
-        LOG_ERROR( "cloud checkin failed" );
-        //PmSendEvent() failed checkin request
-    }
-    else {
-        if( PmProcessManifest( response ) != 0 ) {
-            LOG_ERROR( "process manifest failed" );
-        }
-        else {
-            rtn = true;
-        }
-    }
-
-    return rtn;
-}
-
-bool PackageManager::PmProcessComponent( const PmComponent& component )
-{
-    return false;
-}
-
-bool PackageManager::PmProcessManifest( const std::string& manifest )
-{
-    bool rtn = true;
-    if( m_manifest.ParseManifest( manifest ) != 0 ) {
-        LOG_ERROR( "process manifest failed" );
-        //PmSendEvent() bad manifest
-        rtn = false;
-    }
-    else {
-        for( auto package : m_manifest.GetPackageList() ) {
-            if( PmProcessComponent( package ) != 0 ) {
-                LOG_ERROR( "process package failed" );
-                //PmSendEvent() failed
-                rtn = false;
-            }
-            else {
-                //PmSendEvent() success
-            }
-        }
-    }
-    return false;
-}
-
 bool PackageManager::PmSendEvent( const PmEvent& event )
 {
     return false;
+}
+
+int32_t PackageManager::VerifyPacManConfig( const char* configFile )
+{
+    return m_config.VerifyFileIntegrity( configFile );
 }

@@ -60,12 +60,12 @@ int32_t UCIDApiDll::GetToken(std::string& token )
 
     int bufsz = 0;
 
-    ucid_result_t res = m_getIdFunc(NULL, &bufsz);
+    ucid_result_t res = m_getTokenFunc(NULL, &bufsz);
 
     if (res == UCID_RES_INSUFFICIENT_LEN) {
         char* myucid = (char*)malloc(bufsz);
 
-        res = m_getIdFunc(myucid, &bufsz);
+        res = m_getTokenFunc(myucid, &bufsz);
 
         if (myucid)
         {
@@ -154,11 +154,11 @@ void UCIDApiDll::UnloadDll()
         return;
     }
 
-    LOG_DEBUG( "UnLoading %s", m_loadedDllName.c_str() );
+    WLOG_DEBUG( L"UnLoading %s", m_loadedDllName.c_str() );
 
     if( FreeLibrary(m_api) == 0 )
     {
-        LOG_ERROR( "FreeLibrary() call failed. Error %d", GetLastError() );
+        WLOG_ERROR( L"FreeLibrary() call failed. Error %d", GetLastError() );
     }
 
     m_api = 0;
@@ -210,7 +210,7 @@ bool UCIDApiDll::LoadApi()
     }
     catch( std::exception& ex )
     {
-        WLOG_ERROR( "Exception: %s", ex.what() );
+        LOG_ERROR( "Exception: %s", ex.what() );
     }
 
     m_isModuleLoaded = true;
@@ -226,7 +226,7 @@ void UCIDApiDll::UnloadApi()
 
     if( !m_isModuleLoaded )
     {
-        WLOG_ERROR( L"UnifiedConnectorID Api already unloaded." );
+        WLOG_DEBUG( L"UnifiedConnectorID Api already unloaded." );
         return;
     }
 

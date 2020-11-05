@@ -24,7 +24,7 @@
     <ProjectGuid>{805379ca-1c31-40a9-b908-8b2a603927f1}</ProjectGuid>
     <RootNamespace>PackageMananger</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>PackageMananger</ProjectName>
+    <ProjectName>WinPackageMananger</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -99,13 +99,13 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dcl_static.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -121,7 +121,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,7 +129,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dcl_static.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -143,13 +143,13 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dcl_static.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -165,7 +165,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -173,7 +173,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dcl_static.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;utilLib.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -204,7 +204,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libLogger\libLogger.vcxproj">
+    <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\LibVerifier\LibVerifier.vcxproj">

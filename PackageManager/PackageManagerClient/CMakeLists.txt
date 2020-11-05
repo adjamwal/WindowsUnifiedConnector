@@ -1,9 +1,9 @@
-﻿cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.17)
 
 project (PackageManager VERSION 0.1)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if (MSVC)
@@ -11,6 +11,25 @@ if (MSVC)
         set(_PLATFORM_DEFINES "/DWIN64")
     else()
         set(_PLATFORM_DEFINES "/DWIN32")
+    endif()
+endif()
+
+if(MSVC)
+    if(DEFINED common_LIBRARY)
+        message( "Using common_LIBRARY=${common_LIBRARY}" )
+        set(jsoncpp_LIBRARY ${common_LIBRARY})
+        set(curl_LIBRARY ${common_LIBRARY})
+        set(ssl_LIBRARY ${common_LIBRARY})
+        set(gtest_LIBRARY ${common_LIBRARY})
+    endif()
+
+    if(DEFINED common_INCLUDE_DIRS)
+        message( "Using common_INCLUDE_DIRS=${common_INCLUDE_DIRS}" )
+        set(jsoncpp_INCLUDE_DIRS ${common_INCLUDE_DIRS})
+        set(curl_INCLUDE_DIRS ${common_INCLUDE_DIRS})
+        set(ssl_INCLUDE_DIRS ${common_INCLUDE_DIRS})
+        set(fff_INCLUDE_DIRS ${common_INCLUDE_DIRS})
+        set(gtest_INCLUDE_DIRS ${common_INCLUDE_DIRS})
     endif()
 endif()
 
@@ -36,7 +55,13 @@ endif()
 # fake function framework
 message( "Using fake functon framework fff_INCLUDE_DIRS=${fff_INCLUDE_DIRS}" )
 if(NOT DEFINED fff_INCLUDE_DIRS)
-    message( FATAL_ERROR "Missing fake functon framework" )
+    message( FATAL_ERROR "Missing fake function framework" )
+endif()
+
+# gtest
+message( "Using test gtest_LIBRARY=${gtest_LIBRARY} gtest_INCLUDE_DIRS=${gtest_INCLUDE_DIRS}" )
+if(NOT DEFINED gtest_LIBRARY OR NOT DEFINED gtest_INCLUDE_DIRS)
+    message( FATAL_ERROR "Missing gtest" )
 endif()
 
 # configure a header file to pass the version number only

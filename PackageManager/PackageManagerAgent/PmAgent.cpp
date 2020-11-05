@@ -23,7 +23,6 @@ PmAgent::PmAgent( const std::wstring& configFilePath, IPmPlatformDependencies& d
 
 PmAgent::~PmAgent()
 {
-    m_PacMan->SetPlatformDependencies( nullptr );
     DeinitPackageManager();
     SetPMLogger( nullptr );
 }
@@ -33,7 +32,7 @@ int32_t PmAgent::Start()
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     std::string configFile = converter.to_bytes( m_configFile );
     
-    LOG_DEBUG( "Staring Package Manager Client with config file %s", configFile.c_str() );
+    LOG_DEBUG( "Starting Package Manager Client with config file %s", configFile.c_str() );
     return m_PacMan->Start( configFile.c_str() );
 }
 
@@ -41,4 +40,13 @@ int32_t PmAgent::Stop()
 {
     LOG_DEBUG( "Stopping Package Manager Client" );
     return m_PacMan->Stop();
+}
+
+int32_t PmAgent::VerifyConfig( const std::wstring& configFilePath )
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    std::string configFile = converter.to_bytes( configFilePath );
+
+    LOG_DEBUG( "Verifing config file %s", configFile.c_str() );
+    return m_PacMan->VerifyPacManConfig( configFile.c_str() );
 }

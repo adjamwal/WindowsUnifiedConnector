@@ -1,13 +1,7 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.17)
 
-add_library (pmlib "src/PackageManager.cpp" 
-    "include/IPmConfig.h" 
-    "include/IPmPlatformConfiguration.h" 
-    "include/IPmPlatformComponentManager.h" 
-    "include/IPmPlatformDependencies.h" 
-    "include/PmConfig.h" 
-    "src/PmConfig.cpp" 
-    "include/PmTypes.h" "include/IPmCloud.h" "include/PmCloud.h" "src/PmCloud.cpp" "include/IPmManifest.h" "include/PmManifest.h" "src/PmManifest.cpp" "include/IPackageManager.h" "include/PackageManagerContainer.h" "src/PackageManagerContainer.cpp")
+file(GLOB_RECURSE pmlib_sources ./**.cpp ./**.h)
+add_library (pmlib ${pmlib_sources})
 
 target_include_directories(pmlib 
     PRIVATE "include" ${CMAKE_BINARY_DIR} ${jsoncpp_INCLUDE_DIRS}

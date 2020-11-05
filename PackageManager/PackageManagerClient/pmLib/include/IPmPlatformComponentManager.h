@@ -1,10 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
-struct PmPackage;
-struct PmPackageConfigration;
+struct PmComponent;
+struct PackageConfigInfo;
 struct PmInstalledPackage;
+struct PackageInventory;
 
 /**
  * @file IPmPlatformComponentManager.h
@@ -23,7 +26,7 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    virtual int32_t GetInstalledPackages( PmInstalledPackage* packages, size_t& packagesLen ) = 0;
+    virtual int32_t GetInstalledPackages( PackageInventory& packages ) = 0;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:
@@ -35,7 +38,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was installed. -1 otherwise
      */
-    virtual int32_t InstallComponent( const PmPackage& package ) = 0;
+    virtual int32_t InstallComponent( const PmComponent& package ) = 0;
 
     /**
      * @brief This API will be used to update a package. The package will provide the following:
@@ -48,7 +51,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was updated. -1 otherwise
      */
-    virtual int32_t UpdateComponent( const PmPackage& package ) = 0;
+    virtual int32_t UpdateComponent( const PmComponent& package, std::string& error ) = 0;
 
     /**
      * @brief This API will be used to remove a package. The package will provide the following:
@@ -60,7 +63,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was removed. -1 otherwise
      */
-    virtual int32_t UninstallComponent( const PmPackage& package ) = 0;
+    virtual int32_t UninstallComponent( const PmComponent& package ) = 0;
 
     /**
      * @brief This API will be used to deploy a configuration file for a package. The configuration will provide the 
@@ -71,5 +74,15 @@ public:
      *
      * @return 0 if the configuration was deployed. -1 otherwise
      */
-    virtual int32_t DeployConfiguration( const PmPackageConfigration& config ) = 0;
+    virtual int32_t DeployConfiguration( const PackageConfigInfo& config ) = 0;
+
+    /**
+     * @brief This API will be used to resolve the config file path
+     *   The config path could be absolute
+     *   The config path could be relative to the base path
+     *   The config path could contain platform specific content ( Windows KNOWN_FOLDER_ID )
+     *
+     * @return string containing the absolute path where the file should be deployed
+     */
+    virtual std::string ResolvePath( const std::string& basePath, const std::string& configPath ) = 0;
 };

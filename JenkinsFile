@@ -29,7 +29,7 @@ def SetGithubFailureStatus() {
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
   powershell ".\\AmpRepositorySync.exe -cws ."
-  powershell ".\\AmpRepositorySync.exe -cc latest"
+  powershell ".\\AmpRepositorySync.exe -cc latest --vs2019"
 }
 
 def SetupVersion( boolean upgrade ) {
@@ -189,10 +189,9 @@ pipeline {
             script {
               SetGithubPendingStatus()
               dir('WindowsUnifiedConnector') {
-                //TODO: Enable unit tests when we have them
-                // bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x86\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
-                // bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console Win32\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\Test*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console Win32\\Debug\\ComponentTest*.exe /logger:trx /Platform:x86 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && vstest.console x64\\Debug\\ComponentTest*.exe /logger:trx /Platform:x64 /TestAdapterPath:packages\\GoogleTestAdapter.0.18.0\\build\\_common"
               }                
             }

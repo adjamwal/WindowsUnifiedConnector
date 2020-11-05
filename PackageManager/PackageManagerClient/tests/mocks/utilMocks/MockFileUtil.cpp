@@ -4,6 +4,7 @@ MockFileUtil::MockFileUtil() :
     m_defaultString( "" )
 {
     MakeReadFileReturn( m_defaultString );
+    MakeGetTempDirReturn( m_defaultString );
 }
 
 MockFileUtil::~MockFileUtil()
@@ -42,7 +43,6 @@ void MockFileUtil::ExpectCloseFileNotCalled()
     EXPECT_CALL( *this, CloseFile( _ ) ).Times( 0 );
 }
 
-
 void MockFileUtil::MakeAppendFileReturn( int32_t value )
 {
     ON_CALL( *this, AppendFile( _, _, _ ) ).WillByDefault( Return( value ) );
@@ -51,4 +51,44 @@ void MockFileUtil::MakeAppendFileReturn( int32_t value )
 void MockFileUtil::ExpectAppendFileNotCalled()
 {
     EXPECT_CALL( *this, AppendFile( _, _, _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeGetTempDirReturn( std::string value )
+{
+    ON_CALL( *this, GetTempDir() ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectGetTempDirNotCalled()
+{
+    EXPECT_CALL( *this, GetTempDir() ).Times( 0 );
+}
+
+void MockFileUtil::MakeDeleteFileReturn( int32_t value )
+{
+    ON_CALL( *this, DeleteFile( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectDeleteFileNotCalled()
+{
+    EXPECT_CALL( *this, DeleteFile( _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeRenameReturn( int32_t value )
+{
+    ON_CALL( *this, Rename( _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectRenameNotCalled()
+{
+    EXPECT_CALL( *this, Rename( _, _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeFileExistsReturn( bool value )
+{
+    ON_CALL( *this, FileExists ( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectFileExistsNotCalled()
+{
+    EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
 }

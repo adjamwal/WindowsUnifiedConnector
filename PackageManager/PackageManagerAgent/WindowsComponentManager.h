@@ -1,12 +1,17 @@
 #pragma once
 
 #include "IPmPlatformComponentManager.h"
+#include "IUcLogger.h"
+#include "IWinApiWrapper.h"
+#include "ICodesignVerifier.h"
+#include <string>
+#include <Windows.h>
 
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
 public:
-    WindowsComponentManager() {}
-    virtual ~WindowsComponentManager() {}
+    WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codeSignVerifier );
+    virtual ~WindowsComponentManager();
 
     /**
      * @brief This API is used to retrieve the list of all installed packages on the client. The package manager
@@ -14,10 +19,7 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    int32_t GetInstalledPackages( PmInstalledPackage* packages, size_t& packagesLen ) override
-    {
-        return -1;
-    }
+    int32_t GetInstalledPackages( PackageInventory& packages ) override;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:
@@ -29,10 +31,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was installed. -1 otherwise
      */
-    int32_t InstallComponent( const PmPackage& package ) override
-    {
-        return -1;
-    }
+    int32_t InstallComponent( const PmComponent& package ) override;
 
     /**
      * @brief This API will be used to update a package. The package will provide the following:
@@ -45,10 +44,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was updated. -1 otherwise
      */
-    int32_t UpdateComponent( const PmPackage& package ) override
-    {
-        return -1;
-    }
+    int32_t UpdateComponent( const PmComponent& package, std::string& error ) override;
 
     /**
      * @brief This API will be used to remove a package. The package will provide the following:
@@ -60,10 +56,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was removed. -1 otherwise
      */
-    int32_t UninstallComponent( const PmPackage& package ) override
-    {
-        return -1;
-    }
+    int32_t UninstallComponent( const PmComponent& package ) override;
 
     /**
      * @brief This API will be used to deploy a configuration file for a package. The configuration will provide the
@@ -74,9 +67,23 @@ public:
      *
      * @return 0 if the configuration was deployed. -1 otherwise
      */
-    int32_t DeployConfiguration( const PmPackageConfigration& config ) override
-    {
-        return -1;
-    }
+    int32_t DeployConfiguration( const PackageConfigInfo& config ) override;
+
+    /**
+     * @brief This API will be used to resolve the config file path
+     *   The config path could be absolute
+     *   The config path could be relative to the base path
+     *   The config path could contain platform specific content ( Windows KNOWN_FOLDER_ID )
+     *
+     * @return string containing the absolute path where the file should be deployed
+     */
+    std::string ResolvePath( const std::string& basePath, const std::string& configPath ) override;
+
+private:
+    IWinApiWrapper& m_winApiWrapper;
+    ICodesignVerifier& m_codeSignVerifier;
+
+    int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
+    PmInstalledPackage BuildUcPackage();
 };
 

@@ -98,7 +98,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)SharedLibs\libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -116,7 +116,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)SharedLibs\libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -134,7 +134,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)SharedLibs\libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -152,7 +152,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)SharedLibs\libLogger;$(solutiondir)SharedLibs\LibVerifier</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
