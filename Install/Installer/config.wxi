@@ -18,6 +18,7 @@
     <?define UCIDDirectory = "UCID" ?>
     <?define UCPMDirectory = "UCPM" ?>
     <?define UCConfigDirectory = "Configuration" ?>
+    <?define UCLogDirectory = "UC" ?>
 
     <!-- Config File Information -->
     <?define UCServiceConfigName = "UCService_config.json" ?>

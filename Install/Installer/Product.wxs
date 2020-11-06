@@ -85,6 +85,8 @@
     </Fragment>
 
     <Fragment>
+        <Property Id="UC_LOG_DIRECTORY" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.UCLogDirectory)" />
+        <Property Id="UCID_LOG_DIRECTORY" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.UnifiedConnectorDirectory)" />
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
@@ -98,6 +100,9 @@
                                Key="Software\Cisco\SecureXYZ\UnifiedConnector" 
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
+                <util:RemoveFolderEx On="uninstall" Property="UC_LOG_DIRECTORY" />
+                <!-- TODO: Remove this after UCID moves their logs to the common directory -->
+                <util:RemoveFolderEx On="uninstall" Property="UCID_LOG_DIRECTORY" />
             </Component>
         </ComponentGroup>
     </Fragment>
