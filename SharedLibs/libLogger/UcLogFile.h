@@ -3,6 +3,7 @@
 #include "IUcLogFile.h"
 #include <string>
 #include <mutex>
+#include <filesystem>
 
 class UcLogFile : public IUcLogFile
 {
@@ -20,7 +21,7 @@ public:
     void Deinit();
 
 private:
-    std::wstring m_logFileName;
+    std::filesystem::path m_logFileName;
     std::mutex m_mutex;
     FILE* m_file;
     uint32_t m_lastTick;
@@ -30,8 +31,9 @@ private:
     static const uint32_t DEFAULT_MAX_FILE_SIZE = 52428800;
     static const uint32_t DEFAULT_MAX_LOGFILES = 10;
 
-    std::wstring GenerateFileName( const wchar_t* logname );
+    std::filesystem::path GenerateFileName( const wchar_t* logname );
     bool CreateLogFile();
     void RotateLogs();
     void CleanLogs();
+    std::wstring GetProgramDataFolder();
 };

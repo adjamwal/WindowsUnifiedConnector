@@ -3,6 +3,9 @@
 #include <Windows.h>
 #include <processenv.h>
 #include <set>
+#include <initguid.h>
+#include <KnownFolders.h>
+#include <ShlObj.h>
 
 UcLogFile::UcLogFile() :
     m_logFileName( L"" )
@@ -109,9 +112,25 @@ void UcLogFile::Deinit()
     }
 }
 
-std::wstring UcLogFile::GenerateFileName( const wchar_t* logname )
+std::wstring UcLogFile::GetProgramDataFolder()
 {
-    std::wstring filename;
+    PWSTR path = NULL;
+    std::wstring programData;
+
+    HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
+
+    if( SUCCEEDED( hr ) ) {
+        programData = path;
+        CoTaskMemFree( path );
+        path = NULL;
+    }
+
+    return programData;
+}
+
+std::filesystem::path UcLogFile::GenerateFileName( const wchar_t* logname )
+{
+    std::filesystem::path filename;
 
     if( logname ) {
         filename = logname;
@@ -119,9 +138,18 @@ std::wstring UcLogFile::GenerateFileName( const wchar_t* logname )
     else {
         WCHAR swPath[ MAX_PATH + 5 ] = { 0 };
         DWORD dwSize = GetModuleFileName( NULL, swPath, MAX_PATH );
+        std::wstring modulePath = swPath;
 
-        if( dwSize ) {
-            filename = swPath;
+        filename = GetProgramDataFolder();
+        filename /= L"Cisco";
+        filename /= L"UC";
+
+        if( dwSize && ( modulePath.find_last_of( '\\' ) != std::wstring::npos ) ) {
+            modulePath = modulePath.substr( modulePath.find_last_of( '\\' ) + 1 );
+            filename /= modulePath;
+        }
+        else {
+            filename /= L"UnknownApplication";
         }
 
         filename += L".log";
@@ -132,7 +160,10 @@ std::wstring UcLogFile::GenerateFileName( const wchar_t* logname )
 
 bool UcLogFile::CreateLogFile()
 {
-    if( ( m_file == NULL ) && m_logFileName.length() ) {
+    if( ( m_file == NULL ) && !m_logFileName.empty() ) {
+        if( !std::filesystem::exists( m_logFileName.parent_path() ) ) {
+            std::filesystem::create_directories( m_logFileName.parent_path() );
+        }
         m_file = _wfsopen( m_logFileName.c_str(), L"a+", SH_DENYNO );
     }
 
@@ -149,8 +180,11 @@ void UcLogFile::RotateLogs()
                 struct tm tm;
                 WCHAR tstr[ 64 ];
                 time_t now;
-                std::wstring archiveFilePath = m_logFileName.substr( 0, m_logFileName.length() - 4 ); // strip off .log
+                std::wstring archiveFilePath;
                 BOOL bRotateSucceeded = FALSE;
+
+                archiveFilePath = m_logFileName.c_str();
+                archiveFilePath = archiveFilePath.substr( 0, archiveFilePath.length() - 4 ); // strip off .log
 
                 now = time( NULL );
                 localtime_s( &tm, &now );
@@ -178,7 +212,8 @@ void UcLogFile::CleanLogs()
 {
     std::set<std::wstring> logFileSet;
 
-    std::wstring strSearchPath = m_logFileName.substr( 0, m_logFileName.length() - 4 ); // strip off .log
+    std::wstring strSearchPath = m_logFileName.c_str();
+    strSearchPath = strSearchPath.substr( 0, strSearchPath.length() - 4 ); // strip off .log
     strSearchPath.append( L"_*" );
 
     WIN32_FIND_DATA FindFileData;
