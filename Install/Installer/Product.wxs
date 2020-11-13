@@ -15,6 +15,14 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
+        <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+        <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
+        <InstallExecuteSequence>
+          <Custom Action="DetectInvalidSideGrade" Before="FindRelatedProducts">
+            WIX_UPGRADE_DETECTED
+          </Custom>
+        </InstallExecuteSequence>
+      
         <!--=
         AllowSameVersionUpgrades:
         When set to no (the default), installing a product with the same version and upgrade code (but different product code) is allowed and treated by MSI as two products. 
@@ -36,11 +44,11 @@
         -->
         <MajorUpgrade AllowDowngrades="no"
 					  AllowSameVersionUpgrades="yes"
-                      Schedule="afterInstallExecute"
+            Schedule="afterInstallExecute"
 					  DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         
         <MediaTemplate EmbedCab="yes" />
-
+    
         <Feature Id="UnifiedConnector" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentGroupRef Id="UnifiedConnectorComponents"/>
             <ComponentGroupRef Id="UCServiceComponents" />
