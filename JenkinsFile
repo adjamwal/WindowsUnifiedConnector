@@ -225,15 +225,12 @@ pipeline {
                 
                 bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
                 bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe"
                 
                 bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
                 bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
-                bat "COPY x64\\Release\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
               }
               
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
             }
           }
         }
@@ -257,11 +254,9 @@ pipeline {
                 
                 bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
                 bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                bat "RENAME x64\\Release\\Cisco-UC-Installer.exe Cisco-UC-Installer-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.exe"
               }
 
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.exe', fingerprint: true
             }
           }
         }
