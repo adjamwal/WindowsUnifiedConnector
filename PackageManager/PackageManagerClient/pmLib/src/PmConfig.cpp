@@ -13,26 +13,52 @@ PmConfig::~PmConfig()
 {
 }
 
-int32_t PmConfig::Load( const std::string& filename )
+int32_t PmConfig::LoadBsConfig( const std::string& bsConfig )
 {
     int rtn = -1;
     std::lock_guard<std::mutex> lock( m_mutex );
     
-    std::string config = m_fileUtil.ReadFile( filename );
+    std::string bsData = m_fileUtil.ReadFile( bsConfig );
 
-    rtn = ParseConfig( config );
+    rtn = ParseBsConfig( bsData );
 
     if( rtn != 0 ) {
-        LOG_ERROR( "Failed to parse %s", filename.c_str() );
-        config = m_fileUtil.ReadFile( filename + ".bak" );
+        LOG_ERROR( "Failed to parse %s", bsConfig.c_str() );
+        bsData = m_fileUtil.ReadFile( bsConfig + ".bak" );
 
-        rtn = ParseConfig( config );
+        rtn = ParseBsConfig( bsData );
 
         if( rtn == 0 ) {
             //replace current file with backup?
         }
         else {
-            LOG_ERROR( "Failed to parse %s", ( filename + ".bak" ).c_str() );
+            LOG_ERROR( "Failed to parse %s", (bsConfig + ".bak" ).c_str() );
+        }
+    }
+
+    return rtn;
+}
+
+int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
+{
+    int rtn = -1;
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    std::string pmData = m_fileUtil.ReadFile( pmConfig );
+
+    rtn = ParsePmConfig( pmData );
+
+    if ( rtn != 0 ) {
+        LOG_ERROR( "Failed to parse %s", pmConfig.c_str() );
+        pmData = m_fileUtil.ReadFile( pmConfig + ".bak" );
+
+        rtn = ParsePmConfig( pmData );
+
+        if ( rtn == 0 ) {
+            //replace current file with backup?
+        }
+        else {
+            LOG_ERROR( "Failed to parse %s", (pmConfig + ".bak").c_str() );
         }
     }
 
@@ -60,35 +86,82 @@ const std::vector<PmComponent>& PmConfig::GetSupportedComponentList()
     return m_ComponentList;
 }
 
-int32_t PmConfig::VerifyContents( const std::string& config )
+
+int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
+{
+    int rtn = -1;
+
+    std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
+    Json::Value root, pm;
+    std::string jsonError;
+
+    if ( bsConfig.empty() ) {
+        LOG_ERROR( "config contents is empty" );
+    }
+    else if ( !jsonReader->parse( bsConfig.c_str(), bsConfig.c_str() + bsConfig.length(), &root, &jsonError ) ) {
+        LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
+    }
+    else if ( VerifyBsContents( bsConfig ) != 0 ) {
+        LOG_ERROR( "Failed to verify config contents" );
+    }
+    else {
+        pm = root["pm"];
+        m_configData.cloudUri = pm["url"].asString();
+
+        rtn = 0;
+    }
+
+    return rtn;
+}
+
+int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
+{
+    int rtn = -1;
+
+    std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
+    Json::Value root, pm;
+    std::string jsonError;
+
+    if ( pmConfig.empty() ) {
+        LOG_ERROR( "config contents is empty" );
+    }
+    else if ( !jsonReader->parse( pmConfig.c_str(), pmConfig.c_str() + pmConfig.length(), &root, &jsonError ) ) {
+        LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
+    }
+    else if ( VerifyPmContents( pmConfig ) != 0 ) {
+        LOG_ERROR( "Failed to verify config contents" );
+    }
+    else {
+        pm = root["pm"];
+        m_configData.log_level = pm["loglevel"].asUInt();
+        m_configData.interval = pm["CheckinInterval"].asUInt();
+
+        rtn = 0;
+    }
+
+    return rtn;
+}
+
+int32_t PmConfig::VerifyBsContents( const std::string& bsData )
 {
     int32_t rtn = 0;
 
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root, cloud;
+    Json::Value root, pm;
     std::string jsonError;
 
-    if( config.empty() ) {
+    if( bsData.empty() ) {
         LOG_ERROR( "config contents is empty" );
         rtn = -1;
     }
-    else if( !jsonReader->parse( config.c_str(), config.c_str() + config.length(), &root, &jsonError ) ) {
+    else if( !jsonReader->parse( bsData.c_str(), bsData.c_str() + bsData.length(), &root, &jsonError ) ) {
         LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
         rtn = -1;
     }
     else {
-        cloud = root[ "cloud" ];
-        if( !cloud[ "CheckinUri" ].isString() ) {
+        pm = root[ "pm" ];
+        if( !pm[ "url" ].isString() ) {
             LOG_ERROR( "Invalid CheckinUrl" );
-            rtn = -1;
-        }
-
-        if( !cloud[ "CheckinInterval" ].isUInt() ) {
-            LOG_ERROR( "Invalid CheckinInterval" );
-            rtn = -1;
-        }
-        else if( cloud[ "CheckinInterval" ].asUInt() == 0 ) {
-            LOG_ERROR( "CheckinInterval cannot be 0" );
             rtn = -1;
         }
 
@@ -100,38 +173,59 @@ int32_t PmConfig::VerifyContents( const std::string& config )
     return rtn;
 }
 
-int32_t PmConfig::ParseConfig( const std::string& config )
+int32_t PmConfig::VerifyPmContents( const std::string& pmData )
 {
-    int rtn = -1;
+    int32_t rtn = 0;
 
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root, cloud;
+    Json::Value root, pm;
     std::string jsonError;
 
-    if( config.empty() ) {
+    if ( pmData.empty() ) {
         LOG_ERROR( "config contents is empty" );
+        rtn = -1;
     }
-    else if( !jsonReader->parse( config.c_str(), config.c_str() + config.length(), &root, &jsonError ) ) {
+    else if ( !jsonReader->parse( pmData.c_str(), pmData.c_str() + pmData.length(), &root, &jsonError ) ) {
         LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
-    }
-    else if( VerifyContents( config ) != 0) {
-        LOG_ERROR( "Failed to verify config contents" );
+        rtn = -1;
     }
     else {
-        cloud = root[ "cloud" ];
-        m_configData.cloudUri = cloud[ "CheckinUri" ].asString();
-        m_configData.interval = cloud[ "CheckinInterval" ].asUInt();
+        pm = root["pm"];
+        
+        if ( !pm["loglevel"].isUInt() ) {
+            LOG_ERROR( "Invalid loglevel" );
+            rtn = -1;
+        }
 
-        rtn = 0;
+        if ( !pm["CheckinInterval"].isUInt() ) {
+            LOG_ERROR( "Invalid CheckinInterval" );
+            rtn = -1;
+        }
+        else if ( pm["CheckinInterval"].asUInt() == 0 ) {
+            LOG_ERROR( "CheckinInterval cannot be 0" );
+            rtn = -1;
+        }
+
+        if ( rtn != 0 ) {
+            LOG_ERROR( "Invalid configuartion %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
+        }
     }
 
     return rtn;
 }
 
-int32_t PmConfig::VerifyFileIntegrity( const std::string& filename )
+int32_t PmConfig::VerifyBsFileIntegrity( const std::string& bsConfig )
 {
-    std::string config = m_fileUtil.ReadFile( filename );
+    std::string bsData = m_fileUtil.ReadFile( bsConfig );
 
-    return VerifyContents( config );
+    return VerifyBsContents( bsData );
     
+}
+
+int32_t PmConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
+{
+    std::string pmData = m_fileUtil.ReadFile( pmConfig );
+
+    return VerifyPmContents( pmData );
+
 }

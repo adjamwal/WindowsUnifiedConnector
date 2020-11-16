@@ -17,7 +17,8 @@ using namespace std::chrono_literals;
 PmAgentController::PmAgentController( ICodesignVerifier& codeSignVerifier, const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath ) :
     m_codesignVerifier( codeSignVerifier )
     , m_tstrProcessPath( rtstrPath + L"\\" + _T( PM_AGENT_BINARY ) ) 
-    , m_tstrConfigPath( rtstrConfigPath )
+    , m_tstrBsConfigPath( rtstrConfigPath + L"\\" + _T( BS_CONFIG_FILE ) )
+    , m_tstrPmConfigPath( rtstrConfigPath + L"\\" + _T( PM_CONFIG_FILE ) )
     , m_bIsProcessStartedByPlugin( false )
 {
     if( rtstrPath.empty() )
@@ -255,7 +256,7 @@ PM_STATUS PmAgentController::startProcess()
 
     // command line passed as : 'process path' + _T("--config-path") + 'process config path'
     // to provide ease if additional arguments are needed.
-    std::wstring tstrProcessArgs = m_tstrProcessPath + L" --config-path " + L"\"" + m_tstrConfigPath + L"\"";
+    std::wstring tstrProcessArgs = m_tstrProcessPath + L" --bootstrap " + L"\"" + m_tstrBsConfigPath + L"\"" + L" --config-file " + L"\"" + m_tstrPmConfigPath + L"\"";
 
     //Create a pipe for the child process's STDIN
     if( !CreatePipe( &hChildStdinRd, &m_hChildStdinWr, &saAttr, 0 ) )

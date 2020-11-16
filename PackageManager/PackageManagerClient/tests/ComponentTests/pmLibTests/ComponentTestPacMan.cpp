@@ -89,13 +89,14 @@ protected:
     void StartPacMan()
     {
         m_platformConfiguration->MakeGetSslCertificatesReturn( 0 );
-        m_config->MakeLoadReturn( 0 );
+        m_config->MakeLoadBsConfigReturn( 0 );
+        m_config->MakeLoadPmConfigReturn( 0 );
         m_config->MakeGetCloudUriReturn( m_configUrl );
         m_config->MakeGetCloudIntervalReturn( 1 );
         m_cloud->MakeDownloadFileReturn( 200 );
 
         m_patient->SetPlatformDependencies( m_deps.get() );
-        m_patient->Start( "ConfigFile" );
+        m_patient->Start( "ConfigFile", "ConfigFile" );
     }
 
     std::string m_configUrl;
@@ -311,7 +312,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
 {
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakePmCreateFileReturn( (FileUtilHandle*)1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 

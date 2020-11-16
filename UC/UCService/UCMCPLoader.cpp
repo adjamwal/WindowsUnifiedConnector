@@ -121,17 +121,12 @@ void UCMCPLoader::LoadControlModule()
     }
 
     std::wstring pmPath(WindowsUtilities::GetDirPath( dllFullPath ) );
-    std::wstring pmConfigFile;
-    
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"UCPM", pmConfigFile ) )
-    {
-        WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
-        return;
-    }
 
-    if( !WindowsUtilities::FileExists( pmConfigFile.c_str() ) )
+    std::wstring pmConfigPath;
+
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"path", pmConfigPath ) )
     {
-        WLOG_ERROR( L"PackageManager Control Module configuration file not found: %s", pmConfigFile.c_str() );
+        WLOG_ERROR( L"Failed to read config path from registry" );
         return;
     }
 
@@ -166,7 +161,7 @@ void UCMCPLoader::LoadControlModule()
         WLOG_ERROR( L"Failed to set option PM_MODULE_OPTION_LOG_LEVEL", result );
     }
 
-    if( ( result = m_context.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_context.fpStart( pmPath.c_str(), pmPath.c_str(), pmConfigPath.c_str() ) ) != PM_MODULE_SUCCESS )
     {
         WLOG_ERROR( L"Failed to start PackageManager Control Module: fpStart() returned %d.", result );
         return;

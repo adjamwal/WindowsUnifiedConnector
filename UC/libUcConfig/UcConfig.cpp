@@ -5,8 +5,6 @@
 #include "WindowsUtilities.h"
 #include "json\json.h"
 
-#define UC_CONFIG_FILENAME  L"UCService_config.json"
-
 UcConfig::UcConfig() :
     m_logLevel( ( uint32_t )DEFAULT_LOG_LEVEL )
     , m_fileModifyTime( 0 )
@@ -38,7 +36,7 @@ bool UcConfig::LoadConfig()
             m_fileModifyTime = modifyTime;
             Json::Value root = GetJsonFromFile( m_path );
 
-            m_logLevel = root[ "uc_service" ][ "log_level" ].asInt();
+            m_logLevel = root[ "uc" ][ "loglevel" ].asInt();
             rtn = true;
         }
     }
@@ -83,10 +81,10 @@ Json::Value UcConfig::GetJsonFromFile( const std::wstring& path )
         jsonError = std::string( __FUNCTION__ ) + ": " + jsonError;
         throw( std::exception(  jsonError.c_str()  ) );
     }
-    else if( !root.isMember( "uc_service" ) ) {
+    else if( !root.isMember( "uc" ) ) {
         throw( std::exception( __FUNCTION__ ": missing uc_service element" ) );
     }
-    else if( !root[ "uc_service" ][ "log_level" ].isInt() ) {
+    else if( !root[ "uc" ][ "loglevel" ].isInt() ) {
         throw( std::exception( __FUNCTION__ ": log_level is missing or invalid" ) );
     }
 

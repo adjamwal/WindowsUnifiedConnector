@@ -32,11 +32,12 @@ public:
         IWorkerThread& thread );
     virtual ~PackageManager();
 
-    int32_t Start( const char* configFile ) override;
+    int32_t Start( const char* bsConfigFile, const char* pmConfigFile ) override;
     int32_t Stop() override;
 
     void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) override;
-    int32_t VerifyPacManConfig( const char* configFile ) override;
+    int32_t VerifyBsConfig( const char* bsConfigFile ) override;
+    int32_t VerifyPmConfig( const char* pmConfigFile ) override;
 
 private:
     IPmConfig& m_config;
@@ -48,13 +49,15 @@ private:
     IManifestProcessor& m_manifestProcessor;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
-    std::string m_configFilename;
+    std::string m_bsConfigFile;
+    std::string m_pmConfigFile;
 
     IPmPlatformDependencies* m_dependencies;
     std::vector<PmInstalledPackage> m_packages;
 
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
-    bool PmLoadConfig();
+    bool LoadBsConfig();
+    bool LoadPmConfig();
     bool PmSendEvent( const PmEvent& event );
 };

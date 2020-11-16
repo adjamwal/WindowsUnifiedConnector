@@ -50,23 +50,38 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
         return 1;
     }
 
+    std::wstring bsConfigFile;
+    std::wstring pmConfigFile;
+
+    // --bootstrap " + L"\"" + m_tstrBsConfigPath + L"\"" + L" --config-path
     int i = 0;
     for( i = 0; i < argc; i++ ) {
-        if( std::wstring( _T( "--config-path" ) ) == argv[ i ] ) {
+        if( std::wstring( _T( "--bootstrap" ) ) == argv[ i ] ) {
             if( ++i < argc ) {
+                WLOG_DEBUG( L"bs config file %ls", argv[i] );
+                bsConfigFile = argv[i];
                 //TODO: Validate config?
-                break;
             }
             else {
-                LOG_ERROR( "config file not provided" );
+                LOG_ERROR( "bs config file not provided" );
+                return 1;
+            }
+        }
+        else if ( std::wstring( _T( "--config-file" ) ) == argv[i] )
+        {
+            if ( ++i < argc ) {
+                WLOG_DEBUG( L"pm config file %ls", argv[i] );
+                pmConfigFile = argv[i];
+                //TODO: Validate config?
+            }
+            else {
+                LOG_ERROR( "pm config file not provided" );
                 return 1;
             }
         }
     }
 
-    WLOG_DEBUG( L"Config file %s", argv[ i ] );
-    std::wstring configFile = argv[ i ];
-    PmAgentContainer agentContainer( configFile );
+    PmAgentContainer agentContainer( bsConfigFile, pmConfigFile );
     agentContainer.pmAgent().Start();
 
     //Wait for termination signal from parent process

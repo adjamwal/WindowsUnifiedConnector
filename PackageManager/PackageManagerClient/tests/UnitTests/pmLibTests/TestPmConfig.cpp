@@ -21,55 +21,79 @@ protected:
         m_fileUtil.reset();
     }
 
-    void MakeLoadReadFileSucceed()
-    {
-        m_fileUtil->MakeReadFileReturn( R"(
+    const std::string bsConfigData = R"(
 {
-    "cloud": {
-        "CheckinUri": "https://packagemanager.cisco.com/checkin",
-        "CheckinInterval": 1000
-    }
+	"pm": {
+		"url": "https://packagemanager.cisco.com/checkin"
+	}
 }
-)" );
-    }
+)";
+
+    const std::string pmConfigData = R"(
+{
+	"pm": {
+		"loglevel": 7,
+		"CheckinInterval": 300000
+	}
+}
+)";
 
     std::unique_ptr<MockFileUtil> m_fileUtil;
     std::unique_ptr<PmConfig> m_patient;
 };
 
-TEST_F( TestPmConfig, LoadWillReadFile )
+TEST_F( TestPmConfig, LoadWillReadBsFile )
 {
-    std::string filename( "Some file" );
-    MakeLoadReadFileSucceed();
+    std::string bsfilename( "bs file" );
+    
+    m_fileUtil->MakeReadFileReturn( bsConfigData );
 
-    EXPECT_CALL( *m_fileUtil, ReadFile( filename ) );
+    EXPECT_CALL( *m_fileUtil, ReadFile( bsfilename ) );
 
-    m_patient->Load( filename );
+    m_patient->LoadBsConfig( bsfilename );
+}
+
+TEST_F( TestPmConfig, LoadWillReadPmFile )
+{
+    std::string pmfilename( "pm file" );
+
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
+
+    EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
+
+    m_patient->LoadPmConfig( pmfilename );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveCloudUri )
 {
-    MakeLoadReadFileSucceed();
+    m_fileUtil->MakeReadFileReturn( bsConfigData );
 
-    m_patient->Load( "filename" );
+    m_patient->LoadBsConfig( "filename" );
 
     EXPECT_EQ( m_patient->GetCloudUri(), "https://packagemanager.cisco.com/checkin" );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveInterval )
 {
-    MakeLoadReadFileSucceed();
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
 
-    m_patient->Load( "filename" );
+    m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_EQ( m_patient->GetCloudInterval(), 1000 );
+    EXPECT_EQ( m_patient->GetCloudInterval(), 300000 );
 }
 
-TEST_F( TestPmConfig, LoadWillSucceed )
+TEST_F( TestPmConfig, LoadBsConfigWillSucceed )
 {
-    MakeLoadReadFileSucceed();
+    m_fileUtil->MakeReadFileReturn( bsConfigData );
 
-    EXPECT_EQ( m_patient->Load( "filename" ), 0 );
+    EXPECT_EQ( m_patient->LoadBsConfig( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, LoadPmConfigWillSucceed )
+{
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
+
+    EXPECT_EQ( m_patient->LoadPmConfig( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, LoadWillTryBackupFile )
@@ -81,45 +105,56 @@ TEST_F( TestPmConfig, LoadWillTryBackupFile )
     EXPECT_CALL( *m_fileUtil, ReadFile( filename ) ).WillOnce( Return( "" ) );
     EXPECT_CALL( *m_fileUtil, ReadFile( filename + ".bak" ) ).WillOnce( Return( "" ) );
 
-    m_patient->Load( filename );
+    m_patient->LoadPmConfig( filename );
 }
 
-TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceed )
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceed )
 {
-    MakeLoadReadFileSucceed();
+    m_fileUtil->MakeReadFileReturn( bsConfigData );
 
-    EXPECT_EQ( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+    EXPECT_EQ( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillFailOnEmptyContents )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceed )
+{
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
+
+    EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceedWillFailOnEmptyContents )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
-    EXPECT_NE( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+    EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWillFailOnEmptyContents )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidJson )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
-    "cloud": {
-        "CheckinUri": "https://packagemanager.cisco.com/checkin"
-    }
+    "wrong": { }
 )" );
 
-    EXPECT_NE( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+    EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
-    "cloud": {
-        "CheckinUri": 1,
-        "CheckinInterval": 1000
-    }
+	"pm": {
+		"url": 1
+	}
 }
 )" );
 
-    EXPECT_NE( m_patient->VerifyFileIntegrity( "filename" ), 0 );
+    EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
