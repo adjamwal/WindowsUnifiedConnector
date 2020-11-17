@@ -233,7 +233,8 @@ PM_STATUS CodeSignToPmStatus( CodesignStatus status )
 PM_STATUS PmAgentController::startProcess()
 {
     auto status = PM_STATUS::PM_ERROR;
-    TCHAR tszCmdline[ MAX_PATH ] = { 0 };
+    const DWORD dwCmdlineLen = 1024;
+    TCHAR tszCmdline[ dwCmdlineLen ] = { 0 };
     DWORD bRetStatus = -1;
 
     //Verify CodeSign
@@ -283,7 +284,11 @@ PM_STATUS PmAgentController::startProcess()
     siStartInfo.hStdInput = hChildStdinRd;
     siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-    wcscpy_s( tszCmdline, MAX_PATH, tstrProcessArgs.c_str() );
+    if( wcscpy_s( tszCmdline, dwCmdlineLen, tstrProcessArgs.c_str() ) != 0 ) {
+        LOG_ERROR( "wcscpy_s failure" );
+        status = PM_STATUS::PM_INSUFFICIENT_BUFFER;
+        goto graceful_exit;
+    }
 
     WLOG_DEBUG( L"StartingProcess: %s", tszCmdline );
     // Create the child process.
