@@ -24,7 +24,8 @@ int32_t PmManifest::ParseManifest( const std::string& manifestJson )
     m_ComponentList.clear();
 
     if( manifestJson.empty() ) {
-        LOG_ERROR( "manifest contents is empty" );
+        LOG_DEBUG( "manifest contents is empty" );
+        rtn = 0;
     }
     else if( !jsonReader->parse( manifestJson.c_str(), manifestJson.c_str() + manifestJson.length(), &root, &jsonError ) ) {
         LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
@@ -36,6 +37,10 @@ int32_t PmManifest::ParseManifest( const std::string& manifestJson )
                     AddPackage( root[ "packages" ][ i ] );
                 }
 
+                rtn = 0;
+            }
+            else if( root[ "packages" ].isNull() ) {
+                LOG_DEBUG( "manifest contents is empty" );
                 rtn = 0;
             }
             else {
