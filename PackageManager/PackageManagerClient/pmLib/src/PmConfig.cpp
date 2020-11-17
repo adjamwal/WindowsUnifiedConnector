@@ -65,6 +65,8 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
         }
     }
 
+    GetPMLogger()->SetLogLevel( (IPMLogger::Severity)m_configData.log_level );
+
     return rtn;
 }
 
