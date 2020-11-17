@@ -64,11 +64,12 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         LOG_ERROR( "Platform dependencies not provided. Cannot start Package Manager" );
     }
     else {
+        if ( !LoadPmConfig() ) {
+            LOG_DEBUG( "Failed to load Pm configuration" );
+        }
+
         if( !LoadBsConfig() ) {
             LOG_ERROR( "Failed to load Bs configuration" );
-        }
-        else if ( !LoadPmConfig() ) {
-            LOG_ERROR( "Failed to load Pm configuration" );
         }
         else if( PmThreadWait() == std::chrono::microseconds( 0 ) ) {
             LOG_ERROR( "PM Interval not configured" );
@@ -130,11 +131,6 @@ std::chrono::milliseconds PackageManager::PmThreadWait()
 void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
-
-    if( !LoadBsConfig() ) {
-        LOG_ERROR( "Failed to load PM configuration" );
-        //Send event? might fail without a config/cloudURL
-    }
 
     if ( !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );

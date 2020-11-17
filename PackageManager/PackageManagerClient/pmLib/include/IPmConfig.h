@@ -18,5 +18,6 @@ public:
     virtual int32_t VerifyPmFileIntegrity( const std::string& pmConfig ) = 0;
     virtual const std::string& GetCloudUri() = 0;
     virtual uint32_t GetCloudInterval() = 0;
+    virtual uint32_t GetLogLevel() = 0;
     virtual const std::vector<PmComponent>& GetSupportedComponentList() = 0;
 };

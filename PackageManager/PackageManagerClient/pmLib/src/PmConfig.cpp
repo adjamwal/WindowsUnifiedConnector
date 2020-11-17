@@ -59,6 +59,9 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
         }
         else {
             LOG_ERROR( "Failed to parse %s", (pmConfig + ".bak").c_str() );
+
+            m_configData.interval = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
         }
     }
 
@@ -77,6 +80,13 @@ uint32_t PmConfig::GetCloudInterval()
     std::lock_guard<std::mutex> lock( m_mutex );
 
     return m_configData.interval;
+}
+
+uint32_t PmConfig::GetLogLevel()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.log_level;
 }
 
 const std::vector<PmComponent>& PmConfig::GetSupportedComponentList()

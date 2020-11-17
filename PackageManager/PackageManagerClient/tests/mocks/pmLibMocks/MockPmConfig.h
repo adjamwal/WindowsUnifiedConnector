@@ -34,6 +34,10 @@ public:
     void MakeGetCloudIntervalReturn( uint32_t value );
     void ExpectGetCloudIntervalIsNotCalled();
 
+    MOCK_METHOD0( GetLogLevel, uint32_t() );
+    void MakeGetLogLevelReturn( uint32_t value );
+    void ExpectGetLogLevelIsNotCalled();
+
     MOCK_METHOD0( GetSupportedComponentList, const std::vector<PmComponent>&() );
     void MakeGetSupportedComponentListReturn( const std::vector<PmComponent>& value );
     void ExpectGetSupportedComponentListIsNotCalled();

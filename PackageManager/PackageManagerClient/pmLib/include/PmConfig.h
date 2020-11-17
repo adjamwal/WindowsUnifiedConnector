@@ -3,6 +3,9 @@
 #include "IPmConfig.h"
 #include <mutex>
 
+#define PM_CONFIG_LOGLEVEL_DEFAULT 7
+#define PM_CONFIG_INTERVAL_DEFAULT 300000
+
 class IFileUtil;
 
 struct PmConfigData
@@ -24,6 +27,7 @@ public:
     int32_t VerifyPmFileIntegrity( const std::string& pmConfig ) override;
     const std::string& GetCloudUri() override;
     uint32_t GetCloudInterval() override;
+    uint32_t GetLogLevel() override;
     const std::vector<PmComponent>& GetSupportedComponentList() override;
 
 private:

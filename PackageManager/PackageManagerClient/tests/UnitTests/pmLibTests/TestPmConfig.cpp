@@ -158,3 +158,21 @@ TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
 
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
+
+TEST_F( TestPmConfig, LoadSetDefaulInterval )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetCloudInterval(), PM_CONFIG_INTERVAL_DEFAULT );
+}
+
+TEST_F( TestPmConfig, LoadSetDefaulLogLevel )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetLogLevel(), PM_CONFIG_LOGLEVEL_DEFAULT );
+}
