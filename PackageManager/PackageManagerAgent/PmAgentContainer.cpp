@@ -11,7 +11,7 @@
 #include "WinCertLoader.h"
 #include "WinApiWrapper.h"
 
-PmAgentContainer::PmAgentContainer( const std::wstring& configFilePath ) :
+PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath ) :
     m_winApiWrapper( new WinApiWrapper() ) 
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer(new CodesignVerifier())
@@ -19,7 +19,7 @@ PmAgentContainer::PmAgentContainer( const std::wstring& configFilePath ) :
     , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer ) )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
     , m_pmLogger( new PmLogAdapter() )
-    , m_pmAgent( new PmAgent( configFilePath, *m_pmDependencies, *m_pmLogger ) )
+    , m_pmAgent( new PmAgent( bsConfigFilePath, pmConfigFilePath, *m_pmDependencies, *m_pmLogger ) )
 {
 }
 

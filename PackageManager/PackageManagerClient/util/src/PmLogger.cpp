@@ -13,6 +13,8 @@ public:
     virtual void Log( Severity serverity, const wchar_t* msgFormatter, ... ) override;
     virtual void Log( Severity serverity, const char* msgFormatter, va_list args ) override;
     virtual void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) override;
+
+    virtual void SetLogLevel( Severity serverity ) override;
 };
 
 static DefaultPMLogger defaultLogger;
@@ -93,6 +95,11 @@ void DefaultPMLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_l
     printf( "\n" );
     fflush( stdout );
 #endif
+}
+
+void DefaultPMLogger::SetLogLevel( Severity serverity )
+{
+
 }
 
 IPMLogger* GetPMLogger()

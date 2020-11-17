@@ -118,6 +118,10 @@ void ServiceBase::Start( DWORD dwArgc, PWSTR* pszArgv )
         WLOG_ERROR( L"Service failed to start, error %d", dwError );
         SetServiceStatus( SERVICE_STOPPED, dwError );
     }
+    catch ( std::exception& ex )
+    {
+        LOG_ERROR( "Service failed to start: %s", ex.what() );
+    }
     catch( ... )
     {
         WLOG_ERROR( L"Service failed to start." );

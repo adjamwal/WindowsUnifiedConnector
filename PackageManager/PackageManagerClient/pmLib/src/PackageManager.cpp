@@ -51,20 +51,25 @@ PackageManager::~PackageManager()
 
 }
 
-int32_t PackageManager::Start( const char* configFile )
+int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFile )
 {
     int32_t rtn = -1;
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_configFilename = configFile;
+    m_bsConfigFile = bsConfigFile;
+    m_pmConfigFile = pmConfigFile;
 
     if( !m_dependencies ) {
         LOG_ERROR( "Platform dependencies not provided. Cannot start Package Manager" );
     }
     else {
-        if( !PmLoadConfig() ) {
-            LOG_ERROR( "Failed to load PM configuration" );
+        if ( !LoadPmConfig() ) {
+            LOG_DEBUG( "Failed to load Pm configuration" );
+        }
+
+        if( !LoadBsConfig() ) {
+            LOG_ERROR( "Failed to load Bs configuration" );
         }
         else if( PmThreadWait() == std::chrono::microseconds( 0 ) ) {
             LOG_ERROR( "PM Interval not configured" );
@@ -127,7 +132,7 @@ void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    if( !PmLoadConfig() ) {
+    if ( !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
         //Send event? might fail without a config/cloudURL
     }
@@ -152,9 +157,14 @@ void PackageManager::PmWorkflowThread()
 
 }
 
-bool PackageManager::PmLoadConfig()
+bool PackageManager::LoadBsConfig()
 {
-    return m_config.Load( m_configFilename ) == 0;
+    return m_config.LoadBsConfig( m_bsConfigFile ) == 0;
+}
+
+bool PackageManager::LoadPmConfig()
+{
+    return m_config.LoadPmConfig( m_pmConfigFile ) == 0;
 }
 
 bool PackageManager::PmSendEvent( const PmEvent& event )
@@ -162,7 +172,12 @@ bool PackageManager::PmSendEvent( const PmEvent& event )
     return false;
 }
 
-int32_t PackageManager::VerifyPacManConfig( const char* configFile )
+int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
 {
-    return m_config.VerifyFileIntegrity( configFile );
+    return m_config.VerifyBsFileIntegrity( bsConfigFile );
+}
+
+int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )
+{
+    return m_config.VerifyPmFileIntegrity( pmConfigFile );
 }

@@ -3,12 +3,16 @@
 #include "IPmConfig.h"
 #include <mutex>
 
+#define PM_CONFIG_LOGLEVEL_DEFAULT 7
+#define PM_CONFIG_INTERVAL_DEFAULT 300000
+
 class IFileUtil;
 
 struct PmConfigData
 {
     std::string cloudUri;
     uint32_t interval;
+    uint32_t log_level;
 };
 
 class PmConfig : public IPmConfig
@@ -17,10 +21,13 @@ public:
     PmConfig( IFileUtil& fileUtil );
     ~PmConfig();
 
-    int32_t Load( const std::string& filename ) override;
-    int32_t VerifyFileIntegrity( const std::string& filename ) override;
+    int32_t LoadBsConfig( const std::string& bsConfig ) override;
+    int32_t LoadPmConfig( const std::string& pmConfig ) override;
+    int32_t VerifyBsFileIntegrity( const std::string& bsConfig ) override;
+    int32_t VerifyPmFileIntegrity( const std::string& pmConfig ) override;
     const std::string& GetCloudUri() override;
     uint32_t GetCloudInterval() override;
+    uint32_t GetLogLevel() override;
     const std::vector<PmComponent>& GetSupportedComponentList() override;
 
 private:
@@ -30,6 +37,9 @@ private:
     std::vector<PmComponent> m_ComponentList;
     std::mutex m_mutex;
 
-    int32_t ParseConfig( const std::string& config );
-    int32_t VerifyContents( const std::string& config );
+    int32_t ParseBsConfig( const std::string& bsConfig );
+    int32_t ParsePmConfig( const std::string& pmConfig );
+
+    int32_t VerifyBsContents( const std::string& bsConfig );
+    int32_t VerifyPmContents( const std::string& pmConfig );
 };

@@ -16,6 +16,8 @@
 #include "PmTypes.h"
 
 #define PM_AGENT_BINARY "UC_PM.exe"
+#define BS_CONFIG_FILE "bs.json"
+#define PM_CONFIG_FILE "pm.json"
 
 class ICodesignVerifier;
 
@@ -28,7 +30,7 @@ public:
     */
     PmAgentController( ICodesignVerifier& codesignVerifier, 
         const std::wstring& rtstrPath, 
-        const std::wstring& rtstrConfigPath );
+        const std::wstring& rtstrConfigPath);
 
     ~PmAgentController();
     /**
@@ -56,7 +58,8 @@ private:
 
     ICodesignVerifier& m_codesignVerifier;
     std::wstring m_tstrProcessPath;
-    std::wstring m_tstrConfigPath;
+    std::wstring m_tstrBsConfigPath;
+    std::wstring m_tstrPmConfigPath;
     std::thread m_threadMonitor;
     bool m_bIsProcessStartedByPlugin;
     std::mutex m_mutex;

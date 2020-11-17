@@ -16,7 +16,7 @@ public:
     void Log( Severity serverity, const char* msgFormatter, va_list args ) override;
     void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) override;
 
-    void SetLogLevel( Severity logLevel );
+    void SetLogLevel( Severity logLevel ) override;
 
 private:
     Severity m_logLevel;

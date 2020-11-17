@@ -28,16 +28,24 @@ protected:
 
 const std::string configData = R"(
 {
-	"uc_service": {
-		"log_level": 7
+	"uc": {
+		"loglevel": 7
 	}
 }
 )";
 
 const std::string invalidConfigData = R"(
 {
-	"uc_service": {
-		"log_level": 7
+	"lmao": {
+		"lol": 7
+	}
+}
+)";
+
+const std::string invalidConfigDataBrackets = R"(
+{
+	"uc": {
+		"loglevel": 7
 	}
 )";
 
@@ -60,7 +68,7 @@ TEST_F( TestUcConfig, LoadWillFailOnInvalidJson )
 {
     m_windowsUtils->MakeFileExistsReturn( true );
     m_windowsUtils->MakeGetFileModifyTimeReturn( 1 );
-    m_windowsUtils->MakeReadFileContentsReturn( invalidConfigData );
+    m_windowsUtils->MakeReadFileContentsReturn( invalidConfigDataBrackets );
     
     EXPECT_FALSE( m_patient->LoadConfig() );
 }
@@ -73,7 +81,7 @@ TEST_F( TestUcConfig, LoadInvalidConfigWillResetLogLevel )
     m_patient->LoadConfig();
 
     m_windowsUtils->MakeGetFileModifyTimeReturn( 2 );
-    m_windowsUtils->MakeReadFileContentsReturn( invalidConfigData );
+    m_windowsUtils->MakeReadFileContentsReturn( invalidConfigDataBrackets );
     m_patient->LoadConfig();
 
     EXPECT_EQ( m_patient->GetLogLevel(), ( uint32_t )IUcLogger::LOG_ERROR );
@@ -98,7 +106,7 @@ TEST_F( TestUcConfig, VerifyWillSucceed )
 
 TEST_F( TestUcConfig, VerifyWillFailOnInvalidJson )
 {
-    m_windowsUtils->MakeReadFileContentsReturn( invalidConfigData );
+    m_windowsUtils->MakeReadFileContentsReturn( invalidConfigDataBrackets );
 
     EXPECT_FALSE( m_patient->VerifyConfig( L"file.json" ) );
 }

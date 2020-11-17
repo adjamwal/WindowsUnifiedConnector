@@ -31,27 +31,51 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
         return 1;
     }
 
+    std::wstring bsConfigFile;
+    std::wstring pmConfigFile;
+
+    // --bootstrap " + L"\"" + m_tstrBsConfigPath + L"\"" + L" --config-path
     int i = 0;
-    for( i = 0; i < argc; i++ ) {
-        if( std::wstring( _T( "--config-path" ) ) == argv[ i ] ) {
-            if( ++i < argc ) {
+    for ( i = 0; i < argc; i++ ) {
+        if ( std::wstring( _T( "--bootstrap" ) ) == argv[i] ) {
+            if ( ++i < argc ) {
+                WLOG_DEBUG( L"bs config file %ls", argv[i] );
+                bsConfigFile = argv[i];
                 //TODO: Validate config?
-                break;
             }
             else {
-                LOG_ERROR( "config file not provided" );
+                LOG_ERROR( "bs config file not provided" );
+                return 1;
+            }
+        }
+        else if ( std::wstring( _T( "--config-file" ) ) == argv[i] )
+        {
+            if ( ++i < argc ) {
+                WLOG_DEBUG( L"pm config file %ls", argv[i] );
+                pmConfigFile = argv[i];
+                //TODO: Validate config?
+            }
+            else {
+                LOG_ERROR( "pm config file not provided" );
                 return 1;
             }
         }
     }
 
-    WLOG_DEBUG( L"Config file %s", argv[ i ] );
+    PmAgentContainer agentContainer( L"", L"" );
+    int32_t rtn = agentContainer.pmAgent().VerifyBsConfig( bsConfigFile );
 
-    std::wstring configFile = argv[ i ];
-    PmAgentContainer agentContainer( L"" );
-    int32_t rtn = agentContainer.pmAgent().VerifyConfig( configFile );
+    LOG_DEBUG( "Verify Bs: %d", rtn );
 
-    LOG_DEBUG( "Exit %d", rtn );
+    if ( rtn == 0)
+    {
+        rtn = agentContainer.pmAgent().VerifyPmConfig( pmConfigFile );
+
+        LOG_DEBUG( "Verify Pm %d", rtn );
+    }
+    
+    LOG_DEBUG( "Exit: %d", rtn );
+
     return rtn;
 }
 

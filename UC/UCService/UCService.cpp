@@ -37,6 +37,17 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
 {
     WLOG_DEBUG( L"in OnStart" );
 
+    std::wstring bsConfigFile;
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"Bootstrapper", bsConfigFile ) )
+    {
+        throw std::exception( "Failed to read bootstrapper config path from registry");
+    }
+
+    if ( !WindowsUtilities::FileExists( bsConfigFile.c_str() ) )
+    {
+        throw std::exception( "Boostrapper config file not found" );
+    }
+
     try
     {
         m_ucidLoader.LoadControlModule();

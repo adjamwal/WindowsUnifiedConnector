@@ -21,9 +21,10 @@
     <?define UCLogDirectory = "UC" ?>
 
     <!-- Config File Information -->
-    <?define UCServiceConfigName = "UCService_config.json" ?>
-    <?define UCIDConfigName = "config.xml" ?>
-    <?define UCPMConfigName = "PM_MCP_config.json" ?>
+    <?define BootstrapperConfigName = "bs.json" ?>
+    <?define UCServiceConfigName = "uc.json" ?>
+    <?define UCIDConfigName = "id.json" ?>
+    <?define UCPMConfigName = "pm.json" ?>
 
     <!-- Registry key name used to store installation location -->
     <?define InstallNameKey = "Unified Connector" ?>
