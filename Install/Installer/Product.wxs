@@ -333,7 +333,7 @@
             
             <Component Id="C.Registry.UCIDConfig" Guid="*">
                 <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCIDConfigName)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]UCID_config.xml" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
@@ -361,6 +361,11 @@
             <!-- UCID Config Management -->
             <Component Id="C.UCIDConfigName" NeverOverwrite="yes">
                 <File Id="id.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\id.json" />
+            </Component>
+
+            <!-- Old UCID Config Management that is needed until UCID siwtches to new configs -->
+            <Component Id="C.UCIDXmlConfig">
+                <File Id="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\UCID_config.xml" />
             </Component>
 
             <!-- UCPM Config Management -->
