@@ -7,6 +7,7 @@
 
 #include "UCService.h"
 #include "WindowsUtilities.h"
+#include "ThrowAway_UcidConfigGenerator.h"
 
 #pragma region Service Constructor and Destructor
 
@@ -47,6 +48,9 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
     {
         throw std::exception( "Boostrapper config file not found" );
     }
+
+    //THROW AWAY HACK TILL UCID LOADS BS.JSON
+    ThrowAway_GenerateUcidConfig();
 
     try
     {
