@@ -73,6 +73,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestUcConfig", "UC\TestUcCo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWindowsPackageManager", "PackageManager\TestWindowsPackageManager\TestWindowsPackageManager.vcxproj", "{08529A1F-8D5F-4746-A253-717FF483D3FC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstallerCustomActions", "Install\InstallerCustomActions\InstallerCustomActions.vcxproj", "{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -229,6 +231,12 @@ Global
 		{08529A1F-8D5F-4746-A253-717FF483D3FC}.Release|x64.Build.0 = Release|x64
 		{08529A1F-8D5F-4746-A253-717FF483D3FC}.Release|x86.ActiveCfg = Release|Win32
 		{08529A1F-8D5F-4746-A253-717FF483D3FC}.Release|x86.Build.0 = Release|Win32
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}.Debug|x64.ActiveCfg = Debug|Win32
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}.Debug|x86.ActiveCfg = Debug|Win32
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}.Debug|x86.Build.0 = Debug|Win32
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}.Release|x64.ActiveCfg = Release|Win32
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}.Release|x86.ActiveCfg = Release|Win32
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -258,6 +266,7 @@ Global
 		{BC4968FB-5FCC-4BAB-9647-74B9FB741E81} = {D99E33CC-A481-41A0-A01C-C5F04722912D}
 		{5EE37648-C251-49DF-A95B-9237929C1195} = {BC4968FB-5FCC-4BAB-9647-74B9FB741E81}
 		{08529A1F-8D5F-4746-A253-717FF483D3FC} = {443D3CE9-D446-4D25-A448-AB318FB397F9}
+		{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334} = {8D41A511-A1F1-4475-A898-B343F79FF2BA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}
