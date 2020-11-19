@@ -17,7 +17,8 @@ using namespace std::chrono_literals;
 PmAgentController::PmAgentController( ICodesignVerifier& codeSignVerifier, const std::wstring& rtstrPath, const std::wstring& rtstrConfigPath ) :
     m_codesignVerifier( codeSignVerifier )
     , m_tstrProcessPath( rtstrPath + L"\\" + _T( PM_AGENT_BINARY ) ) 
-    , m_tstrConfigPath( rtstrConfigPath )
+    , m_tstrBsConfigPath( rtstrConfigPath + L"\\" + _T( BS_CONFIG_FILE ) )
+    , m_tstrPmConfigPath( rtstrConfigPath + L"\\" + _T( PM_CONFIG_FILE ) )
     , m_bIsProcessStartedByPlugin( false )
 {
     if( rtstrPath.empty() )
@@ -232,7 +233,8 @@ PM_STATUS CodeSignToPmStatus( CodesignStatus status )
 PM_STATUS PmAgentController::startProcess()
 {
     auto status = PM_STATUS::PM_ERROR;
-    TCHAR tszCmdline[ MAX_PATH ] = { 0 };
+    const DWORD dwCmdlineLen = 1024;
+    TCHAR tszCmdline[ dwCmdlineLen ] = { 0 };
     DWORD bRetStatus = -1;
 
     //Verify CodeSign
@@ -255,7 +257,7 @@ PM_STATUS PmAgentController::startProcess()
 
     // command line passed as : 'process path' + _T("--config-path") + 'process config path'
     // to provide ease if additional arguments are needed.
-    std::wstring tstrProcessArgs = m_tstrProcessPath + L" --config-path " + L"\"" + m_tstrConfigPath + L"\"";
+    std::wstring tstrProcessArgs = m_tstrProcessPath + L" --bootstrap " + L"\"" + m_tstrBsConfigPath + L"\"" + L" --config-file " + L"\"" + m_tstrPmConfigPath + L"\"";
 
     //Create a pipe for the child process's STDIN
     if( !CreatePipe( &hChildStdinRd, &m_hChildStdinWr, &saAttr, 0 ) )
@@ -282,7 +284,11 @@ PM_STATUS PmAgentController::startProcess()
     siStartInfo.hStdInput = hChildStdinRd;
     siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-    wcscpy_s( tszCmdline, MAX_PATH, tstrProcessArgs.c_str() );
+    if( wcscpy_s( tszCmdline, dwCmdlineLen, tstrProcessArgs.c_str() ) != 0 ) {
+        LOG_ERROR( "wcscpy_s failure" );
+        status = PM_STATUS::PM_INSUFFICIENT_BUFFER;
+        goto graceful_exit;
+    }
 
     WLOG_DEBUG( L"StartingProcess: %s", tszCmdline );
     // Create the child process.

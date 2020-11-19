@@ -36,7 +36,7 @@ uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
     struct _stat stFileInfo = { 0 };
     _wstat( filename, &stFileInfo );
 
-    return stFileInfo.st_mtime;
+    return ( uint32_t )stFileInfo.st_mtime;
 }
 
 bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)

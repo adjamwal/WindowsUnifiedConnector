@@ -29,7 +29,7 @@ public:
      *
      * @return 0 on success, -1 otherwise
      */
-    virtual int32_t Start( const char* configFile ) = 0;
+    virtual int32_t Start( const char* bsConfigFile, const char* pmConfigFile ) = 0;
 
     /**
      * @brief Stops the package manager
@@ -44,12 +44,20 @@ public:
      */
     virtual void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) = 0;
 
+
+    /**
+     * @brief Verifies the bootstrapper config file
+     *
+     * @param[in] configFile - Path to the configuration file.
+     */
+    virtual int32_t VerifyBsConfig( const char* bsConfigFile ) = 0;
+
     /**
      * @brief Verifies the package mamanger config file
      *
      * @param[in] configFile - Path to the configuration file.
      */
-    virtual int32_t VerifyPacManConfig( const char* configFile ) = 0;
+    virtual int32_t VerifyPmConfig( const char* pmConfigFile ) = 0;
 };
 
 /**

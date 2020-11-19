@@ -6,6 +6,7 @@
     <UC_PATH>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</UC_PATH>
     <WORKSPACE_PATH>$([System.IO.Path]::GetFullPath('$(UC_PATH)..\'))</WORKSPACE_PATH>
     <IMN_COMMON>$([System.IO.Path]::GetFullPath('$(WORKSPACE_PATH)common\'))</IMN_COMMON>
+    <VC_VARS_PATH>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build</VC_VARS_PATH>
   </PropertyGroup>
   <ItemGroup>
     <BuildMacro Include="IMN_COMMON">
@@ -14,6 +15,10 @@
     </BuildMacro>
 	<BuildMacro Include="WLHBASE">
       <Value>$(WLHBASE)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+	<BuildMacro Include="VC_VARS_PATH">
+      <Value>$(VC_VARS_PATH)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

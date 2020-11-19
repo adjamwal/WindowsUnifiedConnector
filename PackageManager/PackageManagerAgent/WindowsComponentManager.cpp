@@ -77,7 +77,19 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
     {
         if ( package.installerType == "exe" )
         {
-            ret = RunPackage( package.installerPath, package.installerArgs, error );
+            std::string exeCmdline;
+            size_t idx = package.installerPath.find_last_of( '\\' );
+            if( idx != std::string::npos ) {
+                exeCmdline = package.installerPath.substr( idx + 1 );
+            }
+            else {
+                exeCmdline = package.installerPath;
+            }
+
+            exeCmdline += " ";
+            exeCmdline += package.installerArgs;
+
+            ret = RunPackage( package.installerPath, exeCmdline, error );
         }
         else if ( package.installerType == "msi" )
         {
@@ -88,7 +100,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
             {
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.installerPath + "\" /quiet";
+                msiCmdline = " /package \"" + package.installerPath + "\" /quiet " + package.installerArgs;
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }

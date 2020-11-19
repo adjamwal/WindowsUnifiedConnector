@@ -38,3 +38,8 @@ void PmLogAdapter::Log( Severity serverity, const wchar_t* msgFormatter, va_list
 {
     GetUcLogger()->Log( ( IUcLogger::Severity )serverity, msgFormatter, args );
 }
+
+void PmLogAdapter::SetLogLevel( Severity severity )
+{
+    GetUcLogger()->SetLogLevel( (IUcLogger::Severity)severity );
+}

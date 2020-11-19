@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+	<Bundle Name="TestPackageBootstrapper" Version="1.0.0.0" Manufacturer="TestPackage" UpgradeCode="9e071419-5b19-41e8-a68c-aa52b8a6b1a5">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+
+        <Variable Name="FAIL" bal:Overridable="yes"/>
+
+        <Chain>
+            <MsiPackage Id="Installer32" InstallCondition='NOT VersionNT64' SourceFile="..\TestPackage\bin\x86\$(var.Configuration)\TestPackage.msi">
+                <MsiProperty Name="FAIL" Value="[FAIL]" />
+            </MsiPackage>
+            <MsiPackage Id="Installer64" InstallCondition='VersionNT64' SourceFile="..\TestPackage\bin\x64\$(var.Configuration)\TestPackage.msi">
+                <MsiProperty Name="FAIL" Value="[FAIL]" />
+            </MsiPackage>
+		</Chain>
+	</Bundle>
+</Wix>

@@ -15,7 +15,7 @@ class IWinApiWrapper;
 class PmAgentContainer
 {
 public:
-    PmAgentContainer( const std::wstring& configFilePath );
+    PmAgentContainer( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath );
     ~PmAgentContainer();
 
     PmAgent& pmAgent();

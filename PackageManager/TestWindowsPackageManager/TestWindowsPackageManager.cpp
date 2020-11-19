@@ -7,6 +7,7 @@
 #include "MockCodesignVerifier.h"
 #include "MockWindowsUtilities.h"
 #include <memory>
+#include <codecvt>
 
 using ::testing::StrEq;
 
@@ -50,6 +51,43 @@ TEST_F( TestWindowsPackageManager, UpdateComponentSuccess )
 
     EXPECT_EQ( ret, 0 );
     EXPECT_EQ( error, "" );
+}
+
+TEST_F( TestWindowsPackageManager, UpdateExeWillAddExeToCmdLine )
+{
+    std::string error;
+    PmComponent c;
+    c.installerType = "exe";
+    c.installerArgs = " /args";
+    c.installerPath = "update.exe";
+    std::string expectedCmdLine = c.installerPath + " " + c.installerArgs;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+
+    EXPECT_CALL( *m_mockWinApiWrapper, CreateProcessW( _, StrEq( wExpectedCmdLine ), _, _, _, _, _, _, _, _ ) );
+
+    m_patient->UpdateComponent( c, error );
+}
+
+TEST_F( TestWindowsPackageManager, UpdateExeWillAddExeAndDropPath )
+{
+    std::string error;
+    PmComponent c;
+    c.installerType = "exe";
+    c.installerArgs = " /args";
+    std::string updateExe = "update.exe";
+    c.installerPath = "path\\" + updateExe;
+    std::string expectedCmdLine = updateExe + " " + c.installerArgs;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+
+    EXPECT_CALL( *m_mockWinApiWrapper, CreateProcessW( _, StrEq( wExpectedCmdLine ), _, _, _, _, _, _, _, _ ) );
+
+    m_patient->UpdateComponent( c, error );
 }
 
 TEST_F( TestWindowsPackageManager, UpdateComponentInvalidPackageType )

@@ -20,6 +20,8 @@ public:
     virtual void Log( Severity serverity, const wchar_t* msgFormatter, ... ) override;
     virtual void Log( Severity serverity, const char* msgFormatter, va_list args ) override;
     virtual void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) override;
+
+    virtual void SetLogLevel( Severity severity ) override;
 };
 
 static DefaultUCLogger defaultLogger;
@@ -112,6 +114,11 @@ void DefaultUCLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_l
     printf( "\n" );
     fflush( stdout );
 #endif
+}
+
+void DefaultUCLogger::SetLogLevel( Severity severity )
+{
+
 }
 
 UcLogger::UcLogger( IUcLogFile& logFile ) :

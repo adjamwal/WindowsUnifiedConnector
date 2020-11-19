@@ -34,6 +34,17 @@ static std::string _minimalManifest( R"(
 }
 )" );
 
+static std::string _emptyManifest( R"(
+{
+}
+)" );
+
+static std::string _nullPackageManifest( R"(
+{
+  "packages": null
+}
+)" );
+
 static std::string _optionalManifest( R"(
 {
   "packages": [
@@ -183,6 +194,17 @@ TEST_F( TestPmManifest, WillGetPackageHash )
 TEST_F( TestPmManifest, WillAcceptMinimalPackage )
 {
     EXPECT_EQ( m_patient->ParseManifest( _minimalManifest ), 0 );
+}
+
+
+TEST_F( TestPmManifest, WillAcceptEmptyPackage )
+{
+    EXPECT_EQ( m_patient->ParseManifest( _emptyManifest ), 0 );
+}
+
+TEST_F( TestPmManifest, WillAcceptNullPackage )
+{
+    EXPECT_EQ( m_patient->ParseManifest( _nullPackageManifest ), 0 );
 }
 
 TEST_F( TestPmManifest, WillNotAcceptPackageWithoutRequiredFields )

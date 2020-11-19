@@ -85,6 +85,8 @@
     </Fragment>
 
     <Fragment>
+        <Property Id="UC_LOG_DIRECTORY" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.UCLogDirectory)" />
+        <Property Id="UCID_LOG_DIRECTORY" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.UnifiedConnectorDirectory)" />
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
@@ -98,6 +100,9 @@
                                Key="Software\Cisco\SecureXYZ\UnifiedConnector" 
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
+                <util:RemoveFolderEx On="uninstall" Property="UC_LOG_DIRECTORY" />
+                <!-- TODO: Remove this after UCID moves their logs to the common directory -->
+                <util:RemoveFolderEx On="uninstall" Property="UCID_LOG_DIRECTORY" />
             </Component>
         </ComponentGroup>
     </Fragment>
@@ -113,9 +118,9 @@
         
             <Component Id="UCService.exe" Guid="*">
                 <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
-                <ServiceControl Id="StartService" Name="CiscoUnifiedConnector" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+                <ServiceControl Id="StartService" Name="CiscoUnifiedConnector" Start="install" Stop="both" Remove="uninstall" Wait="no" />
                 <ServiceInstall Id="ServiceInstaller" Name="CiscoUnifiedConnector" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
-                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+                    <util:ServiceConfig RestartServiceDelayInSeconds="60" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
                 </ServiceInstall>
             </Component>
 
@@ -308,6 +313,18 @@
         <ComponentGroup Id="CG.ConfigFiles" Directory="UC_CONFIG_DIRECTORY">
             <!-- Registry Keys That point to each Config File -->
             <!-- The Registry key will still be writen if the file doesnt exist -->
+            <Component Id="C.Registry.Config" Guid="*">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                    <RegistryValue Type="string" Name="path" Value="[UC_CONFIG_DIRECTORY]" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+            
+            <Component Id="C.Registry.BSConfig" Guid="*">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                    <RegistryValue Type="string" Name="Bootstrapper" Value="[UC_CONFIG_DIRECTORY]$(var.BootstrapperConfigName)" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+            
             <Component Id="C.Registry.ServiceConfig" Guid="*">
                 <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="Service" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
@@ -316,7 +333,7 @@
             
             <Component Id="C.Registry.UCIDConfig" Guid="*">
                 <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCIDConfigName)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]UCID_config.xml" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
@@ -326,34 +343,34 @@
                 </RegistryKey>
             </Component>
 
-            <!-- UCService Config Management -->
-            <Component Id="C.UCServiceConfig" Guid="3D8A1726-FCE9-4E4A-BA9E-07F3CF732617">
-                <CopyFile Id="CF.UCServiceConfig" SourceProperty="SERVICE_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.UCServiceConfigName)"/>
-                <Condition>SERVICE_CONFIG</Condition>
+            <!-- Bootstrapper Config Management -->
+            <Component Id="C.BootstrapperConfig" Guid="3D8A1726-FCE9-4E4A-BA9E-07F3CF732617">
+                <CopyFile Id="CF.BootstrapperConfig" SourceProperty="BS_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.BootstrapperConfigName)"/>
+                <Condition>BS_CONFIG</Condition>
             </Component>
-
-            <Component Id="C.Remove.UCServiceConfig" Guid="D37A0F1E-EF10-479F-B1EF-D48D29A20086">
-                <RemoveFile Id="RF.UCServiceConfig" Name="$(var.UCServiceConfigName)" On="uninstall"/>
+            
+            <Component Id="C.Remove.BootstrapperConfig" Guid="D37A0F1E-EF10-479F-B1EF-D48D29A20086">
+                <RemoveFile Id="RF.BootstrapperConfig" Name="$(var.BootstrapperConfigName)" On="uninstall"/>
+            </Component>
+            
+            <!-- UCService Config Management -->
+            <Component Id="C.UCServiceConfig" NeverOverwrite="yes">
+                <File Id="uc.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\uc.json" />
             </Component>
             
             <!-- UCID Config Management -->
-            <Component Id="C.UCIDConfig" Guid="8D5CB96C-4577-4A84-9982-C75C61EBDBE8">
-                <CopyFile Id="CF.UCID_CONFIG" SourceProperty="ID_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.UCIDConfigName)"/>
-                <Condition>ID_CONFIG</Condition>
+            <Component Id="C.UCIDConfigName" NeverOverwrite="yes">
+                <File Id="id.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\id.json" />
             </Component>
 
-            <Component Id="C.Remove.UCIDConfig" Guid="0EB6EE70-EB3E-4154-9EFE-88C57F9F1D9C">
-                <RemoveFile Id="RF.UCIDConfig" Name="$(var.UCIDConfigName)" On="uninstall"/>
+            <!-- Old UCID Config Management that is needed until UCID siwtches to new configs -->
+            <Component Id="C.UCIDXmlConfig">
+                <File Id="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\UCID_config.xml" />
             </Component>
 
             <!-- UCPM Config Management -->
-            <Component Id="C.PMConfig" Guid="7729ECE7-B813-4971-AAA4-87C9588D6E34">
-                <CopyFile Id="CF.UCPMConfig" SourceProperty="PM_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.UCPMConfigName)"/>
-                <Condition>PM_CONFIG</Condition>
-            </Component>
-            
-            <Component Id="C.Remove.UCPMConfig" Guid="1F213970-38B3-4EB8-9E20-38ADD4EFFA31">
-                <RemoveFile Id="RF.UCPMConfig" Name="$(var.UCPMConfigName)" On="uninstall"/>
+            <Component Id="C.UCPMConfigName" NeverOverwrite="yes">
+                <File Id="pm.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\pm.json" />
             </Component>
         </ComponentGroup>
     </Fragment>

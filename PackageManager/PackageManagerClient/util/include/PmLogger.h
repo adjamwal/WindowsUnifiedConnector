@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-IPMLogger* GetPMLogger();
-
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 
 #define LOG_EMERGENCY( fmt, ... ) GetPMLogger()->Log( IPMLogger::LOG_EMERGENCY, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
