@@ -75,6 +75,8 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
             LOG_ERROR( "PM Interval not configured" );
         }
         else {
+            SetupDiscoveryPackages();
+
             m_thread.Start(
                 std::bind( &PackageManager::PmThreadWait, this ),
                 std::bind( &PackageManager::PmWorkflowThread, this )
@@ -180,4 +182,35 @@ int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
 int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )
 {
     return m_config.VerifyPmFileIntegrity( pmConfigFile );
+}
+
+void PackageManager::SetupDiscoveryPackages()
+{
+    //TODO: This should be fetched from the cloud for enterprise
+    PmDiscoveryComponent discoveryItem;
+    discoveryItem.packageId = "amp";
+    discoveryItem.packageName = "Immunet";
+    m_discoveryList.push_back( discoveryItem );
+
+    discoveryItem.packageId = "amp";
+    discoveryItem.packageName = "Cisco AMP for Endpoints Connector";
+    m_discoveryList.push_back( discoveryItem );
+
+    discoveryItem.packageId = "test-package-1";
+    discoveryItem.packageName = "TestPackage";
+    m_discoveryList.push_back( discoveryItem );
+
+    discoveryItem.packageId = "test-package-2";
+    discoveryItem.packageName = "TestPackage";
+    m_discoveryList.push_back( discoveryItem );
+
+    discoveryItem.packageId = "test-package-3";
+    discoveryItem.packageName = "TestPackage";
+    m_discoveryList.push_back( discoveryItem );
+
+    discoveryItem.packageId = "test-package-4";
+    discoveryItem.packageName = "TestPackage";
+    m_discoveryList.push_back( discoveryItem );
+
+    m_packageInventoryProvider.SetDiscoveryList( m_discoveryList );
 }

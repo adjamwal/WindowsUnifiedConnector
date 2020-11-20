@@ -618,3 +618,32 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
 
     EXPECT_TRUE( packageUpdated && configUpdated );
 }
+
+std::string _ucReponseNoPackages( R"(
+{
+  "packages": null
+}
+)" );
+
+TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
+{
+    bool pass = false;
+    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+
+    EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages )
+        {
+            EXPECT_EQ( discoveryList.size(), 6 );
+
+            pass = true;
+            m_cv.notify_one();
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+
+    EXPECT_TRUE( pass );
+}

@@ -6,6 +6,7 @@
 #include "ICodesignVerifier.h"
 #include <string>
 #include <Windows.h>
+#include <PmTypes.h>
 
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
@@ -19,7 +20,7 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    int32_t GetInstalledPackages( PackageInventory& packages ) override;
+    int32_t GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages ) override;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:
@@ -85,5 +86,7 @@ private:
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
     PmInstalledPackage BuildUcPackage();
+    PmInstalledPackage HackBuildAmpPackage();
+    void StripBuildNumber( std::string& versionString );
 };
 

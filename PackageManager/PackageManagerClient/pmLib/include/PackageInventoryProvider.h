@@ -15,10 +15,13 @@ public:
 
     void Initialize( IPmPlatformDependencies* dep ) override;
     bool GetInventory( PackageInventory& inventory ) override;
+    void SetDiscoveryList( const std::vector<PmDiscoveryComponent>& discoveryList ) override;
 
 private:
     IFileUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     std::mutex m_mutex;
+    std::vector<PmDiscoveryComponent> m_discoveryList;
+
     IPmPlatformDependencies* m_dependencies;
 };

@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "WindowsComponentManager.h"
 #include "WindowsUtilities.h"
-#include <PmTypes.h>
 #include <sstream>
 #include <locale>
 #include <codecvt>
 #include "..\..\GlobalVersion.h"
+
+#define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
 
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codesignVerifier ) :
     m_winApiWrapper( winApiWrapper ),
@@ -19,14 +20,53 @@ WindowsComponentManager::~WindowsComponentManager()
 
 }
 
-int32_t WindowsComponentManager::GetInstalledPackages( PackageInventory& packages )
+void WindowsComponentManager::StripBuildNumber( std::string& versionString )
+{
+    size_t n = std::count( versionString.begin(), versionString.end(), '.' );
+    if( n == 3 ) {
+        versionString.erase( versionString.find_last_of( "." ) );
+    }
+}
+
+int32_t WindowsComponentManager::GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, 
+    PackageInventory& packages )
 {
     packages.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
     packages.platform = "win";
     
     packages.packages.push_back( BuildUcPackage() );
 
-    //TODO: Discover other packages
+    try {
+        packages.packages.push_back( HackBuildAmpPackage() );
+    }
+    catch( std::exception ex ) {
+        LOG_ERROR( "Failed to build Amp Package: %s", ex.what() );
+    }
+
+    auto programList = WindowsUtilities::GetInstalledPrograms();
+
+    for( auto &program : programList ) {
+        for( auto &interestingItem : discoveryList ) {
+            
+            if( interestingItem.packageName == program.name ) {
+                PmInstalledPackage discoveredPackage;
+
+                LOG_DEBUG( "Found Matching package %s %s %s",
+                    interestingItem.packageId.c_str(),
+                    program.name.c_str(),
+                    program.version.c_str()
+                 );
+
+                discoveredPackage.packageName = interestingItem.packageId;
+                discoveredPackage.packageVersion = program.version;
+                //TODO: Removes the buid number. Should the cloud accept the build number?
+                StripBuildNumber( discoveredPackage.packageVersion );
+
+                packages.packages.push_back( discoveredPackage );
+                //don't break. There can be one to many relationship here
+            }
+        }
+    }
 
     return 0;
 }
@@ -40,7 +80,7 @@ PmInstalledPackage WindowsComponentManager::BuildUcPackage()
     ucPackage.packageName = "uc";
     ucPackage.packageVersion = converter.to_bytes( STRFORMATPRODVER );
     //TODO: Removes the buid number. Should the cloud accept the build number?
-    ucPackage.packageVersion.erase( ucPackage.packageVersion.find_last_of( "." ) );
+    StripBuildNumber( ucPackage.packageVersion );
 
     ucConfig.deleteConfig = false;
 
@@ -55,6 +95,40 @@ PmInstalledPackage WindowsComponentManager::BuildUcPackage()
     ucPackage.configs.push_back( ucConfig );
 
     return ucPackage;
+}
+
+PmInstalledPackage WindowsComponentManager::HackBuildAmpPackage()
+{
+    //TODO: This should be redone in Enterprise. The Discovery component should provide information on how
+    // Discover AMP
+    PmInstalledPackage ampPackage;
+    PackageConfigInfo ucConfig;
+    std::wstring displayName;
+    std::wstring displayVersion;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, IMMUNET_REG_KEY, L"DisplayName", displayName ) ) {
+        throw( std::exception( "Failed to read AMP display name" ) );
+    } 
+    else if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, IMMUNET_REG_KEY, L"DisplayVersion", displayVersion ) ) {
+        throw( std::exception( "Failed to read AMP display version" ) );
+    }
+    else {
+        if( ( displayName == L"Immunet" ) || ( displayName == L"Cisco AMP for Endpoints Connector" ) ) {
+            ampPackage.packageName = "amp";
+        }
+        else {
+            std::string error = "Unexpected display name: ";
+            error += converter.to_bytes( displayName );;
+            throw( std::exception( error.c_str() ) );
+        }
+
+        ampPackage.packageVersion = converter.to_bytes( displayVersion );
+        //TODO: Removes the buid number. Should the cloud accept the build number?
+        StripBuildNumber( ampPackage.packageVersion );
+
+    }
+    return ampPackage;
 }
 
 int32_t WindowsComponentManager::InstallComponent( const PmComponent& package )

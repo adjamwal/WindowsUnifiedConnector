@@ -6,8 +6,8 @@
 class IPmPlatformDependencies;
 
 struct PackageConfigInfo;
-struct PmInstalledPackage;
 struct PackageInventory;
+struct PmDiscoveryComponent;
 
 class IPackageInventoryProvider
 {
@@ -17,4 +17,5 @@ public:
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
     virtual bool GetInventory( PackageInventory& inventory) = 0;
+    virtual void SetDiscoveryList( const std::vector<PmDiscoveryComponent>& discoveryList ) = 0;
 };
