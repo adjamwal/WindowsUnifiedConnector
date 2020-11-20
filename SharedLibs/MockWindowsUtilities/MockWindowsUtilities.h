@@ -4,10 +4,15 @@
 #include "gmock/gmock.h"
 #include <string>
 #include <mutex>
+#include <vector>
+#include "WindowsUtilities.h"
 
 class MockWindowsUtilities
 {
 public:
+    MockWindowsUtilities();
+    ~MockWindowsUtilities();
+
     MOCK_METHOD1( FileExists, bool( const WCHAR* ) );
     void MakeFileExistsReturn( bool value );
     void ExpectFileExistsIsNotCalled();
@@ -44,14 +49,17 @@ public:
     void MakeGetSysDirectoryReturn( bool value );
     void ExpectGetSysDirectoryIsNotCalled();
 
+    MOCK_METHOD0( GetInstalledPrograms, std::vector<WindowsUtilities::WindowsInstallProgram>() );
+    void MakeGetInstalledProgramsReturn( std::vector<WindowsUtilities::WindowsInstallProgram>& value );
+    void ExpectGetInstalledProgramsIsNotCalled();
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();
 
 private:
-    MockWindowsUtilities();
-    ~MockWindowsUtilities();
-
     static MockWindowsUtilities* s_mock;
     static std::mutex s_mutex;
+
+    std::vector<WindowsUtilities::WindowsInstallProgram> m_defaultDiscoveryList;
 };

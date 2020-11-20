@@ -29,13 +29,14 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 {
     bool rtn = false;
     PackageInventory detectedPackages;
+
     std::lock_guard<std::mutex> lock( m_mutex );
 
     if( !m_dependencies ) {
         return false;
     }
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( detectedPackages ) == 0 ) {
+    if( m_dependencies->ComponentManager().GetInstalledPackages( m_discoveryList, detectedPackages ) == 0 ) {
         for( auto &package : detectedPackages.packages ) {
             for( auto it = package.configs.begin(); it < package.configs.end(); it++ ) {
                 if( m_fileUtil.FileExists( it->path ) ) {
@@ -53,4 +54,11 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
     }
 
     return rtn;
+}
+
+void PackageInventoryProvider::SetDiscoveryList( const std::vector<PmDiscoveryComponent>& discoveryList )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    m_discoveryList = discoveryList;
 }

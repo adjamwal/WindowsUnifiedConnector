@@ -18,6 +18,7 @@ class IWorkerThread;
 struct PmComponent;
 struct PmEvent;
 struct PmInstalledPackage;
+struct PmDiscoveryComponent;
 
 class PackageManager : public IPackageManager
 {
@@ -54,10 +55,12 @@ private:
 
     IPmPlatformDependencies* m_dependencies;
     std::vector<PmInstalledPackage> m_packages;
+    std::vector<PmDiscoveryComponent> m_discoveryList;
 
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
     bool LoadBsConfig();
     bool LoadPmConfig();
     bool PmSendEvent( const PmEvent& event );
+    void SetupDiscoveryPackages();
 };

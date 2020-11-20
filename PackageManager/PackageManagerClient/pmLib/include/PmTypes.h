@@ -40,3 +40,9 @@ struct PackageInventory
     std::string platform;
     std::vector<PmInstalledPackage> packages;
 };
+
+struct PmDiscoveryComponent
+{
+    std::string packageId;
+    std::string packageName;
+};

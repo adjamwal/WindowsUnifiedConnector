@@ -4,6 +4,7 @@
 #include <codecvt>
 #include <fstream>
 #include <ShlObj.h>
+#include <Msi.h>
 
 bool WindowsUtilities::FileExists(const WCHAR* filename)
 {
@@ -131,4 +132,39 @@ bool WindowsUtilities::GetSysDirectory( std::string& path )
     }
     
     return ret;
+}
+
+#define GUID_SIZE 39
+std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstalledPrograms()
+{
+    DWORD dwIndex = 0;
+    DWORD dwStatus = ERROR_SUCCESS;
+    static const DWORD max_size = 1024;
+    DWORD cchdata = max_size;
+    wchar_t data[ max_size ] = { 0 };
+    wchar_t szProductCode[ GUID_SIZE ] = { 0 };
+    std::vector<WindowsInstallProgram> list;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    do {
+        WindowsInstallProgram item;
+        memset( szProductCode, 0, sizeof( szProductCode ) );
+        dwStatus = MsiEnumProducts( dwIndex, szProductCode );
+        if( dwStatus != ERROR_SUCCESS ) {
+            break;
+        }
+
+        cchdata = max_size;
+        if( MsiGetProductInfo( szProductCode, INSTALLPROPERTY_PRODUCTNAME, data, &cchdata ) == 0 ) {
+            item.name = converter.to_bytes( data );
+            cchdata = max_size;
+            if( MsiGetProductInfoW( szProductCode, INSTALLPROPERTY_VERSIONSTRING, data, &cchdata ) == 0 ) {
+                item.version = converter.to_bytes( data );
+                list.push_back( item );
+            }
+        }
+        dwIndex++;
+    } while( dwStatus == ERROR_SUCCESS );
+
+    return list;
 }
