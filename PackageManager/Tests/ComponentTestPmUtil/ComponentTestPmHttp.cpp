@@ -54,7 +54,7 @@ TEST_F( ComponentTestPmHttp, DISABLED__CanPostToCheckinURL )
     m_patient->SetToken( "v2.public.eyJVQ0lEIjoiNDI2Y2JjMjYtOTlmMS00ZTA1LTgzMTYtMmVkN2YwODk4OGYyIiwiYmlkIjoiZGVtby1idXMtaWQiLCJleHAiOiIyMDIwLTEwLTE2VDE3OjUxOjEzWiIsImlhdCI6IjIwMjAtMTAtMTZUMTc6NDY6MTNaIiwiaXNzIjoiQ2lzY28gSWRlbnRpdHkgU2VydmljZXMiLCJqdGkiOiIxNjAyODcwMzczLjE2MDI4NzAzNzMxNzc4OTgxNjYuMTExMTI4MDc2MTQ3MjYyODMiLCJuYmYiOiIyMDIwLTEwLTE2VDE3OjQ2OjEzWiJ9XuVulBsLgElQyA4S6NL4RuG7_6uKzkiiNyYa5jbSYx-rRQ4dPlsTLd5IFes1RzFUm7PVwxwJdeF5QfgY4BGGAg.eyJraWQiOiJrZXktZCJ9" );
     
     // TODO: Will need to change this to the real thing
-    m_patient->HttpPost( "https://z0w2hzsjcg.execute-api.us-west-1.amazonaws.com/dev/checkin", "{}", 3, response, rtn );
+    m_patient->HttpPost( "https://z0w2hzsjcg.execute-api.us-west-1.amazonaws.com/dev/checkin", ( void* )"{}", 3, response, rtn );
 
     // Expect 403 because the token has expired
     EXPECT_EQ( rtn, 403 );

@@ -18,13 +18,31 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="IFileUtil.h" />
+    <ClInclude Include="IPmHttp.h" />
+    <ClInclude Include="IPmLogger.h" />
+    <ClInclude Include="ISslUtil.h" />
+    <ClInclude Include="IWorkerThread.h" />
+    <ClInclude Include="PmHttp.h" />
+    <ClInclude Include="PmLogger.h" />
+    <ClInclude Include="SslUtil.h" />
+    <ClInclude Include="WorkerThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="PmHttp.cpp" />
+    <ClCompile Include="PmLogger.cpp" />
+    <ClCompile Include="SslUtil.cpp" />
+    <ClCompile Include="WorkerThread.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{934a27fe-d684-45d0-b901-562f44e4d66f}</ProjectGuid>
-    <RootNamespace>PackageManagerAgent</RootNamespace>
+    <ProjectGuid>{3e610c4d-e8cc-4cfc-a64f-e46b25b554e5}</ProjectGuid>
+    <RootNamespace>PmUtil</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>WinPackageManagerAgent</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -91,12 +109,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -110,12 +126,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -129,12 +143,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -148,12 +160,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -163,40 +173,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="IWinCertLoader.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="PmAgent.h" />
-    <ClInclude Include="PmAgentContainer.h" />
-    <ClInclude Include="PmLogAdapter.h" />
-    <ClInclude Include="UCIDApiDll.h" />
-    <ClInclude Include="WinCertLoader.h" />
-    <ClInclude Include="WindowsComponentManager.h" />
-    <ClInclude Include="WindowsConfiguraton.h" />
-    <ClInclude Include="WindowsPmDependencies.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="PmAgent.cpp" />
-    <ClCompile Include="pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="PmAgentContainer.cpp" />
-    <ClCompile Include="PmLogAdapter.cpp" />
-    <ClCompile Include="UCIDApiDll.cpp" />
-    <ClCompile Include="WinCertLoader.cpp" />
-    <ClCompile Include="WindowsComponentManager.cpp" />
-    <ClCompile Include="WindowsConfiguration.cpp" />
-    <ClCompile Include="WindowsPmDependencies.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
-      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

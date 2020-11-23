@@ -116,7 +116,7 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& com
 {
     bool rtn = true;
 
-    for each( auto config in componentPackage.configs ) {
+    for( auto config : componentPackage.configs ) {
         rtn = m_configProcessor.ProcessConfig( config );
     }
     

@@ -78,7 +78,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)$(Platform)\$(Configuration)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -97,7 +97,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)$(Platform)\$(Configuration)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -115,7 +115,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)$(Platform)\$(Configuration)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -135,7 +135,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)$(Platform)\$(Configuration)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerClient;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
