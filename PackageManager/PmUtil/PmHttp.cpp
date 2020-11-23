@@ -114,7 +114,7 @@ CURLcode PmHttp::SslCallback( CURL* curl, void* sslctx, void* param )
 PmHttp::PmHttp( IFileUtil& fileUtil ) :
     m_fileUtil( fileUtil )
     , m_curlHandle( nullptr )
-    , m_agent( "DefaultPackageManager" )
+    , m_userAgent( "DefaultPackageManager" )
     , m_headerList( nullptr )
     , m_certList( { 0 } )
 {
@@ -148,10 +148,10 @@ int32_t PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::strin
     }
 
     if( !agent.empty() ) {
-        m_agent = agent;
+        m_userAgent = agent;
     }
 
-    rtn = curl_easy_setopt( m_curlHandle, CURLOPT_USERAGENT, m_agent.c_str() );
+    rtn = curl_easy_setopt( m_curlHandle, CURLOPT_USERAGENT, m_userAgent.c_str() );
     if( rtn != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_USERAGENT failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }

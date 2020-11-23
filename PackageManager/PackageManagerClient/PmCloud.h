@@ -15,7 +15,7 @@ public:
     void SetUri( const std::string& uri ) override;
     void SetToken( const std::string& token ) override;
     void SetCerts( const PmHttpCertList& certs ) override;
-    void SetUserAgent( const std::string& agent ) override;
+    void SetUserAgent( const std::string& userAgent ) override;
     void SetShutdownFunc( std::function<bool()> shutdownFunc ) override;
     int32_t Checkin( const std::string& payload, std::string& response ) override;
     int32_t SendEvent( const std::string& payload ) override;
@@ -26,7 +26,7 @@ private:
     PmHttpCertList m_certs;
     std::string m_uri;
     std::string m_token;
-    std::string m_agent;
+    std::string m_userAgent;
     std::function<bool()> m_shutdownFunc;
     std::mutex m_mutex;
 

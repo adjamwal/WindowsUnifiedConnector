@@ -2,7 +2,6 @@
 //
 
 #include "PackageManager.h"
-#include "PmVersion.h"
 #include "PmLogger.h"
 #include "IWorkerThread.h"
 #include "IPmConfig.h"
@@ -19,12 +18,6 @@
 #include "PmTypes.h"
 
 using namespace std;
-
-void PmVersion( int& major, int& minor )
-{
-    major = PackageManager_VERSION_MAJOR;
-    minor = PackageManager_VERSION_MINOR;
-}
 
 PackageManager::PackageManager( IPmConfig& config,
     IPmCloud& cloud,

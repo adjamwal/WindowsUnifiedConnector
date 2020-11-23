@@ -4,7 +4,7 @@ PmCloud::PmCloud( IPmHttp& http )
     : m_http( http )
     , m_certs( { 0 } )
     , m_shutdownFunc( [] { return false; } )
-    , m_agent( "PakcageManager" )
+    , m_userAgent( "PakcageManager" )
 {
 }
 
@@ -30,10 +30,10 @@ void PmCloud::SetCerts( const PmHttpCertList& certs )
     m_certs = certs;
 }
 
-void PmCloud::SetUserAgent( const std::string& agent )
+void PmCloud::SetUserAgent( const std::string& userAgent )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    m_agent = agent;
+    m_userAgent = userAgent;
 }
 
 void PmCloud::SetShutdownFunc( std::function<bool()> shutdownFunc )
@@ -46,7 +46,7 @@ int32_t PmCloud::Checkin( const std::string& payload, std::string& response )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_http.Init( _ProgressCallback, this, m_agent );
+    m_http.Init( _ProgressCallback, this, m_userAgent );
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 
@@ -67,7 +67,7 @@ int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filenam
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_http.Init( _ProgressCallback, this, m_agent );
+    m_http.Init( _ProgressCallback, this, m_userAgent );
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 
