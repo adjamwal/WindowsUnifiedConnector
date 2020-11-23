@@ -13,11 +13,6 @@ public:
     ~WindowsConfiguration();
 
     /**
-     * TO be deleted? Not sure this is required
-     */
-    int32_t GetConfigFileLocation( char* filename, size_t& filenameLength ) override;
-
-    /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
@@ -39,6 +34,11 @@ public:
      *  @param[in] certificates - Number to certs in the array
      */
     void ReleaseSslCertificates( X509** certificates, size_t count ) override;
+
+    /**
+     * @brief Provides the user agent for http requests
+     */
+    std::string GetHttpUserAgent() override;
 
 private:
     IWinCertLoader& m_winCertLoader;

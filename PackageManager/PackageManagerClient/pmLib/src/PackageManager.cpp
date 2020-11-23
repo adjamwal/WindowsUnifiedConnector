@@ -6,6 +6,7 @@
 #include "PmLogger.h"
 #include "IWorkerThread.h"
 #include "IPmConfig.h"
+#include "IPmCloud.h"
 #include "PackageInventoryProvider.h"
 #include "CheckinFormatter.h"
 #include "TokenAdapter.h"
@@ -26,6 +27,7 @@ void PmVersion( int& major, int& minor )
 }
 
 PackageManager::PackageManager( IPmConfig& config,
+    IPmCloud& cloud,
     IPackageInventoryProvider& packageInventoryProvider,
     ICheckinFormatter& checkinFormatter,
     ITokenAdapter& tokenAdapter,
@@ -34,6 +36,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IManifestProcessor& manifestProcessor,
     IWorkerThread& thread ) :
     m_config( config )
+    , m_cloud( cloud )
     , m_packageInventoryProvider( packageInventoryProvider )
     , m_checkinFormatter( checkinFormatter )
     , m_tokenAdapter( tokenAdapter )
@@ -107,6 +110,12 @@ int32_t PackageManager::Stop()
     return rtn;
 }
 
+bool PackageManager::IsRunning()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    return m_thread.IsRunning();
+}
+
 void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependecies )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
@@ -118,6 +127,8 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_certsAdapter.Initialize( m_dependencies );
         m_manifestProcessor.Initialize( m_dependencies );
         m_packageInventoryProvider.Initialize( m_dependencies );
+        m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
+        m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
     }
     catch( std::exception& ex )
     {

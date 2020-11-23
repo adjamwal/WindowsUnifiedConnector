@@ -26,6 +26,16 @@ void MockPmCloud::ExpectSetCertsIsNotCalled()
     EXPECT_CALL( *this, SetCerts( _ ) ).Times( 0 );
 }
 
+void MockPmCloud::ExpectSetUserAgentIsNotCalled()
+{
+    EXPECT_CALL( *this, SetUserAgent( _ ) ).Times( 0 );
+}
+
+void MockPmCloud::ExpectSetShutdownFuncIsNotCalled()
+{
+    EXPECT_CALL( *this, SetShutdownFunc( _ ) ).Times( 0 );
+}
+
 void MockPmCloud::MakeCheckinReturn( int32_t value )
 {
     ON_CALL( *this, Checkin( _, _ ) ).WillByDefault( Return( value ) );

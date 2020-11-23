@@ -44,6 +44,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(
         new PackageManager( *m_config,
+            *m_cloud,
             *m_packageInventoryProvider,
             *m_checkinFormatter,
             *m_tokenAdapter,
