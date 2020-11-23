@@ -25,7 +25,7 @@ public:
 private:
     IFileUtil& m_fileUtil;
     CURL *m_curlHandle;
-    std::string m_agent;
+    std::string m_userAgent;
     std::mutex m_mutex;
     std::string m_token;
     struct curl_slist* m_headerList;
