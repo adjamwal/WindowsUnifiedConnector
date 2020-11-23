@@ -38,6 +38,11 @@ public:
     virtual int32_t Stop() = 0;
 
     /**
+     * @brief Checks if the package manager is running
+     * @return true if running. false otherwise
+     */
+    virtual bool IsRunning() = 0;
+    /**
      * @brief An integrator will need to supply an interface to perform platform specific functionality. This
      *   API will be used to pass that interface into the package manager. The platform dependencies must be
      *   supplied before starting the package manager

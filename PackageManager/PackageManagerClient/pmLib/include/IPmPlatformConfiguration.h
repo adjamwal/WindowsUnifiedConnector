@@ -16,11 +16,6 @@ public:
     virtual ~IPmPlatformConfiguration() {}
 
     /**
-     * TO be deleted? Not sure this is required
-     */
-    virtual int32_t GetConfigFileLocation( char* filename, size_t& filenameLength ) = 0;
-
-    /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
@@ -42,4 +37,9 @@ public:
      *  @param[in] certificates - Number to certs in the array
      */
     virtual void ReleaseSslCertificates( X509** certificates, size_t count ) = 0;
+
+    /**
+     * @brief Provides the user agent for http requests
+     */
+    virtual std::string GetHttpUserAgent() = 0;
 };

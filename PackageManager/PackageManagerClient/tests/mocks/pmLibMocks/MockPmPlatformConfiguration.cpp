@@ -2,23 +2,13 @@
 
 MockPmPlatformConfiguration::MockPmPlatformConfiguration()
 {
-    MakeGetConfigFileLocationReturn( int32_t() );
     MakeGetIdentityTokenReturn( false );
     MakeGetSslCertificatesReturn( int32_t() );
+    MakeGetHttpUserAgentReturn( m_defaultUserAgent );
 }
 
 MockPmPlatformConfiguration::~MockPmPlatformConfiguration()
 {
-}
-
-void MockPmPlatformConfiguration::MakeGetConfigFileLocationReturn( int32_t value )
-{
-    ON_CALL( *this, GetConfigFileLocation( _, _ ) ).WillByDefault( Return( value ) );
-}
-
-void MockPmPlatformConfiguration::ExpectGetConfigFileLocationIsNotCalled()
-{
-    EXPECT_CALL( *this, GetConfigFileLocation( _, _ ) ).Times( 0 );
 }
 
 void MockPmPlatformConfiguration::MakeGetIdentityTokenReturn( bool value )
@@ -46,3 +36,12 @@ void MockPmPlatformConfiguration::ExpectReleaseSslCertificatesIsNotCalled()
     EXPECT_CALL( *this, ReleaseSslCertificates( _, _ ) ).Times( 0 );
 }
 
+void MockPmPlatformConfiguration::MakeGetHttpUserAgentReturn( std::string value )
+{
+    ON_CALL( *this, GetHttpUserAgent() ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformConfiguration::ExpectGetHttpUserAgentIsNotCalled()
+{
+    EXPECT_CALL( *this, GetHttpUserAgent() ).Times( 0 );
+}

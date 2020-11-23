@@ -9,10 +9,6 @@ public:
     MockPmPlatformConfiguration();
     ~MockPmPlatformConfiguration();
 
-    MOCK_METHOD2( GetConfigFileLocation, int32_t( char*, size_t& ) );
-    void MakeGetConfigFileLocationReturn( int32_t value );
-    void ExpectGetConfigFileLocationIsNotCalled();
-
     MOCK_METHOD1( GetIdentityToken, bool( std::string& ) );
     void MakeGetIdentityTokenReturn( bool value );
     void ExpectGetIdentityTokenIsNotCalled();
@@ -24,4 +20,10 @@ public:
     MOCK_METHOD2( ReleaseSslCertificates, void( X509**, size_t ) );
     void ExpectReleaseSslCertificatesIsNotCalled();
 
+    MOCK_METHOD0( GetHttpUserAgent, std::string() );
+    void MakeGetHttpUserAgentReturn( std::string value );
+    void ExpectGetHttpUserAgentIsNotCalled();
+
+private:
+    std::string m_defaultUserAgent;
 };

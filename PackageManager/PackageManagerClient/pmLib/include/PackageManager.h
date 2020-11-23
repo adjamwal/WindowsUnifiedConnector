@@ -7,6 +7,7 @@
 #include <vector>
 
 class IPmConfig;
+class IPmCloud;
 class IPackageInventoryProvider;
 class ICheckinFormatter;
 class ITokenAdapter;
@@ -23,7 +24,8 @@ struct PmDiscoveryComponent;
 class PackageManager : public IPackageManager
 {
 public:
-    PackageManager( IPmConfig& config, 
+    PackageManager( IPmConfig& config,
+        IPmCloud& cloud,
         IPackageInventoryProvider& packageInventoryProvider,
         ICheckinFormatter& checkinFormatter,
         ITokenAdapter& tokenAdapter, 
@@ -35,13 +37,14 @@ public:
 
     int32_t Start( const char* bsConfigFile, const char* pmConfigFile ) override;
     int32_t Stop() override;
-
+    bool IsRunning() override;
     void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) override;
     int32_t VerifyBsConfig( const char* bsConfigFile ) override;
     int32_t VerifyPmConfig( const char* pmConfigFile ) override;
 
 private:
     IPmConfig& m_config;
+    IPmCloud& m_cloud;
     IPackageInventoryProvider& m_packageInventoryProvider;
     ICheckinFormatter& m_checkinFormatter;
     ITokenAdapter& m_tokenAdapter;

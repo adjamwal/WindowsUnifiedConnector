@@ -280,6 +280,7 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     si.cb = sizeof( si );
     ZeroMemory( &pi, sizeof( pi ) );
 
+    WLOG_DEBUG( L"Executing: %s, args:", exe.c_str(), cmd.c_str() );
     if ( m_winApiWrapper.CreateProcessW( &exe[0], &cmd[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi ) )
     {
         ret = m_winApiWrapper.WaitForSingleObject( pi.hProcess, 300000 );

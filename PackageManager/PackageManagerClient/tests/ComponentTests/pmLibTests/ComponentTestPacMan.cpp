@@ -52,6 +52,7 @@ protected:
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
 
         m_patient.reset( new PackageManager( *m_config,
+            *m_cloud,
             *m_packageInventoryProvider,
             *m_checkinFormatter,
             *m_tokenAdapter,
