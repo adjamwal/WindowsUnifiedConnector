@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.17)
 
-file(GLOB_RECURSE test_sources ./**.cpp ./**.h)
+file(GLOB_RECURSE test_sources ${CMAKE_SOURCE_DIR}/../Tests/TestPackageManagerClient/*.cpp ${CMAKE_SOURCE_DIR}/../Tests/TestPmUtil/*.cpp)
 add_executable(UnitTests ${test_sources})
 
 target_include_directories(UnitTests 

@@ -64,9 +64,6 @@ if(NOT DEFINED gtest_LIBRARY OR NOT DEFINED gtest_INCLUDE_DIRS)
     message( FATAL_ERROR "Missing gtest" )
 endif()
 
-# configure a header file to pass the version number only
-configure_file(PmVersion.h.in PmVersion.h)
-
 add_subdirectory( util )
 add_subdirectory( pmLib )
 
