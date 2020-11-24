@@ -3,7 +3,7 @@
   <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -21,16 +21,22 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowsUtilities.h">
+    <ClInclude Include="ICloudEventPublisher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WinApiWrapper.h">
+    <ClInclude Include="ICloudEventBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IWinApiWrapper.h">
+    <ClInclude Include="CloudEventBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnumStringConversion.h">
+    <ClInclude Include="CloudEventPublisher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IHttpAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,10 +44,13 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsUtilities.cpp">
+    <ClCompile Include="CloudEventBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WinApiWrapper.cpp">
+    <ClCompile Include="CloudEventPublisher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
