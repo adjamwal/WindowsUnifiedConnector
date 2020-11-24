@@ -28,18 +28,22 @@ CloudEventPublisher::~CloudEventPublisher()
 
 int32_t CloudEventPublisher::Publish( ICloudEventBuilder& event )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
-
     std::string eventPayload = event.Build();
+
+    return Publish( eventPayload );
+}
+
+int32_t CloudEventPublisher::Publish( const std::string& eventJson )
+{
     std::string eventResponse;
     int32_t httpReturn;
 
-    int32_t result = m_httpAdapter.HttpPost( 
-        m_eventEndpointUrl, 
-        ( void* )eventPayload.c_str(), 
-        eventPayload.length(), 
-        eventResponse, 
-        httpReturn );
+    std::lock_guard<std::mutex> lock( m_mutex );
 
-    return result;
+    return m_httpAdapter.HttpPost(
+        m_eventEndpointUrl,
+        ( void* )eventJson.c_str(),
+        eventJson.length(),
+        eventResponse,
+        httpReturn );
 }

@@ -9,4 +9,5 @@ public:
     virtual ~ICloudEventPublisher() {};
 
     virtual int32_t Publish( ICloudEventBuilder& event ) = 0;
+    virtual int32_t Publish( const std::string& eventJson ) = 0;
 };

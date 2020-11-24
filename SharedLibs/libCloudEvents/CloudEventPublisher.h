@@ -12,6 +12,7 @@ public:
     ~CloudEventPublisher();
 
     int32_t Publish( ICloudEventBuilder& event ) override;
+    int32_t Publish( const std::string& eventJson ) override;
 
 private:
     IHttpAdapter& m_httpAdapter;
