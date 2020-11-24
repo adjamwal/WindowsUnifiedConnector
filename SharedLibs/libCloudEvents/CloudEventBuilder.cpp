@@ -78,17 +78,23 @@ std::string CloudEventBuilder::Build()
 
     if( m_evtype == pkgreconfig )
     {
-        Json::Value oldfile;
-        oldfile[ "file-path" ] = m_oldPath;
-        oldfile[ "hash-sha256" ] = m_oldHash;
-        oldfile[ "size" ] = m_oldSize;
-        event[ "old" ] = oldfile;
+        if( m_oldPath.length() > 0 )
+        {
+            Json::Value oldfile;
+            oldfile[ "path" ] = m_oldPath;
+            oldfile[ "sha256" ] = m_oldHash;
+            oldfile[ "size" ] = m_oldSize;
+            event[ "old" ] = oldfile;
+        }
 
-        Json::Value newfile;
-        newfile[ "file-path" ] = m_newPath;
-        newfile[ "hash-sha256" ] = m_newHash;
-        newfile[ "size" ] = m_newSize;
-        event[ "new" ] = newfile;
+        if( m_newPath.length() > 0 )
+        {
+            Json::Value newfile;
+            newfile[ "path" ] = m_newPath;
+            newfile[ "sha256" ] = m_newHash;
+            newfile[ "size" ] = m_newSize;
+            event[ "new" ] = newfile;
+        }
     }
 
     if( m_errCode != 0 )

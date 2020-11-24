@@ -58,13 +58,18 @@ TEST_F( ComponentTestCloudEvents, EventJSONContainsPackage )
     ASSERT_TRUE( eventJson.find( "\"package\":\"amp/1.0.0\"" ) != std::string::npos );
 }
 
-TEST_F( ComponentTestCloudEvents, EventJSONContainsOldAndNewFile )
+TEST_F( ComponentTestCloudEvents, EventJSONContainsOldFile )
 {
     std::string eventJson = m_eventBuilder.Build();
 
-    ASSERT_TRUE( eventJson.find(
-        "\"new\":{\"file-path\":\"newfile\",\"hash-sha256\":\"newhash123\",\"size\":234},\"old\":{\"file-path\":\"oldfile\",\"hash-sha256\":\"oldhash123\",\"size\":123}" ) 
-        != std::string::npos );
+    ASSERT_TRUE( eventJson.find( "\"old\":{\"path\":\"oldfile\",\"sha256\":\"oldhash123\",\"size\":123}" ) != std::string::npos );
+}
+
+TEST_F( ComponentTestCloudEvents, EventJSONContainsNewFile )
+{
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"new\":{\"path\":\"newfile\",\"sha256\":\"newhash123\",\"size\":234}" ) != std::string::npos );
 }
 
 TEST_F( ComponentTestCloudEvents, EventJSONContainsError )
