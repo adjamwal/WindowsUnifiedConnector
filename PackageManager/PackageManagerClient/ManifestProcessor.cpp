@@ -17,6 +17,7 @@ void ManifestProcessor::Initialize( IPmPlatformDependencies* dep )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
+    m_manifest.Initialize( dep );
     m_componentProcessor.Initialize( dep );
 }
 

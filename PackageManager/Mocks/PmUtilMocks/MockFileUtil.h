@@ -40,6 +40,10 @@ public:
     void MakeFileExistsReturn( bool value );
     void ExpectFileExistsNotCalled();
 
+    MOCK_METHOD2( AppendPath, std::string( const std::string&, const std::string& ) );
+    void MakeAppendPathReturn( std::string value );
+    void ExpectAppendPathCalled();
+
 private:
     std::string m_defaultString;
 };

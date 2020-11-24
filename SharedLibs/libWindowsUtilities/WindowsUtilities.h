@@ -22,4 +22,5 @@ public:
     static bool Is64BitWindows();
     static bool GetSysDirectory( std::string& path );
     static std::vector<WindowsInstallProgram> GetInstalledPrograms();
+    static std::string ResolveKnownFolderId( const std::string& knownFolderId );
 };

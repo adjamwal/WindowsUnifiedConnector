@@ -272,7 +272,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
-    EXPECT_CALL( *m_platformComponentManager, ResolvePath( "/install/location", "config.json" ) )
+    EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );
     EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
@@ -318,7 +318,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     m_platformComponentManager->ExpectDeployConfigurationIsNotCalled();
-    EXPECT_CALL( *m_platformComponentManager, ResolvePath( "/install/location", "config.json" ) )
+    EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );
     EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
@@ -475,7 +475,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+    ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return oldFilename + '/' + newName;
         } ) );
@@ -584,7 +584,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+    ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return newName;
         } ) );

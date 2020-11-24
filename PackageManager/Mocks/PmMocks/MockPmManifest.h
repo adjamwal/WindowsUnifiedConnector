@@ -17,4 +17,6 @@ public:
     void MakeGetPackageListReturn( std::vector<PmComponent> value );
     void ExpectGetPackageListIsNotCalled();
 
+    MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
+    void ExpectInitializeIsNotCalled();
 };

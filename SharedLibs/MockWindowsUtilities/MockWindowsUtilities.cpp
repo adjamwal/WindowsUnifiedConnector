@@ -142,3 +142,13 @@ void MockWindowsUtilities::ExpectGetInstalledProgramsIsNotCalled()
 {
     EXPECT_CALL( *this, GetInstalledPrograms() ).Times( 0 );
 }
+
+void MockWindowsUtilities::MakeResolveKnownFolderIdReturn( std::string value )
+{
+    ON_CALL( *this, ResolveKnownFolderId( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectResolveKnownFolderIdIsNotCalled()
+{
+    EXPECT_CALL( *this, ResolveKnownFolderId( _ ) ).Times( 0 );
+}

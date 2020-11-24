@@ -4,6 +4,7 @@
 #include <sstream>
 #include <locale>
 #include <codecvt>
+#include <filesystem>
 #include "..\..\GlobalVersion.h"
 
 #define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
@@ -230,36 +231,23 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
     return ret;
 }
 
-std::string WindowsComponentManager::ResolvePath( const std::string& basePath, const std::string& configPath )
+std::string WindowsComponentManager::ResolvePath( const std::string& basePath )
 {
-    std::string path;
+    size_t begin = basePath.find( "<FOLDERID_" );
+    if( begin != std::string::npos ) {
+        size_t end = basePath.find( ">", begin + strlen( "<FOLDERID_" ) );
+        if( end != std::string::npos ) {
+            begin;
 
-    if( configPath.empty() ) {
-        WLOG_ERROR( L"configPath is empty" );
-    } 
-    else if( basePath.empty() ) {
-        // Simple test for abosolute path;
-        if( configPath.find( ":\\" ) != std::string::npos ) {
-            path = configPath;
-        }
-        else {
-            WLOG_ERROR( L"basePath is empty and configPath is not absolute" );
+            std::string knownFolder = WindowsUtilities::ResolveKnownFolderId( basePath.substr( begin + 1, end - (begin + 1 ) ) );
+            if( !knownFolder.empty() ) {
+                knownFolder = basePath.substr( 0, begin ) + knownFolder + basePath.substr( end + 1 );
+                return knownFolder;
+            }
         }
     }
-    else if( basePath.find( ":\\" ) == std::string::npos ) {
-        LOG_ERROR( L"basePath %s is not valid", basePath.c_str() );
-    }
-    else {
-        path = basePath;
-        if( path.back() != '\\' && configPath.front() != '\\') {
-            path += "\\";
-        }
-        path += configPath;
-    }
 
-    LOG_DEBUG( "Path resolved to %s", path.c_str() );
-
-    return path;
+    return basePath;
 }
 
 int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )

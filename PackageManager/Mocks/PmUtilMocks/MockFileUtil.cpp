@@ -5,6 +5,7 @@ MockFileUtil::MockFileUtil() :
 {
     MakeReadFileReturn( m_defaultString );
     MakeGetTempDirReturn( m_defaultString );
+    MakeAppendPathReturn( m_defaultString );
 }
 
 MockFileUtil::~MockFileUtil()
@@ -91,4 +92,14 @@ void MockFileUtil::MakeFileExistsReturn( bool value )
 void MockFileUtil::ExpectFileExistsNotCalled()
 {
     EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeAppendPathReturn( std::string value )
+{
+    ON_CALL( *this, AppendPath( _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectAppendPathCalled()
+{
+    EXPECT_CALL( *this, AppendPath( _, _ ) ).Times( 0 );
 }

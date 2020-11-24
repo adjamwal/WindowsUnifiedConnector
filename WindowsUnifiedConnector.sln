@@ -95,6 +95,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCloudEvents", "SharedLib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCloudEvents", "SharedLibs\TestCloudEvents\TestCloudEvents.vcxproj", "{D429FA04-650E-48D2-AF30-094A2D1DF68F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestWindowsUtilities", "SharedLibs\ComponentTestWindowsUtilities\ComponentTestWindowsUtilities.vcxproj", "{69D27034-366E-440F-B6CF-13D6075A5AA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -329,6 +331,14 @@ Global
 		{D429FA04-650E-48D2-AF30-094A2D1DF68F}.Release|x64.Build.0 = Release|x64
 		{D429FA04-650E-48D2-AF30-094A2D1DF68F}.Release|x86.ActiveCfg = Release|Win32
 		{D429FA04-650E-48D2-AF30-094A2D1DF68F}.Release|x86.Build.0 = Release|Win32
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Debug|x64.ActiveCfg = Debug|x64
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Debug|x64.Build.0 = Debug|x64
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Debug|x86.ActiveCfg = Debug|Win32
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Debug|x86.Build.0 = Debug|Win32
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Release|x64.ActiveCfg = Release|x64
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Release|x64.Build.0 = Release|x64
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Release|x86.ActiveCfg = Release|Win32
+		{69D27034-366E-440F-B6CF-13D6075A5AA0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -369,6 +379,7 @@ Global
 		{08529A1F-8D5F-4746-A253-717FF483D3FC} = {443D3CE9-D446-4D25-A448-AB318FB397F9}
 		{5004D35A-F8C0-4F1E-AE8E-5D7FE5CD89A9} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
 		{D429FA04-650E-48D2-AF30-094A2D1DF68F} = {EA581C03-8594-4E64-A5D7-7D8CA6E48E03}
+		{69D27034-366E-440F-B6CF-13D6075A5AA0} = {EA581C03-8594-4E64-A5D7-7D8CA6E48E03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

@@ -210,7 +210,7 @@ TEST_F( TestPackageConfigProcessor, WillDeleteConfig )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_pmComponentManager->MakeResolvePathReturn( m_configInfo.path );
+    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
 
     EXPECT_CALL( *m_fileUtil, DeleteFile( m_configInfo.path ) );
 
@@ -223,7 +223,7 @@ TEST_F( TestPackageConfigProcessor, RemoveConfigWillSucceed )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_pmComponentManager->MakeResolvePathReturn( m_configInfo.path );
+    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
 
     EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
 }
@@ -234,7 +234,7 @@ TEST_F( TestPackageConfigProcessor, WillNotDeleteConfigWithoutValidPath )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_pmComponentManager->MakeResolvePathReturn( "" );
+    m_fileUtil->MakeAppendPathReturn( "" );
 
     m_fileUtil->ExpectDeleteFileNotCalled();
 
@@ -247,7 +247,7 @@ TEST_F( TestPackageConfigProcessor, RemoveConfigWillFail )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_pmComponentManager->MakeResolvePathReturn( "" );
+    m_fileUtil->MakeAppendPathReturn( "" );
 
     EXPECT_FALSE( m_patient->ProcessConfig( m_configInfo ) );
 }

@@ -131,3 +131,24 @@ bool FileUtil::FileExists( const std::string& filename )
 {
     return ::std::filesystem::exists( filename );
 }
+
+std::string FileUtil::AppendPath( const std::string& basePath, const std::string& configPath )
+{
+    std::filesystem::path path;
+
+    if( configPath.empty() ) {
+        WLOG_ERROR( L"configPath is empty" );
+    }
+    else if( basePath.empty() ) {
+         path = configPath;
+    }
+    else {
+        path = basePath;
+        path /= configPath;
+    }
+
+    path.make_preferred();
+    LOG_DEBUG( "Path resolved to %s", path.string().c_str() );
+
+    return path.string();
+}

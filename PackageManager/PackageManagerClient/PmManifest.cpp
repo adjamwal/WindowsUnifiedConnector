@@ -2,8 +2,11 @@
 #include "PmTypes.h"
 #include <json/json.h>
 #include "PmLogger.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformComponentManager.h"
 
-PmManifest::PmManifest()
+PmManifest::PmManifest() :
+    m_dependencies( nullptr )
 {
 
 }
@@ -13,6 +16,12 @@ PmManifest::~PmManifest()
 
 }
 
+void PmManifest::Initialize( IPmPlatformDependencies* dep )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    m_dependencies = dep;
+}
+
 int32_t PmManifest::ParseManifest( const std::string& manifestJson )
 {
     int32_t rtn = -1;
@@ -20,6 +29,11 @@ int32_t PmManifest::ParseManifest( const std::string& manifestJson )
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
     Json::Value root;
     std::string jsonError;
+
+    if( !m_dependencies ) {
+        LOG_ERROR( "Not initialized" );
+        return rtn;
+    }
 
     m_ComponentList.clear();
 
@@ -79,10 +93,10 @@ void PmManifest::AddPackage( Json::Value& packageJson )
         }
 
         for( Json::Value::ArrayIndex i = 0; i != packageJson[ "installer_args" ].size(); i++ ) {
-            package.installerArgs += packageJson[ "installer_args" ][ i ].asString() + " ";
+            package.installerArgs += m_dependencies->ComponentManager().ResolvePath( packageJson[ "installer_args" ][ i ].asString() ) + " ";
         }
     }
-    package.installLocation = GetJsonStringField( packageJson, "install_location", false );
+    package.installLocation = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( packageJson, "install_location", false ) );
     package.signerName = GetJsonStringField( packageJson, "installer_signer_name", false );
     package.installerHash = GetJsonStringField( packageJson, "installer_hash", false );
 
@@ -102,7 +116,7 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     PackageConfigInfo config;
     config.deleteConfig = false;
 
-    config.path = GetJsonStringField( configJson, "path", true );
+    config.path = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( configJson, "path", true ) );
 
     config.contents = GetJsonStringField( configJson, "contents", false );
     config.sha256 = GetJsonStringField( configJson, "sha256", false );
