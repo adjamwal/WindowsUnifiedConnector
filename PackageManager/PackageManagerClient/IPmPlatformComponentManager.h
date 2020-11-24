@@ -1,18 +1,24 @@
 #pragma once
 
-#include "IPmPlatformComponentManager.h"
-#include "IUcLogger.h"
-#include "IWinApiWrapper.h"
-#include "ICodesignVerifier.h"
+#include <cstdint>
 #include <string>
-#include <Windows.h>
-#include <PmTypes.h>
+#include <vector>
 
-class WindowsComponentManager : public IPmPlatformComponentManager
+struct PmComponent;
+struct PackageConfigInfo;
+struct PackageInventory;
+struct PmDiscoveryComponent;
+
+/**
+ * @file IPmPlatformComponentManager.h
+ *
+ * @brief This interface will provide the plaform specific functionality to package installs and updates
+ */
+class IPmPlatformComponentManager
 {
 public:
-    WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codeSignVerifier );
-    virtual ~WindowsComponentManager();
+    IPmPlatformComponentManager() {}
+    virtual ~IPmPlatformComponentManager() {}
 
     /**
      * @brief This API is used to retrieve the list of all installed packages on the client. The package manager
@@ -20,7 +26,8 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    int32_t GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages ) override;
+    virtual int32_t GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList,
+        PackageInventory& packages ) = 0;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:
@@ -32,7 +39,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was installed. -1 otherwise
      */
-    int32_t InstallComponent( const PmComponent& package ) override;
+    virtual int32_t InstallComponent( const PmComponent& package ) = 0;
 
     /**
      * @brief This API will be used to update a package. The package will provide the following:
@@ -45,7 +52,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was updated. -1 otherwise
      */
-    int32_t UpdateComponent( const PmComponent& package, std::string& error ) override;
+    virtual int32_t UpdateComponent( const PmComponent& package, std::string& error ) = 0;
 
     /**
      * @brief This API will be used to remove a package. The package will provide the following:
@@ -57,10 +64,10 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was removed. -1 otherwise
      */
-    int32_t UninstallComponent( const PmComponent& package ) override;
+    virtual int32_t UninstallComponent( const PmComponent& package ) = 0;
 
     /**
-     * @brief This API will be used to deploy a configuration file for a package. The configuration will provide the
+     * @brief This API will be used to deploy a configuration file for a package. The configuration will provide the 
      *   following:
      *   - Configuration file path
      *   - Configuration contents
@@ -68,7 +75,7 @@ public:
      *
      * @return 0 if the configuration was deployed. -1 otherwise
      */
-    int32_t DeployConfiguration( const PackageConfigInfo& config ) override;
+    virtual int32_t DeployConfiguration( const PackageConfigInfo& config ) = 0;
 
     /**
      * @brief This API will be used to resolve the config file path
@@ -78,15 +85,5 @@ public:
      *
      * @return string containing the absolute path where the file should be deployed
      */
-    std::string ResolvePath( const std::string& basePath, const std::string& configPath ) override;
-
-private:
-    IWinApiWrapper& m_winApiWrapper;
-    ICodesignVerifier& m_codeSignVerifier;
-
-    int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
-    PmInstalledPackage BuildUcPackage();
-    PmInstalledPackage HackBuildAmpPackage();
-    void StripBuildNumber( std::string& versionString );
+    virtual std::string ResolvePath( const std::string& basePath, const std::string& configPath ) = 0;
 };
-

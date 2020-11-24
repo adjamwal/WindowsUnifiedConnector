@@ -105,7 +105,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;pmlib.lib;utilLib.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -130,7 +130,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;pmlib.lib;utilLib.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -151,7 +151,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;pmlib.lib;utilLib.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -176,7 +176,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;pmlib.lib;utilLib.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -218,6 +218,12 @@
     </ProjectReference>
     <ProjectReference Include="..\PackageManagerAgent\PackageManagerAgent.vcxproj">
       <Project>{934a27fe-d684-45d0-b901-562f44e4d66f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PackageManagerClient\PackageManagerClient.vcxproj">
+      <Project>{1f2019e6-7a09-434e-a790-b1e7d0a51f87}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PmUtil\PmUtil.vcxproj">
+      <Project>{3e610c4d-e8cc-4cfc-a64f-e46b25b554e5}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

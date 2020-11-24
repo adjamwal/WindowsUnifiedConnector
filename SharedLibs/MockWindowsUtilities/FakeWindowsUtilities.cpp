@@ -47,3 +47,8 @@ bool WindowsUtilities::GetSysDirectory( std::string& path )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetSysDirectory( path );
 }
+
+std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstalledPrograms()
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->GetInstalledPrograms();
+}

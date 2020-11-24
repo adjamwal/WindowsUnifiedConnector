@@ -1,22 +1,25 @@
 #pragma once
 
-#include "IPmPlatformConfiguration.h"
-#include "IUcLogger.h"
-#include "UCIDApiDll.h"
+#include <cstdint>
+#include <string>
+#include <openssl/ssl.h>
 
-class IWinCertLoader;
-
-class WindowsConfiguration : public IPmPlatformConfiguration
+/**
+ * @file IPmPlatformConfiguration.h
+ *
+ * @brief This contains the package manager configuration interface
+ */
+class IPmPlatformConfiguration
 {
 public:
-    WindowsConfiguration(IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier);
-    ~WindowsConfiguration();
+    IPmPlatformConfiguration() {}
+    virtual ~IPmPlatformConfiguration() {}
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud.
      */
-    bool GetIdentityToken( std::string& token ) override;
+    virtual bool GetIdentityToken( std::string& token ) = 0;
 
     /**
      * @brief (Optional) Retrieves the clients system certs
@@ -25,7 +28,7 @@ public:
      *  @param[in|out] certificates - Array of certs returned. The platfrom should allocated these
      *  @param[out] certificates - Number to certs returned
      */
-    int32_t GetSslCertificates( X509*** certificates, size_t& count ) override;
+    virtual int32_t GetSslCertificates( X509*** certificates, size_t &count ) = 0;
 
     /**
      * @brief (Optional) Frees the cert list allocated by GetSslCertificates
@@ -33,14 +36,10 @@ public:
      *  @param[in] certificates - The cert array to be freed
      *  @param[in] certificates - Number to certs in the array
      */
-    void ReleaseSslCertificates( X509** certificates, size_t count ) override;
+    virtual void ReleaseSslCertificates( X509** certificates, size_t count ) = 0;
 
     /**
      * @brief Provides the user agent for http requests
      */
-    std::string GetHttpUserAgent() override;
-
-private:
-    IWinCertLoader& m_winCertLoader;
-    UCIDApiDll m_ucidApi;
+    virtual std::string GetHttpUserAgent() = 0;
 };

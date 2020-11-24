@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "WindowsConfiguraton.h"
 #include "IWinCertLoader.h"
+#include "..\..\GlobalVersion.h"
+#include <codecvt>
 
 WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier ) :
     m_winCertLoader( winCertLoader ),
@@ -12,11 +14,6 @@ WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICode
 WindowsConfiguration::~WindowsConfiguration()
 {
     m_winCertLoader.UnloadSystemCerts();
-}
-
-int32_t WindowsConfiguration::GetConfigFileLocation( char* filename, size_t& filenameLength )
-{
-    return -1;
 }
 
 bool WindowsConfiguration::GetIdentityToken( std::string& token )
@@ -58,4 +55,13 @@ int32_t WindowsConfiguration::GetSslCertificates( X509*** certificates, size_t& 
 void WindowsConfiguration::ReleaseSslCertificates( X509** certificates, size_t count )
 {
     m_winCertLoader.FreeSystemCerts( certificates, count );
+}
+
+std::string WindowsConfiguration::GetHttpUserAgent()
+{
+    std::string agent;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    agent = "PackageManager/" + converter.to_bytes( STRFORMATPRODVER );
+    return agent;
 }
