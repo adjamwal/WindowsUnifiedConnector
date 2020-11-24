@@ -12,18 +12,26 @@ The package manger client is a library that provides access to the package manag
 
 The client can be built using cmake using the following commands
 ```
+cd cmake
 mkdir build
 cmake ../ . \
   -Djsoncpp_INCLUDE_DIRS=<jsoncpp_include_dir> -Djsoncpp_LIBRARY=<jsoncpp_lib_dir> \
   -Dcurl_INCLUDE_DIRS=<curl_include_dir> -Dcurl_LIBRARY=<curl_lib_dir> \
-  -Dciscossl_INCLUDE_DIRS=<ciscossl_include_dir> -Dciscossl_LIBRARY=<ciscossl_lib_dir>
+  -Dciscossl_INCLUDE_DIRS=<ciscossl_include_dir> -Dciscossl_LIBRARY=<ciscossl_lib_dir> \
+  -Dfff_INCLUDE_DIRS=<fff_include_dir> \
+  -Dgtest_INCLUDE_DIRS=<gtest_include_dir> -Dgtest_LIBRARY=<gtest_lib_dir>
 cmake --build
 cmake --install
 ```
 
+Alternatively if the all dependencies are in the same directories a common path can be provided instead
+```
+ -Dcommon_INCLUDE_DIRS=<include_dir> -Dcommon_LIBRARY=<library_dir>
+```
+
 ### Windows
 
-On windows the client can be build using the cmake instructions about. Additionally, a CMakeSettings.json file has been provided. This allows the project to be opened in Visual Studio 2019. An environment variable for `IMN_COMMON` will have to be provided. This should point to and instance of the cloud/common repository. The `windows-common-build` package will also need to be checked out to `IMN_COMMON/common-windows-build`. This package includes the jsoncpp/curl/ciscossl dependencies mentioned about
+On windows, the pacakge manager projects are integrated into a visual studio solution
 
 ## Integrating the client
 Fill this in later
