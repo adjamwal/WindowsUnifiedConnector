@@ -93,7 +93,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWindowsPackageManager",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCloudEvents", "SharedLibs\libCloudEvents\libCloudEvents.vcxproj", "{5004D35A-F8C0-4F1E-AE8E-5D7FE5CD89A9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestCloudEvents", "SharedLibs\ComponentTestCloudEvents\ComponentTestCloudEvents.vcxproj", "{D429FA04-650E-48D2-AF30-094A2D1DF68F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCloudEvents", "SharedLibs\TestCloudEvents\TestCloudEvents.vcxproj", "{D429FA04-650E-48D2-AF30-094A2D1DF68F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
