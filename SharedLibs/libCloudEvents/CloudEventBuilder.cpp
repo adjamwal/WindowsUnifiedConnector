@@ -80,20 +80,24 @@ std::string CloudEventBuilder::Build()
     {
         if( m_oldPath.length() > 0 )
         {
+            Json::Value oldfilearr;
             Json::Value oldfile;
             oldfile[ "path" ] = m_oldPath;
             oldfile[ "sha256" ] = m_oldHash;
             oldfile[ "size" ] = m_oldSize;
-            event[ "old" ] = oldfile;
+            oldfilearr[ 0 ] = oldfile;
+            event[ "old" ] = oldfilearr;
         }
 
         if( m_newPath.length() > 0 )
         {
+            Json::Value newfilearr;
             Json::Value newfile;
             newfile[ "path" ] = m_newPath;
             newfile[ "sha256" ] = m_newHash;
             newfile[ "size" ] = m_newSize;
-            event[ "new" ] = newfile;
+            newfilearr[ 0 ] = newfile;
+            event[ "new" ] = newfilearr;
         }
     }
 
