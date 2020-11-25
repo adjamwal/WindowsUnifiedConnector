@@ -50,6 +50,12 @@ protected:
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
+        ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
+            []( const std::string& basePath )
+            {
+                return basePath;
+            }
+        ) );
 
         m_patient.reset( new PackageManager( *m_config,
             *m_cloud,
@@ -136,7 +142,7 @@ std::string _ucReponseNoConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1"
@@ -347,7 +353,7 @@ std::string _ucReponseWithConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
@@ -416,7 +422,7 @@ std::string _ucReponseMultiPackageAndConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
@@ -442,7 +448,7 @@ std::string _ucReponseMultiPackageAndConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "exe",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc2/0.0.1",
@@ -560,7 +566,7 @@ std::string _ucReponseWithConfigCloudData( R"(
         "/Q"
       ],
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",

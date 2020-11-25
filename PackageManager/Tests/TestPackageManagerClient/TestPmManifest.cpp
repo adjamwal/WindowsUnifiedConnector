@@ -19,7 +19,7 @@ static std::string _validManifest( R"(
       "installer_uri": "Install URL",
       "package": "package name",
       "install_location": "Install Location",
-      "installer_hash": "Install Hash",
+      "installer_sha256": "Install Hash",
     }
   ]
 }
@@ -56,7 +56,7 @@ static std::string _optionalManifest( R"(
       ],
       "installer_signer_name": "Signer Name",
       "install_location": "Install Location",
-      "installer_hash": "Install Hash",
+      "installer_sha256": "Install Hash",
       "installer_type": "type1",
       "installer_uri": "Install URL",
     }
