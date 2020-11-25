@@ -67,9 +67,6 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         if( !LoadBsConfig() ) {
             LOG_ERROR( "Failed to load Bs configuration" );
         }
-        else if( PmThreadWait() == std::chrono::microseconds( 0 ) ) {
-            LOG_ERROR( "PM Interval not configured" );
-        }
         else {
             SetupDiscoveryPackages();
 

@@ -28,6 +28,7 @@ protected:
     void SetUp()
     {
         m_configUrl = "https://test.com";
+        m_configIntervalCalledOnce = false;
 
         m_fileUtil.reset( new NiceMock<MockFileUtil>() );
         m_config.reset( new NiceMock<MockPmConfig>() );
@@ -50,6 +51,7 @@ protected:
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
+        ON_CALL( *m_config, GetCloudInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudInterval ) );
         ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
             []( const std::string& basePath )
             {
@@ -93,19 +95,33 @@ protected:
         m_fileUtil.reset();
     }
 
+    uint32_t GetCloudInterval()
+    {
+        // Addresses random failures. If config always returns 1 as the interval, then sometimes a second
+        // run of the workflow thread is run and causes the expectations to fail
+        uint32_t interval = 2000;
+        if( !m_configIntervalCalledOnce ) {
+            interval = 1;
+            m_configIntervalCalledOnce = true;
+        }
+
+        return interval;
+    }
+
     void StartPacMan()
     {
         m_platformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_config->MakeLoadBsConfigReturn( 0 );
         m_config->MakeLoadPmConfigReturn( 0 );
         m_config->MakeGetCloudUriReturn( m_configUrl );
-        m_config->MakeGetCloudIntervalReturn( 1 );
+
         m_cloud->MakeDownloadFileReturn( 200 );
 
         m_patient->SetPlatformDependencies( m_deps.get() );
         m_patient->Start( "ConfigFile", "ConfigFile" );
     }
 
+    bool m_configIntervalCalledOnce;
     std::string m_configUrl;
     std::mutex m_mutex;
     std::condition_variable m_cv;
