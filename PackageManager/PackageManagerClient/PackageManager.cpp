@@ -16,6 +16,7 @@
 #include "IPmPlatformComponentManager.h"
 #include "IPmPlatformConfiguration.h"
 #include "PmTypes.h"
+#include <sstream>
 
 using namespace std;
 
@@ -197,21 +198,13 @@ void PackageManager::SetupDiscoveryPackages()
     discoveryItem.packageName = "Cisco AMP for Endpoints Connector";
     m_discoveryList.push_back( discoveryItem );
 
-    discoveryItem.packageId = "test-package-1";
-    discoveryItem.packageName = "TestPackage";
-    m_discoveryList.push_back( discoveryItem );
-
-    discoveryItem.packageId = "test-package-2";
-    discoveryItem.packageName = "TestPackage";
-    m_discoveryList.push_back( discoveryItem );
-
-    discoveryItem.packageId = "test-package-3";
-    discoveryItem.packageName = "TestPackage";
-    m_discoveryList.push_back( discoveryItem );
-
-    discoveryItem.packageId = "test-package-4";
-    discoveryItem.packageName = "TestPackage";
-    m_discoveryList.push_back( discoveryItem );
+    for( uint32_t i = 0; i < 10; i++ ) {
+        std::stringstream ss;
+        ss << "test-package-" << i + 1;
+        discoveryItem.packageId = ss.str();
+        discoveryItem.packageName = "TestPackage";
+        m_discoveryList.push_back( discoveryItem );
+    }
 
     m_packageInventoryProvider.SetDiscoveryList( m_discoveryList );
 }
