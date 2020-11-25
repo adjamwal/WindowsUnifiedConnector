@@ -9,14 +9,12 @@
  * Implements UC cloud event publisher
  *
  ***************************************************************************/
-#include "pch.h"
-
 #include "CloudEventPublisher.h"
 #include <Windows.h>
 #include "IUcLogger.h"
 #include "json\json.h"
 
-CloudEventPublisher::CloudEventPublisher( IHttpAdapter& httpAdapter, const std::string& eventEndpointUrl )
+CloudEventPublisher::CloudEventPublisher( IPmHttp& httpAdapter, const std::string& eventEndpointUrl )
     : m_httpAdapter( httpAdapter )
     , m_eventEndpointUrl( eventEndpointUrl )
 {

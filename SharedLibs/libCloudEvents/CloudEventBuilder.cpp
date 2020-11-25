@@ -9,7 +9,7 @@
  * Implements UC cloud event builder
  *
  ***************************************************************************/
-#include "pch.h"
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "CloudEventBuilder.h"
 #include <Windows.h>
