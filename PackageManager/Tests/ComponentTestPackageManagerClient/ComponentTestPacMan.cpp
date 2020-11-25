@@ -28,6 +28,7 @@ protected:
     void SetUp()
     {
         m_configUrl = "https://test.com";
+        m_configIntervalCalledOnce = false;
 
         m_fileUtil.reset( new NiceMock<MockFileUtil>() );
         m_config.reset( new NiceMock<MockPmConfig>() );
@@ -50,6 +51,13 @@ protected:
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
+        ON_CALL( *m_config, GetCloudInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudInterval ) );
+        ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
+            []( const std::string& basePath )
+            {
+                return basePath;
+            }
+        ) );
 
         m_patient.reset( new PackageManager( *m_config,
             *m_cloud,
@@ -87,21 +95,38 @@ protected:
         m_fileUtil.reset();
     }
 
+    uint32_t GetCloudInterval()
+    {
+        std::unique_lock<std::mutex> lock( m_configMutex );
+
+        // Addresses random failures. If config always returns 1 as the interval, then sometimes a second
+        // run of the workflow thread is run and causes the expectations to fail
+        uint32_t interval = 10000;
+        if( !m_configIntervalCalledOnce ) {
+            interval = 1;
+            m_configIntervalCalledOnce = true;
+        }
+
+        return interval;
+    }
+
     void StartPacMan()
     {
         m_platformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_config->MakeLoadBsConfigReturn( 0 );
         m_config->MakeLoadPmConfigReturn( 0 );
         m_config->MakeGetCloudUriReturn( m_configUrl );
-        m_config->MakeGetCloudIntervalReturn( 1 );
+
         m_cloud->MakeDownloadFileReturn( 200 );
 
         m_patient->SetPlatformDependencies( m_deps.get() );
         m_patient->Start( "ConfigFile", "ConfigFile" );
     }
 
+    bool m_configIntervalCalledOnce;
     std::string m_configUrl;
     std::mutex m_mutex;
+    std::mutex m_configMutex;
     std::condition_variable m_cv;
 
     std::unique_ptr<MockFileUtil> m_fileUtil;
@@ -136,7 +161,7 @@ std::string _ucReponseNoConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1"
@@ -272,7 +297,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
-    EXPECT_CALL( *m_platformComponentManager, ResolvePath( "/install/location", "config.json" ) )
+    EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );
     EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
@@ -318,7 +343,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
     m_platformComponentManager->ExpectDeployConfigurationIsNotCalled();
-    EXPECT_CALL( *m_platformComponentManager, ResolvePath( "/install/location", "config.json" ) )
+    EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );
     EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
@@ -347,7 +372,7 @@ std::string _ucReponseWithConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
@@ -416,7 +441,7 @@ std::string _ucReponseMultiPackageAndConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
@@ -442,7 +467,7 @@ std::string _ucReponseMultiPackageAndConfig( R"(
       ],
       "install_location": "/install/location",
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "exe",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc2/0.0.1",
@@ -475,7 +500,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+    ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return oldFilename + '/' + newName;
         } ) );
@@ -560,7 +585,7 @@ std::string _ucReponseWithConfigCloudData( R"(
         "/Q"
       ],
       "installer_signer_name": "Cisco Systems, Inc.",
-      "installer_hash": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+      "installer_sha256": "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
       "installer_type": "msi",
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1",
@@ -584,7 +609,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_platformComponentManager, ResolvePath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+    ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return newName;
         } ) );

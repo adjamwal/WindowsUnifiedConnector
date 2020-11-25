@@ -334,3 +334,44 @@ TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillDiscoverManyPrograms 
     EXPECT_EQ( installedPackages.packages[ 2 ].packageName, "p2" );
     EXPECT_EQ( installedPackages.packages[ 2 ].packageVersion, installedProgram.version );
 }
+
+TEST_F( TestWindowsPackageManager, WillResolveKnownFolderID )
+{
+    std::string knownFolderString = "_My_KNOWN_FOLDER_";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeResolveKnownFolderIdReturn( knownFolderString );
+
+    std::string rtn = m_patient->ResolvePath( "<FOLDERID_SomeKnownFolder>" );
+    EXPECT_EQ( rtn, knownFolderString);
+}
+
+TEST_F( TestWindowsPackageManager, WillResolveKnownFolderIDWithPrefix )
+{
+    std::string prefix = "prefix";
+    std::string knownFolderString = "_My_KNOWN_FOLDER_";
+    std::string suffix = "suffix";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeResolveKnownFolderIdReturn( knownFolderString );
+
+    std::string rtn = m_patient->ResolvePath( prefix + "<FOLDERID_SomeKnownFolder>" + suffix );
+    EXPECT_EQ( rtn, prefix + knownFolderString + suffix );
+}
+
+TEST_F( TestWindowsPackageManager, WillNotModifyPathWhenKnownFolderIsEmpty )
+{
+    std::string folder = "prefix<FOLDERID_SomeKnownFolder>suffix";
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolveKnownFolderId( _ ) ).WillOnce( Return( "" ) );
+
+    std::string rtn = m_patient->ResolvePath( folder );
+
+    EXPECT_EQ( rtn, folder );
+}
+
+
+TEST_F( TestWindowsPackageManager, WillNotResolveKnownFolderWhenTagNotFound )
+{
+    MockWindowsUtilities::GetMockWindowUtilities()->ExpectResolveKnownFolderIdIsNotCalled();
+
+    m_patient->ResolvePath( "C:\\Windows\Somthing");
+}

@@ -2,7 +2,8 @@
 #include "PmManifest.h"
 #include "MockFileUtil.h"
 #include "PmTypes.h"
-
+#include "MockPmPlatformDependencies.h"
+#include "MockPmPlatformComponentManager.h"
 #include <memory>
 
 static std::string _validManifest( R"(
@@ -18,7 +19,7 @@ static std::string _validManifest( R"(
       "installer_uri": "Install URL",
       "package": "package name",
       "install_location": "Install Location",
-      "installer_hash": "Install Hash",
+      "installer_sha256": "Install Hash",
     }
   ]
 }
@@ -55,7 +56,7 @@ static std::string _optionalManifest( R"(
       ],
       "installer_signer_name": "Signer Name",
       "install_location": "Install Location",
-      "installer_hash": "Install Hash",
+      "installer_sha256": "Install Hash",
       "installer_type": "type1",
       "installer_uri": "Install URL",
     }
@@ -103,13 +104,27 @@ class TestPmManifest: public ::testing::Test
 protected:
     void SetUp()
     {
+        m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
+        m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
+        
+        m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
+        ON_CALL( *m_pmComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
+            []( const std::string& basePath ) 
+            {
+                return basePath;
+            }
+        ) );
         m_patient.reset( new PmManifest() );
+        m_patient->Initialize( m_dep.get() );
     }
 
     void TearDown()
     {
         m_patient.reset();
     }
+
+    std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
+    std::unique_ptr<MockPmPlatformDependencies> m_dep;
 
     std::unique_ptr<PmManifest> m_patient;
 };
@@ -231,4 +246,11 @@ TEST_F( TestPmManifest, WillGetPackageConfig )
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].verifyBinPath, "verify_config.exe" );
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].path, "uc.json" );
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].sha256, "4d0bc0da51c1aac547c5473ed53413ae9d9d0c8c57c15ec6a2ac6652812058f4" );
+}
+
+TEST_F( TestPmManifest, WillFailWhenNotInitialied )
+{
+    m_patient.reset( new PmManifest() );
+
+    EXPECT_NE( m_patient->ParseManifest( _emptyManifest ), 0 );
 }

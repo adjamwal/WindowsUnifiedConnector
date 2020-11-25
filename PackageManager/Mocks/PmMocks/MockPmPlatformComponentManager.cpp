@@ -66,9 +66,9 @@ void MockPmPlatformComponentManager::ExpectDeployConfigurationIsNotCalled()
 
 void MockPmPlatformComponentManager::MakeResolvePathReturn( std::string value )
 {
-    ON_CALL( *this, ResolvePath( _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ResolvePath( _ ) ).WillByDefault( Return( value ) );
 }
 void MockPmPlatformComponentManager::ExpectResolvePathIsNotCalled()
 {
-    EXPECT_CALL( *this, ResolvePath( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ResolvePath( _ ) ).Times( 0 );
 }

@@ -83,7 +83,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
             }
 
             if( moveFile ) {
-                std::string location = m_dependencies->ComponentManager().ResolvePath( config.installLocation, config.path );
+                std::string location = m_fileUtil.AppendPath( config.installLocation, config.path );
 
                 if( m_fileUtil.Rename( ss.str(), location ) == 0 ) {
                     rtn = true;
@@ -105,7 +105,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 {
     bool rtn = false;
 
-    std::string location = m_dependencies->ComponentManager().ResolvePath( config.installLocation, config.path );
+    std::string location = m_fileUtil.AppendPath( config.installLocation, config.path );
 
     if( !location.empty() ) {
         if( m_fileUtil.DeleteFile( location ) != 0 ) {

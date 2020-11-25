@@ -31,3 +31,7 @@ void MockPmManifest::ExpectGetPackageListIsNotCalled()
     EXPECT_CALL( *this, GetPackageList() ).Times( 0 );
 }
 
+void MockPmManifest::ExpectInitializeIsNotCalled()
+{
+    EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
+}

@@ -2,8 +2,25 @@
 #include "PmTypes.h"
 #include <json/json.h>
 #include "PmLogger.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformComponentManager.h"
 
-PmManifest::PmManifest()
+#define MANIFEST_FIELD_PACKAGE "package"
+#define MANIFEST_FIELD_INSTALL_URI "installer_uri"
+#define MANIFEST_FIELD_INSTALL_TYPE "installer_type"
+#define MANIFEST_FIELD_INSTALL_ARGS "installer_args"
+#define MANIFEST_FIELD_INSTALL_LOCATION "install_location"
+#define MANIFEST_FIELD_INSTALL_SIGNER "installer_signer_name"
+#define MANIFEST_FIELD_INSTALL_SHA "installer_sha256"
+#define MANIFEST_FIELD_FILES "files"
+#define MANIFEST_FIELD_CONFIG_PATH "path"
+#define MANIFEST_FIELD_CONFIG_CONTENT "contents"
+#define MANIFEST_FIELD_CONFIG_SHA "sha256"
+#define MANIFEST_FIELD_CONFIG_VERIFY_PATH "verify_path"
+#define MANIFEST_FIELD_CONFIG_DELETE "delete"
+
+PmManifest::PmManifest() :
+    m_dependencies( nullptr )
 {
 
 }
@@ -13,6 +30,12 @@ PmManifest::~PmManifest()
 
 }
 
+void PmManifest::Initialize( IPmPlatformDependencies* dep )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    m_dependencies = dep;
+}
+
 int32_t PmManifest::ParseManifest( const std::string& manifestJson )
 {
     int32_t rtn = -1;
@@ -20,6 +43,11 @@ int32_t PmManifest::ParseManifest( const std::string& manifestJson )
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
     Json::Value root;
     std::string jsonError;
+
+    if( !m_dependencies ) {
+        LOG_ERROR( "Not initialized" );
+        return rtn;
+    }
 
     m_ComponentList.clear();
 
@@ -68,27 +96,27 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     PmComponent package;
 
     // Required Data
-    package.packageName = GetJsonStringField( packageJson, "package", true );
+    package.packageName = GetJsonStringField( packageJson, MANIFEST_FIELD_PACKAGE, true );
 
     // Optional Data
-    package.installerUrl = GetJsonStringField( packageJson, "installer_uri", false );
-    package.installerType = GetJsonStringField( packageJson, "installer_type", false );
-    if( packageJson.isMember( "installer_args" ) ) {
-        if( !packageJson[ "installer_args" ].isArray() ) {
-            throw( std::invalid_argument( __FUNCTION__ ": Invalid Content: installer_args" ) );
+    package.installerUrl = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_URI, false );
+    package.installerType = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_TYPE, false );
+    if( packageJson.isMember( MANIFEST_FIELD_INSTALL_ARGS ) ) {
+        if( !packageJson[ MANIFEST_FIELD_INSTALL_ARGS ].isArray() ) {
+            throw( std::invalid_argument( __FUNCTION__ ": Invalid Content: " MANIFEST_FIELD_INSTALL_ARGS ) );
         }
 
-        for( Json::Value::ArrayIndex i = 0; i != packageJson[ "installer_args" ].size(); i++ ) {
-            package.installerArgs += packageJson[ "installer_args" ][ i ].asString() + " ";
+        for( Json::Value::ArrayIndex i = 0; i != packageJson[ MANIFEST_FIELD_INSTALL_ARGS ].size(); i++ ) {
+            package.installerArgs += m_dependencies->ComponentManager().ResolvePath( packageJson[ MANIFEST_FIELD_INSTALL_ARGS ][ i ].asString() ) + " ";
         }
     }
-    package.installLocation = GetJsonStringField( packageJson, "install_location", false );
-    package.signerName = GetJsonStringField( packageJson, "installer_signer_name", false );
-    package.installerHash = GetJsonStringField( packageJson, "installer_hash", false );
+    package.installLocation = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_LOCATION, false ) );
+    package.signerName = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_SIGNER, false );
+    package.installerHash = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_SHA, false );
 
-    if( packageJson[ "files" ].isArray() ) {
-        for( Json::Value::ArrayIndex i = 0; i != packageJson[ "files" ].size(); i++ ) {
-            AddConfigToPackage( packageJson[ "files" ][ i ], package );
+    if( packageJson[ MANIFEST_FIELD_FILES ].isArray() ) {
+        for( Json::Value::ArrayIndex i = 0; i != packageJson[ MANIFEST_FIELD_FILES ].size(); i++ ) {
+            AddConfigToPackage( packageJson[ MANIFEST_FIELD_FILES ][ i ], package );
         }
     }
     else {
@@ -102,17 +130,17 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     PackageConfigInfo config;
     config.deleteConfig = false;
 
-    config.path = GetJsonStringField( configJson, "path", true );
+    config.path = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) );
 
-    config.contents = GetJsonStringField( configJson, "contents", false );
-    config.sha256 = GetJsonStringField( configJson, "sha256", false );
-    config.verifyBinPath = GetJsonStringField( configJson, "verify_path", false );
+    config.contents = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_CONTENT, false );
+    config.sha256 = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_SHA, false );
+    config.verifyBinPath = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_VERIFY_PATH, false );
 
     config.installLocation = package.installLocation;
     config.signerName = package.signerName;
 
-    if( configJson.isMember( "delete" ) && configJson[ "delete" ].isBool() ) {
-        config.deleteConfig = configJson[ "delete" ].asBool();
+    if( configJson.isMember( MANIFEST_FIELD_CONFIG_DELETE ) && configJson[ MANIFEST_FIELD_CONFIG_DELETE ].isBool() ) {
+        config.deleteConfig = configJson[ MANIFEST_FIELD_CONFIG_DELETE ].asBool();
     }
 
     if( !config.contents.empty() && config.deleteConfig ) {
