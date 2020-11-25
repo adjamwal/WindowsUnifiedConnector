@@ -24,7 +24,7 @@ TEST_P( ComponentTestWindowsUtilites, VerifyKnownFolderId )
     KNOWNFOLDERPAIR data = GetParam();
 
     std::string knownFolder = WindowsUtilities::ResolveKnownFolderId( data.first );
-    EXPECT_EQ( knownFolder, data.second );
+    EXPECT_STRCASEEQ( knownFolder.c_str(), data.second.c_str() );
 }
 
 #ifdef _WIN64
