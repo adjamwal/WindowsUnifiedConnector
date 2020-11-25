@@ -97,9 +97,11 @@ protected:
 
     uint32_t GetCloudInterval()
     {
+        std::unique_lock<std::mutex> lock( m_configMutex );
+
         // Addresses random failures. If config always returns 1 as the interval, then sometimes a second
         // run of the workflow thread is run and causes the expectations to fail
-        uint32_t interval = 2000;
+        uint32_t interval = 10000;
         if( !m_configIntervalCalledOnce ) {
             interval = 1;
             m_configIntervalCalledOnce = true;
@@ -124,6 +126,7 @@ protected:
     bool m_configIntervalCalledOnce;
     std::string m_configUrl;
     std::mutex m_mutex;
+    std::mutex m_configMutex;
     std::condition_variable m_cv;
 
     std::unique_ptr<MockFileUtil> m_fileUtil;
