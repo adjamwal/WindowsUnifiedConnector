@@ -2,12 +2,7 @@
 
 #include <string>
 
-enum CloudEventType
-{
-    pkginstall = 0,
-    pkgreconfig,
-    pkguninstall
-};
+enum CloudEventType;
 
 class ICloudEventBuilder
 {
