@@ -1,13 +1,23 @@
 #pragma once
 
 #include "ICloudEventBuilder.h"
-#include "EnumStringConversion.h"
 
-template<> char const* EnumStrings<CloudEventType>::data[] = {
-    "pkg-install",
-    "pkg-reconfig",
-    "pkg-uninstall"
+enum CloudEventType
+{
+    pkginstall,
+    pkgreconfig,
+    pkguninstall
 };
+
+static std::string CloudEventString( CloudEventType eventType )
+{
+    switch( eventType )
+    {
+    case pkginstall: return "pkg-install";
+    case pkgreconfig: return "pkg-reconfig";
+    default: return "pkg-uninstall";
+    }
+}
 
 class CloudEventBuilder final : public ICloudEventBuilder
 {

@@ -30,9 +30,6 @@
     <ClInclude Include="IWinApiWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnumStringConversion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

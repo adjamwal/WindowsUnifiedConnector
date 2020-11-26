@@ -73,7 +73,7 @@ ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::string path, cons
 std::string CloudEventBuilder::Build()
 {
     Json::Value event;
-    event[ "type" ] = EnumToString( m_evtype ); //inferred type
+    event[ "type" ] = CloudEventString( m_evtype );
     event[ "package" ] = m_packageName + "/" + m_packageVersion;
 
     if( m_evtype == pkgreconfig )
