@@ -117,6 +117,7 @@ int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& new
 
     try {
         ::std::filesystem::path target( newName );
+        ::std::filesystem::create_directories( target.parent_path() );
         ::std::filesystem::rename( ::std::filesystem::path( oldFilename ), target );
         rtn = 0;
     }

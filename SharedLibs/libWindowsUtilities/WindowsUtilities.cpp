@@ -126,7 +126,7 @@ static std::unordered_map< std::string, const GUID> _knownFolderMap = {
     { "FOLDERID_UserPinned", FOLDERID_UserPinned },
     { "FOLDERID_UserProfiles", FOLDERID_UserProfiles },
     { "FOLDERID_UserProgramFiles", FOLDERID_UserProgramFiles },
-    { "FOLDERID_UserProgramFilesCommon", FOLDERID_UserProgramFiles },
+    { "FOLDERID_UserProgramFilesCommon", FOLDERID_UserProgramFilesCommon },
     { "FOLDERID_UsersFiles", FOLDERID_UsersFiles },
     { "FOLDERID_UsersLibraries", FOLDERID_UsersLibraries },
     { "FOLDERID_Videos", FOLDERID_Videos },
