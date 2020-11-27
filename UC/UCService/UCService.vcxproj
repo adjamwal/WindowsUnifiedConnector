@@ -89,14 +89,14 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -113,13 +113,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -137,7 +137,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,7 +145,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -163,7 +163,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -171,7 +171,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;jsoncpp.lib;Wintrust.lib;Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -205,6 +205,9 @@
     <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SharedLibs\libCrashHandlerClient\libCrashHandlerClient.vcxproj">
+      <Project>{58783f4f-d8a3-4409-a4d0-618441c95c8e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>

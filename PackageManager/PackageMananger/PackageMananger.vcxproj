@@ -99,14 +99,14 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -122,7 +122,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -131,7 +131,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -145,14 +145,14 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -168,7 +168,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)PackageManager\PackageManagerAgent</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -177,7 +177,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
@@ -208,6 +208,9 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SharedLibs\libCrashHandlerClient\libCrashHandlerClient.vcxproj">
+      <Project>{58783f4f-d8a3-4409-a4d0-618441c95c8e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>

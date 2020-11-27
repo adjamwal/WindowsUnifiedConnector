@@ -57,6 +57,11 @@ public:
     void MakeResolveKnownFolderIdReturn( std::string value );
     void ExpectResolveKnownFolderIdIsNotCalled();
 
+    MOCK_METHOD0( GetDataDir, std::wstring() );
+    void MakeGetDataDirReturn( std::wstring value );
+    void ExpectGetDataDirIsNotCalled();
+
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();

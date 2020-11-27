@@ -5,6 +5,7 @@
 #include <Evntrace.h>
 #include <memory>
 #include "ServiceLogManager.h"
+#include "CrashHandlerClient.h"
 
 class ServiceBase
 {
@@ -46,8 +47,11 @@ private:
     void Pause();
     void Continue();
     void Shutdown();
+    void StartCrashHandler();
+    void StopCrashHandler();
 
     static ServiceBase* s_service;
     SERVICE_STATUS_HANDLE m_statusHandle;
     SERVICE_STATUS m_status;
+    CrashHandlerClient m_crashHandler;
 };

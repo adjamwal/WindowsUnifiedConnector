@@ -253,6 +253,7 @@ bool WindowsUtilities::GetSysDirectory( std::string& path )
             path = _g_converter.to_bytes( tmpPath );
         }
         
+        CoTaskMemFree( tmpPath );
         ret = true;
     }
     
@@ -306,4 +307,22 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
     }
 
     return knownFolder;
+}
+
+std::wstring WindowsUtilities::GetDataDir()
+{
+    PWSTR path = NULL;
+    std::wstring dataDir;
+
+    HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
+
+    if( SUCCEEDED( hr ) ) {
+        dataDir = path;
+        CoTaskMemFree( path );
+        path = NULL;
+        
+        dataDir += L"\\Cisco\\UC";
+    }
+
+    return dataDir;
 }
