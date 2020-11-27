@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 struct FileUtilHandle;
 
@@ -11,6 +12,8 @@ public:
     virtual ~IFileUtil() {}
 
     virtual std::string ReadFile( const std::string& filename ) = 0;
+    virtual bool WriteLine( const std::string& filename, const std::string& data ) = 0;
+    virtual std::vector<std::string> ReadFileLines( const std::string& filename ) = 0;
     virtual FileUtilHandle* PmCreateFile( const std::string& filename ) = 0;
     virtual int32_t CloseFile( FileUtilHandle* handle ) = 0;
     virtual int32_t AppendFile( FileUtilHandle* handle, void* data, size_t dataLen ) = 0;

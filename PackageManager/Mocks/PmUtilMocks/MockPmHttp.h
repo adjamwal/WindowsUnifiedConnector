@@ -31,6 +31,7 @@ public:
 
     MOCK_METHOD5( HttpPost, int32_t( const std::string&, void*, size_t, std::string&, int32_t& ) );
     void MakeHttpPostReturn( int32_t value );
+    void MakeHttpPostReturn( int32_t value, int32_t httpResponse );
     void ExpectHttpPostIsNotCalled();
 
     MOCK_METHOD3( HttpDownload, int32_t( const std::string&, const std::string&, int32_t& ) );
