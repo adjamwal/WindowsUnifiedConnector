@@ -7,7 +7,7 @@ MockPmHttp::MockPmHttp()
     MakeSetTokenReturn( int32_t() );
     MakeSetCertsReturn( int32_t() );
     MakeHttpGetReturn( int32_t() );
-    MakeHttpPostReturn( int32_t() );
+    MakeHttpPostReturn( int32_t(), 200 );
     MakeHttpDownloadReturn( int32_t() );
 }
 
@@ -65,9 +65,14 @@ void MockPmHttp::ExpectHttpGetIsNotCalled()
     EXPECT_CALL( *this, HttpGet( _, _, _ ) ).Times( 0 );
 }
 
-void MockPmHttp::MakeHttpPostReturn( int32_t value )
+void MockPmHttp::MakeHttpPostReturn( int32_t value  )
 {
-    ON_CALL( *this, HttpPost( _, _, _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, HttpPost( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( 200 ), Return( value ) ) );
+}
+
+void MockPmHttp::MakeHttpPostReturn( int32_t value, int32_t httpResponse )
+{
+    ON_CALL( *this, HttpPost( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( httpResponse ), Return( value ) ) );
 }
 
 void MockPmHttp::ExpectHttpPostIsNotCalled()

@@ -8,9 +8,17 @@ public:
     MockFileUtil();
     ~MockFileUtil();
 
-    MOCK_METHOD1( ReadFile, std::string( const std::string& ));
+    MOCK_METHOD1( ReadFile, std::string( const std::string& ) );
     void MakeReadFileReturn( std::string value );
     void ExpectReadFileNotCalled();
+
+    MOCK_METHOD2( WriteLine, bool( const std::string&, const std::string& ) );
+    void MakeWriteLineReturn( bool value );
+    void ExpectWriteLineNotCalled();
+
+    MOCK_METHOD1( ReadFileLines, std::vector<std::string>( const std::string& ) );
+    void MakeReadFileLinesReturn( std::vector<std::string> value );
+    void ExpectReadFileLinesNotCalled();
 
     MOCK_METHOD1( PmCreateFile, FileUtilHandle*( const std::string& ) );
     void MakePmCreateFileReturn( FileUtilHandle* value );
