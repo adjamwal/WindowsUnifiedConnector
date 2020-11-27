@@ -39,6 +39,43 @@ std::string FileUtil::ReadFile( const std::string& filename )
     return stream.str();
 }
 
+bool FileUtil::WriteLine( const std::string& filename, const std::string& data )
+{
+    bool ret = false;
+    std::ofstream file( filename, std::ios_base::app );
+
+    if ( file.is_open() )
+    {
+        file << data << "\n";
+        file.close();
+        ret = true;
+    }
+
+    return ret;
+}
+
+std::vector<std::string> FileUtil::ReadFileLines( const std::string& filename )
+{
+    std::vector<std::string> lines;
+    std::ifstream file( filename );
+
+    if ( file.is_open() )
+    {
+        std::string str;
+
+        while ( std::getline( file, str ) )
+        {
+            lines.push_back( str );
+        }
+
+        file.close();
+
+        ::std::filesystem::remove( ::std::filesystem::path( filename ) );
+    }
+    
+    return lines;
+}
+
 FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
 {
     FileUtilHandle* handle = NULL;

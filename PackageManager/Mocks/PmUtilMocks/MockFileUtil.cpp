@@ -23,6 +23,26 @@ void MockFileUtil::ExpectReadFileNotCalled()
     EXPECT_CALL( *this, ReadFile( _ ) ).Times( 0 );
 }
 
+void MockFileUtil::MakeWriteLineReturn( bool value )
+{
+    ON_CALL( *this, WriteLine( _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectWriteLineNotCalled()
+{
+    EXPECT_CALL( *this, WriteLine( _, _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeReadFileLinesReturn( std::vector<std::string> value )
+{
+    ON_CALL( *this, ReadFileLines( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectReadFileLinesNotCalled()
+{
+    EXPECT_CALL( *this, ReadFileLines( _ ) ).Times( 0 );
+}
+
 void MockFileUtil::MakePmCreateFileReturn( FileUtilHandle* value )
 {
     ON_CALL( *this, PmCreateFile( _ ) ).WillByDefault( Return( value ) );
