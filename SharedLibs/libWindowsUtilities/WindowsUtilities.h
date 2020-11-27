@@ -23,4 +23,5 @@ public:
     static bool GetSysDirectory( std::string& path );
     static std::vector<WindowsInstallProgram> GetInstalledPrograms();
     static std::string ResolveKnownFolderId( const std::string& knownFolderId );
+    static std::wstring GetDataDir();
 };

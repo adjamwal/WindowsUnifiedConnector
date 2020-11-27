@@ -9,6 +9,8 @@
 #include "UcLogFile.h"
 #include "PmAgent.h"
 #include "PmAgentContainer.h"
+#include "CrashHandlerClient.h"
+#include "WindowsUtilities.h"
 
 void WaitForTermination()
 {
@@ -31,6 +33,12 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
     _In_ LPWSTR    lpCmdLine,
     _In_ int       nCmdShow )
 {
+    std::wstring dataDir = WindowsUtilities::GetDataDir();
+
+    CrashHandlerClient crashClient( nullptr );
+    crashClient.Init( dataDir.c_str(), MiniDumpNormal );
+    crashClient.SetupCrashHandler();
+
     UcLogFile logFile;
     logFile.Init();
 
@@ -89,6 +97,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 
     agentContainer.pmAgent().Stop();
 
+    crashClient.RemoveCrashHandler();
     LOG_DEBUG( "Exit" );
     return 0;
 }

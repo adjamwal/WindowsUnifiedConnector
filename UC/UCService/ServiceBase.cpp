@@ -5,8 +5,10 @@
 #include <iostream>
 #include <fstream>  
 
+#include "DbgHelp.h"
 #include "ServiceBase.h"
 #include "IUcLogger.h"
+#include "WindowsUtilities.h"
 
 //
 // UC Service trace event provider
@@ -90,13 +92,16 @@ ServiceBase::ServiceBase(
     , m_logMgr( nullptr )
     , m_etwRegHandle( 0 )
     , m_statusHandle( nullptr )
+    , m_crashHandler( CrashHandlerClient( nullptr ) )
 {
+    StartCrashHandler();
     InitializeLogging( fCanStop, fCanShutdown, fCanPauseContinue );
 }
 
 ServiceBase::~ServiceBase( void )
 {
     DeinitializeLogging();
+    StopCrashHandler();
 }
 
 #pragma endregion
@@ -310,6 +315,19 @@ void ServiceBase::DeinitializeLogging()
         }
     }
     catch( ... ) { };
+}
+
+void ServiceBase::StartCrashHandler()
+{
+    std::wstring dataDir = WindowsUtilities::GetDataDir();
+
+    m_crashHandler.Init( dataDir.c_str(), MiniDumpNormal );
+    m_crashHandler.SetupCrashHandler();
+}
+
+void ServiceBase::StopCrashHandler()
+{
+    m_crashHandler.RemoveCrashHandler();
 }
 
 #pragma endregion
