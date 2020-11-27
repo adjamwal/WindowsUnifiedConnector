@@ -9,7 +9,7 @@ public:
     MockPmHttp();
     ~MockPmHttp();
 
-    MOCK_METHOD3( Init, int32_t( PM_PROGRESS_CALLBACK, void*, std::string& ) );
+    MOCK_METHOD3( Init, int32_t( PM_PROGRESS_CALLBACK, void*, const std::string& ) );
     void MakeInitReturn( int32_t value );
     void ExpectInitIsNotCalled();
 

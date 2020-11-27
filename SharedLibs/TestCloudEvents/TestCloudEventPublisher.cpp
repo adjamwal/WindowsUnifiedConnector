@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "CloudEventBuilder.h"
-#include "MockHttpAdapter.h"
+#include "MockPmHttp.h"
 #include "CloudEventPublisher.h"
 #include <memory>
 
@@ -10,7 +10,7 @@ class TestCloudEventPublisher : public ::testing::Test
 protected:
     void SetUp()
     {
-        m_httpAdapter.reset( new NiceMock<MockHttpAdapter>() );
+        m_httpAdapter.reset( new NiceMock<MockPmHttp>() );
         m_eventPublisher.reset( new CloudEventPublisher( *m_httpAdapter, "https://4m2294wzqf.execute-api.us-west-1.amazonaws.com/dev/identify/event" ) );
 
         m_eventBuilder
@@ -30,7 +30,7 @@ protected:
     }
 
     CloudEventBuilder m_eventBuilder;
-    std::unique_ptr<MockHttpAdapter> m_httpAdapter;
+    std::unique_ptr<MockPmHttp> m_httpAdapter;
     std::unique_ptr<ICloudEventPublisher> m_eventPublisher;
 };
 
