@@ -16,7 +16,6 @@ public:
     virtual ICloudEventBuilder& WithError( int code, const std::string message ) = 0;
     virtual ICloudEventBuilder& WithOldFile( const std::string path, const std::string hash, int size ) = 0;
     virtual ICloudEventBuilder& WithNewFile( const std::string path, const std::string hash, int size ) = 0;
-    virtual ICloudEventBuilder& WithJsonString( const std::string json ) = 0;
     virtual std::string Build() = 0;
     virtual void Reset() = 0;
 

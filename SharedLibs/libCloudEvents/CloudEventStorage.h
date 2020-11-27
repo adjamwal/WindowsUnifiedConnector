@@ -2,6 +2,7 @@
 
 #include "ICloudEventStorage.h"
 #include "../../PackageManager/PmUtil/IFileUtil.h"
+#include <mutex>
 
 class CloudEventStorage : public ICloudEventStorage
 {
@@ -14,6 +15,7 @@ public:
     std::vector<std::string> ReadEvents() override;
 
 private:
+    std::mutex m_mutex;
     std::string m_fileName;
     IFileUtil& m_fileUtil;
 };

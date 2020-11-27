@@ -60,15 +60,18 @@ TEST_F( TestCloudEventStorage, TestMultipleEventsSaveToFile )
 {
     std::vector<std::string> events;
 
-    m_eventStorage->SaveEvent( m_eventBuilder1 );
-    m_eventStorage->SaveEvent( m_eventBuilder2 );
-    m_eventStorage->SaveEvent( m_eventBuilder1 );
+    std::string event1 = m_eventBuilder1.Build();
+    std::string event2 = m_eventBuilder2.Build();
+
+    m_eventStorage->SaveEvent( event1 );
+    m_eventStorage->SaveEvent( event2 );
+    m_eventStorage->SaveEvent( event1 );
 
     events = m_eventStorage->ReadEvents();
 
     EXPECT_EQ( events.size(), 3 );
 
-    ASSERT_TRUE( events.at( 0 ).find( "\"ucid\":\"5B3861FF-2690-45D4-A49D-8F8CD18BBFC6\"" ) != std::string::npos );
-    ASSERT_TRUE( events.at( 1 ).find( "\"ucid\":\"6361E811-BEFE-477A-9D1C-231D4E9C2CF3\"" ) != std::string::npos );
-    ASSERT_TRUE( events.at( 2 ).find( "\"ucid\":\"5B3861FF-2690-45D4-A49D-8F8CD18BBFC6\"" ) != std::string::npos );
+    EXPECT_EQ( events.at( 0 ), event1 );
+    EXPECT_EQ( events.at( 1 ), event2 );
+    EXPECT_EQ( events.at( 2 ), event1 );
 }

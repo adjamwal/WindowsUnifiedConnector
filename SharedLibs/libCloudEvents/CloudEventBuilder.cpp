@@ -70,26 +70,6 @@ ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::string path, cons
     return *this;
 }
 
-ICloudEventBuilder& CloudEventBuilder::WithJsonString( const std::string json )
-{
-    std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root;
-    std::string jsonError;
-
-    if ( json.empty() ) {
-        throw(std::exception( __FUNCTION__ ": json contents is empty" ));
-    }
-    else if ( !jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, &jsonError ) ) {
-        jsonError = std::string( __FUNCTION__ ) + ": " + jsonError;
-        throw(std::exception( jsonError.c_str() ));
-    }
-    else if ( root.isMember( "event" ) ) {
-        throw(std::exception( __FUNCTION__ ": missing event element" ));
-    }
-
-    return *this;
-}
-
 std::string CloudEventBuilder::Build()
 {
     Json::Value event;

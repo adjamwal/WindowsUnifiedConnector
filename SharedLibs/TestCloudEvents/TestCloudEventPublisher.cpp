@@ -40,14 +40,23 @@ protected:
 
 TEST_F( TestCloudEventPublisher, EventPublisherCallsHttpPost )
 {
-    m_httpAdapter->MakeHttpPostReturn( 201 );
+    m_httpAdapter->MakeHttpPostReturn( 5 );
     EXPECT_CALL( *m_httpAdapter, HttpPost( _, _, _, _, _ ) ).Times( 1 );
-    EXPECT_EQ( 201, m_eventPublisher->Publish( m_eventBuilder ) );
+    EXPECT_EQ( 5, m_eventPublisher->Publish( m_eventBuilder ) );
 }
 
-TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEvent )
+TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpError )
 {
     m_httpAdapter->MakeHttpPostReturn( -1 );
+
+    EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
+
+    m_eventPublisher->Publish( m_eventBuilder );
+}
+
+TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpCode )
+{
+    m_httpAdapter->MakeHttpPostReturn( 0, 400 );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
 

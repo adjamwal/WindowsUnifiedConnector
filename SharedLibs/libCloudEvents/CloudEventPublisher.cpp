@@ -47,7 +47,7 @@ int32_t CloudEventPublisher::Publish( const std::string& eventJson )
         eventResponse,
         httpReturn );
 
-    if ( postReturn )
+    if ( postReturn || httpReturn < 200 || httpReturn >= 300 )
     {
         m_eventStorage.SaveEvent( eventJson );
     }

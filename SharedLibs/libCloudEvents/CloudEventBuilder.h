@@ -31,7 +31,6 @@ public:
     ICloudEventBuilder& WithError( int code, const std::string message ) override;
     ICloudEventBuilder& WithOldFile( const std::string path, const std::string hash, int size ) override;
     ICloudEventBuilder& WithNewFile( const std::string path, const std::string hash, int size ) override;
-    ICloudEventBuilder& WithJsonString( const std::string json ) override;
     std::string Build() override;
     void Reset() override;
 
