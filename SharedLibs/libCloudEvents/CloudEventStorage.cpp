@@ -20,7 +20,12 @@ int32_t CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
     return m_fileUtil.WriteLine( m_fileName, eventStr );
 }
 
-void CloudEventStorage::ReadEvents( std::vector<std::string>& events )
+int32_t CloudEventStorage::SaveEvent( const std::string& event )
 {
-    events = m_fileUtil.ReadFileLines( m_fileName );
+    return m_fileUtil.WriteLine( m_fileName, event );
+}
+
+std::vector<std::string> CloudEventStorage::ReadEvents()
+{
+    return m_fileUtil.ReadFileLines( m_fileName );
 }

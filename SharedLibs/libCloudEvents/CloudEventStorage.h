@@ -10,7 +10,8 @@ public:
     ~CloudEventStorage();
 
     int32_t SaveEvent( ICloudEventBuilder& event ) override;
-    void ReadEvents( std::vector<std::string>& events ) override;
+    int32_t SaveEvent( const std::string& event ) override;
+    std::vector<std::string> ReadEvents() override;
 
 private:
     std::string m_fileName;
