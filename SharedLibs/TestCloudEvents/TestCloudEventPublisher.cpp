@@ -13,7 +13,7 @@ protected:
     {
         m_httpAdapter.reset( new NiceMock<MockPmHttp>() );
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
-        m_eventPublisher.reset( new CloudEventPublisher( *m_httpAdapter, *m_eventStorage, "https://4m2294wzqf.execute-api.us-west-1.amazonaws.com/dev/identify/event" ) );
+        m_eventPublisher.reset( new CloudEventPublisher( *m_httpAdapter, *m_eventStorage, CLOUD_EVENT_PUBLISHING_URL ) );
 
         m_eventBuilder
             .WithUCID( "5B3861FF-2690-45D4-A49D-8F8CD18BBFC6" )

@@ -28,6 +28,9 @@
     <ClCompile Include="TestPmManifest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\SharedLibs\MockCloudEvents\MockCloudEvents.vcxproj">
+      <Project>{f40a9e15-7cf0-4ac0-9741-6a7e29cf4b96}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Mocks\PmMocks\PmMocks.vcxproj">
       <Project>{55cd001d-26a5-4864-89c6-ebdae64551a0}</Project>
     </ProjectReference>
@@ -115,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)SharedLibs\MockCloudEvents;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -133,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)SharedLibs\MockCloudEvents;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -151,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)SharedLibs\MockCloudEvents;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -169,7 +172,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)SharedLibs\MockCloudEvents;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\PmMocks;$(SolutionDir)PackageManager\Mocks\PmUtilMocks;$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)PackageManager\PackageManagerClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

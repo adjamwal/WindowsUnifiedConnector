@@ -120,6 +120,8 @@ std::string CloudEventBuilder::Build()
 
     LOG_DEBUG( __FUNCTION__ ": %s", result.c_str() );
 
+    Reset();
+
     return result;
 }
 

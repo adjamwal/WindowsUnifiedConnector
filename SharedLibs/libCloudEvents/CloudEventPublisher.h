@@ -6,12 +6,15 @@
 #include <mutex>
 #include <string>
 
+#define CLOUD_EVENT_PUBLISHING_URL "https://4m2294wzqf.execute-api.us-west-1.amazonaws.com/dev/identify/event"
+
 class CloudEventPublisher final : public ICloudEventPublisher
 {
 public:
     CloudEventPublisher( IPmHttp& httpAdapter, ICloudEventStorage& eventStorage, const std::string& eventEndpointUrl );
     ~CloudEventPublisher();
 
+    void SetToken( const std::string& token ) override;
     int32_t Publish( ICloudEventBuilder& event ) override;
     int32_t Publish( const std::string& eventJson ) override;
     int32_t PublishFailedEvents() override;

@@ -173,7 +173,7 @@
     <ClInclude Include="UCIDApiDll.h" />
     <ClInclude Include="WinCertLoader.h" />
     <ClInclude Include="WindowsComponentManager.h" />
-    <ClInclude Include="WindowsConfiguraton.h" />
+    <ClInclude Include="WindowsConfiguration.h" />
     <ClInclude Include="WindowsPmDependencies.h" />
   </ItemGroup>
   <ItemGroup>

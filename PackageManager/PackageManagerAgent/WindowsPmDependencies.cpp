@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "WindowsPmDependencies.h"
-#include "WindowsConfiguraton.h"
+#include "WindowsConfiguration.h"
 #include "WindowsComponentManager.h"
 
 WindowsPmDependencies::WindowsPmDependencies( WindowsConfiguration& configuration, WindowsComponentManager& componentManager ) :

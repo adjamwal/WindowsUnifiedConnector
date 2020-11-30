@@ -9,9 +9,13 @@ public:
     MockCloudEventPublisher();
     ~MockCloudEventPublisher();
 
-    MOCK_METHOD1( Publish, int32_t(ICloudEventBuilder& event) );
+    MOCK_METHOD1( SetToken, void( const std::string& ) );
+
+    MOCK_METHOD1( Publish, int32_t( ICloudEventBuilder& ) );
     void MakePublishReturn( int32_t value );
     void ExpectPublishNotCalled();
+
+    MOCK_METHOD1( Publish, int32_t( const std::string& ) );
 
     MOCK_METHOD0( PublishFailedEvents, int32_t() );
     void MakePublishFailedEventsReturn( int32_t value );

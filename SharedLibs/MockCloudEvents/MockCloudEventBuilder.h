@@ -9,10 +9,17 @@ public:
     MockCloudEventBuilder();
     ~MockCloudEventBuilder();
 
+    MOCK_METHOD1( WithUCID, ICloudEventBuilder& ( const std::string ) );
+    MOCK_METHOD1( WithType, ICloudEventBuilder& ( CloudEventType ) );
+    MOCK_METHOD2( WithPackage, ICloudEventBuilder& ( const std::string, const std::string ) );
+    MOCK_METHOD2( WithError, ICloudEventBuilder& ( int, const std::string ) );
+    MOCK_METHOD3( WithOldFile, ICloudEventBuilder& ( const std::string, const std::string, int ) );
+    MOCK_METHOD3( WithNewFile, ICloudEventBuilder& ( const std::string, const std::string, int ) );
+
     MOCK_METHOD0( Build, std::string() );
     void MakeBuildReturn( std::string value );
-    void ExpectBuildNotCalled();
+    void ExpectBuildIsNotCalled();
 
     MOCK_METHOD0( Reset, void() );
-    void ExpectResetNotCalled();
+    void ExpectResetIsNotCalled();
 };

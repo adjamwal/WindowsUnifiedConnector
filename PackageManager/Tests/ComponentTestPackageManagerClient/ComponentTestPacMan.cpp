@@ -21,6 +21,8 @@
 #include "MockPmPlatformComponentManager.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockSslUtil.h"
+#include "MockCloudEventBuilder.h"
+#include "MockCloudEventPublisher.h"
 
 class ComponentTestPacMan : public ::testing::Test
 {
@@ -44,9 +46,13 @@ protected:
         m_checkinFormatter.reset( new CheckinFormatter() );
         m_tokenAdapter.reset( new TokenAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
+
+        m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
+        m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
+
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
-        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor ) );
+        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor, *m_tokenAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
@@ -79,6 +85,8 @@ protected:
         m_componentPackageProcessor.reset();
         m_configProcesor.reset();
         m_checkinManifestRetriever.reset();
+        m_eventBuilder.reset();
+        m_eventPublisher.reset();
         m_certsAdapter.reset();
         m_tokenAdapter.reset();
         m_checkinFormatter.reset();
@@ -144,6 +152,9 @@ protected:
     std::unique_ptr<ITokenAdapter> m_tokenAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
+    std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
+    std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
+
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
     std::unique_ptr<IPackageConfigProcessor> m_configProcesor;

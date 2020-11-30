@@ -6,6 +6,8 @@
 #include "MockPmPlatformComponentManager.h"
 #include "MockSslUtil.h"
 #include "MockPackageConfigProcessor.h"
+#include "MockCloudEventBuilder.h"
+#include "MockCloudEventPublisher.h"
 
 #include <memory>
 
@@ -36,6 +38,8 @@ protected:
         m_pmComponentManager.reset();
         m_sslUtil.reset();
         m_configProcessor.reset();
+        m_eventBuilder.reset();
+        m_eventPublisher.reset();
 
         m_expectedComponentPackage = {};
     }
@@ -83,6 +87,8 @@ protected:
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;
     std::unique_ptr<MockPackageConfigProcessor> m_configProcessor;
+    std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
+    std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
 
     std::unique_ptr<ComponentPackageProcessor> m_patient;
 
