@@ -18,7 +18,7 @@
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <InstallExecuteSequence>
-          <Custom Action="DetectInvalidSideGrade" Before="FindRelatedProducts">
+          <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
             WIX_UPGRADE_DETECTED
           </Custom>
         </InstallExecuteSequence>
