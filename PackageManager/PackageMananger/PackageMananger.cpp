@@ -36,7 +36,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
     std::wstring dataDir = WindowsUtilities::GetDataDir();
 
     CrashHandlerClient crashClient( nullptr );
-    crashClient.Init( dataDir.c_str(), MiniDumpNormal );
+    crashClient.Init( dataDir.c_str(), MiniDumpWithFullMemory );
     crashClient.SetupCrashHandler();
 
     UcLogFile logFile;
