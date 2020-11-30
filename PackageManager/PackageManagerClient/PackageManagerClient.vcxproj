@@ -147,7 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(Platform)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -164,7 +164,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(Platform)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -181,7 +181,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(Platform)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -198,7 +198,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(Platform)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\PackageManagerAgent;$(SolutionDir)PackageManager\PmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

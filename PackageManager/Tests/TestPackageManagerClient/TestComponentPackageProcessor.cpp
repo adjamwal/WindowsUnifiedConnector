@@ -8,6 +8,7 @@
 #include "MockPackageConfigProcessor.h"
 #include "MockCloudEventBuilder.h"
 #include "MockCloudEventPublisher.h"
+#include "MockTokenAdapter.h"
 
 #include <memory>
 
@@ -22,8 +23,11 @@ protected:
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
         m_configProcessor.reset( new NiceMock<MockPackageConfigProcessor>() );
+        m_tokenAdapter.reset( new NiceMock<MockTokenAdapter>() );
+        m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
+        m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
 
-        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcessor ) );
+        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcessor, *m_tokenAdapter, *m_eventBuilder, *m_eventPublisher ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -38,6 +42,7 @@ protected:
         m_pmComponentManager.reset();
         m_sslUtil.reset();
         m_configProcessor.reset();
+        m_tokenAdapter.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
 
@@ -67,7 +72,7 @@ protected:
             "installLocation",
             "signerName",
             false
-        } );
+            } );
     }
 
     void SetupComponentPackageWithConfig()
@@ -87,18 +92,18 @@ protected:
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;
     std::unique_ptr<MockPackageConfigProcessor> m_configProcessor;
+    std::unique_ptr<MockTokenAdapter> m_tokenAdapter;
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
 
     std::unique_ptr<ComponentPackageProcessor> m_patient;
-
 };
 
 TEST_F( TestComponentPackageProcessor, WillTryToDownloadIfInitialized )
 {
     SetupComponentPackage();
     m_patient->Initialize( m_dep.get() );
-    
+
     EXPECT_CALL( *m_cloud, DownloadFile( m_expectedComponentPackage.installerUrl, _ ) ).Times( 1 );
 
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
