@@ -321,7 +321,7 @@ void ServiceBase::StartCrashHandler()
 {
     std::wstring dataDir = WindowsUtilities::GetDataDir();
 
-    m_crashHandler.Init( dataDir.c_str(), MiniDumpNormal );
+    m_crashHandler.Init( dataDir.c_str(), MiniDumpWithFullMemory );
     m_crashHandler.SetupCrashHandler();
 }
 
