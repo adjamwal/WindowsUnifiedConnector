@@ -52,7 +52,7 @@ protected:
     void SetupComponentPackage()
     {
         m_expectedComponentPackage = {
-            "packageName",
+            "test/1.0.0",
             "installerUrl",
             "installerType",
             "installerArgs",

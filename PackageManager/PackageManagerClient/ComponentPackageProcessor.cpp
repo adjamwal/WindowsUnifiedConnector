@@ -27,7 +27,7 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_configProcessor( configProcessor )
-    , m_tokenAdapter( m_tokenAdapter )
+    , m_tokenAdapter( tokenAdapter )
     , m_eventBuilder( eventBuilder )
     , m_eventPublisher( eventPublisher )
     , m_dependencies( nullptr )
@@ -69,17 +69,11 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
     m_eventPublisher.SetToken( ucidToken );
 
     ExtractPackageNameAndVersion( componentPackage.packageName, pkgName, pkgVersion );
+    bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageName, pkgName );
 
     m_eventBuilder.WithUCID( ucidToken );
     m_eventBuilder.WithPackage( pkgName, pkgVersion );
-    m_eventBuilder.WithType( CloudEventType::pkginstall );
-
-    PmDiscoveryComponent searchTarget = { componentPackage.packageName, pkgName };
-    std::vector<PmDiscoveryComponent> searchFor( { searchTarget } );
-    PackageInventory detectedInventory;
-    m_dependencies->ComponentManager().GetInstalledPackages( searchFor, detectedInventory );
-
-    m_eventBuilder.WithType( detectedInventory.packages.size() == 0 ? CloudEventType::pkginstall : CloudEventType::pkgreconfig );
+    m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
 
     std::stringstream ss;
     //TODO: Should make this more random
@@ -190,6 +184,19 @@ bool ComponentPackageProcessor::ExtractPackageNameAndVersion( const std::string&
     if( parts.size() > 1 ) version = parts[ 1 ];
 
     return parts.size() == 2;
+}
+
+bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly )
+{
+    if( !m_dependencies ) return false;
+
+    PmDiscoveryComponent searchTarget = { nameAndVersion, nameOnly };
+    std::vector<PmDiscoveryComponent> searchFor( { searchTarget } );
+    PackageInventory detectedInventory = {};
+
+    m_dependencies->ComponentManager().GetInstalledPackages( searchFor, detectedInventory );
+
+    return detectedInventory.packages.size() > 0;
 }
 
 bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& componentPackage )
