@@ -1,8 +1,11 @@
 #pragma once
 
 #include "ICloudEventStorage.h"
-#include "../../PackageManager/PmUtil/IFileUtil.h"
+#include "ICloudEventBuilder.h"
+#include "IFileUtil.h"
 #include <mutex>
+
+#define CLOUD_EVENT_STORAGE_FILE "uc_event.cache"
 
 class CloudEventStorage : public ICloudEventStorage
 {

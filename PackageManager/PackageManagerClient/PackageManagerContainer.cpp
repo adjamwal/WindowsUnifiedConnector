@@ -14,6 +14,9 @@
 #include "ComponentPackageProcessor.h"
 #include "ManifestProcessor.h"
 #include "PackageConfigProcessor.h"
+#include "CloudEventStorage.h"
+#include "CloudEventBuilder.h"
+#include "CloudEventPublisher.h"
 
 #include "FileUtil.h"
 #include "SslUtil.h"
@@ -38,9 +41,12 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_checkinFormatter( new CheckinFormatter() )
     , m_tokenAdapter( new TokenAdapter() )
     , m_certsAdapter( new CertsAdapter() )
+    , m_eventStorage( new CloudEventStorage( CLOUD_EVENT_STORAGE_FILE, *m_fileUtil ) )
+    , m_eventBuilder( new CloudEventBuilder() )
+    , m_eventPublisher( new CloudEventPublisher( *m_http, *m_eventStorage, CLOUD_EVENT_PUBLISHING_URL ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) )
-    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_packageConfigProcessor ) )
+    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_packageConfigProcessor, *m_tokenAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(
         new PackageManager( *m_config,

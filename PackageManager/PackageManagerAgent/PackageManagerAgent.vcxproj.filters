@@ -24,9 +24,6 @@
     <ClInclude Include="PmAgent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowsConfiguraton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WindowsComponentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -46,6 +43,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IWinCertLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsConfiguration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

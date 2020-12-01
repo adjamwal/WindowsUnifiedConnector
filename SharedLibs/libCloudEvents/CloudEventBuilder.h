@@ -2,13 +2,6 @@
 
 #include "ICloudEventBuilder.h"
 
-enum CloudEventType
-{
-    pkginstall,
-    pkgreconfig,
-    pkguninstall
-};
-
 static std::string CloudEventString( CloudEventType eventType )
 {
     switch( eventType )

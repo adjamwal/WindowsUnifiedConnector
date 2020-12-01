@@ -25,6 +25,11 @@ CloudEventPublisher::~CloudEventPublisher()
 {
 }
 
+void CloudEventPublisher::SetToken( const std::string& token )
+{
+    m_httpAdapter.SetToken( token );
+}
+
 int32_t CloudEventPublisher::Publish( ICloudEventBuilder& event )
 {
     std::string eventPayload = event.Build();

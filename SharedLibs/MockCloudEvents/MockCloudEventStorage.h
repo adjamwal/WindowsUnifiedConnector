@@ -2,6 +2,7 @@
 
 #include "pch.h"
 #include "ICloudEventStorage.h"
+#include "ICloudEventBuilder.h"
 
 class MockCloudEventStorage : public ICloudEventStorage
 {

@@ -170,6 +170,11 @@ bool FileUtil::FileExists( const std::string& filename )
     return ::std::filesystem::exists( filename );
 }
 
+size_t FileUtil::FileSize( const std::string& filename )
+{
+    return ::std::filesystem::file_size( filename );
+}
+
 std::string FileUtil::AppendPath( const std::string& basePath, const std::string& configPath )
 {
     std::filesystem::path path;

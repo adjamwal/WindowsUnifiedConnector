@@ -1,8 +1,9 @@
 #pragma once
-#include <vector>
 
-#include "../../PackageManager/PmUtil/IFileUtil.h"
-#include "ICloudEventBuilder.h"
+#include <vector>
+#include <string>
+
+class ICloudEventBuilder;
 
 class ICloudEventStorage
 {

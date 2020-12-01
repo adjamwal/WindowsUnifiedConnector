@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "PmAgentContainer.h"
-#include "WindowsConfiguraton.h"
+#include "WindowsConfiguration.h"
 #include "WindowsComponentManager.h"
 #include "WindowsPmDependencies.h"
 #include "PmAgent.h"

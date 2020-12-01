@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "WindowsConfiguraton.h"
+#include "WindowsConfiguration.h"
 #include "IWinCertLoader.h"
 #include "..\..\GlobalVersion.h"
 #include <codecvt>
