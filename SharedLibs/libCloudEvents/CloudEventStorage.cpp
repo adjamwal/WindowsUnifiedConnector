@@ -34,5 +34,9 @@ std::vector<std::string> CloudEventStorage::ReadEvents()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return m_fileUtil.ReadFileLines( m_fileName );
+    auto ret = m_fileUtil.ReadFileLines( m_fileName );
+
+    m_fileUtil.DeleteFile( m_fileName );
+
+    return ret;
 }

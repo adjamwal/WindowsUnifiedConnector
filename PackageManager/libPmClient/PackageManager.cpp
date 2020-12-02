@@ -15,6 +15,7 @@
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include "IPmPlatformConfiguration.h"
+#include "ICloudEventPublisher.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -28,6 +29,7 @@ PackageManager::PackageManager( IPmConfig& config,
     ICertsAdapter& certsAdapter,
     ICheckinManifestRetriever& manifestRetriever,
     IManifestProcessor& manifestProcessor,
+    ICloudEventPublisher& cloudEventPublisher,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
@@ -37,6 +39,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_certsAdapter( certsAdapter )
     , m_manifestRetriever( manifestRetriever )
     , m_manifestProcessor( manifestProcessor )
+    , m_cloudEventPublisher( cloudEventPublisher )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
@@ -153,6 +156,8 @@ void PackageManager::PmWorkflowThread()
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
         m_manifestProcessor.ProcessManifest( manifest );
+
+        m_cloudEventPublisher.PublishFailedEvents();
     }
     catch( std::exception& ex )
     {

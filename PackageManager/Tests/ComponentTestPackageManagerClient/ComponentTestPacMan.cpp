@@ -73,6 +73,7 @@ protected:
             *m_certsAdapter,
             *m_checkinManifestRetriever,
             *m_manifestProcessor,
+            *m_eventPublisher,
             *m_thread ) );
     }
 
@@ -672,6 +673,27 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
         {
             EXPECT_EQ( discoveryList.size(), 12 );
 
+            pass = true;
+            m_cv.notify_one();
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+
+    EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
+{
+    bool pass = false;
+    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+
+    EXPECT_CALL( *m_eventPublisher, PublishFailedEvents( ) ).WillOnce( Invoke(
+        [this, &pass]()
+        {
             pass = true;
             m_cv.notify_one();
             return 0;

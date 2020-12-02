@@ -69,8 +69,6 @@ std::vector<std::string> FileUtil::ReadFileLines( const std::string& filename )
         }
 
         file.close();
-
-        ::std::filesystem::remove( ::std::filesystem::path( filename ) );
     }
     
     return lines;
