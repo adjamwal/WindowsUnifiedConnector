@@ -3,6 +3,7 @@
 
 MockCloudEventBuilder::MockCloudEventBuilder()
 {
+    ON_CALL( *this, FromJson( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithUCID( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithType( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithPackage( _, _ ) ).WillByDefault( ReturnRef( *this ) );

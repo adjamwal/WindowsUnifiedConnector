@@ -18,12 +18,13 @@ public:
     CloudEventBuilder();
     ~CloudEventBuilder();
     
-    ICloudEventBuilder& WithUCID( const std::string ucid ) override;
+    ICloudEventBuilder& FromJson( const std::string& eventJson ) override;
+    ICloudEventBuilder& WithUCID( const std::string& ucid ) override;
     ICloudEventBuilder& WithType( CloudEventType evtype ) override;
-    ICloudEventBuilder& WithPackage( const std::string name, const std::string version ) override;
-    ICloudEventBuilder& WithError( int code, const std::string message ) override;
-    ICloudEventBuilder& WithOldFile( const std::string path, const std::string hash, int size ) override;
-    ICloudEventBuilder& WithNewFile( const std::string path, const std::string hash, int size ) override;
+    ICloudEventBuilder& WithPackage( const std::string& name, const std::string& version ) override;
+    ICloudEventBuilder& WithError( int code, const std::string& message ) override;
+    ICloudEventBuilder& WithOldFile( const std::string& path, const std::string& hash, int size ) override;
+    ICloudEventBuilder& WithNewFile( const std::string& path, const std::string& hash, int size ) override;
     std::string Build() override;
     void Reset() override;
 
@@ -40,6 +41,10 @@ private:
     std::string m_newPath;
     std::string m_newHash;
     int m_newSize;
+    std::string m_tse;
 
     std::string Now_RFC3339();
+    void UpdateEventTime();
+    std::string Serialize();
+    void Deserialize( const std::string& eventJson );
 };

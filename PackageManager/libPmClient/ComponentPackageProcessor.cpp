@@ -63,13 +63,16 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
 
     std::string pkgName;
     std::string pkgVersion;
+    std::string ucid = "replace-with-ucid"; // = m_dependencies->Configuration().GetUCID();
     std::string ucidToken = m_tokenAdapter.GetUcidToken();
     m_eventPublisher.SetToken( ucidToken );
 
     ExtractPackageNameAndVersion( componentPackage.packageName, pkgName, pkgVersion );
     bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageName, pkgName );
 
-    m_eventBuilder.WithUCID( ucidToken );
+    m_eventBuilder.Reset();
+
+    m_eventBuilder.WithUCID( ucid );
     m_eventBuilder.WithPackage( pkgName, pkgVersion );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
 
