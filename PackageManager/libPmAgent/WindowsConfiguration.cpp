@@ -21,7 +21,7 @@ bool WindowsConfiguration::UpdateUCID()
     bool ret = true;
     int32_t ucidRet = 0;
 
-    LOG_ERROR( "Refreshing UCID" );
+    LOG_DEBUG( "Refreshing UCID" );
     if (m_ucidApi.LoadApi()) {
         //refresh identity token
         ucidRet = m_ucidApi.RefreshToken();
