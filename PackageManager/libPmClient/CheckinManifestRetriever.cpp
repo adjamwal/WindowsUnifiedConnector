@@ -2,9 +2,9 @@
 #include "PmLogger.h"
 #include "PmCloud.h"
 
-CheckinManifestRetriever::CheckinManifestRetriever( IPmCloud& cloud, ITokenAdapter& tokenAdapter, ICertsAdapter& certsAdapter )
+CheckinManifestRetriever::CheckinManifestRetriever( IPmCloud& cloud, IUcidAdapter& ucidAdapter, ICertsAdapter& certsAdapter )
     : m_cloud( cloud )
-    , m_tokenAdapter( tokenAdapter )
+    , m_ucidAdapter( ucidAdapter )
     , m_certsAdapter( certsAdapter )
 {
 }
@@ -27,7 +27,7 @@ std::string CheckinManifestRetriever::GetCheckinManifestFrom( std::string uri, s
     }
 
     if ( checkinFailed ) {
-        m_tokenAdapter.Refresh();
+        m_ucidAdapter.Refresh();
         response = InternalGetCheckinManifestFrom( uri, payload );
     }
 
@@ -37,7 +37,7 @@ std::string CheckinManifestRetriever::GetCheckinManifestFrom( std::string uri, s
 std::string CheckinManifestRetriever::InternalGetCheckinManifestFrom( std::string uri, std::string payload )
 {
     m_cloud.SetUri( uri );
-    m_cloud.SetToken( m_tokenAdapter.GetAccessToken() );
+    m_cloud.SetToken( m_ucidAdapter.GetAccessToken() );
     m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
 
     LOG_DEBUG( "Checkin uri:%s, payload:%s", uri.c_str(), payload.c_str() );

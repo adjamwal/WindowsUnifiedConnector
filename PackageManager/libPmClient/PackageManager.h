@@ -10,7 +10,7 @@ class IPmConfig;
 class IPmCloud;
 class IPackageInventoryProvider;
 class ICheckinFormatter;
-class ITokenAdapter;
+class IUcidAdapter;
 class ICertsAdapter;
 class ICheckinManifestRetriever;
 class IManifestProcessor;
@@ -28,7 +28,7 @@ public:
         IPmCloud& cloud,
         IPackageInventoryProvider& packageInventoryProvider,
         ICheckinFormatter& checkinFormatter,
-        ITokenAdapter& tokenAdapter, 
+        IUcidAdapter& ucidAdapter, 
         ICertsAdapter& certsAdapter,
         ICheckinManifestRetriever& manifestRetriever,
         IManifestProcessor& manifestProcessor, 
@@ -47,7 +47,7 @@ private:
     IPmCloud& m_cloud;
     IPackageInventoryProvider& m_packageInventoryProvider;
     ICheckinFormatter& m_checkinFormatter;
-    ITokenAdapter& m_tokenAdapter;
+    IUcidAdapter& m_ucidAdapter;
     ICertsAdapter& m_certsAdapter;
     ICheckinManifestRetriever& m_manifestRetriever;
     IManifestProcessor& m_manifestProcessor;

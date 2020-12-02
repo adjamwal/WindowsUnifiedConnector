@@ -5,11 +5,11 @@
 class IPmPlatformDependencies;
 
 //boundary separation from the external IPmPlatformDependencies->Configuration.GetIdentityToken() for proper mocking
-class ITokenAdapter
+class IUcidAdapter
 {
 public:
-    ITokenAdapter() {}
-    virtual ~ITokenAdapter() {}
+    IUcidAdapter() {}
+    virtual ~IUcidAdapter() {}
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
     virtual std::string GetAccessToken() = 0;

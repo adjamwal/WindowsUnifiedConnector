@@ -1,45 +1,45 @@
-#include "MockTokenAdapter.h"
+#include "MockUcidAdapter.h"
 
-MockTokenAdapter::MockTokenAdapter()
+MockUcidAdapter::MockUcidAdapter()
 {
     MakeGetUcidTokenReturn( std::string() );
 }
 
-MockTokenAdapter::~MockTokenAdapter()
+MockUcidAdapter::~MockUcidAdapter()
 {
 }
 
-void MockTokenAdapter::ExpectInitializeIsNotCalled()
+void MockUcidAdapter::ExpectInitializeIsNotCalled()
 {
     EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
 }
 
-void MockTokenAdapter::MakeGetUcidTokenReturn( std::string value )
+void MockUcidAdapter::MakeGetUcidTokenReturn( std::string value )
 {
     ON_CALL( *this, GetAccessToken() ).WillByDefault( Return( value ) );
 }
 
-void MockTokenAdapter::ExpectGetUcidTokenIsNotCalled()
+void MockUcidAdapter::ExpectGetUcidTokenIsNotCalled()
 {
     EXPECT_CALL( *this, GetAccessToken() ).Times( 0 );
 }
 
-void MockTokenAdapter::MakeGetIdentityReturn( std::string value )
+void MockUcidAdapter::MakeGetIdentityReturn( std::string value )
 {
     ON_CALL( *this, GetIdentity() ).WillByDefault( Return( value ) );
 }
 
-void MockTokenAdapter::ExpectGetIdentityIsNotCalled()
+void MockUcidAdapter::ExpectGetIdentityIsNotCalled()
 {
     EXPECT_CALL( *this, GetIdentity() ).Times( 0 );
 }
 
-void MockTokenAdapter::MakeRefreshReturn( bool value )
+void MockUcidAdapter::MakeRefreshReturn( bool value )
 {
     ON_CALL( *this, Refresh() ).WillByDefault( Return( value ) );
 }
 
-void MockTokenAdapter::ExpectRefreshIsNotCalled()
+void MockUcidAdapter::ExpectRefreshIsNotCalled()
 {
     EXPECT_CALL( *this, Refresh() ).Times( 0 );
 }

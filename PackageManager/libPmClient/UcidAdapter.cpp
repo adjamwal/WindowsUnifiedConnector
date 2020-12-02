@@ -1,25 +1,25 @@
-#include "TokenAdapter.h"
+#include "UcidAdapter.h"
 #include "PmLogger.h"
 #include "PmHttp.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformConfiguration.h"
 
-TokenAdapter::TokenAdapter()
+UcidAdapter::UcidAdapter()
     : m_dependencies( nullptr )
 {
 }
 
-TokenAdapter::~TokenAdapter()
+UcidAdapter::~UcidAdapter()
 {
 }
 
-void TokenAdapter::Initialize( IPmPlatformDependencies* dep )
+void UcidAdapter::Initialize( IPmPlatformDependencies* dep )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     m_dependencies = dep;
 }
 
-std::string TokenAdapter::GetAccessToken()
+std::string UcidAdapter::GetAccessToken()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     std::string token;
@@ -35,7 +35,7 @@ std::string TokenAdapter::GetAccessToken()
     return token;
 }
 
-std::string TokenAdapter::GetIdentity()
+std::string UcidAdapter::GetIdentity()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     std::string ucid;
@@ -51,7 +51,7 @@ std::string TokenAdapter::GetIdentity()
     return ucid;
 }
 
-bool TokenAdapter::Refresh()
+bool UcidAdapter::Refresh()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     bool rtn = false;

@@ -1,13 +1,13 @@
 #pragma once
 #include "MocksCommon.h"
 
-#include "ITokenAdapter.h"
+#include "IUcidAdapter.h"
 
-class MockTokenAdapter : public ITokenAdapter
+class MockUcidAdapter : public IUcidAdapter
 {
 public:
-    MockTokenAdapter();
-    ~MockTokenAdapter();
+    MockUcidAdapter();
+    ~MockUcidAdapter();
 
     MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
     void ExpectInitializeIsNotCalled();

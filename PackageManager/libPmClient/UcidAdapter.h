@@ -1,14 +1,14 @@
 #pragma once
 
-#include "ITokenAdapter.h"
+#include "IUcidAdapter.h"
 #include "IPmPlatformDependencies.h"
 #include <mutex>
 
-class TokenAdapter : public ITokenAdapter
+class UcidAdapter : public IUcidAdapter
 {
 public:
-    TokenAdapter();
-    virtual ~TokenAdapter();
+    UcidAdapter();
+    virtual ~UcidAdapter();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
     std::string GetAccessToken() override;

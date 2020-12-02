@@ -5,7 +5,7 @@
 #include "IFileUtil.h"
 #include "ISslUtil.h"
 #include "IPackageConfigProcessor.h"
-#include "TokenAdapter.h"
+#include "IUcidAdapter.h"
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
 #include "PmLogger.h"
@@ -18,14 +18,14 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     IFileUtil& fileUtil,
     ISslUtil& sslUtil,
     IPackageConfigProcessor& configProcessor,
-    ITokenAdapter& tokenAdapter,
+    IUcidAdapter& ucidAdapter,
     ICloudEventBuilder& eventBuilder,
     ICloudEventPublisher& eventPublisher )
     : m_pmCloud( pmCloud )
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_configProcessor( configProcessor )
-    , m_tokenAdapter( tokenAdapter )
+    , m_ucidAdapter( ucidAdapter )
     , m_eventBuilder( eventBuilder )
     , m_eventPublisher( eventPublisher )
     , m_dependencies( nullptr )
@@ -63,7 +63,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
 
     std::string pkgName;
     std::string pkgVersion;
-    std::string ucidToken = m_tokenAdapter.GetAccessToken();
+    std::string ucidToken = m_ucidAdapter.GetAccessToken();
     m_eventPublisher.SetToken( ucidToken );
 
     ExtractPackageNameAndVersion( componentPackage.packageName, pkgName, pkgVersion );

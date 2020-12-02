@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "CheckinManifestRetriever.h"
 #include "MockPmCloud.h"
-#include "MockTokenAdapter.h"
+#include "MockUcidAdapter.h"
 #include "MockCertsAdapter.h"
 
 #include <memory>
@@ -12,7 +12,7 @@ protected:
     void SetUp()
     {
         m_cloud.reset( new NiceMock<MockPmCloud>() );
-        m_token.reset( new NiceMock<MockTokenAdapter>() );
+        m_token.reset( new NiceMock<MockUcidAdapter>() );
         m_certs.reset( new NiceMock<MockCertsAdapter>() );
         m_patient.reset( new CheckinManifestRetriever( *m_cloud, *m_token, *m_certs ) );
         m_cloud->MakeCheckinReturn( 200 );
@@ -27,7 +27,7 @@ protected:
     }
 
     std::unique_ptr<MockPmCloud> m_cloud;
-    std::unique_ptr<MockTokenAdapter> m_token;
+    std::unique_ptr<MockUcidAdapter> m_token;
     std::unique_ptr<MockCertsAdapter> m_certs;
     std::unique_ptr<CheckinManifestRetriever> m_patient;
 };

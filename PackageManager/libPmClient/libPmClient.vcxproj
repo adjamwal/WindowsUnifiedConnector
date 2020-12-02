@@ -38,7 +38,7 @@
     <ClInclude Include="IPmPlatformComponentManager.h" />
     <ClInclude Include="IPmPlatformConfiguration.h" />
     <ClInclude Include="IPmPlatformDependencies.h" />
-    <ClInclude Include="ITokenAdapter.h" />
+    <ClInclude Include="IUcidAdapter.h" />
     <ClInclude Include="ManifestProcessor.h" />
     <ClInclude Include="PackageConfigProcessor.h" />
     <ClInclude Include="PackageInventoryProvider.h" />
@@ -48,7 +48,7 @@
     <ClInclude Include="PmConfig.h" />
     <ClInclude Include="PmManifest.h" />
     <ClInclude Include="PmTypes.h" />
-    <ClInclude Include="TokenAdapter.h" />
+    <ClInclude Include="UcidAdapter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CertsAdapter.cpp" />
@@ -63,7 +63,7 @@
     <ClCompile Include="PmCloud.cpp" />
     <ClCompile Include="PmConfig.cpp" />
     <ClCompile Include="PmManifest.cpp" />
-    <ClCompile Include="TokenAdapter.cpp" />
+    <ClCompile Include="UcidAdapter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
