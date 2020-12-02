@@ -218,11 +218,15 @@ pipeline {
               dir('WindowsUnifiedConnector') {
                 powershell 'Compress-Archive -Path "Win32\\Debug" -DestinationPath "Debug-Win32.zip"'
                 powershell 'Compress-Archive -Path "x64\\Debug" -DestinationPath "Debug-x64.zip"'
-                powershell 'Compress-Archive -Path "Win32\\Release" -DestinationPath "Release-Win32.zip"'
-                powershell 'Compress-Archive -Path "x64\\Release" -DestinationPath "Release-x64.zip"'
+
+                dir('Symbols') {
+                  powershell "Move-Item -Path ..\\Win32\\Release\\ -Destination Win32"
+                  powershell "Move-Item -Path ..\\x64\\Release\\ -Destination x64"
+                }
+                powershell 'Compress-Archive -Path "Symbols\\*" -DestinationPath "Symbols.zip"'
                 
                 archiveArtifacts artifacts: '*.zip', fingerprint: true
-                
+
                 bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
                 bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
                 
@@ -231,6 +235,19 @@ pipeline {
               }
               
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+            }
+          }
+        }
+        stage ('Prepare Symbols') {
+          when {
+            not { changeRequest() }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+              dir('WindowsUnifiedConnector') {
+                stash name: 'SymbolStash', includes: 'Symbols.zip'
+              }
             }
           }
         }
@@ -257,6 +274,36 @@ pipeline {
               }
 
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+            }
+          }
+        }
+        stage ('Upload Symbols') {
+		  agent {
+            label 'Windows-Symbol-Server-Slave'
+          }
+          when {
+            not { changeRequest() }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+              powershell "gci env:"
+
+              try {
+                dir('WindowsUnifiedConnector') {
+			      powershell "git clean -dfx"
+                  unstash 'SymbolStash'
+                  powershell 'Expand-Archive -Path "Symbols.zip" -force'
+
+                  bat "\"C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64\\symstore.exe\" add /s C:\\SymbolStore\\dev\\ /compress /r /f Symbols\\* /t UnifiedConnector"
+                }
+              } catch (e) {
+                currentBuild.result = 'FAILURE'
+                throw e
+              } finally {
+			    // Since this is on a different node, it needs its own clean up call
+                cleanWs cleanWhenAborted: true, cleanWhenFailure: false, cleanWhenSuccess: true
+              }
             }
           }
         }
