@@ -5,7 +5,7 @@
 #include "IFileUtil.h"
 #include "ISslUtil.h"
 #include "IPackageConfigProcessor.h"
-#include "TokenAdapter.h"
+#include "IUcidAdapter.h"
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
 #include "PmLogger.h"
@@ -18,14 +18,14 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     IFileUtil& fileUtil,
     ISslUtil& sslUtil,
     IPackageConfigProcessor& configProcessor,
-    ITokenAdapter& tokenAdapter,
+    IUcidAdapter& ucidAdapter,
     ICloudEventBuilder& eventBuilder,
     ICloudEventPublisher& eventPublisher )
     : m_pmCloud( pmCloud )
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_configProcessor( configProcessor )
-    , m_tokenAdapter( tokenAdapter )
+    , m_ucidAdapter( ucidAdapter )
     , m_eventBuilder( eventBuilder )
     , m_eventPublisher( eventPublisher )
     , m_dependencies( nullptr )
@@ -63,16 +63,14 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
 
     std::string pkgName;
     std::string pkgVersion;
-    std::string ucid = "replace-with-ucid"; // = m_dependencies->Configuration().GetUCID();
-    std::string ucidToken = m_tokenAdapter.GetUcidToken();
-    m_eventPublisher.SetToken( ucidToken );
+    m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
 
     ExtractPackageNameAndVersion( componentPackage.packageName, pkgName, pkgVersion );
     bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageName, pkgName );
 
     m_eventBuilder.Reset();
 
-    m_eventBuilder.WithUCID( ucid );
+    m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
     m_eventBuilder.WithPackage( pkgName, pkgVersion );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
 
@@ -81,7 +79,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
     ss << m_fileUtil.GetTempDir() << "PMInstaller_" << m_fileCount++ << "." << componentPackage.installerType;
 
     int dlResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() );
-    if( !dlResult == 200 )
+    if( dlResult != 200 )
     {
         m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 );
 
