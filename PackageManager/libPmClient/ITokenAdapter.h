@@ -12,5 +12,7 @@ public:
     virtual ~ITokenAdapter() {}
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
-    virtual std::string GetUcidToken() = 0;
+    virtual std::string GetAccessToken() = 0;
+    virtual std::string GetIdentity() = 0;
+    virtual bool Refresh() = 0;
 };

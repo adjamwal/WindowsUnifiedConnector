@@ -11,11 +11,12 @@ public:
     virtual ~TokenAdapter();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
-    std::string GetUcidToken() override;
+    std::string GetAccessToken() override;
+    std::string GetIdentity() override;
+    bool Refresh() override;
 
 private:
     IPmPlatformDependencies* m_dependencies;
 
     std::mutex m_mutex;
-    std::string m_token;
 };

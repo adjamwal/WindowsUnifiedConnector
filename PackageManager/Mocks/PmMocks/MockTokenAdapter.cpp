@@ -16,11 +16,30 @@ void MockTokenAdapter::ExpectInitializeIsNotCalled()
 
 void MockTokenAdapter::MakeGetUcidTokenReturn( std::string value )
 {
-    ON_CALL( *this, GetUcidToken() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, GetAccessToken() ).WillByDefault( Return( value ) );
 }
 
 void MockTokenAdapter::ExpectGetUcidTokenIsNotCalled()
 {
-    EXPECT_CALL( *this, GetUcidToken() ).Times( 0 );
+    EXPECT_CALL( *this, GetAccessToken() ).Times( 0 );
 }
 
+void MockTokenAdapter::MakeGetIdentityReturn( std::string value )
+{
+    ON_CALL( *this, GetIdentity() ).WillByDefault( Return( value ) );
+}
+
+void MockTokenAdapter::ExpectGetIdentityIsNotCalled()
+{
+    EXPECT_CALL( *this, GetIdentity() ).Times( 0 );
+}
+
+void MockTokenAdapter::MakeRefreshReturn( bool value )
+{
+    ON_CALL( *this, Refresh() ).WillByDefault( Return( value ) );
+}
+
+void MockTokenAdapter::ExpectRefreshIsNotCalled()
+{
+    EXPECT_CALL( *this, Refresh() ).Times( 0 );
+}

@@ -18,4 +18,6 @@ private:
     ITokenAdapter& m_tokenAdapter;
     ICertsAdapter& m_certsAdapter;
     std::mutex m_mutex;
+
+    std::string InternalGetCheckinManifestFrom( std::string uri, std::string payload );
 };

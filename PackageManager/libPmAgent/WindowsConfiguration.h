@@ -3,6 +3,7 @@
 #include "IPmPlatformConfiguration.h"
 #include "IUcLogger.h"
 #include "UCIDApiDll.h"
+#include <mutex>
 
 class IWinCertLoader;
 
@@ -14,9 +15,20 @@ public:
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
-     *   communicating with the cloud.
+     *   communicating with the cloud. This may return a cached value
      */
-    bool GetIdentityToken( std::string& token ) override;
+    bool GetIdentityToken(std::string& token) override;
+
+    /**
+     * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
+     *   communicating with the cloud. This may return a cached value
+     */
+    bool GetUcIdentity(std::string& identity) override;
+
+    /**
+     * @brief Refreshes the UCID and UCID token values
+     */
+    bool RefreshIdentity() override;
 
     /**
      * @brief (Optional) Retrieves the clients system certs
@@ -43,4 +55,9 @@ public:
 private:
     IWinCertLoader& m_winCertLoader;
     UCIDApiDll m_ucidApi;
+    std::string m_token;
+    std::string m_ucid;
+    std::mutex m_ucidMutex;
+
+    bool UpdateUCID();
 };

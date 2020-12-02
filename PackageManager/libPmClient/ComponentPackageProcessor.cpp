@@ -63,7 +63,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
 
     std::string pkgName;
     std::string pkgVersion;
-    std::string ucidToken = m_tokenAdapter.GetUcidToken();
+    std::string ucidToken = m_tokenAdapter.GetAccessToken();
     m_eventPublisher.SetToken( ucidToken );
 
     ExtractPackageNameAndVersion( componentPackage.packageName, pkgName, pkgVersion );

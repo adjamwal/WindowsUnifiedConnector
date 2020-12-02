@@ -17,9 +17,20 @@ public:
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
-     *   communicating with the cloud.
+     *   communicating with the cloud. This may return a cached value
      */
     virtual bool GetIdentityToken( std::string& token ) = 0;
+
+    /**
+     * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
+     *   communicating with the cloud. This may return a cached value
+     */
+    virtual bool GetUcIdentity(std::string& identity) = 0;
+
+    /**
+     * @brief Refreshes the UCID and UCID token values
+     */
+    virtual bool RefreshIdentity() = 0;
 
     /**
      * @brief (Optional) Retrieves the clients system certs
