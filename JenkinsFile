@@ -278,7 +278,7 @@ pipeline {
           }
         }
         stage ('Upload Symbols') {
-		  agent {
+          agent {
             label 'Windows-Symbol-Server-Slave'
           }
           when {
@@ -291,7 +291,7 @@ pipeline {
 
               try {
                 dir('WindowsUnifiedConnector') {
-			      powershell "git clean -dfx"
+                  powershell "git clean -dfx"
                   unstash 'SymbolStash'
                   powershell 'Expand-Archive -Path "Symbols.zip" -force'
 
@@ -301,7 +301,7 @@ pipeline {
                 currentBuild.result = 'FAILURE'
                 throw e
               } finally {
-			    // Since this is on a different node, it needs its own clean up call
+                // Since this is on a different node, it needs its own clean up call
                 cleanWs cleanWhenAborted: true, cleanWhenFailure: false, cleanWhenSuccess: true
               }
             }
