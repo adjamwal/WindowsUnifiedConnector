@@ -8,7 +8,7 @@
 #include "MockPackageConfigProcessor.h"
 #include "MockCloudEventBuilder.h"
 #include "MockCloudEventPublisher.h"
-#include "MockTokenAdapter.h"
+#include "MockUcidAdapter.h"
 
 #include <memory>
 
@@ -23,11 +23,11 @@ protected:
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
         m_configProcessor.reset( new NiceMock<MockPackageConfigProcessor>() );
-        m_tokenAdapter.reset( new NiceMock<MockTokenAdapter>() );
+        m_ucidAdapter.reset( new NiceMock<MockUcidAdapter>() );
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
 
-        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcessor, *m_tokenAdapter, *m_eventBuilder, *m_eventPublisher ) );
+        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcessor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -42,7 +42,7 @@ protected:
         m_pmComponentManager.reset();
         m_sslUtil.reset();
         m_configProcessor.reset();
-        m_tokenAdapter.reset();
+        m_ucidAdapter.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
 
@@ -92,7 +92,7 @@ protected:
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;
     std::unique_ptr<MockPackageConfigProcessor> m_configProcessor;
-    std::unique_ptr<MockTokenAdapter> m_tokenAdapter;
+    std::unique_ptr<MockUcidAdapter> m_ucidAdapter;
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
 

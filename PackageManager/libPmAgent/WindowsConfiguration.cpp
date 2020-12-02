@@ -16,35 +16,73 @@ WindowsConfiguration::~WindowsConfiguration()
     m_winCertLoader.UnloadSystemCerts();
 }
 
-bool WindowsConfiguration::GetIdentityToken( std::string& token )
+bool WindowsConfiguration::UpdateUCID()
 {
     bool ret = true;
     int32_t ucidRet = 0;
 
-    if ( m_ucidApi.LoadApi() )
-    {
-        //refreshh indentity token
+    LOG_DEBUG( "Refreshing UCID" );
+    if (m_ucidApi.LoadApi()) {
+        //refresh identity token
         ucidRet = m_ucidApi.RefreshToken();
 
-        if ( ucidRet != 0 )
-        {
-            LOG_ERROR( "RefreshIdentityToken Failed: %d", ucidRet );
+        if (ucidRet != 0) {
+            LOG_ERROR("RefreshIdentityToken Failed: %d", ucidRet);
             ret = false;
         }
 
         //get token
-        ucidRet = m_ucidApi.GetToken( token );
+        ucidRet = m_ucidApi.GetToken( m_token );
 
-        if ( ucidRet != 0 )
-        {
-            LOG_ERROR( "GetIdentity Failed: %d", ucidRet );
+        if (ucidRet != 0) {
+            LOG_ERROR("GetToken Failed: %d", ucidRet);
+            ret = false;
+        }
+
+        ucidRet = m_ucidApi.GetId( m_ucid );
+        if (ucidRet != 0) {
+            LOG_ERROR("GetId Failed: %d", ucidRet);
             ret = false;
         }
 
         m_ucidApi.UnloadApi();
     }
-    
+
     return ret;
+}
+
+bool WindowsConfiguration::GetIdentityToken( std::string& token )
+{
+    std::lock_guard<std::mutex> lock( m_ucidMutex );
+    bool ret = true;
+
+    if ( m_ucid.empty() ) {
+        ret = UpdateUCID();
+    }
+
+    token = m_token;
+
+    return ret;
+}
+
+bool WindowsConfiguration::GetUcIdentity( std::string& identity )
+{
+    std::lock_guard<std::mutex> lock( m_ucidMutex );
+    bool ret = true;
+
+    if ( m_ucid.empty() ) {
+        ret = UpdateUCID();
+    }
+
+    identity = m_ucid;
+
+    return ret;
+}
+
+bool WindowsConfiguration::RefreshIdentity()
+{
+    std::lock_guard<std::mutex> lock( m_ucidMutex );
+    return UpdateUCID();
 }
 
 int32_t WindowsConfiguration::GetSslCertificates( X509*** certificates, size_t& count )

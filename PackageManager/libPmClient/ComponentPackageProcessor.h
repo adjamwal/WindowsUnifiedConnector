@@ -8,7 +8,7 @@ class IPmCloud;
 class IFileUtil;
 class ISslUtil;
 class IPackageConfigProcessor;
-class ITokenAdapter;
+class IUcidAdapter;
 class ICloudEventBuilder;
 class ICloudEventPublisher;
 
@@ -20,7 +20,7 @@ public:
         IFileUtil& fileutil, 
         ISslUtil& sslUtil, 
         IPackageConfigProcessor& configProcessor, 
-        ITokenAdapter& tokenAdapter,
+        IUcidAdapter& ucidAdapter,
         ICloudEventBuilder& eventBuilder,
         ICloudEventPublisher& eventPublisher
     );
@@ -35,7 +35,7 @@ private:
     IFileUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     IPackageConfigProcessor& m_configProcessor;
-    ITokenAdapter& m_tokenAdapter;
+    IUcidAdapter& m_ucidAdapter;
     ICloudEventBuilder& m_eventBuilder;
     ICloudEventPublisher& m_eventPublisher;
     IPmPlatformDependencies* m_dependencies;

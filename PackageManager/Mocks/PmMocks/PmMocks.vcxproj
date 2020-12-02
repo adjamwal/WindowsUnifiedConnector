@@ -31,7 +31,7 @@
     <ClInclude Include="MockPmPlatformComponentManager.h" />
     <ClInclude Include="MockPmPlatformConfiguration.h" />
     <ClInclude Include="MockPmPlatformDependencies.h" />
-    <ClInclude Include="MockTokenAdapter.h" />
+    <ClInclude Include="MockUcidAdapter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockCertsAdapter.cpp" />
@@ -46,7 +46,7 @@
     <ClCompile Include="MockPmPlatformComponentManager.cpp" />
     <ClCompile Include="MockPmPlatformConfiguration.cpp" />
     <ClCompile Include="MockPmPlatformDependencies.cpp" />
-    <ClCompile Include="MockTokenAdapter.cpp" />
+    <ClCompile Include="MockUcidAdapter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
