@@ -6,12 +6,12 @@
 #include "IWorkerThread.h"
 #include "IPmConfig.h"
 #include "IPmCloud.h"
-#include "PackageInventoryProvider.h"
-#include "CheckinFormatter.h"
-#include "TokenAdapter.h"
-#include "CertsAdapter.h"
-#include "CheckinManifestRetriever.h"
-#include "ManifestProcessor.h"
+#include "IPackageInventoryProvider.h"
+#include "ICheckinFormatter.h"
+#include "IUcidAdapter.h"
+#include "ICertsAdapter.h"
+#include "ICheckinManifestRetriever.h"
+#include "IManifestProcessor.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include "IPmPlatformConfiguration.h"
@@ -25,7 +25,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IPmCloud& cloud,
     IPackageInventoryProvider& packageInventoryProvider,
     ICheckinFormatter& checkinFormatter,
-    ITokenAdapter& tokenAdapter,
+    IUcidAdapter& ucidAdapter,
     ICertsAdapter& certsAdapter,
     ICheckinManifestRetriever& manifestRetriever,
     IManifestProcessor& manifestProcessor,
@@ -35,7 +35,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_cloud( cloud )
     , m_packageInventoryProvider( packageInventoryProvider )
     , m_checkinFormatter( checkinFormatter )
-    , m_tokenAdapter( tokenAdapter )
+    , m_ucidAdapter( ucidAdapter )
     , m_certsAdapter( certsAdapter )
     , m_manifestRetriever( manifestRetriever )
     , m_manifestProcessor( manifestProcessor )
@@ -117,7 +117,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
 
     try
     {
-        m_tokenAdapter.Initialize( m_dependencies );
+        m_ucidAdapter.Initialize( m_dependencies );
         m_certsAdapter.Initialize( m_dependencies );
         m_manifestProcessor.Initialize( m_dependencies );
         m_packageInventoryProvider.Initialize( m_dependencies );

@@ -13,6 +13,14 @@ public:
     void MakeGetIdentityTokenReturn( bool value );
     void ExpectGetIdentityTokenIsNotCalled();
 
+    MOCK_METHOD1( GetUcIdentity, bool( std::string& ) );
+    void MakeGetUcIdentityReturn( bool value );
+    void ExpectGetUcIdentityIsNotCalled();
+
+    MOCK_METHOD0( RefreshIdentity, bool() );
+    void MakeRefreshIdentityReturn( bool value );
+    void ExpectRefreshIdentityIsNotCalled();
+
     MOCK_METHOD2( GetSslCertificates, int32_t( X509***, size_t & ) );
     void MakeGetSslCertificatesReturn( int32_t value );
     void ExpectGetSslCertificatesIsNotCalled();

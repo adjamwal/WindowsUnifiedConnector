@@ -51,7 +51,7 @@
     <ClInclude Include="MockPmPlatformDependencies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MockTokenAdapter.h">
+    <ClInclude Include="MockUcidAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,7 +92,7 @@
     <ClCompile Include="MockPmPlatformDependencies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MockTokenAdapter.cpp">
+    <ClCompile Include="MockUcidAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

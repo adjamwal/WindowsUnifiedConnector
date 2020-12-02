@@ -4,7 +4,7 @@
 #include "PackageManager.h"
 #include "PackageInventoryProvider.h"
 #include "CheckinFormatter.h"
-#include "TokenAdapter.h"
+#include "UcidAdapter.h"
 #include "CertsAdapter.h"
 #include "CheckinManifestRetriever.h"
 #include "ComponentPackageProcessor.h"
@@ -44,15 +44,15 @@ protected:
         m_thread.reset( new WorkerThread() );
         m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) );
         m_checkinFormatter.reset( new CheckinFormatter() );
-        m_tokenAdapter.reset( new TokenAdapter() );
+        m_ucidAdapter.reset( new UcidAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
 
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
 
-        m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_tokenAdapter, *m_certsAdapter ) );
+        m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
-        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor, *m_tokenAdapter, *m_eventBuilder, *m_eventPublisher ) );
+        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
@@ -69,7 +69,7 @@ protected:
             *m_cloud,
             *m_packageInventoryProvider,
             *m_checkinFormatter,
-            *m_tokenAdapter,
+            *m_ucidAdapter,
             *m_certsAdapter,
             *m_checkinManifestRetriever,
             *m_manifestProcessor,
@@ -89,7 +89,7 @@ protected:
         m_eventBuilder.reset();
         m_eventPublisher.reset();
         m_certsAdapter.reset();
-        m_tokenAdapter.reset();
+        m_ucidAdapter.reset();
         m_checkinFormatter.reset();
         m_packageInventoryProvider.reset();
         m_thread.reset();
@@ -150,7 +150,7 @@ protected:
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
-    std::unique_ptr<ITokenAdapter> m_tokenAdapter;
+    std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
