@@ -207,6 +207,9 @@
     <Image Include="..\PackageMananger\small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SharedLibs\libCloudEvents\libCloudEvents.vcxproj">
+      <Project>{5004d35a-f8c0-4f1e-ae8e-5d7fe5cd89a9}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
