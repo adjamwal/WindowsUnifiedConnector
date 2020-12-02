@@ -58,6 +58,23 @@ ICloudEventBuilder& CloudEventBuilder::WithPackage( const std::string& name, con
     return *this;
 }
 
+ICloudEventBuilder& CloudEventBuilder::WithPackageID( const std::string& idAsNameAndVersion )
+{
+    std::istringstream original( idAsNameAndVersion );
+    std::vector<std::string> parts;
+    std::string s;
+
+    while( std::getline( original, s, '/' ) ) {
+        parts.push_back( s );
+    }
+
+    if( parts.size() > 0 ) m_packageName = parts[ 0 ];
+    if( parts.size() > 1 ) m_packageVersion = parts[ 1 ];
+
+    UpdateEventTime();
+    return *this;
+}
+
 ICloudEventBuilder& CloudEventBuilder::WithError( int code, const std::string& message )
 {
     m_errCode = code;
@@ -82,6 +99,16 @@ ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::string& path, con
     m_newSize = size;
     UpdateEventTime();
     return *this;
+}
+
+std::string CloudEventBuilder::GetPackageName()
+{
+    return m_packageName;
+}
+
+std::string CloudEventBuilder::GetPackageVersion()
+{
+    return m_packageVersion;
 }
 
 std::string CloudEventBuilder::Build()

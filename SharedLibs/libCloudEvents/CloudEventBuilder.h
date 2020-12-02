@@ -21,10 +21,15 @@ public:
     ICloudEventBuilder& FromJson( const std::string& eventJson ) override;
     ICloudEventBuilder& WithUCID( const std::string& ucid ) override;
     ICloudEventBuilder& WithType( CloudEventType evtype ) override;
+    ICloudEventBuilder& WithPackageID( const std::string& idAsNameAndVersion ) override; // e.g. 'AMP/1.0.0'
     ICloudEventBuilder& WithPackage( const std::string& name, const std::string& version ) override;
     ICloudEventBuilder& WithError( int code, const std::string& message ) override;
     ICloudEventBuilder& WithOldFile( const std::string& path, const std::string& hash, int size ) override;
     ICloudEventBuilder& WithNewFile( const std::string& path, const std::string& hash, int size ) override;
+
+    std::string GetPackageName() override;
+    std::string GetPackageVersion() override;
+
     std::string Build() override;
     void Reset() override;
 

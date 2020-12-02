@@ -6,10 +6,13 @@ MockCloudEventBuilder::MockCloudEventBuilder()
     ON_CALL( *this, FromJson( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithUCID( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithType( _ ) ).WillByDefault( ReturnRef( *this ) );
+    ON_CALL( *this, WithPackageID( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithPackage( _, _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithError( _, _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithOldFile( _, _, _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, WithNewFile( _, _, _ ) ).WillByDefault( ReturnRef( *this ) );
+    ON_CALL( *this, GetPackageName() ).WillByDefault( Return( "" ) );
+    ON_CALL( *this, GetPackageVersion() ).WillByDefault( Return( "" ) );
     MakeBuildReturn( "" );
 }
 
