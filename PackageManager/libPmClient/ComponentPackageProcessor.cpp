@@ -2,8 +2,6 @@
 #include "IPmCloud.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
-#include "WindowsConfiguration.h"
-#include "WindowsPmDependencies.h"
 #include "IFileUtil.h"
 #include "ISslUtil.h"
 #include "IPackageConfigProcessor.h"

@@ -95,7 +95,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -118,7 +118,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -141,7 +141,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -164,7 +164,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\PmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -194,7 +194,7 @@
     <ClCompile Include="CloudEventStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PackageManager\PmUtil\PmUtil.vcxproj">
+    <ProjectReference Include="..\..\PackageManager\libPmUtil\libPmUtil.vcxproj">
       <Project>{3e610c4d-e8cc-4cfc-a64f-e46b25b554e5}</Project>
     </ProjectReference>
   </ItemGroup>

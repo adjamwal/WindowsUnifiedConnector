@@ -22,9 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{805379ca-1c31-40a9-b908-8b2a603927f1}</ProjectGuid>
-    <RootNamespace>PackageMananger</RootNamespace>
+    <RootNamespace>WinPackageManager</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>WinPackageMananger</ProjectName>
+    <ProjectName>WinPackageManager</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -99,7 +99,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -122,7 +122,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -145,7 +145,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -168,7 +168,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\PackageManagerAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -185,14 +185,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
-    <ClInclude Include="PackageMananger.h" />
+    <ClInclude Include="WinPackageManager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PackageMananger.cpp" />
+    <ClCompile Include="WinPackageManager.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -201,13 +201,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PackageMananger.rc" />
+    <ResourceCompile Include="WinPackageManager.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="PackageMananger.ico" />
+    <Image Include="WinPackageManager.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SharedLibs\libCloudEvents\libCloudEvents.vcxproj">
+      <Project>{5004d35a-f8c0-4f1e-ae8e-5d7fe5cd89a9}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libCrashHandlerClient\libCrashHandlerClient.vcxproj">
       <Project>{58783f4f-d8a3-4409-a4d0-618441c95c8e}</Project>
     </ProjectReference>
@@ -220,13 +223,13 @@
     <ProjectReference Include="..\..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
       <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\PackageManagerAgent\PackageManagerAgent.vcxproj">
+    <ProjectReference Include="..\libPmAgent\libPmAgent.vcxproj">
       <Project>{934a27fe-d684-45d0-b901-562f44e4d66f}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\PackageManagerClient\PackageManagerClient.vcxproj">
+    <ProjectReference Include="..\libPmClient\libPmClient.vcxproj">
       <Project>{1f2019e6-7a09-434e-a790-b1e7d0a51f87}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\PmUtil\PmUtil.vcxproj">
+    <ProjectReference Include="..\libPmUtil\libPmUtil.vcxproj">
       <Project>{3e610c4d-e8cc-4cfc-a64f-e46b25b554e5}</Project>
     </ProjectReference>
   </ItemGroup>
