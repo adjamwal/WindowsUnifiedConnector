@@ -58,6 +58,7 @@ protected:
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
         ON_CALL( *m_config, GetCloudInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudInterval ) );
+        ON_CALL( *m_platformConfiguration, GetIdentityToken( _ ) ).WillByDefault( DoAll( SetArgReferee<0>( "token" ), Return( true ) ) );
         ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
             []( const std::string& basePath )
             {
