@@ -1,4 +1,4 @@
-// PackageMananger.cpp : Defines the entry point for the application.
+// WinPackageManager.cpp : Defines the entry point for the application.
 //
 
 #include "pch.h"

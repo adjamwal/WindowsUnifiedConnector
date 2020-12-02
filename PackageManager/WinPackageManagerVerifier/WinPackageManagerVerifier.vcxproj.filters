@@ -48,10 +48,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\PackageMananger\PackageMananger.ico">
+    <Image Include="..\WinPackageManager\WinPackageManager.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\PackageMananger\small.ico">
+    <Image Include="..\WinPackageManager\small.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -9,11 +9,11 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Install\Instal
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Bootstrapper", "Install\Bootstrapper\Bootstrapper.wixproj", "{068683A5-CECC-45F9-94D7-60CF1E0C941B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dllControlModule", "PackageManager\ControlModule\ControlModule.vcxproj", "{E7DB0C5A-D7C4-4E3B-85B6-53758EDE0A23}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dllControlModule", "PackageManager\dllControlModule\dllControlModule.vcxproj", "{E7DB0C5A-D7C4-4E3B-85B6-53758EDE0A23}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageManager", "PackageManager", "{3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageMananger", "PackageManager\PackageMananger\PackageMananger.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageMananger", "PackageManager\WinPackageManager\WinPackageManager.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libControlModule", "PackageManager\libControlModule\libControlModule.vcxproj", "{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}"
 EndProject
@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageManagerAgent", "PackageManager\PackageManagerAgent\PackageManagerAgent.vcxproj", "{934A27FE-D684-45D0-B901-562F44E4D66F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libPmAgent", "PackageManager\libPmAgent\libPmAgent.vcxproj", "{934A27FE-D684-45D0-B901-562F44E4D66F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{1A73622D-F811-4A98-A1BA-ED0435F1656A}"
 EndProject
@@ -69,9 +69,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestUcConfig", "UC\TestUcCo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstallerCustomActions", "Install\InstallerCustomActions\InstallerCustomActions.vcxproj", "{D72EB94C-BDC3-45BA-8F73-F4EB0C73B334}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageManagerClient", "PackageManager\PackageManagerClient\PackageManagerClient.vcxproj", "{1F2019E6-7A09-434E-A790-B1E7D0A51F87}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libPmClient", "PackageManager\libPmClient\libPmClient.vcxproj", "{1F2019E6-7A09-434E-A790-B1E7D0A51F87}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PmUtil", "PackageManager\PmUtil\PmUtil.vcxproj", "{3E610C4D-E8CC-4CFC-A64F-E46B25B554E5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libPmUtil", "PackageManager\libPmUtil\libPmUtil.vcxproj", "{3E610C4D-E8CC-4CFC-A64F-E46B25B554E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mocks", "Mocks", "{FD94AA0B-B34F-47C9-890E-B7E16F6C0019}"
 EndProject

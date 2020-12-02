@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by PackageMananger.rc
+// Used by WinPackageManager.rc
 
 #define IDS_APP_TITLE			103
 

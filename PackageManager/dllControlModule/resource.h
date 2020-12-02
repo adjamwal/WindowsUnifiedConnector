@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by ControlModule.rc
+// Used by dllControlModule.rc
 
 // Next default values for new objects
 // 

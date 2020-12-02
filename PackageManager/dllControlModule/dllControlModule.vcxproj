@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{e7db0c5a-d7c4-4e3b-85b6-53758ede0a23}</ProjectGuid>
-    <RootNamespace>ControlModule</RootNamespace>
+    <RootNamespace>dllControlModule</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>dllControlModule</ProjectName>
   </PropertyGroup>
@@ -289,7 +289,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ControlModule.rc" />
+    <ResourceCompile Include="dllControlModule.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
