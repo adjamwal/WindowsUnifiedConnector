@@ -65,12 +65,12 @@ PM_STATUS PmAgentController::Stop()
         std::lock_guard<std::mutex> lock( m_mutex );
         if( m_bIsProcessStartedByPlugin )
         {
+            m_bIsProcessStartedByPlugin = false;
             if( PM_STATUS::PM_OK != stopProcess() )
             {
                 LOG_ERROR( "Could not stop the process." );
                 return PM_STATUS::PM_FAIL;
             }
-            m_bIsProcessStartedByPlugin = false;
             LOG_DEBUG( "Process successfully stopped." );
         }
     }
@@ -347,9 +347,9 @@ PM_STATUS PmAgentController::stopProcess()
     }
 
     //wait for 5s and terminate if not responding.
-    if( WAIT_OBJECT_0 != WaitForSingleObject( m_hProcess, 5000 ) )
+    if( WAIT_OBJECT_0 != WaitForSingleObject( m_hProcess, 60000 ) )
     {
-        LOG_WARNING( "Process hasn't terminated after 5s. Force terminate..." );
+        LOG_WARNING( "Process hasn't terminated after 60s. Force terminate..." );
         if( !TerminateProcess( m_hProcess, 0 ) )
         {
             LOG_ERROR( "Failed to force terminate child." );
