@@ -44,7 +44,7 @@ protected:
 
 TEST_F( TestCloudEventPublisher, EventPublisherRetrievesTheEventUriFromConfig )
 {
-    EXPECT_CALL( *m_pmConfig, GetCloudIdentifyUri() );
+    EXPECT_CALL( *m_pmConfig, GetCloudEventUri() );
     m_eventPublisher->Publish( m_eventBuilder );
 }
 

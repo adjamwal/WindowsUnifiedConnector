@@ -28,6 +28,7 @@ protected:
 	},
 	"pm": {
 		"url": "https://packagemanager.cisco.com/checkin"
+        "event_url": "https://packagemanager.cisco.com/event/1"
 	}
 }
 )";
