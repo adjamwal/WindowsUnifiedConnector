@@ -28,6 +28,9 @@
     <ClCompile Include="TestPmManifest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\SharedLibs\libLogger\libLogger.vcxproj">
+      <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\SharedLibs\MockCloudEvents\MockCloudEvents.vcxproj">
       <Project>{f40a9e15-7cf0-4ac0-9741-6a7e29cf4b96}</Project>
     </ProjectReference>

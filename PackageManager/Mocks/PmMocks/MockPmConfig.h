@@ -26,11 +26,15 @@ public:
     void MakeVerifyPmFileIntegrityReturn( int32_t value );
     void ExpectVerifyPmFileIntegrityIsNotCalled();
 
-    MOCK_METHOD0( GetCloudUri, const std::string&() );
-    void MakeGetCloudUriReturn( const std::string& value );
-    void ExpectGetCloudUriIsNotCalled();
+    MOCK_METHOD0( GetCloudIdentifyUri, const std::string&() );
+    void MakeGetCloudIdentifyUriReturn( const std::string& value );
+    void ExpectGetCloudIdentifyUriIsNotCalled();
 
-    MOCK_METHOD0( GetCloudInterval, uint32_t() );
+    MOCK_METHOD0( GetCloudCheckinUri, const std::string&() );
+    void MakeGetCloudCheckinUriReturn( const std::string& value );
+    void ExpectGetCloudCheckinUriIsNotCalled();
+
+    MOCK_METHOD0( GetCloudCheckinInterval, uint32_t() );
     void MakeGetCloudIntervalReturn( uint32_t value );
     void ExpectGetCloudIntervalIsNotCalled();
 
@@ -42,4 +46,7 @@ public:
     void MakeGetSupportedComponentListReturn( const std::vector<PmComponent>& value );
     void ExpectGetSupportedComponentListIsNotCalled();
 
+private:
+    std::string m_identifyUri;
+    std::string m_checkinUri;
 };

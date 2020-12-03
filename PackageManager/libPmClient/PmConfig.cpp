@@ -70,14 +70,21 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
     return rtn;
 }
 
-const std::string& PmConfig::GetCloudUri()
+const std::string& PmConfig::GetCloudIdentifyUri()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return m_configData.cloudUri;
+    return m_configData.identifyUri;
 }
 
-uint32_t PmConfig::GetCloudInterval()
+const std::string& PmConfig::GetCloudCheckinUri()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.checkinUri;
+}
+
+uint32_t PmConfig::GetCloudCheckinInterval()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -104,7 +111,7 @@ int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
     int rtn = -1;
 
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root, pm;
+    Json::Value root, pm, id;
     std::string jsonError;
 
     if ( bsConfig.empty() ) {
@@ -117,8 +124,11 @@ int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
         LOG_ERROR( "Failed to verify config contents" );
     }
     else {
+        id = root[ "id" ];
+        m_configData.identifyUri = id[ "url" ].asString();
+
         pm = root["pm"];
-        m_configData.cloudUri = pm["url"].asString();
+        m_configData.checkinUri = pm["url"].asString();
 
         rtn = 0;
     }
@@ -159,7 +169,7 @@ int32_t PmConfig::VerifyBsContents( const std::string& bsData )
     int32_t rtn = 0;
 
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root, pm;
+    Json::Value root, pm, id;
     std::string jsonError;
 
     if( bsData.empty() ) {
@@ -171,9 +181,15 @@ int32_t PmConfig::VerifyBsContents( const std::string& bsData )
         rtn = -1;
     }
     else {
+        id = root[ "id" ];
+        if( !id[ "url" ].isString() ) {
+            LOG_ERROR( "Invalid Identify Url" );
+            rtn = -1;
+        }
+
         pm = root[ "pm" ];
         if( !pm[ "url" ].isString() ) {
-            LOG_ERROR( "Invalid CheckinUrl" );
+            LOG_ERROR( "Invalid Checkin Url" );
             rtn = -1;
         }
 
@@ -219,7 +235,7 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
         }
 
         if ( rtn != 0 ) {
-            LOG_ERROR( "Invalid configuartion %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
+            LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
         }
     }
 

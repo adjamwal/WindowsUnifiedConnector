@@ -51,14 +51,14 @@ protected:
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
-        m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
+        m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
-        ON_CALL( *m_config, GetCloudInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudInterval ) );
         ON_CALL( *m_platformConfiguration, GetIdentityToken( _ ) ).WillByDefault( DoAll( SetArgReferee<0>( "token" ), Return( true ) ) );
+        ON_CALL( *m_config, GetCloudCheckinInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinInterval ) );
         ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
             []( const std::string& basePath )
             {
@@ -104,7 +104,7 @@ protected:
         m_fileUtil.reset();
     }
 
-    uint32_t GetCloudInterval()
+    uint32_t GetCloudCheckinInterval()
     {
         std::unique_lock<std::mutex> lock( m_configMutex );
 
@@ -124,7 +124,7 @@ protected:
         m_platformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_config->MakeLoadBsConfigReturn( 0 );
         m_config->MakeLoadPmConfigReturn( 0 );
-        m_config->MakeGetCloudUriReturn( m_configUrl );
+        m_config->MakeGetCloudCheckinUriReturn( m_configUrl );
 
         m_cloud->MakeDownloadFileReturn( 200 );
 

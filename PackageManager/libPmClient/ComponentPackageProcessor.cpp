@@ -184,6 +184,7 @@ bool ComponentPackageProcessor::ProcessComponentPackageConfigs( PmComponent& com
     bool rtn = true;
 
     for( auto config : componentPackage.configs ) {
+        config.forComponentID = componentPackage.packageNameAndVersion;
         rtn = m_configProcessor.ProcessConfig( config );
     }
 
