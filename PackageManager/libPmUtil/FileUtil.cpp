@@ -172,7 +172,16 @@ bool FileUtil::FileExists( const std::string& filename )
 
 size_t FileUtil::FileSize( const std::string& filename )
 {
-    return ::std::filesystem::file_size( filename );
+    size_t rtn = 0;
+
+    try {
+        rtn = ::std::filesystem::file_size( filename );
+    }
+    catch( std::filesystem::filesystem_error ex ) {
+        LOG_ERROR( "%s", ex.what() );
+    }
+
+    return rtn;
 }
 
 std::string FileUtil::AppendPath( const std::string& basePath, const std::string& configPath )

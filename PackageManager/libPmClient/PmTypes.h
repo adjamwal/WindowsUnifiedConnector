@@ -11,6 +11,7 @@ struct PackageConfigInfo
     std::string verifyPath;
     std::string installLocation;
     std::string signerName;
+    std::string forComponentID; // e.g. 'AMP/1.0.0'
     bool deleteConfig;
 };
 

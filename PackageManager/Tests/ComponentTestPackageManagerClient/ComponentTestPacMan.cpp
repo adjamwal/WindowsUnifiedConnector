@@ -51,7 +51,7 @@ protected:
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
-        m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
+        m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 

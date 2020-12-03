@@ -45,7 +45,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_eventBuilder( new CloudEventBuilder() )
     , m_eventPublisher( new CloudEventPublisher( *m_http, *m_eventStorage, CLOUD_EVENT_PUBLISHING_URL ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
-    , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) )
+    , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_packageConfigProcessor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(

@@ -4,6 +4,9 @@
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
 #include "MockSslUtil.h"
+#include "MockCloudEventBuilder.h"
+#include "MockCloudEventPublisher.h"
+#include "MockUcidAdapter.h"
 
 #include <memory>
 
@@ -16,8 +19,11 @@ protected:
         m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
+        m_ucidAdapter.reset( new NiceMock<MockUcidAdapter>() );
+        m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
+        m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
 
-        m_patient.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil ) );
+        m_patient.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -30,6 +36,9 @@ protected:
         m_dep.reset();
         m_pmComponentManager.reset();
         m_sslUtil.reset();
+        m_ucidAdapter.reset();
+        m_eventBuilder.reset();
+        m_eventPublisher.reset();
 
         m_configInfo = {};
     }
@@ -44,8 +53,9 @@ protected:
             "configverifyPath",
             "installLocation",
             "signerName",
+            "test/1.0.0",
             false
-            };
+        };
     }
 
     PackageConfigInfo m_configInfo;
@@ -54,6 +64,9 @@ protected:
     std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;
+    std::unique_ptr<MockUcidAdapter> m_ucidAdapter;
+    std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
+    std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
 
     std::unique_ptr<PackageConfigProcessor> m_patient;
 };
@@ -74,7 +87,7 @@ TEST_F( TestPackageConfigProcessor, WillFailIfDecodeConfigFileFails )
 
     m_sslUtil->MakeDecodeBase64Return( -1 );
 
-    m_patient->ProcessConfig( m_configInfo );
+    EXPECT_EQ( false, m_patient->ProcessConfig( m_configInfo ) );
 }
 
 TEST_F( TestPackageConfigProcessor, WillNotCreateConfigWhenDecodeFails )
@@ -85,6 +98,19 @@ TEST_F( TestPackageConfigProcessor, WillNotCreateConfigWhenDecodeFails )
     m_sslUtil->MakeDecodeBase64Return( -1 );
 
     m_fileUtil->ExpectCloseFileNotCalled();
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
+TEST_F( TestPackageConfigProcessor, WillSendErrorEventIfDecodeConfigFileFails )
+{
+    SetupConfig();
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( -1 );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
     m_patient->ProcessConfig( m_configInfo );
 }
@@ -116,7 +142,6 @@ TEST_F( TestPackageConfigProcessor, WillVerifyConfigFileHash )
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
-
     m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
 
     m_patient->ProcessConfig( m_configInfo );
@@ -171,6 +196,25 @@ TEST_F( TestPackageConfigProcessor, AddFileWillSucceed )
     EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
 }
 
+TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfAddFileSucceeds )
+{
+    SetupConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+    m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
+    m_fileUtil->MakeRenameReturn( 0 );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
 TEST_F( TestPackageConfigProcessor, WillNotVerifyConfigHashIfNotProvided )
 {
     SetupConfig();
@@ -186,7 +230,6 @@ TEST_F( TestPackageConfigProcessor, WillNotVerifyConfigHashIfNotProvided )
 
     m_patient->ProcessConfig( m_configInfo );
 }
-
 
 TEST_F( TestPackageConfigProcessor, WillRemoveTempConfig )
 {
@@ -228,6 +271,20 @@ TEST_F( TestPackageConfigProcessor, RemoveConfigWillSucceed )
     EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
 }
 
+TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfRemoveConfigSucceeds )
+{
+    SetupConfig();
+    m_configInfo.deleteConfig = true;
+    m_patient->Initialize( m_dep.get() );
+
+    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
 TEST_F( TestPackageConfigProcessor, WillNotDeleteConfigWithoutValidPath )
 {
     SetupConfig();
@@ -251,3 +308,18 @@ TEST_F( TestPackageConfigProcessor, RemoveConfigWillFail )
 
     EXPECT_FALSE( m_patient->ProcessConfig( m_configInfo ) );
 }
+
+TEST_F( TestPackageConfigProcessor, WillSendErrorEventIfRemoveConfigFails )
+{
+    SetupConfig();
+    m_configInfo.deleteConfig = true;
+    m_patient->Initialize( m_dep.get() );
+
+    m_fileUtil->MakeAppendPathReturn( "" );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+

@@ -71,6 +71,7 @@ protected:
             "configverifyPath",
             "installLocation",
             "signerName",
+            "test/1.0.0",
             false
             } );
     }
@@ -144,3 +145,25 @@ TEST_F( TestComponentPackageProcessor, WillProcessConfig )
 
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }
+
+TEST_F( TestComponentPackageProcessor, WillSendSuccessEventIfProcessComponentPackageSucceeds )
+{
+    SetupComponentPackageWithConfig();
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPackageFails )
+{
+    SetupComponentPackageWithConfig();
+    m_pmComponentManager->MakeUpdateComponentReturn( -1 );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+}
+

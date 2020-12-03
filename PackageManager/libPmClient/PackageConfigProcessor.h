@@ -5,11 +5,19 @@
 
 class IFileUtil;
 class ISslUtil;
+class IUcidAdapter;
+class ICloudEventBuilder;
+class ICloudEventPublisher;
 
 class PackageConfigProcessor : public IPackageConfigProcessor
 {
 public:
-    PackageConfigProcessor( IFileUtil& fileUtil, ISslUtil& sslUtil );
+    PackageConfigProcessor( 
+        IFileUtil& fileUtil, 
+        ISslUtil& sslUtil,
+        IUcidAdapter& ucidAdapter,
+        ICloudEventBuilder& eventBuilder,
+        ICloudEventPublisher& eventPublisher );
     ~PackageConfigProcessor();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
@@ -21,6 +29,9 @@ private:
 
     IFileUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
+    IUcidAdapter& m_ucidAdapter;
+    ICloudEventBuilder& m_eventBuilder;
+    ICloudEventPublisher& m_eventPublisher;
     std::mutex m_mutex;
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
