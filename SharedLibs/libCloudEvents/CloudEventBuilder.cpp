@@ -31,7 +31,7 @@ CloudEventBuilder::~CloudEventBuilder()
 ICloudEventBuilder& CloudEventBuilder::FromJson( const std::string& eventJson )
 {
     Reset();
-    Deserialize( eventJson );
+    Deserialize( *this, eventJson );
     UpdateEventTime();
     return *this;
 }
@@ -214,46 +214,171 @@ std::string CloudEventBuilder::Serialize()
     return Json::writeString( Json::StreamWriterBuilder(), root );
 }
 
-void CloudEventBuilder::Deserialize( const std::string& eventJson )
+bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std::string& eventJson )
 {
     std::string orig_ucid = "";
+    std::string orig_tse = "";
+    int orig_errCode( 0 );
+    std::string orig_errMessage = "";
     CloudEventType orig_evtype( CloudEventType( 0 ) );
     std::string orig_packageName = "";
-    std::string orig_packageVersion = "";
-    int orig_errCode(0);
-    std::string orig_errMessage = "";
     std::string orig_oldPath = "";
     std::string orig_oldHash = "";
     int orig_oldSize(0);
     std::string orig_newPath = "";
     std::string orig_newHash = "";
     int orig_newSize(0);
-    std::string orig_tse = "";
-
-    Reset();
+    
+    bool isValid = true;
 
     try
     {
-        
+        std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
+        Json::Value root, event, error, oldfile, oldfilearr, newfile, newfilearr;
+        std::string jsonError;
 
+        if ( !eventJson.empty() ) {
+            if ( jsonReader->parse( eventJson.c_str(), eventJson.c_str() + eventJson.length(), &root, &jsonError ) ) {
+                event = root["event"];
+
+                if ( event["ucid"].isString() ) {
+                    orig_ucid = event["ucid"].asString();
+                }
+                else {
+                    isValid = false;
+                    LOG_ERROR( "Invalid ucid" );
+                }
+
+                if ( event["tse"].isString() ) {
+                    orig_tse = event["tse"].asString();
+                }
+                else {
+                    isValid = false;
+                    LOG_ERROR( "Invalid tse" );
+                }
+
+                if ( event["type"].isString() ) {
+                    std::string s = event["type"].asString();
+                    orig_evtype = ConvertCloudEventType( s );
+                }
+                else {
+                    isValid = false;
+                    LOG_ERROR( "Invalid Event Type" );
+                }
+
+                if ( event["package"].isString() ) {
+                    std::string p = event["package"].asString();
+                    orig_packageName = p;
+                }
+                else {
+                    isValid = false;
+                    LOG_ERROR( "Invalid Package Name" );
+                }
+
+                if ( !event["err"].isNull() ) {
+                    error = event["err"];
+
+                    if ( error["code"].isUInt() ) {
+                        orig_errCode = error["code"].asUInt();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid Error Code" );
+                    }
+
+                    if ( error["msg"].isString() ) {
+                        orig_errMessage = error["msg"].asString();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid Error Message" );
+                    }
+                }
+
+                if ( !event["old"].isNull() && event["old"].isArray() && event["old"].size() == 1 ) {
+                    oldfilearr = event["old"];
+                    oldfile = oldfilearr[0];
+
+                    if ( oldfile["path"].isString() ) {
+                        orig_oldPath = oldfile["path"].asString();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid OldFile " );
+                    }
+
+                    if ( oldfile["sha256"].isString() ) {
+                        orig_oldHash = oldfile["sha256"].asString();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid OldFile " );
+                    }
+
+                    if ( oldfile["size"].isUInt() ) {
+                        orig_oldSize = oldfile["size"].asUInt();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid OldFile " );
+                    }
+                }
+
+                if ( !event["new"].isNull() && event["new"].isArray() && event["new"].size() == 1 ) {
+                    newfilearr = event["new"];
+                    newfile = newfilearr[0];
+
+                    if ( newfile["path"].isString() ) {
+                        orig_newPath = newfile["path"].asString();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid NewFile Path" );
+                    }
+
+                    if ( newfile["sha256"].isString() ) {
+                        orig_newHash = newfile["sha256"].asString();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid NewFile Hash" );
+                    }
+
+                    if ( newfile["size"].isInt() ) {
+                        orig_newSize = newfile["size"].asInt();
+                    }
+                    else {
+                        isValid = false;
+                        LOG_ERROR( "Invalid NewFile Size" );
+                    }
+                }
+            }
+            else {
+                isValid = false;
+                LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
+            }
+        }
+        else {
+            isValid = false;
+            LOG_ERROR( "json contents is empty" );
+        }
     }
-    catch(...)
+    catch( std::exception& ex )
     {
-        LOG_ERROR( __FUNCTION__ ": Error deserializing event: %s", eventJson.c_str() );
-        return;
+        isValid = false;
+        LOG_ERROR( __FUNCTION__ ": Error deserializing event: %s", ex.what() );
     }
 
-    m_ucid = orig_ucid;
-    m_evtype = orig_evtype;
-    m_packageName = orig_packageName;
-    m_packageVersion = orig_packageVersion;
-    m_errCode = orig_errCode;
-    m_errMessage = orig_errMessage;
-    m_oldPath = orig_oldPath;
-    m_oldHash = orig_oldHash;
-    m_oldSize = orig_oldSize;
-    m_newPath = orig_newPath;
-    m_newHash = orig_newHash;
-    m_newSize = orig_newSize;
-    m_tse = orig_tse;
+    if ( isValid )
+    {
+        eventBuilder
+            .WithUCID( orig_ucid )
+            .WithType( orig_evtype )
+            .WithPackageID( orig_packageName )
+            .WithOldFile( orig_oldPath, orig_oldHash, orig_oldSize )
+            .WithNewFile( orig_newPath, orig_newHash, orig_newSize )
+            .WithError( orig_errCode, orig_errMessage );
+    }
+
+    return isValid;
 }

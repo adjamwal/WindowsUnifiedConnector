@@ -12,6 +12,18 @@ static std::string CloudEventString( CloudEventType eventType )
     }
 }
 
+static CloudEventType ConvertCloudEventType( const std::string& eventType )
+{
+    if ( eventType == "pkg-install" )
+        return pkginstall;
+    else if ( eventType == "pkg-reconfig" )
+        return pkgreconfig;
+    else if ( eventType == "pkg-uninstall" )
+        return pkguninstall;
+    else
+        return pkgunknown;
+}
+
 class CloudEventBuilder final : public ICloudEventBuilder
 {
 public:
@@ -33,6 +45,8 @@ public:
     std::string Build() override;
     void Reset() override;
 
+    static bool Deserialize( ICloudEventBuilder& event, const std::string& eventJson );
+
 private:
     std::string m_ucid;
     CloudEventType m_evtype;
@@ -51,5 +65,4 @@ private:
     std::string Now_RFC3339();
     void UpdateEventTime();
     std::string Serialize();
-    void Deserialize( const std::string& eventJson );
 };

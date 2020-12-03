@@ -10,6 +10,7 @@
  *
  ***************************************************************************/
 #include "CloudEventPublisher.h"
+#include "CloudEventBuilder.h"
 #include <Windows.h>
 #include "IUcLogger.h"
 #include "json\json.h"
@@ -51,7 +52,11 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 
     for ( auto&& e : events )
     {
-        publishReturn = InternalPublish( e );
+        CloudEventBuilder eventBuilder;
+        if ( CloudEventBuilder::Deserialize( eventBuilder, e ) )
+        {
+            publishReturn = InternalPublish( eventBuilder.Build() );
+        }
     }
 
     return publishReturn;

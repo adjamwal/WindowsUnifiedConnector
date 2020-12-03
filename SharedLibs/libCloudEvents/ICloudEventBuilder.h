@@ -4,6 +4,7 @@
 
 enum CloudEventType
 {
+    pkgunknown,
     pkginstall,
     pkgreconfig,
     pkguninstall
