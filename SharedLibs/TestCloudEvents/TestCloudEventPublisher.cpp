@@ -45,8 +45,8 @@ protected:
 
 TEST_F( TestCloudEventPublisher, EventPublisherRetrievesTheEventUriFromConfig )
 {
-    EXPECT_CALL( *m_pmConfig, GetCloudIdentifyUri() ).Times( 1 );
-    EXPECT_EQ( 5, m_eventPublisher->Publish( m_eventBuilder ) );
+    EXPECT_CALL( *m_pmConfig, GetCloudIdentifyUri() );
+    m_eventPublisher->Publish( m_eventBuilder );
 }
 
 TEST_F( TestCloudEventPublisher, EventPublisherCallsHttpPost )
