@@ -129,7 +129,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
 
 std::chrono::milliseconds PackageManager::PmThreadWait()
 {
-    return std::chrono::milliseconds( m_config.GetCloudInterval() );
+    return std::chrono::milliseconds( m_config.GetCloudCheckinInterval() );
 }
 
 void PackageManager::PmWorkflowThread()
@@ -147,7 +147,7 @@ void PackageManager::PmWorkflowThread()
         m_packageInventoryProvider.GetInventory( inventory );
 
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
-            m_config.GetCloudUri(),
+            m_config.GetCloudCheckinUri(),
             m_checkinFormatter.GetJson( inventory )
         );
 

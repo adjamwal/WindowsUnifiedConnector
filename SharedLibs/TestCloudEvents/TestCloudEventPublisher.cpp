@@ -3,6 +3,7 @@
 #include "CloudEventBuilder.h"
 #include "MockPmHttp.h"
 #include "MockCloudEventStorage.h"
+#include "MockPmConfig.h"
 #include "CloudEventPublisher.h"
 #include <memory>
 
@@ -13,8 +14,10 @@ protected:
     {
         m_httpAdapter.reset( new NiceMock<MockPmHttp>() );
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
-        m_eventPublisher.reset( new CloudEventPublisher( *m_httpAdapter, *m_eventStorage, CLOUD_EVENT_PUBLISHING_URL ) );
+        m_pmConfig.reset( new NiceMock<MockPmConfig>() );
+        m_eventPublisher.reset( new CloudEventPublisher( *m_httpAdapter, *m_eventStorage, *m_pmConfig ) );
 
+        m_pmConfig->MakeGetCloudIdentifyUriReturn( "https://test" );
         m_eventBuilder
             .WithUCID( "5B3861FF-2690-45D4-A49D-8F8CD18BBFC6" )
             .WithType( CloudEventType::pkgreconfig )
@@ -30,13 +33,21 @@ protected:
         m_httpAdapter.reset();
         m_eventPublisher.reset();
         m_eventStorage.reset();
+        m_pmConfig.reset();
     }
 
     CloudEventBuilder m_eventBuilder;
     std::unique_ptr<MockPmHttp> m_httpAdapter;
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;
+    std::unique_ptr<MockPmConfig> m_pmConfig;
     std::unique_ptr<ICloudEventPublisher> m_eventPublisher;
 };
+
+TEST_F( TestCloudEventPublisher, EventPublisherRetrievesTheEventUriFromConfig )
+{
+    EXPECT_CALL( *m_pmConfig, GetCloudIdentifyUri() ).Times( 1 );
+    EXPECT_EQ( 5, m_eventPublisher->Publish( m_eventBuilder ) );
+}
 
 TEST_F( TestCloudEventPublisher, EventPublisherCallsHttpPost )
 {

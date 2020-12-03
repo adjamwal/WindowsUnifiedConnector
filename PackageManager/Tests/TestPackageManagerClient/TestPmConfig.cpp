@@ -23,6 +23,9 @@ protected:
 
     const std::string bsConfigData = R"(
 {
+    "id": {
+		"url": "https://packagemanager.cisco.com/identify"
+	},
 	"pm": {
 		"url": "https://packagemanager.cisco.com/checkin"
 	}
@@ -70,7 +73,7 @@ TEST_F( TestPmConfig, LoadWillSaveCloudUri )
 
     m_patient->LoadBsConfig( "filename" );
 
-    EXPECT_EQ( m_patient->GetCloudUri(), "https://packagemanager.cisco.com/checkin" );
+    EXPECT_EQ( m_patient->GetCloudCheckinUri(), "https://packagemanager.cisco.com/checkin" );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveInterval )
@@ -79,7 +82,7 @@ TEST_F( TestPmConfig, LoadWillSaveInterval )
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_EQ( m_patient->GetCloudInterval(), 300000 );
+    EXPECT_EQ( m_patient->GetCloudCheckinInterval(), 300000 );
 }
 
 TEST_F( TestPmConfig, LoadBsConfigWillSucceed )
@@ -165,7 +168,7 @@ TEST_F( TestPmConfig, LoadSetDefaulInterval )
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_EQ( m_patient->GetCloudInterval(), PM_CONFIG_INTERVAL_DEFAULT );
+    EXPECT_EQ( m_patient->GetCloudCheckinInterval(), PM_CONFIG_INTERVAL_DEFAULT );
 }
 
 TEST_F( TestPmConfig, LoadSetDefaulLogLevel )

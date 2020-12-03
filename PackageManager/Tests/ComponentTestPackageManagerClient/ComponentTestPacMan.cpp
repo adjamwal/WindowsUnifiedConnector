@@ -57,7 +57,7 @@ protected:
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
-        ON_CALL( *m_config, GetCloudInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudInterval ) );
+        ON_CALL( *m_config, GetCloudCheckinInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinInterval ) );
         ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
             []( const std::string& basePath )
             {
@@ -103,7 +103,7 @@ protected:
         m_fileUtil.reset();
     }
 
-    uint32_t GetCloudInterval()
+    uint32_t GetCloudCheckinInterval()
     {
         std::unique_lock<std::mutex> lock( m_configMutex );
 
@@ -123,7 +123,7 @@ protected:
         m_platformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_config->MakeLoadBsConfigReturn( 0 );
         m_config->MakeLoadPmConfigReturn( 0 );
-        m_config->MakeGetCloudUriReturn( m_configUrl );
+        m_config->MakeGetCloudCheckinUriReturn( m_configUrl );
 
         m_cloud->MakeDownloadFileReturn( 200 );
 

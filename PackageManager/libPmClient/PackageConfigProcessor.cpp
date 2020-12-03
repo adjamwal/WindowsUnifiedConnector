@@ -59,9 +59,15 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     bool rtn = false;
 
     std::vector<uint8_t> configData;
+    std::string targetLocation = m_fileUtil.AppendPath( config.installLocation, config.path );
 
-    m_eventBuilder.WithType( CloudEventType::pkginstall );
+    m_eventBuilder.WithType( CloudEventType::pkgreconfig );
     m_eventBuilder.WithNewFile( config.path, config.sha256, 0 );
+    if( m_fileUtil.FileExists( targetLocation ) )
+    {
+        auto old_sha256 = m_sslUtil.CalculateSHA256( targetLocation );
+        m_eventBuilder.WithOldFile( config.path, old_sha256.value(), m_fileUtil.FileSize( targetLocation ) );
+    }
 
     if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
         std::stringstream ssError;
@@ -124,8 +130,6 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     if( moveFile && !config.verifyBinPath.empty() ) {
         moveFile = m_dependencies->ComponentManager().DeployConfiguration( config ) == 0;
     }
-
-    std::string targetLocation = m_fileUtil.AppendPath( config.installLocation, config.path );
 
     if( moveFile ) {
         if( m_fileUtil.Rename( ss.str(), targetLocation ) == 0 ) {
