@@ -25,8 +25,8 @@ protected:
 {
     "id": {
         "url": "https://packagemanager.cisco.com/identify"
-`   },
-	"pm": {
+    },
+    "pm": {
         "url": "https://packagemanager.cisco.com/checkin",
         "event_url": "https://packagemanager.cisco.com/event/1"
     }
