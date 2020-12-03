@@ -44,7 +44,7 @@ std::string UcidAdapter::GetIdentity()
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
     }
 
-    if ( !m_dependencies->Configuration().GetIdentityToken( ucid ) ) {
+    if ( !m_dependencies->Configuration().GetUcIdentity( ucid ) ) {
         LOG_ERROR( "Failed to get ucid" );
     }
 
