@@ -12,6 +12,7 @@ struct PmConfigData
 {
     std::string identifyUri;
     std::string checkinUri;
+    std::string eventUri;
     uint32_t interval;
     uint32_t log_level;
 };
@@ -28,6 +29,7 @@ public:
     int32_t VerifyPmFileIntegrity( const std::string& pmConfig ) override;
     const std::string& GetCloudIdentifyUri() override;
     const std::string& GetCloudCheckinUri() override;
+    const std::string& GetCloudEventUri()override;
     uint32_t GetCloudCheckinInterval() override;
     uint32_t GetLogLevel() override;
     const std::vector<PmComponent>& GetSupportedComponentList() override;

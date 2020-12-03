@@ -17,7 +17,6 @@ protected:
         m_pmConfig.reset( new NiceMock<MockPmConfig>() );
         m_eventPublisher.reset( new CloudEventPublisher( *m_httpAdapter, *m_eventStorage, *m_pmConfig ) );
 
-        m_pmConfig->MakeGetCloudIdentifyUriReturn( "https://test" );
         m_eventBuilder
             .WithUCID( "5B3861FF-2690-45D4-A49D-8F8CD18BBFC6" )
             .WithType( CloudEventType::pkgreconfig )

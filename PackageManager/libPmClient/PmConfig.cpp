@@ -84,6 +84,13 @@ const std::string& PmConfig::GetCloudCheckinUri()
     return m_configData.checkinUri;
 }
 
+const std::string& PmConfig::GetCloudEventUri()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.eventUri;
+}
+
 uint32_t PmConfig::GetCloudCheckinInterval()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
@@ -129,6 +136,7 @@ int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
 
         pm = root["pm"];
         m_configData.checkinUri = pm["url"].asString();
+        m_configData.eventUri = pm[ "event_url" ].asString();
 
         rtn = 0;
     }
@@ -193,8 +201,13 @@ int32_t PmConfig::VerifyBsContents( const std::string& bsData )
             rtn = -1;
         }
 
+        if( !pm[ "event_url" ].isString() ) {
+            LOG_ERROR( "Invalid Event Url" );
+            rtn = -1;
+        }
+
         if( rtn != 0 ) {
-            LOG_ERROR( "Invalid configuartion %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
+            LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
         }
     }
 

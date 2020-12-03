@@ -6,5 +6,6 @@
 	},
 	"pm": {
 		"url": "https://1iuk1c8mv6.execute-api.us-west-1.amazonaws.com/dev/checkin"
+		"event_url": "https://55ggm0pqv6.execute-api.us-west-1.amazonaws.com/dev/event/1"
 	}
 }
