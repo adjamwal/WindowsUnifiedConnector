@@ -42,8 +42,5 @@ private:
     uint32_t m_fileCount;
 
     bool ProcessComponentPackageConfigs( PmComponent& componentPackage );
-    bool ProcessComponentConfig( PackageConfigInfo& config );
-
-    bool ExtractPackageNameAndVersion(const std::string& nameAndVersion, std::string& name, std::string& version);
     bool IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly );
 };

@@ -61,16 +61,13 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         return ProcessComponentPackageConfigs( componentPackage );
     }
 
-    std::string pkgName;
-    std::string pkgVersion;
-    std::string ucidToken = m_ucidAdapter.GetAccessToken();
-    m_eventPublisher.SetToken( ucidToken );
+    m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
 
-    ExtractPackageNameAndVersion( componentPackage.packageName, pkgName, pkgVersion );
-    bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageName, pkgName );
+    m_eventBuilder.Reset();
+    m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
+    m_eventBuilder.WithPackageID( componentPackage.packageNameAndVersion );
 
-    m_eventBuilder.WithUCID( ucidToken );
-    m_eventBuilder.WithPackage( pkgName, pkgVersion );
+    bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageNameAndVersion, m_eventBuilder.GetPackageName() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
 
     std::stringstream ss;
@@ -78,7 +75,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
     ss << m_fileUtil.GetTempDir() << "PMInstaller_" << m_fileCount++ << "." << componentPackage.installerType;
 
     int dlResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() );
-    if( !dlResult == 200 )
+    if( dlResult != 200 )
     {
         m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 );
 
@@ -167,21 +164,6 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
     }
 
     return rtn;
-}
-
-bool ComponentPackageProcessor::ExtractPackageNameAndVersion( const std::string& nameAndVersion, std::string& name, std::string& version )
-{
-    std::istringstream original( nameAndVersion );
-    std::vector<std::string> parts;
-    std::string s;
-    while( std::getline( original, s, '/' ) ) {
-        parts.push_back( s );
-    }
-
-    if( parts.size() > 0 ) name = parts[ 0 ];
-    if( parts.size() > 1 ) version = parts[ 1 ];
-
-    return parts.size() == 2;
 }
 
 bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly )

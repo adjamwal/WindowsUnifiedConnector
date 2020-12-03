@@ -7,7 +7,7 @@
 #include <memory>
 
 MATCHER_P( PmComponentMatch, expected, "" ) {
-    return arg.packageName.compare( expected.packageName ) == 0 &&
+    return arg.packageNameAndVersion.compare( expected.packageNameAndVersion ) == 0 &&
         arg.installerUrl.compare( expected.installerUrl ) == 0 &&
         arg.installerType.compare( expected.installerType ) == 0 &&
         arg.installerArgs.compare( expected.installerArgs ) == 0 &&
