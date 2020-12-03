@@ -16,7 +16,7 @@ struct PackageConfigInfo
 
 struct PmComponent
 {
-    std::string packageName;
+    std::string packageNameAndVersion;
     std::string installerUrl;
     std::string installerType;
     std::string installerArgs;

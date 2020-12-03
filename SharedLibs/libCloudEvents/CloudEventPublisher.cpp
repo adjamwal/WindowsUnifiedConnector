@@ -27,6 +27,8 @@ CloudEventPublisher::~CloudEventPublisher()
 
 void CloudEventPublisher::SetToken( const std::string& token )
 {
+    std::lock_guard<std::mutex> lock( m_mutex );
+
     m_httpAdapter.SetToken( token );
 }
 
@@ -34,10 +36,28 @@ int32_t CloudEventPublisher::Publish( ICloudEventBuilder& event )
 {
     std::string eventPayload = event.Build();
 
-    return Publish( eventPayload );
+    return InternalPublish( eventPayload );
 }
 
-int32_t CloudEventPublisher::Publish( const std::string& eventJson )
+int32_t CloudEventPublisher::PublishFailedEvents()
+{
+    int32_t publishReturn = 0;
+    std::vector<std::string> events;
+
+    {
+        std::lock_guard<std::mutex> lock( m_mutex );
+        events = m_eventStorage.ReadEvents();
+    }
+
+    for ( auto&& e : events )
+    {
+        publishReturn = InternalPublish( e );
+    }
+
+    return publishReturn;
+}
+
+int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 {
     int32_t postReturn = 0;
     std::string eventResponse;
@@ -52,25 +72,10 @@ int32_t CloudEventPublisher::Publish( const std::string& eventJson )
         eventResponse,
         httpReturn );
 
-    if ( postReturn || httpReturn < 200 || httpReturn >= 300 )
+    if( postReturn || httpReturn < 200 || httpReturn >= 300 )
     {
         m_eventStorage.SaveEvent( eventJson );
     }
 
     return postReturn;
-}
-
-int32_t CloudEventPublisher::PublishFailedEvents()
-{
-    int32_t publishReturn = 0;
-    std::vector<std::string> events;
-
-    events = m_eventStorage.ReadEvents();
-
-    for ( auto&& e : events )
-    {
-        publishReturn = Publish( e );
-    }
-
-    return publishReturn;
 }
