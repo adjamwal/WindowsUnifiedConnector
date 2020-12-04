@@ -1,13 +1,19 @@
 #include "pch.h"
 #include "CloudEventStorage.h"
+#include "WindowsUtilities.h"
 
 #include <fstream>
 #include <filesystem>
+#include <locale>
+#include <codecvt>
 
 CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileUtil& fileUtil ) :
-    m_fileName( fileName ),
     m_fileUtil( fileUtil )
 {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::string logFilePath = converter.to_bytes( WindowsUtilities::GetDataDir() );
+    logFilePath.append( "\\" ).append( fileName );
+    m_fileName = logFilePath;
 }
 
 CloudEventStorage::~CloudEventStorage()
