@@ -15,7 +15,7 @@
 #include "IUcLogger.h"
 #include "json\json.h"
 
-CloudEventPublisher::CloudEventPublisher( IPmHttp& httpAdapter, ICloudEventStorage& eventStorage, IPmConfig& pmConfig )
+CloudEventPublisher::CloudEventPublisher( IPmCloud& httpAdapter, ICloudEventStorage& eventStorage, IPmConfig& pmConfig )
     : m_httpAdapter( httpAdapter )
     , m_eventStorage( eventStorage )
     , m_pmConfig( pmConfig )
@@ -70,7 +70,7 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 
     std::lock_guard<std::mutex> lock( m_mutex );
     
-    postReturn = m_httpAdapter.HttpPost(
+    postReturn = m_httpAdapter.Post(
         m_pmConfig.GetCloudEventUri(),
         ( void* )eventJson.c_str(),
         eventJson.length(),

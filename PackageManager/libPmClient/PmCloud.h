@@ -18,7 +18,7 @@ public:
     void SetUserAgent( const std::string& userAgent ) override;
     void SetShutdownFunc( std::function<bool()> shutdownFunc ) override;
     int32_t Checkin( const std::string& payload, std::string& response ) override;
-    int32_t SendEvent( const std::string& payload ) override;
+    int32_t Post( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t& httpReturn ) override;
     int32_t DownloadFile( const std::string& uri, const std::string filename ) override;
 
 private:

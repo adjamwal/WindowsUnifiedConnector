@@ -43,7 +43,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_certsAdapter( new CertsAdapter() )
     , m_eventStorage( new CloudEventStorage( CLOUD_EVENT_STORAGE_FILE, *m_fileUtil ) )
     , m_eventBuilder( new CloudEventBuilder() )
-    , m_eventPublisher( new CloudEventPublisher( *m_http, *m_eventStorage, *m_config ) )
+    , m_eventPublisher( new CloudEventPublisher( *m_cloud, *m_eventStorage, *m_config ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_packageConfigProcessor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )

@@ -189,6 +189,7 @@ int32_t PmHttp::Deinit()
     }
 
     curl_easy_cleanup( m_curlHandle );
+    m_curlHandle = NULL;
 
     return 0;
 }
