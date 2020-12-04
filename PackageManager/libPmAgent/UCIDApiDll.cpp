@@ -43,9 +43,8 @@ int32_t UCIDApiDll::GetId( std::string& id )
 
         if( myucid )
         {
-            id.assign( myucid, bufsz );
+            id.assign( myucid, bufsz - 1 );
             free( myucid );
-            id = StringUtil::Trim( id );
         }
     }
     if( res != UCID_RES_SUCCESS )
