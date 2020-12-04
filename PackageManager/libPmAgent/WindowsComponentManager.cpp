@@ -173,9 +173,15 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
             if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
+                std::string logFile = "%PROGRAMDATA%\\Cisco\\UC\\";
+                std::string logFileName = package.packageNameAndVersion;
+
+                std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
+                logFile.append( logFileName ).append(".log");
+
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.installerPath + "\" /quiet " + package.installerArgs;
+                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /qn /L*V " + logFile + " " + package.installerArgs;
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }
