@@ -259,8 +259,6 @@ std::string WindowsComponentManager::ResolvePath( const std::string& basePath )
 int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )
 {
     int32_t ret = 0;
-
-    DWORD retlol = 0;
     DWORD exit_code = 0;
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
