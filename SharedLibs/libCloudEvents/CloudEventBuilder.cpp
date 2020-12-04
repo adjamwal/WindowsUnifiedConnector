@@ -199,7 +199,7 @@ std::string CloudEventBuilder::Serialize()
     if( m_errCode != 0 )
     {
         Json::Value error;
-        error[ "code" ] = m_errCode;
+        error[ "code" ] = (unsigned)m_errCode;
         error[ "msg" ] = m_errMessage;
         event[ "err" ] = error;
     }
