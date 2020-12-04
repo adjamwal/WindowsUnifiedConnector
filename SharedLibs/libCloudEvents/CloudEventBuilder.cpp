@@ -14,7 +14,6 @@
 #include "CloudEventBuilder.h"
 #include <Windows.h>
 #include "IUcLogger.h"
-#include "json\json.h"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -241,116 +240,43 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
             if ( jsonReader->parse( eventJson.c_str(), eventJson.c_str() + eventJson.length(), &root, &jsonError ) ) {
                 event = root["event"];
 
-                if ( event["ucid"].isString() ) {
-                    orig_ucid = event["ucid"].asString();
-                }
-                else {
-                    isValid = false;
-                    LOG_ERROR( "Invalid ucid" );
+                isValid = ExtractJsonString( event, "ucid", orig_ucid );
+
+                isValid = ExtractJsonString( event, "tse", orig_tse );
+
+                std::string typeString;
+                isValid = ExtractJsonString( event, "type", typeString );
+
+                if ( isValid )
+                {
+                    orig_evtype = ConvertCloudEventType( typeString );
                 }
 
-                if ( event["tse"].isString() ) {
-                    orig_tse = event["tse"].asString();
-                }
-                else {
-                    isValid = false;
-                    LOG_ERROR( "Invalid tse" );
-                }
-
-                if ( event["type"].isString() ) {
-                    std::string s = event["type"].asString();
-                    orig_evtype = ConvertCloudEventType( s );
-                }
-                else {
-                    isValid = false;
-                    LOG_ERROR( "Invalid Event Type" );
-                }
-
-                if ( event["package"].isString() ) {
-                    std::string p = event["package"].asString();
-                    orig_packageName = p;
-                }
-                else {
-                    isValid = false;
-                    LOG_ERROR( "Invalid Package Name" );
-                }
+                isValid = ExtractJsonString( event, "package", orig_packageName );
 
                 if ( !event["err"].isNull() ) {
                     error = event["err"];
 
-                    if ( error["code"].isUInt() ) {
-                        orig_errCode = error["code"].asUInt();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid Error Code" );
-                    }
-
-                    if ( error["msg"].isString() ) {
-                        orig_errMessage = error["msg"].asString();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid Error Message" );
-                    }
+                    isValid = ExtractJsonInt( error, "code", orig_errCode );
+                    isValid = ExtractJsonString( error, "msg", orig_errMessage );
                 }
 
                 if ( !event["old"].isNull() && event["old"].isArray() && event["old"].size() == 1 ) {
                     oldfilearr = event["old"];
                     oldfile = oldfilearr[0];
 
-                    if ( oldfile["path"].isString() ) {
-                        orig_oldPath = oldfile["path"].asString();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid OldFile " );
-                    }
-
-                    if ( oldfile["sha256"].isString() ) {
-                        orig_oldHash = oldfile["sha256"].asString();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid OldFile " );
-                    }
-
-                    if ( oldfile["size"].isUInt() ) {
-                        orig_oldSize = oldfile["size"].asUInt();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid OldFile " );
-                    }
+                    isValid = ExtractJsonString( oldfile, "path", orig_oldPath );
+                    isValid = ExtractJsonString( oldfile, "sha256", orig_oldHash );
+                    isValid = ExtractJsonInt( oldfile, "size", orig_oldSize );
                 }
 
                 if ( !event["new"].isNull() && event["new"].isArray() && event["new"].size() == 1 ) {
                     newfilearr = event["new"];
                     newfile = newfilearr[0];
 
-                    if ( newfile["path"].isString() ) {
-                        orig_newPath = newfile["path"].asString();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid NewFile Path" );
-                    }
-
-                    if ( newfile["sha256"].isString() ) {
-                        orig_newHash = newfile["sha256"].asString();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid NewFile Hash" );
-                    }
-
-                    if ( newfile["size"].isInt() ) {
-                        orig_newSize = newfile["size"].asInt();
-                    }
-                    else {
-                        isValid = false;
-                        LOG_ERROR( "Invalid NewFile Size" );
-                    }
+                    isValid = ExtractJsonString( newfile, "path", orig_newPath );
+                    isValid = ExtractJsonString( newfile, "sha256", orig_newHash );
+                    isValid = ExtractJsonInt( newfile, "size", orig_newSize );
                 }
             }
             else {
@@ -381,4 +307,34 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
     }
 
     return isValid;
+}
+
+bool CloudEventBuilder::ExtractJsonInt( Json::Value& root, const std::string& attribute, int& dest )
+{
+    bool rtn = true;
+
+    if ( root[attribute].isInt() ) {
+        dest = root[attribute].asInt();
+    }
+    else {
+        rtn = false;
+        LOG_ERROR( "Invalid %s", attribute.c_str() );
+    }
+
+    return rtn;
+}
+
+bool CloudEventBuilder::ExtractJsonString( Json::Value& root, const std::string& attribute, std::string& dest )
+{
+    bool rtn = true;
+
+    if ( root[attribute].isString() ) {
+        dest = root[attribute].asString();
+    }
+    else {
+        rtn = false;
+        LOG_ERROR( "Invalid %s", attribute.c_str() );
+    }
+
+    return rtn;
 }

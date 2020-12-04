@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ICloudEventBuilder.h"
+#include "json\json.h"
 
 static std::string CloudEventString( CloudEventType eventType )
 {
@@ -46,6 +47,8 @@ public:
     void Reset() override;
 
     static bool Deserialize( ICloudEventBuilder& event, const std::string& eventJson );
+    static bool ExtractJsonInt( Json::Value& root, const std::string& attribute, int& dest );
+    static bool ExtractJsonString( Json::Value& root, const std::string& attribute, std::string& dest );
 
 private:
     std::string m_ucid;

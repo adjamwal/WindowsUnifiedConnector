@@ -155,9 +155,11 @@ void PackageManager::PmWorkflowThread()
         );
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
-        m_manifestProcessor.ProcessManifest( manifest );
-
-        m_cloudEventPublisher.PublishFailedEvents();
+        
+        if ( m_manifestProcessor.ProcessManifest( manifest ) )
+        {
+            m_cloudEventPublisher.PublishFailedEvents();
+        }
     }
     catch( std::exception& ex )
     {
