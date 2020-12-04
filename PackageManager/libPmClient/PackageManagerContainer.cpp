@@ -57,6 +57,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_certsAdapter,
             *m_checkinManifestRetriever,
             *m_manifestProcessor,
+            *m_eventPublisher,
             *m_thread ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );

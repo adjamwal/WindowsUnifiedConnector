@@ -25,11 +25,20 @@ protected:
             .WithOldFile( "oldfile", "oldhash123", 123 )
             .WithNewFile( "newfile", "newhash123", 234 )
             .WithError( 100, "some error" );
+
+        m_eventBuilderTwo
+            .WithUCID( "6B3861FF-2690-45D4-A49D-8F8CD18BBFC6" )
+            .WithType( CloudEventType::pkgreconfig )
+            .WithPackage( "vpn", "2.0.0" )
+            .WithOldFile( "oldfile", "oldhash1234", 1234 )
+            .WithNewFile( "newfile", "newhash1234", 2345 )
+            .WithError( 100, "some error" );
     }
 
     void TearDown()
     {
         m_eventBuilder.Reset();
+        m_eventBuilderTwo.Reset();
         m_httpAdapter.reset();
         m_eventPublisher.reset();
         m_eventStorage.reset();
@@ -37,6 +46,7 @@ protected:
     }
 
     CloudEventBuilder m_eventBuilder;
+    CloudEventBuilder m_eventBuilderTwo;
     std::unique_ptr<MockPmHttp> m_httpAdapter;
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;
     std::unique_ptr<MockPmConfig> m_pmConfig;
@@ -98,7 +108,9 @@ TEST_F( TestCloudEventPublisher, EventPublisherSendFailedEventsWithEmptyList )
 
 TEST_F( TestCloudEventPublisher, EventPublisherSendFailedEvents )
 {
-    std::vector<std::string> list = { "one", "two" };
+    std::vector<std::string> list;
+    list.push_back( m_eventBuilder.Build() );
+    list.push_back( m_eventBuilderTwo.Build() );
 
     m_httpAdapter->MakeHttpPostReturn( 0 );
     m_eventStorage->MakeReadEventsReturn( list );
@@ -110,12 +122,39 @@ TEST_F( TestCloudEventPublisher, EventPublisherSendFailedEvents )
 
 TEST_F( TestCloudEventPublisher, EventPublisherSavesFailedEventsThatFailAgain )
 {
-    std::vector<std::string> list = { "one" };
+    std::vector<std::string> list;
+    list.push_back( m_eventBuilder.Build() );
 
     m_httpAdapter->MakeHttpPostReturn( -1 );
     m_eventStorage->MakeReadEventsReturn( list );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
+
+    m_eventPublisher->PublishFailedEvents();
+}
+
+TEST_F( TestCloudEventPublisher, EventPublisherDoesntPublishInvalidFailedEvents )
+{
+    std::vector<std::string> list;
+    list.push_back( "{ event : \"\" }" );
+
+    m_httpAdapter->MakeHttpPostReturn( -1 );
+    m_eventStorage->MakeReadEventsReturn( list );
+
+    EXPECT_CALL( *m_httpAdapter, HttpPost( _, _, _, _, _ ) ).Times( 0 );
+
+    m_eventPublisher->PublishFailedEvents();
+}
+
+TEST_F( TestCloudEventPublisher, EventPublisherDoesntSaveInvalidFailedEvents )
+{
+    std::vector<std::string> list;
+    list.push_back( "{ event : \"\" }" );
+
+    m_httpAdapter->MakeHttpPostReturn( -1 );
+    m_eventStorage->MakeReadEventsReturn( list );
+
+    EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 0 );
 
     m_eventPublisher->PublishFailedEvents();
 }
