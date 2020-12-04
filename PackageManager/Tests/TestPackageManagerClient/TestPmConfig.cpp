@@ -24,20 +24,21 @@ protected:
     const std::string bsConfigData = R"(
 {
     "id": {
-		"url": "https://packagemanager.cisco.com/identify"
-	},
-	"pm": {
-		"url": "https://packagemanager.cisco.com/checkin"
-	}
+        "url": "https://packagemanager.cisco.com/identify"
+    },
+    "pm": {
+        "url": "https://packagemanager.cisco.com/checkin",
+        "event_url": "https://packagemanager.cisco.com/event/1"
+    }
 }
 )";
 
     const std::string pmConfigData = R"(
 {
-	"pm": {
-		"loglevel": 7,
-		"CheckinInterval": 300000
-	}
+    "pm": {
+        "loglevel": 7,
+        "CheckinInterval": 300000
+    }
 }
 )";
 
@@ -48,7 +49,7 @@ protected:
 TEST_F( TestPmConfig, LoadWillReadBsFile )
 {
     std::string bsfilename( "bs file" );
-    
+
     m_fileUtil->MakeReadFileReturn( bsConfigData );
 
     EXPECT_CALL( *m_fileUtil, ReadFile( bsfilename ) );
@@ -162,7 +163,7 @@ TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, LoadSetDefaulInterval )
+TEST_F( TestPmConfig, LoadSetDefaultInterval )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
@@ -171,7 +172,7 @@ TEST_F( TestPmConfig, LoadSetDefaulInterval )
     EXPECT_EQ( m_patient->GetCloudCheckinInterval(), PM_CONFIG_INTERVAL_DEFAULT );
 }
 
-TEST_F( TestPmConfig, LoadSetDefaulLogLevel )
+TEST_F( TestPmConfig, LoadSetDefaultLogLevel )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 

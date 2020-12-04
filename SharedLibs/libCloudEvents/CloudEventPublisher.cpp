@@ -69,9 +69,9 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
     int32_t httpReturn;
 
     std::lock_guard<std::mutex> lock( m_mutex );
-    auto eventUri = m_pmConfig.GetCloudIdentifyUri() + "/event";
+    
     postReturn = m_httpAdapter.HttpPost(
-        eventUri,
+        m_pmConfig.GetCloudEventUri(),
         ( void* )eventJson.c_str(),
         eventJson.length(),
         eventResponse,

@@ -2,7 +2,7 @@
 
 @Library('JenkinsShared@ReleaseLogging')_
 
-agentLabel = "VS2019"
+agentLabel = "windowsci2019"
 
 def SetGithubPendingStatus() {
   if (env.CHANGE_ID != null) {

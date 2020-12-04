@@ -90,13 +90,16 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
     }
 
     componentPackage.installerPath = ss.str();
-    m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, m_fileUtil.FileSize( componentPackage.installerPath ) );
+    auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
+
+    m_eventBuilder.WithNewFile( 
+        componentPackage.installerUrl, 
+        sha256.has_value() ? sha256.value() : componentPackage.installerHash,
+        m_fileUtil.FileSize( componentPackage.installerPath ) );
 
     // only validate hash if installerHash is not empty
     if( !componentPackage.installerHash.empty() )
     {
-        auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
-
         if( sha256.has_value() )
         {
             if( sha256.value() == componentPackage.installerHash )
