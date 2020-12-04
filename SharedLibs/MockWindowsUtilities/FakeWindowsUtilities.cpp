@@ -62,3 +62,13 @@ std::wstring WindowsUtilities::GetDataDir()
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
 }
+
+std::string utf8_encode( const std::wstring& wstr )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->utf8_encode();
+}
+
+std::wstring utf8_decode( const std::string& str )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->utf8_decode();
+}

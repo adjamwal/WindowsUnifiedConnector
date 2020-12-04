@@ -163,3 +163,23 @@ void MockWindowsUtilities::ExpectGetDataDirIsNotCalled()
 {
     EXPECT_CALL( *this, GetDataDir() ).Times( 0 );
 }
+
+void MockWindowsUtilities::Makeutf8_encodeReturn( std::string value )
+{
+    ON_CALL( *this, utf8_encode() ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::Expectutf8_encodeIsNotCalled()
+{
+    EXPECT_CALL( *this, utf8_encode() ).Times( 0 );
+}
+
+void MockWindowsUtilities::Makeutf8_decodeReturn( std::wstring value )
+{
+    ON_CALL( *this, utf8_decode() ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::Expectutf8_decodeIsNotCalled()
+{
+    EXPECT_CALL( *this, utf8_decode() ).Times( 0 );
+}

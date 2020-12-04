@@ -4,14 +4,11 @@
 
 #include <fstream>
 #include <filesystem>
-#include <locale>
-#include <codecvt>
 
 CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileUtil& fileUtil ) :
     m_fileUtil( fileUtil )
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::string logFilePath = converter.to_bytes( WindowsUtilities::GetDataDir() );
+    std::string logFilePath = WindowsUtilities::utf8_encode( WindowsUtilities::GetDataDir() );
     logFilePath.append( "\\" ).append( fileName );
     m_fileName = logFilePath;
 }

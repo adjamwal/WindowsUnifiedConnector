@@ -74,6 +74,9 @@
     <ProjectReference Include="..\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\libWindowsUtilities\libWindowsUtilities.vcxproj">
+      <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\MockCloudEvents\MockCloudEvents.vcxproj">
       <Project>{f40a9e15-7cf0-4ac0-9741-6a7e29cf4b96}</Project>
     </ProjectReference>
@@ -96,7 +99,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;Msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -115,7 +118,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;Msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -135,7 +138,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;Msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -155,7 +158,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gtest.lib;gtest_main.lib;gmock.lib;Wintrust.lib;Crypt32.lib;Msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

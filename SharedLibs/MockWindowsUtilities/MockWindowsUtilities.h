@@ -61,6 +61,13 @@ public:
     void MakeGetDataDirReturn( std::wstring value );
     void ExpectGetDataDirIsNotCalled();
 
+    MOCK_METHOD1( utf8_encode, std::string( const std::wstring& ) );
+    void Makeutf8_encodeReturn( std::string value );
+    void Expectutf8_encodeIsNotCalled();
+
+    MOCK_METHOD1( utf8_decode, std::wstring( const std::string& ) );
+    void Makeutf8_decodeReturn( std::wstring value );
+    void Expectutf8_decodeIsNotCalled();
 
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
