@@ -3,6 +3,7 @@
 #include "UCIDApiDll.h"
 #include "ICodeSignVerifier.h"
 #include "WindowsUtilities.h"
+#include "StringUtil.h"
 #include <IUcLogger.h>
 
 #define UCID_API_GET_ID_FUNCTION_NAME "ucid_get_id"
@@ -13,8 +14,8 @@ UCIDApiDll::UCIDApiDll( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
     , m_api( 0 )
     , m_getIdFunc( NULL )
-    , m_getTokenFunc(NULL)
-    , m_refreshTokenFunc(NULL)
+    , m_getTokenFunc( NULL )
+    , m_refreshTokenFunc( NULL )
     , m_loadedDllName()
     , m_isModuleLoaded( false )
 {
@@ -33,20 +34,21 @@ int32_t UCIDApiDll::GetId( std::string& id )
 
     int bufsz = 0;
 
-    ucid_result_t res = m_getIdFunc(NULL, &bufsz);
+    ucid_result_t res = m_getIdFunc( NULL, &bufsz );
 
-    if (res == UCID_RES_INSUFFICIENT_LEN) {
-        char* myucid = (char*)malloc(bufsz);
+    if( res == UCID_RES_INSUFFICIENT_LEN ) {
+        char* myucid = ( char* )malloc( bufsz );
 
-        res = m_getIdFunc(myucid, &bufsz);
+        res = m_getIdFunc( myucid, &bufsz );
 
-        if (myucid)
+        if( myucid )
         {
-            id.assign(myucid, bufsz);
-            free(myucid);
+            id.assign( myucid, bufsz );
+            free( myucid );
+            id = StringUtil::Trim( id );
         }
     }
-    if (res != UCID_RES_SUCCESS) 
+    if( res != UCID_RES_SUCCESS )
     {
         return res;
     }
@@ -54,26 +56,26 @@ int32_t UCIDApiDll::GetId( std::string& id )
     return res;
 }
 
-int32_t UCIDApiDll::GetToken(std::string& token )
+int32_t UCIDApiDll::GetToken( std::string& token )
 {
     LoadApi();
 
     int bufsz = 0;
 
-    ucid_result_t res = m_getTokenFunc(NULL, &bufsz);
+    ucid_result_t res = m_getTokenFunc( NULL, &bufsz );
 
-    if (res == UCID_RES_INSUFFICIENT_LEN) {
-        char* myucid = (char*)malloc(bufsz);
+    if( res == UCID_RES_INSUFFICIENT_LEN ) {
+        char* myucid = ( char* )malloc( bufsz );
 
-        res = m_getTokenFunc(myucid, &bufsz);
+        res = m_getTokenFunc( myucid, &bufsz );
 
-        if (myucid)
+        if( myucid )
         {
-            token.assign(myucid, bufsz);
-            free(myucid);
+            token.assign( myucid, bufsz );
+            free( myucid );
         }
     }
-    if (res != UCID_RES_SUCCESS)
+    if( res != UCID_RES_SUCCESS )
     {
         return res;
     }
@@ -118,7 +120,7 @@ bool UCIDApiDll::LoadDll( const std::wstring dllPath )
     SetDllDirectory( dllDir.c_str() );
 
     m_api = LoadLibrary( m_loadedDllName.c_str() );
-    if( !m_api) {
+    if( !m_api ) {
         WLOG_ERROR( L"LoadLibrary() call failed. Error %d", GetLastError() );
         SetDllDirectory( NULL );
         return false;
@@ -126,22 +128,22 @@ bool UCIDApiDll::LoadDll( const std::wstring dllPath )
 
     SetDllDirectory( NULL );
 
-    m_getIdFunc = ( GetIdFunc )GetProcAddress( m_api, UCID_API_GET_ID_FUNCTION_NAME);
-    if(m_getIdFunc == NULL )
+    m_getIdFunc = ( GetIdFunc )GetProcAddress( m_api, UCID_API_GET_ID_FUNCTION_NAME );
+    if( m_getIdFunc == NULL )
     {
         throw std::exception( "Couldn't bind to Get Id dll function. Error %d", GetLastError() );
     }
 
     m_getTokenFunc = ( GetTokenFunc )GetProcAddress( m_api, UCID_API_GET_TOKEN_FUNCTION_NAME );
-    if(m_getTokenFunc == NULL )
+    if( m_getTokenFunc == NULL )
     {
         throw std::exception( "Couldn't bind to Get Token dll function. Error %d", GetLastError() );
     }
 
     m_refreshTokenFunc = ( RefreshTokenFunc )GetProcAddress( m_api, UCID_API_REFRESH_TOKEN_FUNCTION_NAME );
-    if (m_refreshTokenFunc == NULL)
+    if( m_refreshTokenFunc == NULL )
     {
-        throw std::exception("Couldn't bind to Refresh Token dll function. Error %d", GetLastError());
+        throw std::exception( "Couldn't bind to Refresh Token dll function. Error %d", GetLastError() );
     }
 
     return true;
@@ -149,14 +151,14 @@ bool UCIDApiDll::LoadDll( const std::wstring dllPath )
 
 void UCIDApiDll::UnloadDll()
 {
-    if( !m_api)
+    if( !m_api )
     {
         return;
     }
 
     WLOG_DEBUG( L"UnLoading %s", m_loadedDllName.c_str() );
 
-    if( FreeLibrary(m_api) == 0 )
+    if( FreeLibrary( m_api ) == 0 )
     {
         WLOG_ERROR( L"FreeLibrary() call failed. Error %d", GetLastError() );
     }
@@ -188,7 +190,7 @@ bool UCIDApiDll::LoadApi()
     }
 
     dllFullPath = ucidDllDir;
-    if(WindowsUtilities::Is64BitWindows() )
+    if( WindowsUtilities::Is64BitWindows() )
     {
         dllFullPath.append( L"x64\\" );
     }
