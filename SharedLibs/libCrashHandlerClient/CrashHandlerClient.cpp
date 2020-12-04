@@ -32,6 +32,7 @@ CrashHandlerClient::CrashHandlerClient( CrashDumpWrittenCallback callback ) :
     m_DumpFile( L"" ),
     m_CheckThread( NULL ),
     m_callback( callback ),
+    m_DumpType( MiniDumpNormal ),
     m_hShutDown( CreateEvent( NULL, TRUE, FALSE, NULL ) )
 {
 
@@ -89,15 +90,11 @@ bool CrashHandlerClient::SetupCrashHandler()
     signal( SIGABRT, &HandleAborts );
 
     if( !s_ExceptionHandler->IsOutOfProcess() ) {
-        WLOG_DEBUG( L": OOP Not created" );
-        if( !m_CheckThread ) {
-            m_CheckThread = new std::thread( &CrashHandlerClient::CheckOopThread, this );
-        }
+        WLOG_ERROR( L": OOP Not created. Crashes will be handled locally" );
     }
     else {
         WLOG_DEBUG( L": OOP Crash Handler Created" );
     }
-
 
     return TRUE;
 }
@@ -107,23 +104,6 @@ bool CrashHandlerClient::RemoveCrashHandler()
     std::lock_guard<std::mutex> guard( CrashHandlerClient::s_mutex );
     signal( SIGABRT, SIG_DFL );
     return TRUE;
-}
-
-void CrashHandlerClient::CheckOopThread()
-{
-    while( WaitForSingleObject( m_hShutDown, OOP_THREAD_TIMEOUT ) != WAIT_OBJECT_0 ) {
-        google_breakpad::ExceptionHandler* newHandler = SetupCrashHandlerInternal();
-        if( newHandler && newHandler->IsOutOfProcess() ) {
-            RemoveCrashHandler();
-            std::lock_guard<std::mutex> guard( CrashHandlerClient::s_mutex );
-            s_ExceptionHandler = newHandler;
-            break;
-        }
-        else {
-            delete newHandler;
-            newHandler = NULL;
-        }
-    }
 }
 
 void CrashHandlerClient::CrashHandled( const wchar_t* dump_path, const wchar_t* minidump_id )

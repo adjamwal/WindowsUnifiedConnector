@@ -52,15 +52,22 @@ int32_t PmCloud::Checkin( const std::string& payload, std::string& response )
 
     int32_t respStatus = 0;
     m_http.HttpPost( m_uri, (void*)payload.c_str(), payload.length() + 1, response, respStatus );
-
+    m_http.Deinit();
     return respStatus;
 }
 
-int32_t PmCloud::SendEvent( const std::string& payload )
+int32_t PmCloud::Post( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t& httpReturn )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return -1;
+    m_http.Init( _ProgressCallback, this, m_userAgent );
+    m_http.SetCerts( m_certs );
+    m_http.SetToken( m_token );
+
+    int32_t respStatus = 0;
+    m_http.HttpPost( url, data, dataSize, response, respStatus );
+    m_http.Deinit();
+    return respStatus;
 }
 
 int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filename )
@@ -73,7 +80,7 @@ int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filenam
 
     int32_t respStatus = 0;
     m_http.HttpDownload( uri, filename, respStatus );
-
+    m_http.Deinit();
     return respStatus;
 }
 
