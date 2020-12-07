@@ -38,7 +38,7 @@ int32_t CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return m_fileUtil.WriteLine( m_fileName, eventStr );
+    return m_fileUtil.WriteLine( m_fullPath, eventStr );
 }
 
 int32_t CloudEventStorage::SaveEvent( const std::string& event )
@@ -49,7 +49,7 @@ int32_t CloudEventStorage::SaveEvent( const std::string& event )
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
     }
 
-    return m_fileUtil.WriteLine( m_fileName, event );
+    return m_fileUtil.WriteLine( m_fullPath, event );
 }
 
 std::vector<std::string> CloudEventStorage::ReadEvents()
@@ -60,9 +60,9 @@ std::vector<std::string> CloudEventStorage::ReadEvents()
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
     }
 
-    auto ret = m_fileUtil.ReadFileLines( m_fileName );
+    auto ret = m_fileUtil.ReadFileLines( m_fullPath );
 
-    m_fileUtil.DeleteFile( m_fileName );
+    m_fileUtil.DeleteFile( m_fullPath );
 
     return ret;
 }
