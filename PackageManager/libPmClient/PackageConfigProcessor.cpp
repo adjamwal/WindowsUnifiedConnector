@@ -6,6 +6,7 @@
 #include "CloudEventPublisher.h"
 #include "PmTypes.h"
 #include "PmLogger.h"
+#include "PmConstants.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include <sstream>
@@ -72,7 +73,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
         std::stringstream ssError;
         ssError << "Failed to decode " << config.contents;
-        m_eventBuilder.WithError( -1, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_DECODE, ssError.str() );
         LOG_ERROR( "%s", ssError.str().c_str() );
         m_eventPublisher.Publish( m_eventBuilder );
 
@@ -87,7 +88,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     {
         std::stringstream ssError;
         ssError << "Failed to create " << ss.str();
-        m_eventBuilder.WithError( -1, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_CREATE, ssError.str() );
         LOG_ERROR( "%s", ssError.str().c_str() );
         m_eventPublisher.Publish( m_eventBuilder );
 
@@ -100,7 +101,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
         std::stringstream ssError;
         ssError << "Failed to write to " << ss.str();
-        m_eventBuilder.WithError( -1, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_WRITE, ssError.str() );
         LOG_ERROR( "%s", ssError.str().c_str() );
         m_eventPublisher.Publish( m_eventBuilder );
 
@@ -152,7 +153,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     {
         std::stringstream ssError;
         ssError << "Failed to deploy configuration to " << targetLocation;
-        m_eventBuilder.WithError( -1, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_DEPLOY, ssError.str() );
     }
 
     m_eventPublisher.Publish( m_eventBuilder );
@@ -167,14 +168,18 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     std::string targetLocation = m_fileUtil.AppendPath( config.installLocation, config.path );
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithOldFile( config.path, config.sha256, m_fileUtil.FileSize( targetLocation ) );
+    auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
+    m_eventBuilder.WithOldFile( 
+        config.path, 
+        sha256.has_value() ? sha256.value() : config.sha256,
+        m_fileUtil.FileSize( targetLocation ) );
 
     if( !targetLocation.empty() ) {
         if( m_fileUtil.DeleteFile( targetLocation ) != 0 )
         {
             std::stringstream ssError;
             ssError << "Failed to remove " << targetLocation;
-            m_eventBuilder.WithError( -1, ssError.str() );
+            m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_REMOVE, ssError.str() );
             LOG_ERROR( "%s", ssError.str().c_str() );
         }
         else {
@@ -186,7 +191,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     {
         std::stringstream ssError;
         ssError << "Failed to resolve file " << targetLocation;
-        m_eventBuilder.WithError( -1, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_RESOLVE, ssError.str() );
         LOG_ERROR( "%s", ssError.str().c_str() );
     }
 

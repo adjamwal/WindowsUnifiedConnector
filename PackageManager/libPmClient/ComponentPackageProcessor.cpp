@@ -9,6 +9,7 @@
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
 #include "PmLogger.h"
+#include "PmConstants.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -81,7 +82,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
 
         std::stringstream ssError;
         ssError << "Download failed. Result code: " << dlResult << ", uri: " << componentPackage.installerUrl;
-        m_eventBuilder.WithError( -1, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD, ssError.str() );
 
         LOG_ERROR( "%s", ssError.str().c_str() );
         m_eventPublisher.Publish( m_eventBuilder );
@@ -111,7 +112,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
                 {
                     std::stringstream ssError;
                     ssError << "Failed to Update Component. Error " << updated << errorText;
-                    m_eventBuilder.WithError( -1, ssError.str() );
+                    m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_UPDATE, ssError.str() );
 
                     LOG_ERROR( "%s", ssError.str().c_str() );
                     m_eventPublisher.Publish( m_eventBuilder );
@@ -125,7 +126,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
             {
                 std::stringstream ssError;
                 ssError << "Failed to match hash of download. Calculated Hash: " << sha256.value() << ", Cloud Hash: " << componentPackage.installerHash;
-                m_eventBuilder.WithError( -1, ssError.str() );
+                m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH, ssError.str() );
 
                 LOG_ERROR( "%s", ssError.str().c_str() );
                 m_eventPublisher.Publish( m_eventBuilder );
@@ -135,7 +136,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         {
             std::stringstream ssError;
             ssError << "Failed to calculate sha256 of " << ss.str();
-            m_eventBuilder.WithError( -1, ssError.str() );
+            m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_HASH_CALC, ssError.str() );
 
             LOG_ERROR( "%s", ssError.str().c_str() );
             m_eventPublisher.Publish( m_eventBuilder );
@@ -150,7 +151,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
         {
             std::stringstream ssError;
             ssError << "Failed to Update Component. Error " << updated << errorText;
-            m_eventBuilder.WithError( -1, ssError.str() );
+            m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_UPDATE, ssError.str() );
 
             LOG_ERROR( "%s", ssError.str().c_str() );
             m_eventPublisher.Publish( m_eventBuilder );
