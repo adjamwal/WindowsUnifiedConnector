@@ -2,6 +2,7 @@
 #include "WindowsConfiguration.h"
 #include "IWinCertLoader.h"
 #include "..\..\GlobalVersion.h"
+#include "WindowsUtilities.h"
 #include <codecvt>
 
 WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier ) :
@@ -102,4 +103,11 @@ std::string WindowsConfiguration::GetHttpUserAgent()
 
     agent = "PackageManager/" + converter.to_bytes( STRFORMATPRODVER );
     return agent;
+}
+
+std::string WindowsConfiguration::GetDataDirectory()
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    return converter.to_bytes( WindowsUtilities::GetDataDir() );
 }

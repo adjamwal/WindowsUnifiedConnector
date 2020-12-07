@@ -32,6 +32,10 @@ public:
     void MakeGetHttpUserAgentReturn( std::string value );
     void ExpectGetHttpUserAgentIsNotCalled();
 
+    MOCK_METHOD0( GetDataDirectory, std::string() );
+    void MakeGetDataDirectoryReturn( std::string value );
+    void ExpectGetDataDirectoryIsNotCalled();
+
 private:
     std::string m_defaultUserAgent;
 };

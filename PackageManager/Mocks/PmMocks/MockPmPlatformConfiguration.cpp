@@ -65,3 +65,13 @@ void MockPmPlatformConfiguration::ExpectGetHttpUserAgentIsNotCalled()
 {
     EXPECT_CALL( *this, GetHttpUserAgent() ).Times( 0 );
 }
+
+void MockPmPlatformConfiguration::MakeGetDataDirectoryReturn( std::string value )
+{
+    ON_CALL( *this, GetDataDirectory() ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformConfiguration::ExpectGetDataDirectoryIsNotCalled()
+{
+    EXPECT_CALL( *this, GetDataDirectory() ).Times( 0 );
+}

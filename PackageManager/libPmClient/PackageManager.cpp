@@ -16,6 +16,7 @@
 #include "IPmPlatformComponentManager.h"
 #include "IPmPlatformConfiguration.h"
 #include "ICloudEventPublisher.h"
+#include "ICloudEventStorage.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -30,6 +31,7 @@ PackageManager::PackageManager( IPmConfig& config,
     ICheckinManifestRetriever& manifestRetriever,
     IManifestProcessor& manifestProcessor,
     ICloudEventPublisher& cloudEventPublisher,
+    ICloudEventStorage& cloudEventStorage,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
@@ -40,6 +42,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_manifestRetriever( manifestRetriever )
     , m_manifestProcessor( manifestProcessor )
     , m_cloudEventPublisher( cloudEventPublisher )
+    , m_cloudEventStorage( cloudEventStorage )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
@@ -121,6 +124,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_certsAdapter.Initialize( m_dependencies );
         m_manifestProcessor.Initialize( m_dependencies );
         m_packageInventoryProvider.Initialize( m_dependencies );
+        m_cloudEventStorage.Initialize( m_dependencies );
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
         m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
     }

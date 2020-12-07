@@ -52,6 +52,8 @@ public:
      */
     std::string GetHttpUserAgent() override;
 
+    std::string GetDataDirectory() override;
+
 private:
     IWinCertLoader& m_winCertLoader;
     UCIDApiDll m_ucidApi;

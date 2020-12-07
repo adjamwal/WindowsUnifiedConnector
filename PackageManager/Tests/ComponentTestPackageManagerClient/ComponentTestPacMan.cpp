@@ -23,6 +23,7 @@
 #include "MockSslUtil.h"
 #include "MockCloudEventBuilder.h"
 #include "MockCloudEventPublisher.h"
+#include "MockCloudEventStorage.h"
 
 class ComponentTestPacMan : public ::testing::Test
 {
@@ -49,6 +50,7 @@ protected:
 
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
+        m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
@@ -75,6 +77,7 @@ protected:
             *m_checkinManifestRetriever,
             *m_manifestProcessor,
             *m_eventPublisher,
+            *m_eventStorage,
             *m_thread ) );
     }
 
@@ -89,6 +92,7 @@ protected:
         m_checkinManifestRetriever.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
+        m_eventStorage.reset();
         m_certsAdapter.reset();
         m_ucidAdapter.reset();
         m_checkinFormatter.reset();
@@ -156,6 +160,7 @@ protected:
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
+    std::unique_ptr<MockCloudEventStorage> m_eventStorage;
 
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;

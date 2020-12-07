@@ -61,7 +61,6 @@ public:
     void MakeGetDataDirReturn( std::wstring value );
     void ExpectGetDataDirIsNotCalled();
 
-
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();

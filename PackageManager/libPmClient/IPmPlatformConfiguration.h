@@ -53,4 +53,9 @@ public:
      * @brief Provides the user agent for http requests
      */
     virtual std::string GetHttpUserAgent() = 0;
+
+    /**
+     * @brief Gets the temp
+     */
+    virtual std::string GetDataDirectory() = 0;
 };

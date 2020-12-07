@@ -16,6 +16,7 @@ class ICheckinManifestRetriever;
 class IManifestProcessor;
 class IWorkerThread;
 class ICloudEventPublisher;
+class ICloudEventStorage;
 
 struct PmComponent;
 struct PmEvent;
@@ -34,6 +35,7 @@ public:
         ICheckinManifestRetriever& manifestRetriever,
         IManifestProcessor& manifestProcessor, 
         ICloudEventPublisher& cloudEventPublisher,
+        ICloudEventStorage& cloudEventStorage,
         IWorkerThread& thread );
     virtual ~PackageManager();
 
@@ -54,6 +56,7 @@ private:
     ICheckinManifestRetriever& m_manifestRetriever;
     IManifestProcessor& m_manifestProcessor;
     ICloudEventPublisher& m_cloudEventPublisher;
+    ICloudEventStorage& m_cloudEventStorage;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
     std::string m_bsConfigFile;

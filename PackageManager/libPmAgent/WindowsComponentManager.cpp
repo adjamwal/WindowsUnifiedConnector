@@ -173,15 +173,15 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
             if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
-                std::string logFile = "%PROGRAMDATA%\\Cisco\\UC\\";
+                std::string logFilePath = converter.to_bytes(WindowsUtilities::GetDataDir());
                 std::string logFileName = package.packageNameAndVersion;
 
                 std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
-                logFile.append( logFileName ).append(".log");
+                logFilePath.append( "\\" ).append( logFileName ).append(".log");
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /qn /L*V " + logFile + " " + package.installerArgs;
+                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /qn /L*V \"" + logFilePath + "\" " + package.installerArgs;
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }
@@ -259,8 +259,6 @@ std::string WindowsComponentManager::ResolvePath( const std::string& basePath )
 int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )
 {
     int32_t ret = 0;
-
-    DWORD retlol = 0;
     DWORD exit_code = 0;
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -274,7 +272,7 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     si.cb = sizeof( si );
     ZeroMemory( &pi, sizeof( pi ) );
 
-    WLOG_DEBUG( L"Executing: %s, args:", exe.c_str(), cmd.c_str() );
+    WLOG_DEBUG( L"Executing: %s, args: %s", exe.c_str(), cmd.c_str() );
     if ( m_winApiWrapper.CreateProcessW( &exe[0], &cmd[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi ) )
     {
         ret = m_winApiWrapper.WaitForSingleObject( pi.hProcess, 300000 );

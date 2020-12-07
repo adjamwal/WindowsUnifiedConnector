@@ -3,6 +3,8 @@
 #include "CloudEventBuilder.h"
 #include "FileUtil.h"
 #include "CloudEventStorage.h"
+#include "MockPmPlatformDependencies.h"
+#include "MockPmPlatformConfiguration.h"
 #include <memory>
 
 class TestCloudEventStorage : public ::testing::Test
@@ -13,6 +15,14 @@ protected:
         std::string filename = "TestCloudEventStorage";
         m_fileUtil.reset( new FileUtil() );
         m_eventStorage.reset( new CloudEventStorage( filename, *m_fileUtil ) );
+
+        m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
+        m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
+
+        m_platformConfiguration->MakeGetDataDirectoryReturn(".");
+        m_deps->MakeConfigurationReturn( *m_platformConfiguration );
+
+        m_eventStorage->Initialize( m_deps.get() );
 
         m_eventBuilder1
             .WithUCID( "5B3861FF-2690-45D4-A49D-8F8CD18BBFC6" )
@@ -37,12 +47,17 @@ protected:
         m_eventBuilder2.Reset();
         m_eventStorage.reset();
         m_fileUtil.reset();
+        m_deps.reset();
+        m_platformConfiguration.reset();
     }
 
     std::unique_ptr<IFileUtil> m_fileUtil;
     CloudEventBuilder m_eventBuilder1;
     CloudEventBuilder m_eventBuilder2;
     std::unique_ptr<ICloudEventStorage> m_eventStorage;
+
+    std::unique_ptr<MockPmPlatformConfiguration> m_platformConfiguration;
+    std::unique_ptr<MockPmPlatformDependencies> m_deps;
 };
 
 TEST_F( TestCloudEventStorage, TestOneEventSavedToFile )
