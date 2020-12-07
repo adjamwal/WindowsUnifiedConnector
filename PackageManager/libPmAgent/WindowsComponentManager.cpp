@@ -177,7 +177,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
                 std::string logFileName = package.packageNameAndVersion;
 
                 std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
-                logFilePath.append( logFileName ).append(".log");
+                logFilePath.append( "\\" ).append( logFileName ).append(".log");
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
