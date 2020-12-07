@@ -10,11 +10,12 @@
  *
  ***************************************************************************/
 #include "CloudEventPublisher.h"
+#include "CloudEventBuilder.h"
 #include <Windows.h>
 #include "IUcLogger.h"
 #include "json\json.h"
 
-CloudEventPublisher::CloudEventPublisher( IPmHttp& httpAdapter, ICloudEventStorage& eventStorage, IPmConfig& pmConfig )
+CloudEventPublisher::CloudEventPublisher( IPmCloud& httpAdapter, ICloudEventStorage& eventStorage, IPmConfig& pmConfig )
     : m_httpAdapter( httpAdapter )
     , m_eventStorage( eventStorage )
     , m_pmConfig( pmConfig )
@@ -51,7 +52,11 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 
     for ( auto&& e : events )
     {
-        publishReturn = InternalPublish( e );
+        CloudEventBuilder eventBuilder;
+        if ( CloudEventBuilder::Deserialize( eventBuilder, e ) )
+        {
+            publishReturn = InternalPublish( eventBuilder.Build() );
+        }
     }
 
     return publishReturn;
@@ -64,9 +69,9 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
     int32_t httpReturn;
 
     std::lock_guard<std::mutex> lock( m_mutex );
-    auto eventUri = m_pmConfig.GetCloudIdentifyUri() + "/event";
-    postReturn = m_httpAdapter.HttpPost(
-        eventUri,
+    
+    postReturn = m_httpAdapter.Post(
+        m_pmConfig.GetCloudEventUri(),
         ( void* )eventJson.c_str(),
         eventJson.length(),
         eventResponse,

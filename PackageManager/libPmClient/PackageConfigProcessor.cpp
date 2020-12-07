@@ -113,15 +113,20 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     }
 
     m_fileUtil.CloseFile( handle );
-    m_eventBuilder.WithNewFile( config.path, config.sha256, m_fileUtil.FileSize( ss.str() ) );
     config.verifyPath = ss.str();
+
+    auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
+    m_eventBuilder.WithNewFile( 
+        config.path, 
+        sha256.has_value() ? sha256.value() : config.sha256,
+        m_fileUtil.FileSize( ss.str() ) 
+    );
 
     bool moveFile = true;
 
     // only validate hash if installerHash is not empty
     if( !config.sha256.empty() )
     {
-        auto sha256 = m_sslUtil.CalculateSHA256( config.verifyPath );
         if( sha256 != config.sha256 ) {
             moveFile = false;
         }

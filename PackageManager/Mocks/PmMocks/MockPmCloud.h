@@ -29,9 +29,10 @@ public:
     void MakeCheckinReturn( int32_t value );
     void ExpectCheckinIsNotCalled();
 
-    MOCK_METHOD1( SendEvent, int32_t( const std::string& ) );
-    void MakeSendEventReturn( int32_t value );
-    void ExpectSendEventIsNotCalled();
+    MOCK_METHOD5( Post, int32_t( const std::string&, void*, size_t, std::string&, int32_t& ) );
+    void MakePostReturn( int32_t value );
+    void MakePostReturn( int32_t value, int32_t httpResponse );
+    void ExpectPostIsNotCalled();
 
     MOCK_METHOD2( DownloadFile, int32_t( const std::string&, const std::string ) );
     void MakeDownloadFileReturn( int32_t value );

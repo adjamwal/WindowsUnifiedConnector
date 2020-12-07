@@ -30,7 +30,6 @@ private:
     HANDLE m_hShutDown;
     CrashDumpWrittenCallback m_callback;
 
-    void CheckOopThread();
     google_breakpad::ExceptionHandler* SetupCrashHandlerInternal();
 
     void SetDumpFileName( const wchar_t* dump_path, const wchar_t* minidump_id );

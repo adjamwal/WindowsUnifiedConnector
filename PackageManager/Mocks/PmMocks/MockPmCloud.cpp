@@ -3,7 +3,6 @@
 MockPmCloud::MockPmCloud()
 {
     MakeCheckinReturn( int32_t() );
-    MakeSendEventReturn( int32_t() );
     MakeDownloadFileReturn( int32_t() );
 }
 
@@ -46,14 +45,19 @@ void MockPmCloud::ExpectCheckinIsNotCalled()
     EXPECT_CALL( *this, Checkin( _, _ ) ).Times( 0 );
 }
 
-void MockPmCloud::MakeSendEventReturn( int32_t value )
+void MockPmCloud::MakePostReturn( int32_t value )
 {
-    ON_CALL( *this, SendEvent( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( 200 ), Return( value ) ) );
 }
 
-void MockPmCloud::ExpectSendEventIsNotCalled()
+void MockPmCloud::MakePostReturn( int32_t value, int32_t httpResponse )
 {
-    EXPECT_CALL( *this, SendEvent( _ ) ).Times( 0 );
+    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( httpResponse ), Return( value ) ) );
+}
+
+void MockPmCloud::ExpectPostIsNotCalled()
+{
+    EXPECT_CALL( *this, Post( _, _, _, _, _ ) ).Times( 0 );
 }
 
 void MockPmCloud::MakeDownloadFileReturn( int32_t value )

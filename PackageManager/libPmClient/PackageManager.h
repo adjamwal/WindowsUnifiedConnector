@@ -15,6 +15,7 @@ class ICertsAdapter;
 class ICheckinManifestRetriever;
 class IManifestProcessor;
 class IWorkerThread;
+class ICloudEventPublisher;
 
 struct PmComponent;
 struct PmEvent;
@@ -32,6 +33,7 @@ public:
         ICertsAdapter& certsAdapter,
         ICheckinManifestRetriever& manifestRetriever,
         IManifestProcessor& manifestProcessor, 
+        ICloudEventPublisher& cloudEventPublisher,
         IWorkerThread& thread );
     virtual ~PackageManager();
 
@@ -51,6 +53,7 @@ private:
     ICertsAdapter& m_certsAdapter;
     ICheckinManifestRetriever& m_manifestRetriever;
     IManifestProcessor& m_manifestProcessor;
+    ICloudEventPublisher& m_cloudEventPublisher;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
     std::string m_bsConfigFile;
