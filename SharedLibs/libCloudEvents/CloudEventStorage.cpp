@@ -6,11 +6,9 @@
 #include <filesystem>
 
 CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileUtil& fileUtil ) :
+    m_fileName( fileName ),
     m_fileUtil( fileUtil )
 {
-    std::string logFilePath = WindowsUtilities::utf8_encode( WindowsUtilities::GetDataDir() );
-    logFilePath.append( "\\" ).append( fileName );
-    m_fileName = logFilePath;
 }
 
 CloudEventStorage::~CloudEventStorage()

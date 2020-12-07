@@ -23,7 +23,5 @@ public:
     static bool GetSysDirectory( std::string& path );
     static std::vector<WindowsInstallProgram> GetInstalledPrograms();
     static std::string ResolveKnownFolderId( const std::string& knownFolderId );
-    static std::wstring GetDataDir(); 
-    static std::string utf8_encode( const std::wstring& wstr );
-    static std::wstring utf8_decode( const std::string& str );
+    static std::wstring GetDataDir();
 };
