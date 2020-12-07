@@ -105,6 +105,9 @@
     <ClInclude Include="UcidAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PmConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CertsAdapter.cpp">
