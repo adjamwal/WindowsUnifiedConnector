@@ -10,6 +10,7 @@ public:
     MockCloudEventStorage();
     ~MockCloudEventStorage();
 
+    MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* dep ) );
     MOCK_METHOD1( SaveEvent, int32_t( ICloudEventBuilder& event ) );
     MOCK_METHOD1( SaveEvent, int32_t( const std::string& event ) );
     void MakeSaveEventReturn( int32_t value );
