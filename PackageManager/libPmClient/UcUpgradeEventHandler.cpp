@@ -62,7 +62,7 @@ bool UcUpgradeEventHandler::PublishUcUpgradeEvent()
     for ( auto&& e : events ) {
         m_eventBuilder.FromJson( e );
 
-        if ( m_eventBuilder.GetPackageVersion() == m_dependencies->Configuration().GetPmVersion() ) {
+        if ( m_eventBuilder.GetPackageVersion() != m_dependencies->Configuration().GetPmVersion() ) {
             m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_UC_UPDATE, "Unified Connector failed to upgrade" );
         }
 

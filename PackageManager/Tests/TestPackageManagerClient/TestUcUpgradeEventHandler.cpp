@@ -104,18 +104,30 @@ TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillFailWhenNoEventsFoun
 TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillFlagErrorWhenNotUpgraded )
 {
     m_patient->Initialize( m_dep.get() );
-    std::string version = "Version";
     std::vector<std::string> events = { "Event1" };
 
     m_eventStorage->MakeReadEventsReturn( events );
-    ON_CALL( *m_eventBuilder, GetPackageVersion() ).WillByDefault( Return( version ) );
-    m_pmConfiguration->MakeGetPmVersionReturn( version );
+    ON_CALL( *m_eventBuilder, GetPackageVersion() ).WillByDefault( Return( "new" ) );
+    m_pmConfiguration->MakeGetPmVersionReturn( "old" );
 
     EXPECT_CALL( *m_eventBuilder, WithError( UCPM_EVENT_ERROR_COMPONENT_UC_UPDATE, _ ) );
 
     m_patient->PublishUcUpgradeEvent();
 }
 
+TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillSendUpgradeSuccess )
+{
+    m_patient->Initialize( m_dep.get() );
+    std::vector<std::string> events = { "Event1" };
+    std::string version = "version";
+    m_eventStorage->MakeReadEventsReturn( events );
+    ON_CALL( *m_eventBuilder, GetPackageVersion() ).WillByDefault( Return( version ) );
+    m_pmConfiguration->MakeGetPmVersionReturn( version );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
+
+    m_patient->PublishUcUpgradeEvent();
+}
 TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillPublish )
 {
     m_patient->Initialize( m_dep.get() );
