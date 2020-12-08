@@ -52,7 +52,15 @@ public:
      */
     std::string GetHttpUserAgent() override;
 
+    /**
+     * @brief Gets the data directory
+     */
     std::string GetDataDirectory() override;
+
+    /**
+     * @brief Gets the PM version string
+     */
+    std::string GetPmVersion() override;
 
 private:
     IWinCertLoader& m_winCertLoader;

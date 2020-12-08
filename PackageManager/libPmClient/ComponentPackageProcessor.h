@@ -11,18 +11,20 @@ class IPackageConfigProcessor;
 class IUcidAdapter;
 class ICloudEventBuilder;
 class ICloudEventPublisher;
+class IUcUpgradeEventHandler;
 
 class ComponentPackageProcessor : public IComponentPackageProcessor
 {
 public:
     ComponentPackageProcessor(
-        IPmCloud& pmCloud, 
-        IFileUtil& fileutil, 
-        ISslUtil& sslUtil, 
-        IPackageConfigProcessor& configProcessor, 
+        IPmCloud& pmCloud,
+        IFileUtil& fileutil,
+        ISslUtil& sslUtil,
+        IPackageConfigProcessor& configProcessor,
         IUcidAdapter& ucidAdapter,
         ICloudEventBuilder& eventBuilder,
-        ICloudEventPublisher& eventPublisher
+        ICloudEventPublisher& eventPublisher,
+        IUcUpgradeEventHandler& ucUpgradeEventHandler
     );
     virtual ~ComponentPackageProcessor();
 
@@ -38,6 +40,7 @@ private:
     IUcidAdapter& m_ucidAdapter;
     ICloudEventBuilder& m_eventBuilder;
     ICloudEventPublisher& m_eventPublisher;
+    IUcUpgradeEventHandler& m_ucUpgradeEventHandler;
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
 

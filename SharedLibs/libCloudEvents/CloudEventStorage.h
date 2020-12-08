@@ -6,6 +6,7 @@
 #include <mutex>
 
 #define CLOUD_EVENT_STORAGE_FILE "uc_event.cache"
+#define UC_UPGRADE_EVENT_STORAGE_FILE "uc_upgrade.cache"
 
 class CloudEventStorage : public ICloudEventStorage
 {

@@ -5,6 +5,7 @@ MockPmPlatformConfiguration::MockPmPlatformConfiguration()
     MakeGetIdentityTokenReturn( false );
     MakeGetSslCertificatesReturn( int32_t() );
     MakeGetHttpUserAgentReturn( m_defaultUserAgent );
+    MakeGetPmVersionReturn( "" );
 }
 
 MockPmPlatformConfiguration::~MockPmPlatformConfiguration()
@@ -74,4 +75,14 @@ void MockPmPlatformConfiguration::MakeGetDataDirectoryReturn( std::string value 
 void MockPmPlatformConfiguration::ExpectGetDataDirectoryIsNotCalled()
 {
     EXPECT_CALL( *this, GetDataDirectory() ).Times( 0 );
+}
+
+void MockPmPlatformConfiguration::MakeGetPmVersionReturn( std::string value )
+{
+    ON_CALL( *this, GetPmVersion() ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformConfiguration::ExpectGetPmVersionIsNotCalled()
+{
+    EXPECT_CALL( *this, GetPmVersion() ).Times( 0 );
 }

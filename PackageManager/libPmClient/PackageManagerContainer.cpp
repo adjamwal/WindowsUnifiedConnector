@@ -17,6 +17,7 @@
 #include "CloudEventStorage.h"
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
+#include "UcUpgradeEventHandler.h"
 
 #include "FileUtil.h"
 #include "SslUtil.h"
@@ -44,9 +45,20 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_eventStorage( new CloudEventStorage( CLOUD_EVENT_STORAGE_FILE, *m_fileUtil ) )
     , m_eventBuilder( new CloudEventBuilder() )
     , m_eventPublisher( new CloudEventPublisher( *m_cloud, *m_eventStorage, *m_config ) )
+    , m_ucUpgradeEventBuilder( new CloudEventBuilder)
+    , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILE, *m_fileUtil ) )
+    , m_ucUpgradeEventHandler( new UcUpgradeEventHandler( *m_eventPublisher, *m_ucUpgradeEventStorage, *m_ucUpgradeEventBuilder ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
-    , m_componentPackageProcessor( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_packageConfigProcessor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
+    , m_componentPackageProcessor( 
+        new ComponentPackageProcessor( *m_cloud, 
+            *m_fileUtil, 
+            *m_sslUtil, 
+            *m_packageConfigProcessor, 
+            *m_ucidAdapter, 
+            *m_eventBuilder, 
+            *m_eventPublisher,
+            *m_ucUpgradeEventHandler ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_pacMan(
         new PackageManager( *m_config,
@@ -59,6 +71,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_manifestProcessor,
             *m_eventPublisher,
             *m_eventStorage,
+            *m_ucUpgradeEventHandler,
             *m_thread ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );

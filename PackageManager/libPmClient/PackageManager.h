@@ -17,6 +17,7 @@ class IManifestProcessor;
 class IWorkerThread;
 class ICloudEventPublisher;
 class ICloudEventStorage;
+class IUcUpgradeEventHandler;
 
 struct PmComponent;
 struct PmEvent;
@@ -36,6 +37,7 @@ public:
         IManifestProcessor& manifestProcessor, 
         ICloudEventPublisher& cloudEventPublisher,
         ICloudEventStorage& cloudEventStorage,
+        IUcUpgradeEventHandler& ucUpgradeEventHandler,
         IWorkerThread& thread );
     virtual ~PackageManager();
 
@@ -57,6 +59,7 @@ private:
     IManifestProcessor& m_manifestProcessor;
     ICloudEventPublisher& m_cloudEventPublisher;
     ICloudEventStorage& m_cloudEventStorage;
+    IUcUpgradeEventHandler& m_ucUpgradeEventHandler;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
     std::string m_bsConfigFile;
