@@ -22,6 +22,7 @@
 #include "FileUtil.h"
 #include "SslUtil.h"
 #include "PmLogger.h"
+#include "PmConstants.h"
 
 #include <mutex>
 #include <exception>
@@ -42,11 +43,11 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_checkinFormatter( new CheckinFormatter() )
     , m_ucidAdapter( new UcidAdapter() )
     , m_certsAdapter( new CertsAdapter() )
-    , m_eventStorage( new CloudEventStorage( CLOUD_EVENT_STORAGE_FILE, *m_fileUtil ) )
+    , m_eventStorage( new CloudEventStorage( CLOUD_EVENT_STORAGE_FILENAME, *m_fileUtil ) )
     , m_eventBuilder( new CloudEventBuilder() )
     , m_eventPublisher( new CloudEventPublisher( *m_cloud, *m_eventStorage, *m_config ) )
     , m_ucUpgradeEventBuilder( new CloudEventBuilder)
-    , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILE, *m_fileUtil ) )
+    , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILENAME, *m_fileUtil ) )
     , m_ucUpgradeEventHandler( new UcUpgradeEventHandler( *m_eventPublisher, *m_ucUpgradeEventStorage, *m_ucUpgradeEventBuilder ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )

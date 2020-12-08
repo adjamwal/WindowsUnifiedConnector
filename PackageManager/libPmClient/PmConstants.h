@@ -14,3 +14,6 @@
 #define UCPM_EVENT_ERROR_CONFIG_RESOLVE                 0x00000016
 
 #define UC_PACKAGE_NAME                                 "uc"
+
+#define CLOUD_EVENT_STORAGE_FILENAME                    "uc_event.cache"
+#define UC_UPGRADE_EVENT_STORAGE_FILENAME               "uc_upgrade.cache"
