@@ -65,8 +65,9 @@ int32_t PmCloud::Post( const std::string& url, void* data, size_t dataSize, std:
     m_http.SetToken( m_token );
 
     int32_t respStatus = 0;
-    m_http.HttpPost( url, data, dataSize, response, respStatus );
+    respStatus = m_http.HttpPost( url, data, dataSize, response, httpReturn );
     m_http.Deinit();
+
     return respStatus;
 }
 
