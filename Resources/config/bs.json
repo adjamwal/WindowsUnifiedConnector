@@ -1,11 +1,11 @@
 {
 	"id": {
 		"business_id": "hexmen-dev-demo-bus-id",
-		"installer_key" : "11111111-2222-3333-4444-55556c10d048",
-		"url": "https://55ggm0pqv6.execute-api.us-west-1.amazonaws.com/dev/identify"
+		"installer_key": "11111111-2222-3333-4444-55553fbe0d1f",
+		"url": "https://identity.dev-latest.securexyz.io/identify"
 	},
 	"pm": {
-		"url": "https://1iuk1c8mv6.execute-api.us-west-1.amazonaws.com/dev/checkin",
-		"event_url": "https://55ggm0pqv6.execute-api.us-west-1.amazonaws.com/dev/event/1"
+		"url": "https://pacman.dev-latest.securexyz.io/checkin",
+		"event_url": "https://identity.dev-latest.securexyz.io/event/1"
 	}
 }
