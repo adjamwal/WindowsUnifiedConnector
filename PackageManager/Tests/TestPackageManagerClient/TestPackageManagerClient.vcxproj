@@ -26,6 +26,7 @@
     <ClCompile Include="TestPackageConfigProcessor.cpp" />
     <ClCompile Include="TestPmConfig.cpp" />
     <ClCompile Include="TestPmManifest.cpp" />
+    <ClCompile Include="TestUcUpgradeEventHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharedLibs\libLogger\libLogger.vcxproj">

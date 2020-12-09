@@ -6,8 +6,9 @@
 #include "ISslUtil.h"
 #include "IPackageConfigProcessor.h"
 #include "IUcidAdapter.h"
-#include "CloudEventBuilder.h"
-#include "CloudEventPublisher.h"
+#include "ICloudEventBuilder.h"
+#include "ICloudEventPublisher.h"
+#include "IUcUpgradeEventHandler.h"
 #include "PmLogger.h"
 #include "PmConstants.h"
 #include <sstream>
@@ -21,7 +22,8 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     IPackageConfigProcessor& configProcessor,
     IUcidAdapter& ucidAdapter,
     ICloudEventBuilder& eventBuilder,
-    ICloudEventPublisher& eventPublisher )
+    ICloudEventPublisher& eventPublisher,
+    IUcUpgradeEventHandler& ucUpgradeEventHandler )
     : m_pmCloud( pmCloud )
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
@@ -29,6 +31,7 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     , m_ucidAdapter( ucidAdapter )
     , m_eventBuilder( eventBuilder )
     , m_eventPublisher( eventPublisher )
+    , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
     , m_dependencies( nullptr )
     , m_fileCount( 0 )
 {
@@ -44,6 +47,7 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
 
     m_dependencies = dep;
     m_configProcessor.Initialize( dep );
+    m_ucUpgradeEventHandler.Initialize( dep );
 }
 
 bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentPackage )
@@ -106,6 +110,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
             if( sha256.value() == componentPackage.installerHash )
             {
                 std::string errorText;
+                m_ucUpgradeEventHandler.StoreUcUpgradeEvent( m_eventBuilder.Build() );
                 int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
 
                 if( updated != 0 )
@@ -145,6 +150,7 @@ bool ComponentPackageProcessor::ProcessComponentPackage( PmComponent& componentP
     else
     {
         std::string errorText;
+        m_ucUpgradeEventHandler.StoreUcUpgradeEvent( m_eventBuilder.Build() );
         int32_t updated = m_dependencies->ComponentManager().UpdateComponent( componentPackage, errorText );
 
         if( updated != 0 )

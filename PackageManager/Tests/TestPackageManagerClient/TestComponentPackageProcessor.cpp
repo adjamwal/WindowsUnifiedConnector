@@ -9,6 +9,7 @@
 #include "MockCloudEventBuilder.h"
 #include "MockCloudEventPublisher.h"
 #include "MockUcidAdapter.h"
+#include "MockUcUpgradeEventHandler.h"
 
 #include <memory>
 
@@ -26,8 +27,16 @@ protected:
         m_ucidAdapter.reset( new NiceMock<MockUcidAdapter>() );
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
+        m_ucUpgraadeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
-        m_patient.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcessor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
+        m_patient.reset( new ComponentPackageProcessor( *m_cloud, 
+            *m_fileUtil, 
+            *m_sslUtil, 
+            *m_configProcessor, 
+            *m_ucidAdapter, 
+            *m_eventBuilder, 
+            *m_eventPublisher, 
+            *m_ucUpgraadeEventHandler ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -45,6 +54,7 @@ protected:
         m_ucidAdapter.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
+        m_ucUpgraadeEventHandler.reset();
 
         m_expectedComponentPackage = {};
     }
@@ -96,6 +106,7 @@ protected:
     std::unique_ptr<MockUcidAdapter> m_ucidAdapter;
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
+    std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgraadeEventHandler;
 
     std::unique_ptr<ComponentPackageProcessor> m_patient;
 };
@@ -115,6 +126,15 @@ TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
     SetupComponentPackageWithConfig();
 
     EXPECT_CALL( *m_pmComponentManager, UpdateComponent( _, _ ) );
+
+    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
+{
+    SetupComponentPackageWithConfig();
+
+    EXPECT_CALL( *m_ucUpgraadeEventHandler, StoreUcUpgradeEvent( _ ) );
 
     m_patient->ProcessComponentPackage( m_expectedComponentPackage );
 }

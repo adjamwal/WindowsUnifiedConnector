@@ -55,7 +55,12 @@ public:
     virtual std::string GetHttpUserAgent() = 0;
 
     /**
-     * @brief Gets the temp
+     * @brief Gets the data directory
      */
     virtual std::string GetDataDirectory() = 0;
+
+    /**
+     * @brief Gets the PM version string
+     */
+    virtual std::string GetPmVersion() = 0;
 };

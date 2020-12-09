@@ -24,6 +24,7 @@
 #include "MockCloudEventBuilder.h"
 #include "MockCloudEventPublisher.h"
 #include "MockCloudEventStorage.h"
+#include "MockUcUpgradeEventHandler.h"
 
 class ComponentTestPacMan : public ::testing::Test
 {
@@ -51,10 +52,19 @@ protected:
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
+        m_ucUpgraadeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
-        m_componentPackageProcessor.reset( new ComponentPackageProcessor( *m_cloud, *m_fileUtil, *m_sslUtil, *m_configProcesor, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
+        m_componentPackageProcessor.reset( new ComponentPackageProcessor( 
+            *m_cloud, 
+            *m_fileUtil, 
+            *m_sslUtil, 
+            *m_configProcesor, 
+            *m_ucidAdapter, 
+            *m_eventBuilder, 
+            *m_eventPublisher,
+            *m_ucUpgraadeEventHandler ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
@@ -78,6 +88,7 @@ protected:
             *m_manifestProcessor,
             *m_eventPublisher,
             *m_eventStorage,
+            *m_ucUpgraadeEventHandler,
             *m_thread ) );
     }
 
@@ -86,6 +97,7 @@ protected:
         m_patient->Stop();
         m_patient.reset();
 
+        m_ucUpgraadeEventHandler.reset();
         m_manifestProcessor.reset();
         m_componentPackageProcessor.reset();
         m_configProcesor.reset();
@@ -93,6 +105,7 @@ protected:
         m_eventBuilder.reset();
         m_eventPublisher.reset();
         m_eventStorage.reset();
+        m_ucUpgraadeEventHandler.reset();
         m_certsAdapter.reset();
         m_ucidAdapter.reset();
         m_checkinFormatter.reset();
@@ -161,6 +174,7 @@ protected:
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;
+    std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgraadeEventHandler;
 
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;

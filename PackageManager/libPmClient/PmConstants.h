@@ -4,6 +4,7 @@
 #define UCPM_EVENT_ERROR_COMPONENT_UPDATE               0x00000002
 #define UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH        0x00000003
 #define UCPM_EVENT_ERROR_COMPONENT_HASH_CALC            0x00000004
+#define UCPM_EVENT_ERROR_COMPONENT_UC_UPDATE            0x00000005
 
 #define UCPM_EVENT_ERROR_CONFIG_DECODE                  0x00000011
 #define UCPM_EVENT_ERROR_CONFIG_CREATE                  0x00000012
@@ -11,3 +12,8 @@
 #define UCPM_EVENT_ERROR_CONFIG_DEPLOY                  0x00000014
 #define UCPM_EVENT_ERROR_CONFIG_REMOVE                  0x00000015
 #define UCPM_EVENT_ERROR_CONFIG_RESOLVE                 0x00000016
+
+#define UC_PACKAGE_NAME                                 "uc"
+
+#define CLOUD_EVENT_STORAGE_FILENAME                    "uc_event.cache"
+#define UC_UPGRADE_EVENT_STORAGE_FILENAME               "uc_upgrade.cache"
