@@ -11,7 +11,7 @@ MockCloudEventStorage::~MockCloudEventStorage()
 
 }
 
-void MockCloudEventStorage::MakeSaveEventReturn( int32_t value )
+void MockCloudEventStorage::MakeSaveEventReturn( bool value )
 {
     ON_CALL( *this, SaveEvent( Matcher<const std::string&>( _ ) ) ).WillByDefault( Return( value ) );
 }

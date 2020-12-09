@@ -28,7 +28,7 @@ void CloudEventStorage::Initialize( IPmPlatformDependencies* dep )
     m_fullPath = filePath;
 }
 
-int32_t CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
+bool CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
 {
     if ( !m_dependencies ) {
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
@@ -41,7 +41,7 @@ int32_t CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
     return m_fileUtil.WriteLine( m_fullPath, eventStr );
 }
 
-int32_t CloudEventStorage::SaveEvent( const std::string& event )
+bool CloudEventStorage::SaveEvent( const std::string& event )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 

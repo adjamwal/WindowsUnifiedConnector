@@ -36,6 +36,10 @@ public:
     void MakeGetDataDirectoryReturn( std::string value );
     void ExpectGetDataDirectoryIsNotCalled();
 
+    MOCK_METHOD0( GetPmVersion, std::string() );
+    void MakeGetPmVersionReturn( std::string value );
+    void ExpectGetPmVersionIsNotCalled();
+
 private:
     std::string m_defaultUserAgent;
 };

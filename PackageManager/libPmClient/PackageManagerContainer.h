@@ -21,6 +21,7 @@ class ISslUtil;
 class ICloudEventStorage;
 class ICloudEventBuilder;
 class ICloudEventPublisher;
+class IUcUpgradeEventHandler;
 
 class PackageManagerContainer
 {
@@ -45,7 +46,9 @@ private:
     std::unique_ptr<ICloudEventStorage> m_eventStorage;
     std::unique_ptr<ICloudEventBuilder> m_eventBuilder;
     std::unique_ptr<ICloudEventPublisher> m_eventPublisher;
-
+    std::unique_ptr<ICloudEventBuilder> m_ucUpgradeEventBuilder;
+    std::unique_ptr<ICloudEventStorage> m_ucUpgradeEventStorage;
+    std::unique_ptr<IUcUpgradeEventHandler> m_ucUpgradeEventHandler;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
