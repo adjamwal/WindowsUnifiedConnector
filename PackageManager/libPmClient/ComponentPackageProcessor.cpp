@@ -134,12 +134,12 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
     }
     catch( std::exception& ex )
     {
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, ex.what() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
         LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
     }
     catch( ... )
     {
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, "Unknown processing exception" );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
         LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
     }
 
