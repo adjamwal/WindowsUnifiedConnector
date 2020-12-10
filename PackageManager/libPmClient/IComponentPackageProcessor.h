@@ -13,5 +13,10 @@ public:
     virtual ~IComponentPackageProcessor() {}
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
-    virtual bool ProcessComponentPackage( PmComponent& componentPackage ) = 0;
+
+    virtual bool IsActionable( PmComponent& componentPackage ) = 0;
+    virtual bool HasConfigs( PmComponent& componentPackage ) = 0;
+
+    virtual bool ProcessPackage( PmComponent& componentPackage ) = 0;
+    virtual bool ProcessPackageConfigs( PmComponent& componentPackage ) = 0;
 };

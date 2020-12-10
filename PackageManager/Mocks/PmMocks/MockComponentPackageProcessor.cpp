@@ -16,11 +16,11 @@ void MockComponentPackageProcessor::ExpectInitializeIsNotCalled()
 
 void MockComponentPackageProcessor::MakeProcessComponentPackageReturn( bool value )
 {
-    ON_CALL( *this, ProcessComponentPackage( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ProcessPackage( _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockComponentPackageProcessor::ExpectProcessComponentPackageIsNotCalled()
 {
-    EXPECT_CALL( *this, ProcessComponentPackage( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ProcessPackage( _ ) ).Times( 0 );
 }
 

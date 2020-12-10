@@ -94,7 +94,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
 {
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor, 
-        ProcessComponentPackage( PmComponentMatch( m_expectedComponentPackage ) ) 
+        ProcessPackage( PmComponentMatch( m_expectedComponentPackage ) ) 
     ).Times( m_packageList.size() );
 
     m_patient->ProcessManifest( "test" );

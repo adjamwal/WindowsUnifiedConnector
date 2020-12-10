@@ -29,7 +29,12 @@ public:
     virtual ~ComponentPackageProcessor();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
-    bool ProcessComponentPackage( PmComponent& componentPackage ) override;
+
+    bool IsActionable( PmComponent& componentPackage ) override;
+    bool HasConfigs( PmComponent& componentPackage ) override;
+
+    bool ProcessPackage( PmComponent& componentPackage ) override;
+    bool ProcessPackageConfigs( PmComponent& componentPackage ) override;
 
 private:
     std::mutex m_mutex;
@@ -44,6 +49,7 @@ private:
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
 
-    bool ProcessComponentPackageConfigs( PmComponent& componentPackage );
     bool IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly );
+    void DownloadAsTempFile( const PmComponent& componentPackage, std::string downloadedFilePath );
+    void CleanupTempDownload( std::string tempFilePath );
 };
