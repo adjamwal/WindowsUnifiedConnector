@@ -34,7 +34,7 @@ public:
     bool HasConfigs( PmComponent& componentPackage ) override;
 
     bool ProcessPackage( PmComponent& componentPackage ) override;
-    bool ProcessPackageConfigs( PmComponent& componentPackage ) override;
+    bool ProcessConfigsForPackage( PmComponent& componentPackage ) override;
 
 private:
     std::mutex m_mutex;

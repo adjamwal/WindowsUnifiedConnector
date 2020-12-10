@@ -133,7 +133,7 @@ bool ComponentPackageProcessor::ProcessPackage( PmComponent& componentPackage )
     catch( ... )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, "Unknown processing exception" );
-        LOG_ERROR( "%s", ex.what() );
+        LOG_ERROR( "Unknown processing exception" );
     }
 
     m_eventBuilder.WithNewFile(
@@ -192,7 +192,7 @@ void ComponentPackageProcessor::CleanupTempDownload( std::string tempFilePath )
     }
 }
 
-bool ComponentPackageProcessor::ProcessPackageConfigs( PmComponent& componentPackage )
+bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& componentPackage )
 {
     bool rtn = true;
 

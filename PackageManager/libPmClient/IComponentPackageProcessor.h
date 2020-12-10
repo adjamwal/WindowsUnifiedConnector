@@ -18,5 +18,5 @@ public:
     virtual bool HasConfigs( PmComponent& componentPackage ) = 0;
 
     virtual bool ProcessPackage( PmComponent& componentPackage ) = 0;
-    virtual bool ProcessPackageConfigs( PmComponent& componentPackage ) = 0;
+    virtual bool ProcessConfigsForPackage( PmComponent& componentPackage ) = 0;
 };
