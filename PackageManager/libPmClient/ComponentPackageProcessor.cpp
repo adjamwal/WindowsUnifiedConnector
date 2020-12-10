@@ -89,7 +89,7 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
 
     bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageNameAndVersion, m_eventBuilder.GetPackageName() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
-    m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 ); //new file gets repopulated after download
+    m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 ); //new file info gets updated after download
 
     try
     {

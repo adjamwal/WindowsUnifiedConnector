@@ -55,7 +55,7 @@ protected:
         }
 
         m_pmManifest->MakeGetPackageListReturn( m_packageList );
-        m_componentProcessor->MakeProcessComponentPackageReturn( true );
+        m_componentProcessor->MakeProcessPackageBinariesReturn( true );
     }
 
     std::vector<PmComponent> m_packageList;
@@ -103,6 +103,6 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
 TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessComponentPackageFailed )
 {
     SetupPackageList( 1 );
-    m_componentProcessor->MakeProcessComponentPackageReturn( false );
+    m_componentProcessor->MakeProcessPackageBinariesReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
 }

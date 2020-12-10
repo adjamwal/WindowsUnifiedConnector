@@ -15,7 +15,7 @@ public:
     void ExpectInitializeIsNotCalled();
 
     MOCK_METHOD1( ProcessConfig, bool( PackageConfigInfo& ) );
-    void MakeProcessComponentPackageReturn( bool value );
-    void ExpectProcessComponentPackageIsNotCalled();
+    void MakeProcessConfigReturn( bool value );
+    void ExpectProcessConfigIsNotCalled();
 
 };
