@@ -99,9 +99,8 @@ void WindowsConfiguration::ReleaseSslCertificates( X509** certificates, size_t c
 std::string WindowsConfiguration::GetHttpUserAgent()
 {
     std::string agent;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    agent = "PackageManager/" + converter.to_bytes( STRFORMATPRODVER );
+    agent = "PackageManager/" + GetPmVersion();
     return agent;
 }
 
@@ -110,4 +109,11 @@ std::string WindowsConfiguration::GetDataDirectory()
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     return converter.to_bytes( WindowsUtilities::GetDataDir() );
+}
+
+std::string WindowsConfiguration::GetPmVersion()
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    return converter.to_bytes( STRFORMATPRODVER );
 }

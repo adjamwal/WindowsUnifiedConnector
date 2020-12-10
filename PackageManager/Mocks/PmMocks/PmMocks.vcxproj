@@ -32,6 +32,7 @@
     <ClInclude Include="MockPmPlatformConfiguration.h" />
     <ClInclude Include="MockPmPlatformDependencies.h" />
     <ClInclude Include="MockUcidAdapter.h" />
+    <ClInclude Include="MockUcUpgradeEventHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockCertsAdapter.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="MockPmPlatformConfiguration.cpp" />
     <ClCompile Include="MockPmPlatformDependencies.cpp" />
     <ClCompile Include="MockUcidAdapter.cpp" />
+    <ClCompile Include="MockUcUpgradeEventHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -10,6 +10,7 @@
 #include "ICheckinFormatter.h"
 #include "IUcidAdapter.h"
 #include "ICertsAdapter.h"
+#include "IPmHttp.h"
 #include "ICheckinManifestRetriever.h"
 #include "IManifestProcessor.h"
 #include "IPmPlatformDependencies.h"
@@ -17,6 +18,7 @@
 #include "IPmPlatformConfiguration.h"
 #include "ICloudEventPublisher.h"
 #include "ICloudEventStorage.h"
+#include "IUcUpgradeEventHandler.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -32,6 +34,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IManifestProcessor& manifestProcessor,
     ICloudEventPublisher& cloudEventPublisher,
     ICloudEventStorage& cloudEventStorage,
+    IUcUpgradeEventHandler& ucUpgradeEventHandler,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
@@ -43,6 +46,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_manifestProcessor( manifestProcessor )
     , m_cloudEventPublisher( cloudEventPublisher )
     , m_cloudEventStorage( cloudEventStorage )
+    , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
@@ -76,6 +80,13 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         }
         else {
             SetupDiscoveryPackages();
+
+            std::string token = m_ucidAdapter.GetAccessToken();
+            if ( !token.empty() ) {
+                m_cloud.SetToken( token );
+                m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
+                m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
+            }
 
             m_thread.Start(
                 std::bind( &PackageManager::PmThreadWait, this ),
@@ -127,6 +138,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_cloudEventStorage.Initialize( m_dependencies );
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
         m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
+        m_ucUpgradeEventHandler.Initialize( m_dependencies );
     }
     catch( std::exception& ex )
     {
