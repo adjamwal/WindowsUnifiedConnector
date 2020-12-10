@@ -37,7 +37,7 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
     for( auto package : m_manifest.GetPackageList() )
     {
         bool processed = 
-            ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackage( package ) ) &&
+            ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackageBinaries( package ) ) &&
             ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
 
         failedPackages += processed ? 0 : 1;

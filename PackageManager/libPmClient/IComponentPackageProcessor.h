@@ -17,6 +17,6 @@ public:
     virtual bool IsActionable( PmComponent& componentPackage ) = 0;
     virtual bool HasConfigs( PmComponent& componentPackage ) = 0;
 
-    virtual bool ProcessPackage( PmComponent& componentPackage ) = 0;
+    virtual bool ProcessPackageBinaries( PmComponent& componentPackage ) = 0;
     virtual bool ProcessConfigsForPackage( PmComponent& componentPackage ) = 0;
 };

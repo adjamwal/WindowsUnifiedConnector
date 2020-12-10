@@ -14,7 +14,7 @@ public:
     MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
     void ExpectInitializeIsNotCalled();
 
-    MOCK_METHOD1( ProcessPackage, bool( PmComponent& ) );
+    MOCK_METHOD1( ProcessPackageBinaries, bool( PmComponent& ) );
     void MakeProcessComponentPackageReturn( bool value );
     void ExpectProcessComponentPackageIsNotCalled();
 

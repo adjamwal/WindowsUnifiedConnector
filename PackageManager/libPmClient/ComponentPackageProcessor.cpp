@@ -60,7 +60,7 @@ bool ComponentPackageProcessor::HasConfigs( PmComponent& componentPackage )
     return componentPackage.configs.size() > 0;
 }
 
-bool ComponentPackageProcessor::ProcessPackage( PmComponent& componentPackage )
+bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPackage )
 {
     if( !IsActionable( componentPackage ) )
     {
@@ -76,7 +76,7 @@ bool ComponentPackageProcessor::ProcessPackage( PmComponent& componentPackage )
 
     if( !m_dependencies )
     {
-        LOG_ERROR( "Dependencies not initialized" );
+        LOG_ERROR( __FUNCTION__ ": Dependencies not initialized" );
         return false;
     }
 
@@ -123,17 +123,17 @@ bool ComponentPackageProcessor::ProcessPackage( PmComponent& componentPackage )
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        LOG_ERROR( "%s", ex.what() );
+        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
     }
     catch( std::exception& ex )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, ex.what() );
-        LOG_ERROR( "%s", ex.what() );
+        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
     }
     catch( ... )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, "Unknown processing exception" );
-        LOG_ERROR( "Unknown processing exception" );
+        LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
     }
 
     m_eventBuilder.WithNewFile(
@@ -188,7 +188,7 @@ void ComponentPackageProcessor::CleanupTempDownload( std::string tempFilePath )
     LOG_DEBUG( "Removing %s", tempFilePath.c_str() );
     if( m_fileUtil.DeleteFile( tempFilePath ) != 0 )
     {
-        LOG_ERROR( "Failed to remove %s", tempFilePath.c_str() );
+        LOG_ERROR( __FUNCTION__ ": Failed to remove %s", tempFilePath.c_str() );
     }
 }
 

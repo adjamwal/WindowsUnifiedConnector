@@ -33,7 +33,7 @@ public:
     bool IsActionable( PmComponent& componentPackage ) override;
     bool HasConfigs( PmComponent& componentPackage ) override;
 
-    bool ProcessPackage( PmComponent& componentPackage ) override;
+    bool ProcessPackageBinaries( PmComponent& componentPackage ) override;
     bool ProcessConfigsForPackage( PmComponent& componentPackage ) override;
 
 private:
