@@ -89,6 +89,7 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
 
     bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageNameAndVersion, m_eventBuilder.GetPackageName() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
+    m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 ); //new file gets repopulated after download
 
     try
     {
@@ -100,6 +101,11 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
             ssError << "Failed to calculate sha256 of " << tempPackageFile;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_CALC );
         }
+
+        m_eventBuilder.WithNewFile(
+            componentPackage.installerUrl,
+            tempSha256.has_value() ? tempSha256.value() : componentPackage.installerHash,
+            tempPackageFile.empty() ? 0 : m_fileUtil.FileSize( tempPackageFile ) );
 
         // only validate hash if installerHash is not empty
         if( !componentPackage.installerHash.empty() &&
@@ -136,11 +142,6 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, "Unknown processing exception" );
         LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
     }
-
-    m_eventBuilder.WithNewFile(
-        componentPackage.installerUrl,
-        tempSha256.has_value() ? tempSha256.value() : componentPackage.installerHash,
-        tempPackageFile.empty() ? 0 : m_fileUtil.FileSize( tempPackageFile ) );
 
     m_eventPublisher.Publish( m_eventBuilder );
 
