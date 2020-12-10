@@ -120,14 +120,19 @@ bool ComponentPackageProcessor::ProcessPackage( PmComponent& componentPackage )
 
         rtn = true;
     }
+    catch( PackageException& ex )
+    {
+        m_eventBuilder.WithError( ex.whatCode(), ex.what() );
+        LOG_ERROR( "%s", ex.what() );
+    }
     catch( std::exception& ex )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, ex.what() );
         LOG_ERROR( "%s", ex.what() );
     }
-    catch( PackageException& ex )
+    catch( ... )
     {
-        m_eventBuilder.WithError( ex.whatCode(), ex.what() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_GENERIC_EXCEPTION, "Unknown processing exception" );
         LOG_ERROR( "%s", ex.what() );
     }
 
