@@ -11,6 +11,7 @@
 #include "IUcUpgradeEventHandler.h"
 #include "PmLogger.h"
 #include "PmConstants.h"
+#include "PackageException.h"
 #include <sstream>
 #include <iostream>
 #include <vector>

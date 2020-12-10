@@ -25,6 +25,7 @@
     <ClInclude Include="ComponentPackageProcessor.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IUcUpgradeEventHandler.h" />
+    <ClInclude Include="PackageException.h" />
     <ClInclude Include="PmConstants.h" />
     <ClInclude Include="ICertsAdapter.h" />
     <ClInclude Include="ICheckinFormatter.h" />
