@@ -33,7 +33,6 @@
       <Filter>ModuleLoaders</Filter>
     </ClInclude>
     <ClInclude Include="ServiceLogManager.h" />
-    <ClInclude Include="ThrowAway_UcidConfigGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ServiceInstaller">

@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dllControlModule", "Package
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageManager", "PackageManager", "{3C1DE0C7-BBF0-410E-96E5-783D5A9D446E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageMananger", "PackageManager\WinPackageManager\WinPackageManager.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinPackageManager", "PackageManager\WinPackageManager\WinPackageManager.vcxproj", "{805379CA-1C31-40A9-B908-8B2A603927F1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libControlModule", "PackageManager\libControlModule\libControlModule.vcxproj", "{31FC5172-1CDF-40AF-9E2C-1AD069CEB772}"
 EndProject
@@ -54,7 +54,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{CF7C87
 		Resources\config\id.json = Resources\config\id.json
 		Resources\config\pm.json = Resources\config\pm.json
 		Resources\config\uc.json = Resources\config\uc.json
-		Resources\config\UCID_config.xml = Resources\config\UCID_config.xml
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCService", "UC\UCService\UCService.vcxproj", "{ED56F555-F214-4B00-805E-E6564E9C1BF2}"

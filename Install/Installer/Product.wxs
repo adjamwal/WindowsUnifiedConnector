@@ -54,7 +54,9 @@
             <ComponentGroupRef Id="UCServiceComponents" />
             <ComponentGroupRef Id="UCIDComponents" />
             <ComponentGroupRef Id="UCIDx86Components"/>
-            <ComponentGroupRef Id="UCIDx64Components"/>
+            <?if $(var.Platform) = "x64" ?>
+              <ComponentGroupRef Id="UCIDx64Components"/>
+            <?endif?>
             <ComponentGroupRef Id="UCPMComponents" />
             <ComponentGroupRef Id="CG.ConfigFiles" />
         </Feature>
@@ -94,7 +96,6 @@
 
     <Fragment>
         <Property Id="UC_LOG_DIRECTORY" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.UCLogDirectory)" />
-        <Property Id="UCID_LOG_DIRECTORY" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.UnifiedConnectorDirectory)" />
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
@@ -109,8 +110,6 @@
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_LOG_DIRECTORY" />
-                <!-- TODO: Remove this after UCID moves their logs to the common directory -->
-                <util:RemoveFolderEx On="uninstall" Property="UCID_LOG_DIRECTORY" />
             </Component>
         </ComponentGroup>
     </Fragment>
@@ -207,17 +206,19 @@
             <Component Id="ucidapi.dll.x86" Guid="*">
                 <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x86\bin\ucidapi.dll" />
             </Component>
-            <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
-                <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll" />
-            </Component>
+            <?if $(var.Platform) != "x64" ?>
+              <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
+                  <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll" />
+              </Component>
+            <?endif?>
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
             <Component Id="ucidapi.dll.x64" Guid="*">
-                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidapi.dll" />
+              <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidapi.dll" />
             </Component>
             <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
-                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll" />
+              <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll" />
             </Component>
         </ComponentGroup>
     </Fragment>
@@ -339,12 +340,6 @@
                 </RegistryKey>
             </Component>
             
-            <Component Id="C.Registry.UCIDConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]UCID_config.xml" KeyPath="yes"/>
-                </RegistryKey>
-            </Component>
-
             <Component Id="C.Registry.UCPMConfig" Guid="*">
                 <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="UCPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCPMConfigName)" KeyPath="yes"/>
@@ -374,11 +369,6 @@
             <!-- UCID Config Management -->
             <Component Id="C.UCIDConfigName" NeverOverwrite="yes">
                 <File Id="id.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\id.json" />
-            </Component>
-
-            <!-- Old UCID Config Management that is needed until UCID siwtches to new configs -->
-            <Component Id="C.UCIDXmlConfig">
-                <File Id="config.xml" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\UCID_config.xml" />
             </Component>
 
             <!-- UCPM Config Management -->
