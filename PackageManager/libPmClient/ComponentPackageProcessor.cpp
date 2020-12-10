@@ -163,7 +163,7 @@ bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& nameAn
     return detectedInventory.packages.size() > 0;
 }
 
-void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& componentPackage, std::string tempPackageFile )
+void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& componentPackage, std::string& tempPackageFile )
 {
     std::stringstream ss;
     std::stringstream ssError;

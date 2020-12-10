@@ -50,6 +50,6 @@ private:
     uint32_t m_fileCount;
 
     bool IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly );
-    void DownloadAsTempFile( const PmComponent& componentPackage, std::string downloadedFilePath );
+    void DownloadAsTempFile( const PmComponent& componentPackage, std::string& downloadedFilePath );
     void CleanupTempDownload( std::string tempFilePath );
 };

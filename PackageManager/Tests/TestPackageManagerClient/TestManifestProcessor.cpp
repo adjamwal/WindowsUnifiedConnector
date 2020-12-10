@@ -55,6 +55,7 @@ protected:
         }
 
         m_pmManifest->MakeGetPackageListReturn( m_packageList );
+        m_componentProcessor->MakeIsActionableReturn( true );
         m_componentProcessor->MakeProcessPackageBinariesReturn( true );
     }
 
