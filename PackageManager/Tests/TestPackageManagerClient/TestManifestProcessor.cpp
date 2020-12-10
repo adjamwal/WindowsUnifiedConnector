@@ -56,7 +56,9 @@ protected:
 
         m_pmManifest->MakeGetPackageListReturn( m_packageList );
         m_componentProcessor->MakeIsActionableReturn( true );
+        m_componentProcessor->MakeHasConfigsReturn( true );
         m_componentProcessor->MakeProcessPackageBinariesReturn( true );
+        m_componentProcessor->MakeProcessConfigsForPackageReturn( true );
     }
 
     std::vector<PmComponent> m_packageList;
@@ -107,3 +109,21 @@ TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessComponentPackage
     m_componentProcessor->MakeProcessPackageBinariesReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
 }
+
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForPackage )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_patient->ProcessManifest( "test" );
+}
+
+TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessConfigsForPackageFailed )
+{
+    SetupPackageList( 1 );
+    m_componentProcessor->MakeProcessConfigsForPackageReturn( false );
+    EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
+}
+
