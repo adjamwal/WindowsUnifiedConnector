@@ -18,5 +18,8 @@
     <ClCompile Include="TestPmHttp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestRandomUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

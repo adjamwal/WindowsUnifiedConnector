@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "RandomUtil.h"
 
-class ComponentTestRandomUtil : public ::testing::Test
+class TestRandomUtil : public ::testing::Test
 {
 protected:
     void SetUp()
@@ -13,7 +13,7 @@ protected:
     }
 };
 
-TEST_F( ComponentTestRandomUtil, WillGenerateDifferentInts )
+TEST_F( TestRandomUtil, WillGenerateDifferentInts )
 {
     int intarr1[ 10 ];
     int intarr2[ 10 ];
@@ -26,7 +26,7 @@ TEST_F( ComponentTestRandomUtil, WillGenerateDifferentInts )
     ASSERT_NE( intarr1, intarr2 );
 }
 
-TEST_F( ComponentTestRandomUtil, WillGenerateDifferentStrings )
+TEST_F( TestRandomUtil, WillGenerateDifferentStrings )
 {
     std::string prevstr = "";
     for( int i = 0; i < 10; i++ )
@@ -37,7 +37,7 @@ TEST_F( ComponentTestRandomUtil, WillGenerateDifferentStrings )
     }
 }
 
-TEST_F( ComponentTestRandomUtil, WillGenerateDifferentWStrings )
+TEST_F( TestRandomUtil, WillGenerateDifferentWStrings )
 {
     std::wstring prevstr = L"";
     for( int i = 0; i < 10; i++ )
@@ -48,7 +48,7 @@ TEST_F( ComponentTestRandomUtil, WillGenerateDifferentWStrings )
     }
 }
 
-TEST_F( ComponentTestRandomUtil, WillGenerateDifferentSeeds )
+TEST_F( TestRandomUtil, WillGenerateDifferentSeeds )
 {
     uint64_t prevseed = 0;
     for( int i = 0; i < 10; i++ )
