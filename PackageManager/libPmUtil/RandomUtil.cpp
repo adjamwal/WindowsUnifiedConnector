@@ -84,8 +84,8 @@ std::wstring RandomUtil::GetWString( int minLength, int maxLength )
 
 uint64_t RandomUtil::GetSeed()
 {
-    unsigned int seed = sequence + GetNanos();
-    auto seedData = DWords( 1 + seed % 6 );
+    uint64_t seed = sequence + GetNanos();
+    auto seedData = QWords( 10 + seed % 6 );
     for( auto element : seedData ) {
         seed += element;
     }
