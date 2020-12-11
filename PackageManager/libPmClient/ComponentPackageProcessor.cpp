@@ -12,10 +12,10 @@
 #include "PmLogger.h"
 #include "PmConstants.h"
 #include "PackageException.h"
+#include "RandomUtil.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
-#include <chrono>
 
 ComponentPackageProcessor::ComponentPackageProcessor(
     IPmCloud& pmCloud,
@@ -169,10 +169,7 @@ void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& component
     std::stringstream ss;
     std::stringstream ssError;
 
-    std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-    std::chrono::system_clock::duration nanos = tp.time_since_epoch();
-
-    ss << m_fileUtil.GetTempDir() << "tmpPmInst_" << m_fileCount++ << nanos.count() << "." << componentPackage.installerType;
+    ss << m_fileUtil.GetTempDir() << "tmpPmInst_" << m_fileCount++ << RandomUtil::GetString(10) << "." << componentPackage.installerType;
 
     if( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) != 200 )
     {

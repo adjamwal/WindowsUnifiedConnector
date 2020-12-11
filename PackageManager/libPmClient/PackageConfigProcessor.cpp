@@ -10,7 +10,7 @@
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include <sstream>
-#include <chrono>
+#include "RandomUtil.h"
 
 PackageConfigProcessor::PackageConfigProcessor(
     IFileUtil& fileUtil,
@@ -83,10 +83,8 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
     std::stringstream ss;
     FileUtilHandle* handle = NULL;
-    std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-    std::chrono::system_clock::duration nanos = tp.time_since_epoch();
 
-    ss << m_fileUtil.GetTempDir() << "tmpPmConf_" << m_fileCount++ << nanos.count();
+    ss << m_fileUtil.GetTempDir() << "tmpPmConf_" << m_fileCount++ << RandomUtil::GetString( 10 );
 
     if( ( handle = m_fileUtil.PmCreateFile( ss.str() ) ) == NULL )
     {
