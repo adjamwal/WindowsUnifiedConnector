@@ -211,7 +211,6 @@ TEST_F( TestPmManifest, WillAcceptMinimalPackage )
     EXPECT_EQ( m_patient->ParseManifest( _minimalManifest ), 0 );
 }
 
-
 TEST_F( TestPmManifest, WillAcceptEmptyPackage )
 {
     EXPECT_EQ( m_patient->ParseManifest( _emptyManifest ), 0 );

@@ -10,6 +10,7 @@
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include <sstream>
+#include "RandomUtil.h"
 
 PackageConfigProcessor::PackageConfigProcessor(
     IFileUtil& fileUtil,
@@ -82,7 +83,8 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
     std::stringstream ss;
     FileUtilHandle* handle = NULL;
-    ss << m_fileUtil.GetTempDir() << "PMConfig_" << m_fileCount++;
+
+    ss << m_fileUtil.GetTempDir() << "tmpPmConf_" << m_fileCount++ << RandomUtil::GetString( 10 );
 
     if( ( handle = m_fileUtil.PmCreateFile( ss.str() ) ) == NULL )
     {

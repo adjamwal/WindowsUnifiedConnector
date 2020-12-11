@@ -114,6 +114,9 @@
     <ClInclude Include="UcUpgradeEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PackageException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CertsAdapter.cpp">

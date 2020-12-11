@@ -1,5 +1,7 @@
 #include "ManifestProcessor.h"
 #include "PmTypes.h"
+#include <iostream>
+#include <sstream>
 
 ManifestProcessor::ManifestProcessor(
     IPmManifest& manifest,
@@ -29,16 +31,23 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
     {
         //PmSendEvent() bad manifest
         throw std::exception( __FUNCTION__": Failed to process manifest" );
-        return false;
     }
 
+    int failedPackages = 0;
     for( auto package : m_manifest.GetPackageList() )
     {
-        if( !m_componentProcessor.ProcessComponentPackage( package ) )
-        {
-            //PmSendEvent() bad manifest
-            throw std::exception( __FUNCTION__": Failed to process component package" );
-        }
+        bool processed = 
+            ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackageBinaries( package ) ) &&
+            ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+
+        failedPackages += processed ? 0 : 1;
+    }
+
+    if( failedPackages > 0 )
+    {
+        std::stringstream ss;
+        ss << __FUNCTION__ << ": Failed to process " << failedPackages << " component package(s)";
+        throw std::exception( ss.str().c_str() );
     }
 
     //PmSendEvent() success

@@ -27,7 +27,7 @@ protected:
         m_ucidAdapter.reset( new NiceMock<MockUcidAdapter>() );
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
-        m_ucUpgraadeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
+        m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
         m_patient.reset( new ComponentPackageProcessor( *m_cloud, 
             *m_fileUtil, 
@@ -36,7 +36,7 @@ protected:
             *m_ucidAdapter, 
             *m_eventBuilder, 
             *m_eventPublisher, 
-            *m_ucUpgraadeEventHandler ) );
+            *m_ucUpgradeEventHandler ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -54,7 +54,7 @@ protected:
         m_ucidAdapter.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
-        m_ucUpgraadeEventHandler.reset();
+        m_ucUpgradeEventHandler.reset();
 
         m_expectedComponentPackage = {};
     }
@@ -94,6 +94,7 @@ protected:
         m_cloud->MakeDownloadFileReturn( 200 );
         m_sslUtil->MakeCalculateSHA256Return( "installerHash" );
         m_pmComponentManager->MakeUpdateComponentReturn( 0 );
+        m_fileUtil->MakeFileExistsReturn( true );
     }
 
     PmComponent m_expectedComponentPackage;
@@ -106,7 +107,7 @@ protected:
     std::unique_ptr<MockUcidAdapter> m_ucidAdapter;
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
-    std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgraadeEventHandler;
+    std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgradeEventHandler;
 
     std::unique_ptr<ComponentPackageProcessor> m_patient;
 };
@@ -118,7 +119,7 @@ TEST_F( TestComponentPackageProcessor, WillTryToDownloadIfInitialized )
 
     EXPECT_CALL( *m_cloud, DownloadFile( m_expectedComponentPackage.installerUrl, _ ) ).Times( 1 );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
@@ -127,16 +128,16 @@ TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
 
     EXPECT_CALL( *m_pmComponentManager, UpdateComponent( _, _ ) );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
 {
     SetupComponentPackageWithConfig();
 
-    EXPECT_CALL( *m_ucUpgraadeEventHandler, StoreUcUpgradeEvent( _ ) );
+    EXPECT_CALL( *m_ucUpgradeEventHandler, StoreUcUpgradeEvent( _ ) );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
@@ -145,16 +146,17 @@ TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
     m_patient->Initialize( m_dep.get() );
 
     m_cloud->MakeDownloadFileReturn( 200 );
+    m_fileUtil->MakeFileExistsReturn( true );
     EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillNotProcessComponentPackageIfNotInitialized )
 {
     SetupComponentPackage();
     m_cloud->ExpectDownloadFileIsNotCalled();
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillProcessConfig )
@@ -163,7 +165,7 @@ TEST_F( TestComponentPackageProcessor, WillProcessConfig )
 
     EXPECT_CALL( *m_configProcessor, ProcessConfig( _ ) );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessConfigsForPackage( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillSendSuccessEventIfProcessComponentPackageSucceeds )
@@ -173,7 +175,7 @@ TEST_F( TestComponentPackageProcessor, WillSendSuccessEventIfProcessComponentPac
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPackageFails )
@@ -184,6 +186,6 @@ TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPac
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
-    m_patient->ProcessComponentPackage( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
 }
 

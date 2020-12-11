@@ -55,7 +55,10 @@ protected:
         }
 
         m_pmManifest->MakeGetPackageListReturn( m_packageList );
-        m_componentProcessor->MakeProcessComponentPackageReturn( true );
+        m_componentProcessor->MakeIsActionableReturn( true );
+        m_componentProcessor->MakeHasConfigsReturn( true );
+        m_componentProcessor->MakeProcessPackageBinariesReturn( true );
+        m_componentProcessor->MakeProcessConfigsForPackageReturn( true );
     }
 
     std::vector<PmComponent> m_packageList;
@@ -94,15 +97,66 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
 {
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor, 
-        ProcessComponentPackage( PmComponentMatch( m_expectedComponentPackage ) ) 
+        ProcessPackageBinaries( PmComponentMatch( m_expectedComponentPackage ) ) 
     ).Times( m_packageList.size() );
 
     m_patient->ProcessManifest( "test" );
 }
 
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessAllPackagesRegardlessOfPackageFailures )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessPackageBinaries( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_componentProcessor->MakeProcessPackageBinariesReturn( false );
+    EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
+}
+
 TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessComponentPackageFailed )
 {
     SetupPackageList( 1 );
-    m_componentProcessor->MakeProcessComponentPackageReturn( false );
+    m_componentProcessor->MakeProcessPackageBinariesReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
 }
+
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForActionablePackages )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_patient->ProcessManifest( "test" );
+}
+
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForNonActionablePackages )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_componentProcessor->MakeIsActionableReturn( false );
+    m_patient->ProcessManifest( "test" );
+}
+
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessAllConfigsForSuccessfulPackagesRegardlessOfConfigFailures )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_componentProcessor->MakeProcessConfigsForPackageReturn( false );
+    EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
+}
+
+TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessConfigsForPackageFailed )
+{
+    SetupPackageList( 1 );
+    m_componentProcessor->MakeProcessConfigsForPackageReturn( false );
+    EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
+}
+

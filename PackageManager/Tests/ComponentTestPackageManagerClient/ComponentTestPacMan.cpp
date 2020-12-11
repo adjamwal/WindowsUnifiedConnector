@@ -52,7 +52,7 @@ protected:
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
-        m_ucUpgraadeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
+        m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
@@ -64,7 +64,7 @@ protected:
             *m_ucidAdapter, 
             *m_eventBuilder, 
             *m_eventPublisher,
-            *m_ucUpgraadeEventHandler ) );
+            *m_ucUpgradeEventHandler ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
@@ -88,7 +88,7 @@ protected:
             *m_manifestProcessor,
             *m_eventPublisher,
             *m_eventStorage,
-            *m_ucUpgraadeEventHandler,
+            *m_ucUpgradeEventHandler,
             *m_thread ) );
     }
 
@@ -97,7 +97,7 @@ protected:
         m_patient->Stop();
         m_patient.reset();
 
-        m_ucUpgraadeEventHandler.reset();
+        m_ucUpgradeEventHandler.reset();
         m_manifestProcessor.reset();
         m_componentPackageProcessor.reset();
         m_configProcesor.reset();
@@ -105,7 +105,7 @@ protected:
         m_eventBuilder.reset();
         m_eventPublisher.reset();
         m_eventStorage.reset();
-        m_ucUpgraadeEventHandler.reset();
+        m_ucUpgradeEventHandler.reset();
         m_certsAdapter.reset();
         m_ucidAdapter.reset();
         m_checkinFormatter.reset();
@@ -174,7 +174,7 @@ protected:
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;
-    std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgraadeEventHandler;
+    std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgradeEventHandler;
 
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
@@ -305,7 +305,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
         {
             EXPECT_EQ( config.sha256, "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
             EXPECT_EQ( config.verifyBinPath, "verify.exe" );
-            EXPECT_NE( config.verifyPath.find( "PMConfig_" ), std::string::npos );
+            EXPECT_NE( config.verifyPath.find( "tmpPmConf_" ), std::string::npos );
 
             pass = true;
             m_cv.notify_one();
@@ -429,8 +429,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_0" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
@@ -530,8 +530,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
     ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return oldFilename + '/' + newName;
