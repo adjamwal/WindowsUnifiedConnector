@@ -213,14 +213,16 @@
             <?endif?>
         </ComponentGroup>
 
-        <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
-            <Component Id="ucidapi.dll.x64" Guid="*">
-              <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidapi.dll" />
-            </Component>
-            <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
-              <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll" />
-            </Component>
-        </ComponentGroup>
+        <?if $(var.Platform) = "x64" ?>
+          <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
+              <Component Id="ucidapi.dll.x64" Guid="*">
+                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidapi.dll" />
+              </Component>
+              <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
+                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll" />
+              </Component>
+          </ComponentGroup>
+        <?endif?>
     </Fragment>
 
     <Fragment>
