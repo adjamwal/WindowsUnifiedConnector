@@ -305,7 +305,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
         {
             EXPECT_EQ( config.sha256, "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
             EXPECT_EQ( config.verifyBinPath, "verify.exe" );
-            EXPECT_NE( config.verifyPath.find( "PMConfig_" ), std::string::npos );
+            EXPECT_NE( config.verifyPath.find( "tmpPmConf_" ), std::string::npos );
 
             pass = true;
             m_cv.notify_one();
@@ -429,8 +429,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_0" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
@@ -530,8 +530,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMInstaller_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "PMConfig_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
     ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return oldFilename + '/' + newName;

@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 ComponentPackageProcessor::ComponentPackageProcessor(
     IPmCloud& pmCloud,
@@ -168,8 +169,10 @@ void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& component
     std::stringstream ss;
     std::stringstream ssError;
 
-    //TODO: Should make this more random
-    ss << m_fileUtil.GetTempDir() << "PMInstaller_" << m_fileCount++ << "." << componentPackage.installerType;
+    std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
+    std::chrono::system_clock::duration nanos = tp.time_since_epoch();
+
+    ss << m_fileUtil.GetTempDir() << "tmpPmInst_" << m_fileCount++ << nanos.count() << "." << componentPackage.installerType;
 
     if( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) != 200 )
     {
