@@ -121,13 +121,24 @@ TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessComponentPackage
     EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
 }
 
-TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForPackage )
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForActionablePackages )
 {
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
     ).Times( m_packageList.size() );
 
+    m_patient->ProcessManifest( "test" );
+}
+
+TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForNonActionablePackages )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_componentProcessor->MakeIsActionableReturn( false );
     m_patient->ProcessManifest( "test" );
 }
 
