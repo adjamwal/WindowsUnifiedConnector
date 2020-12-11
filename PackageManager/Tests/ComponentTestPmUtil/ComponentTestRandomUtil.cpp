@@ -15,13 +15,15 @@ protected:
 
 TEST_F( ComponentTestRandomUtil, WillGenerateDifferentInts )
 {
-    int prevint = 0;
+    int intarr1[ 10 ];
+    int intarr2[ 10 ];
     for( int i = 0; i < 10; i++ )
     {
-        uint64_t newint = RandomUtil::GetInt();
-        ASSERT_NE( prevint, newint );
-        prevint = newint;
+        intarr1[ i ] = RandomUtil::GetInt();
+        intarr2[ i ] = RandomUtil::GetInt();
     }
+
+    ASSERT_NE( intarr1, intarr2 );
 }
 
 TEST_F( ComponentTestRandomUtil, WillGenerateDifferentStrings )
