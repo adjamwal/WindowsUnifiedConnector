@@ -2,6 +2,7 @@
 
 #include <random>
 #include <vector>
+#include <string>
 
 class RandomUtil
 {
@@ -11,7 +12,7 @@ public:
     static std::vector<uint32_t> DWords( std::size_t count );
     static std::vector<uint64_t> QWords( std::size_t count );
 
-    static int GetInt( int min, int max );
+    static int GetInt( int min = std::numeric_limits<int>::lowest(), int max = std::numeric_limits<int>::max() );
     static std::string GetString( int minLength = 5, int maxLength = 10 );
     static std::wstring GetWString( int minLength = 5, int maxLength = 10 );
     static uint64_t GetSeed();
