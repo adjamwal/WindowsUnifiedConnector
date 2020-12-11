@@ -33,7 +33,7 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
 
-    bool failedPackages = 0;
+    int failedPackages = 0;
     for( auto package : m_manifest.GetPackageList() )
     {
         bool processed = 
