@@ -95,6 +95,7 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
     try
     {
         DownloadAsTempFile( componentPackage, tempPackageFile );
+        componentPackage.installerPath = tempPackageFile;
 
         tempSha256 = m_sslUtil.CalculateSHA256( tempPackageFile );
         if( !tempSha256.has_value() )
