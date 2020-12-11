@@ -85,6 +85,6 @@ private:
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
     PmInstalledPackage BuildUcPackage();
     PmInstalledPackage HackBuildAmpPackage();
-    void StripBuildNumber( std::string& versionString );
+    void PadBuildNumber( std::string& versionString );
 };
 

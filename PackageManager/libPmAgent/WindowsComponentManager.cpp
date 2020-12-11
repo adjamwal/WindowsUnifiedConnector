@@ -21,11 +21,10 @@ WindowsComponentManager::~WindowsComponentManager()
 
 }
 
-void WindowsComponentManager::StripBuildNumber( std::string& versionString )
+void WindowsComponentManager::PadBuildNumber( std::string& versionString )
 {
-    size_t n = std::count( versionString.begin(), versionString.end(), '.' );
-    if( n == 3 ) {
-        versionString.erase( versionString.find_last_of( "." ) );
+    while ( std::count( versionString.begin(), versionString.end(), '.' ) < 3 ) {
+        versionString += ".0";
     }
 }
 
@@ -60,8 +59,7 @@ int32_t WindowsComponentManager::GetInstalledPackages( const std::vector<PmDisco
 
                 discoveredPackage.packageName = interestingItem.packageId;
                 discoveredPackage.packageVersion = program.version;
-                //TODO: Removes the buid number. Should the cloud accept the build number?
-                StripBuildNumber( discoveredPackage.packageVersion );
+                PadBuildNumber( discoveredPackage.packageVersion );
 
                 packages.packages.push_back( discoveredPackage );
                 //don't break. There can be one to many relationship here
@@ -80,8 +78,7 @@ PmInstalledPackage WindowsComponentManager::BuildUcPackage()
 
     ucPackage.packageName = "uc";
     ucPackage.packageVersion = converter.to_bytes( STRFORMATPRODVER );
-    //TODO: Removes the buid number. Should the cloud accept the build number?
-    StripBuildNumber( ucPackage.packageVersion );
+    PadBuildNumber( ucPackage.packageVersion );
 
     ucConfig.deleteConfig = false;
 
@@ -125,8 +122,7 @@ PmInstalledPackage WindowsComponentManager::HackBuildAmpPackage()
         }
 
         ampPackage.packageVersion = converter.to_bytes( displayVersion );
-        //TODO: Removes the buid number. Should the cloud accept the build number?
-        StripBuildNumber( ampPackage.packageVersion );
+        PadBuildNumber( ampPackage.packageVersion );
 
     }
     return ampPackage;
