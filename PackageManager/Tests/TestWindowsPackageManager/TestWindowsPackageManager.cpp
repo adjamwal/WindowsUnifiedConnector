@@ -6,6 +6,7 @@
 #include "MockWinApiWrapper.h"
 #include "MockCodesignVerifier.h"
 #include "MockWindowsUtilities.h"
+#include "MockPackageDiscovery.h"
 #include <memory>
 #include <codecvt>
 
@@ -19,7 +20,8 @@ protected:
         MockWindowsUtilities::Init();
         m_mockCodesignVerifier = std::make_unique<NiceMock<MockCodesignVerifier>>();
         m_mockWinApiWrapper = std::make_unique<NiceMock<MockWinApiWrapper>>();
-        m_patient = std::make_unique<WindowsComponentManager>( *m_mockWinApiWrapper, *m_mockCodesignVerifier );
+        m_mockPackageDiscovery = std::make_unique<NiceMock<MockPackageDiscovery>>();
+        m_patient = std::make_unique<WindowsComponentManager>( *m_mockWinApiWrapper, *m_mockCodesignVerifier, *m_mockPackageDiscovery );
     }
 
     void TearDown()
@@ -27,11 +29,14 @@ protected:
         m_patient.reset();
         m_mockWinApiWrapper.reset();
         m_mockCodesignVerifier.reset();
+        m_mockPackageDiscovery.reset();
+
         MockWindowsUtilities::Deinit();
     }
 
     std::unique_ptr<MockCodesignVerifier> m_mockCodesignVerifier;
     std::unique_ptr<MockWinApiWrapper> m_mockWinApiWrapper;
+    std::unique_ptr<MockPackageDiscovery> m_mockPackageDiscovery;
     std::unique_ptr<WindowsComponentManager> m_patient;
 };
 
@@ -251,88 +256,14 @@ TEST_F( TestWindowsPackageManager, GetInstalledPackagesSucceed )
     EXPECT_EQ( ret, 0 );
 }
 
-TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillSetOS )
+TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillSearchForPackages )
 {
     PackageInventory installedPackages;
     std::vector<PmDiscoveryComponent> discoveryList;
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+    EXPECT_CALL( *m_mockPackageDiscovery, GetInstalledPackages( _ ) );
 
-    m_patient->GetInstalledPackages( discoveryList, installedPackages );
-
-    EXPECT_EQ( installedPackages.architecture, "x64" );
-    EXPECT_EQ( installedPackages.platform, "win" );
-}
-
-
-TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillGetUC )
-{
-    PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
-
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-
-    m_patient->GetInstalledPackages( discoveryList, installedPackages );
-
-    EXPECT_EQ( installedPackages.packages.front().packageName, "uc" );
-    EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
-}
-
-TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillDiscoverPrograms )
-{
-    PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
-
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "p1";
-    interestedPrograms.packageName = "Package1";
-    discoveryList.push_back( interestedPrograms );
-
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.packageName;
-    installedProgram.version = "version";
-    installedList.push_back( installedProgram );
-
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
-
-    m_patient->GetInstalledPackages( discoveryList, installedPackages );
-
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, interestedPrograms.packageId );
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
-}
-
-TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillDiscoverManyPrograms )
-{
-    PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
-
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "p1";
-    interestedPrograms.packageName = "Package";
-    discoveryList.push_back( interestedPrograms );
-
-    interestedPrograms.packageId = "p2";
-    interestedPrograms.packageName = "Package";
-    discoveryList.push_back( interestedPrograms );
-
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.packageName;
-    installedProgram.version = "version";
-    installedList.push_back( installedProgram );
-
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
-
-    m_patient->GetInstalledPackages( discoveryList, installedPackages );
-
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, "p1" );
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
-
-    EXPECT_EQ( installedPackages.packages[ 2 ].packageName, "p2" );
-    EXPECT_EQ( installedPackages.packages[ 2 ].packageVersion, installedProgram.version );
+    int32_t ret = m_patient->GetInstalledPackages( discoveryList, installedPackages );
 }
 
 TEST_F( TestWindowsPackageManager, WillResolveKnownFolderID )
