@@ -2,10 +2,16 @@
 
 #include <string>
 #include <Windows.h>
+#include <vector>
 
 class WindowsUtilities
 {
 public:
+    struct WindowsInstallProgram {
+        std::string name;
+        std::string version;
+    };
+
     static bool FileExists(const WCHAR* filename);
     static std::string ReadFileContents( const WCHAR* filename );
     static uint32_t GetFileModifyTime( const WCHAR* filename );
@@ -15,4 +21,7 @@ public:
     static bool ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data);
     static bool Is64BitWindows();
     static bool GetSysDirectory( std::string& path );
+    static std::vector<WindowsInstallProgram> GetInstalledPrograms();
+    static std::string ResolveKnownFolderId( const std::string& knownFolderId );
+    static std::wstring GetDataDir();
 };

@@ -1,0 +1,38 @@
+#pragma once
+
+#include "IPackageConfigProcessor.h"
+#include <mutex>
+
+class IFileUtil;
+class ISslUtil;
+class IUcidAdapter;
+class ICloudEventBuilder;
+class ICloudEventPublisher;
+
+class PackageConfigProcessor : public IPackageConfigProcessor
+{
+public:
+    PackageConfigProcessor( 
+        IFileUtil& fileUtil, 
+        ISslUtil& sslUtil,
+        IUcidAdapter& ucidAdapter,
+        ICloudEventBuilder& eventBuilder,
+        ICloudEventPublisher& eventPublisher );
+    ~PackageConfigProcessor();
+
+    void Initialize( IPmPlatformDependencies* dep ) override;
+    bool ProcessConfig( PackageConfigInfo& config ) override;
+
+private:
+    bool AddConfig( PackageConfigInfo& config );
+    bool RemoveConfig( PackageConfigInfo& config );
+
+    IFileUtil& m_fileUtil;
+    ISslUtil& m_sslUtil;
+    IUcidAdapter& m_ucidAdapter;
+    ICloudEventBuilder& m_eventBuilder;
+    ICloudEventPublisher& m_eventPublisher;
+    std::mutex m_mutex;
+    IPmPlatformDependencies* m_dependencies;
+    uint32_t m_fileCount;
+};

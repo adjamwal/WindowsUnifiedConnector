@@ -4,10 +4,15 @@
 #include "gmock/gmock.h"
 #include <string>
 #include <mutex>
+#include <vector>
+#include "WindowsUtilities.h"
 
 class MockWindowsUtilities
 {
 public:
+    MockWindowsUtilities();
+    ~MockWindowsUtilities();
+
     MOCK_METHOD1( FileExists, bool( const WCHAR* ) );
     void MakeFileExistsReturn( bool value );
     void ExpectFileExistsIsNotCalled();
@@ -44,14 +49,25 @@ public:
     void MakeGetSysDirectoryReturn( bool value );
     void ExpectGetSysDirectoryIsNotCalled();
 
+    MOCK_METHOD0( GetInstalledPrograms, std::vector<WindowsUtilities::WindowsInstallProgram>() );
+    void MakeGetInstalledProgramsReturn( std::vector<WindowsUtilities::WindowsInstallProgram>& value );
+    void ExpectGetInstalledProgramsIsNotCalled();
+
+    MOCK_METHOD1( ResolveKnownFolderId, std::string( const std::string& ) );
+    void MakeResolveKnownFolderIdReturn( std::string value );
+    void ExpectResolveKnownFolderIdIsNotCalled();
+
+    MOCK_METHOD0( GetDataDir, std::wstring() );
+    void MakeGetDataDirReturn( std::wstring value );
+    void ExpectGetDataDirIsNotCalled();
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();
 
 private:
-    MockWindowsUtilities();
-    ~MockWindowsUtilities();
-
     static MockWindowsUtilities* s_mock;
     static std::mutex s_mutex;
+
+    std::vector<WindowsUtilities::WindowsInstallProgram> m_defaultDiscoveryList;
 };

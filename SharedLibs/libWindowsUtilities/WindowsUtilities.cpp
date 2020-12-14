@@ -4,6 +4,135 @@
 #include <codecvt>
 #include <fstream>
 #include <ShlObj.h>
+#include <Msi.h>
+#include <unordered_map>
+
+static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> _g_converter;
+// TOOD: Do we acutally need all of thses or just a subset?
+static std::unordered_map< std::string, const GUID> _knownFolderMap = {
+    { "FOLDERID_AccountPictures", FOLDERID_AccountPictures },
+    { "FOLDERID_AddNewPrograms", FOLDERID_AddNewPrograms },
+    { "FOLDERID_AdminTools", FOLDERID_AdminTools },
+    { "FOLDERID_AppDataDesktop", FOLDERID_AppDataDesktop },
+    { "FOLDERID_AppDataDocuments", FOLDERID_AppDataDocuments },
+    { "FOLDERID_AppDataFavorites", FOLDERID_AppDataFavorites },
+    { "FOLDERID_AppDataProgramData", FOLDERID_AppDataProgramData },
+    { "FOLDERID_ApplicationShortcuts", FOLDERID_ApplicationShortcuts },
+    { "FOLDERID_AppsFolder", FOLDERID_AppsFolder },
+    { "FOLDERID_AppUpdates", FOLDERID_AppUpdates },
+    { "FOLDERID_CameraRoll", FOLDERID_CameraRoll },
+    { "FOLDERID_CDBurning", FOLDERID_CDBurning },
+    { "FOLDERID_ChangeRemovePrograms", FOLDERID_ChangeRemovePrograms },
+    { "FOLDERID_CommonAdminTools", FOLDERID_CommonAdminTools },
+    { "FOLDERID_CommonOEMLinks", FOLDERID_CommonOEMLinks },
+    { "FOLDERID_CommonPrograms", FOLDERID_CommonPrograms },
+    { "FOLDERID_CommonStartMenu", FOLDERID_CommonStartMenu },
+    { "FOLDERID_CommonStartup", FOLDERID_CommonStartup },
+    { "FOLDERID_CommonTemplates", FOLDERID_CommonTemplates },
+    { "FOLDERID_ComputerFolder", FOLDERID_ComputerFolder },
+    { "FOLDERID_ConflictFolder", FOLDERID_ConflictFolder },
+    { "FOLDERID_ConnectionsFolder", FOLDERID_ConnectionsFolder },
+    { "FOLDERID_Contacts", FOLDERID_Contacts },
+    { "FOLDERID_ControlPanelFolder", FOLDERID_ControlPanelFolder },
+    { "FOLDERID_Cookies", FOLDERID_Cookies },
+    { "FOLDERID_Desktop", FOLDERID_Desktop },
+    { "FOLDERID_DeviceMetadataStore", FOLDERID_DeviceMetadataStore },
+    { "FOLDERID_Documents", FOLDERID_Documents },
+    { "FOLDERID_DocumentsLibrary", FOLDERID_DocumentsLibrary },
+    { "FOLDERID_Downloads", FOLDERID_Downloads },
+    { "FOLDERID_Favorites", FOLDERID_Favorites },
+    { "FOLDERID_Fonts", FOLDERID_Fonts },
+    { "FOLDERID_Games", FOLDERID_Games },
+    { "FOLDERID_GameTasks", FOLDERID_GameTasks },
+    { "FOLDERID_History", FOLDERID_History },
+    { "FOLDERID_HomeGroup", FOLDERID_HomeGroup },
+    { "FOLDERID_HomeGroupCurrentUser", FOLDERID_HomeGroupCurrentUser },
+    { "FOLDERID_ImplicitAppShortcuts", FOLDERID_ImplicitAppShortcuts },
+    { "FOLDERID_InternetCache", FOLDERID_InternetCache },
+    { "FOLDERID_InternetFolder", FOLDERID_InternetFolder },
+    { "FOLDERID_Libraries", FOLDERID_Libraries },
+    { "FOLDERID_Links", FOLDERID_Links },
+    { "FOLDERID_LocalAppData", FOLDERID_LocalAppData },
+    { "FOLDERID_LocalAppDataLow", FOLDERID_LocalAppDataLow },
+    { "FOLDERID_LocalizedResourcesDir", FOLDERID_LocalizedResourcesDir },
+    { "FOLDERID_Music", FOLDERID_Music },
+    { "FOLDERID_MusicLibrary", FOLDERID_MusicLibrary },
+    { "FOLDERID_NetHood", FOLDERID_NetHood },
+    { "FOLDERID_NetworkFolder", FOLDERID_NetworkFolder },
+    { "FOLDERID_Objects3D", FOLDERID_Objects3D },
+    { "FOLDERID_OriginalImages", FOLDERID_OriginalImages },
+    { "FOLDERID_PhotoAlbums", FOLDERID_PhotoAlbums },
+    { "FOLDERID_PicturesLibrary", FOLDERID_PicturesLibrary },
+    { "FOLDERID_Pictures", FOLDERID_Pictures },
+    { "FOLDERID_Playlists", FOLDERID_Playlists },
+    { "FOLDERID_PrintersFolder", FOLDERID_PrintersFolder },
+    { "FOLDERID_Profile", FOLDERID_Profile },
+    { "FOLDERID_ProgramData", FOLDERID_ProgramData },
+    { "FOLDERID_ProgramFiles", FOLDERID_ProgramFiles },
+    { "FOLDERID_ProgramFilesX64", FOLDERID_ProgramFilesX64 },
+    { "FOLDERID_ProgramFilesX86", FOLDERID_ProgramFilesX86 },
+    { "FOLDERID_ProgramFilesCommon", FOLDERID_ProgramFilesCommon },
+    { "FOLDERID_ProgramFilesCommonX64", FOLDERID_ProgramFilesCommonX64 },
+    { "FOLDERID_ProgramFilesCommonX86", FOLDERID_ProgramFilesCommonX86 },
+    { "FOLDERID_Programs", FOLDERID_Programs },
+    { "FOLDERID_Public", FOLDERID_Public },
+    { "FOLDERID_PublicDocuments", FOLDERID_PublicDocuments },
+    { "FOLDERID_PublicDownloads", FOLDERID_PublicDownloads },
+    { "FOLDERID_PublicGameTasks", FOLDERID_PublicGameTasks },
+    { "FOLDERID_PublicLibraries", FOLDERID_PublicLibraries },
+    { "FOLDERID_PublicMusic", FOLDERID_PublicMusic },
+    { "FOLDERID_PublicPictures", FOLDERID_PublicPictures },
+    { "FOLDERID_PublicRingtones", FOLDERID_PublicRingtones },
+    { "FOLDERID_PublicUserTiles", FOLDERID_PublicUserTiles },
+    { "FOLDERID_PublicVideos", FOLDERID_PublicVideos },
+    { "FOLDERID_QuickLaunch", FOLDERID_QuickLaunch },
+    { "FOLDERID_Recent", FOLDERID_Recent },
+    { "FOLDERID_RecordedTVLibrary", FOLDERID_RecordedTVLibrary },
+    { "FOLDERID_RecycleBinFolder", FOLDERID_RecycleBinFolder },
+    { "FOLDERID_ResourceDir", FOLDERID_ResourceDir },
+    { "FOLDERID_Ringtones", FOLDERID_Ringtones },
+    { "FOLDERID_RoamingAppData", FOLDERID_RoamingAppData },
+    { "FOLDERID_RoamedTileImages", FOLDERID_RoamedTileImages },
+    { "FOLDERID_RoamingTiles", FOLDERID_RoamingTiles },
+    { "FOLDERID_SampleMusic", FOLDERID_SampleMusic },
+    { "FOLDERID_SamplePictures", FOLDERID_SamplePictures },
+    { "FOLDERID_SamplePlaylists", FOLDERID_SamplePlaylists },
+    { "FOLDERID_SampleVideos", FOLDERID_SampleVideos },
+    { "FOLDERID_SavedGames", FOLDERID_SavedGames },
+    { "FOLDERID_SavedPictures", FOLDERID_SavedPictures },
+    { "FOLDERID_SavedPicturesLibrary", FOLDERID_SavedPicturesLibrary },
+    { "FOLDERID_SavedSearches", FOLDERID_SavedSearches },
+    { "FOLDERID_Screenshots", FOLDERID_Screenshots },
+    { "FOLDERID_SEARCH_CSC", FOLDERID_SEARCH_CSC },
+    { "FOLDERID_SearchHistory", FOLDERID_SearchHistory },
+    { "FOLDERID_SearchHome", FOLDERID_SearchHome },
+    { "FOLDERID_SEARCH_MAPI", FOLDERID_SEARCH_MAPI },
+    { "FOLDERID_SearchTemplates", FOLDERID_SearchTemplates },
+    { "FOLDERID_SendTo", FOLDERID_SendTo },
+    { "FOLDERID_SidebarDefaultParts", FOLDERID_SidebarDefaultParts },
+    { "FOLDERID_SidebarParts", FOLDERID_SidebarParts },
+    { "FOLDERID_SkyDrive", FOLDERID_SkyDrive },
+    { "FOLDERID_SkyDriveCameraRoll", FOLDERID_SkyDriveCameraRoll },
+    { "FOLDERID_SkyDriveDocuments", FOLDERID_SkyDriveDocuments },
+    { "FOLDERID_SkyDrivePictures", FOLDERID_SkyDrivePictures },
+    { "FOLDERID_StartMenu", FOLDERID_StartMenu },
+    { "FOLDERID_Startup", FOLDERID_Startup },
+    { "FOLDERID_SyncManagerFolder", FOLDERID_SyncManagerFolder },
+    { "FOLDERID_SyncResultsFolder", FOLDERID_SyncResultsFolder },
+    { "FOLDERID_SyncSetupFolder", FOLDERID_SyncSetupFolder },
+    { "FOLDERID_System", FOLDERID_System },
+    { "FOLDERID_SystemX86", FOLDERID_SystemX86 },
+    { "FOLDERID_Templates", FOLDERID_Templates },
+    { "FOLDERID_UserPinned", FOLDERID_UserPinned },
+    { "FOLDERID_UserProfiles", FOLDERID_UserProfiles },
+    { "FOLDERID_UserProgramFiles", FOLDERID_UserProgramFiles },
+    { "FOLDERID_UserProgramFilesCommon", FOLDERID_UserProgramFilesCommon },
+    { "FOLDERID_UsersFiles", FOLDERID_UsersFiles },
+    { "FOLDERID_UsersLibraries", FOLDERID_UsersLibraries },
+    { "FOLDERID_Videos", FOLDERID_Videos },
+    { "FOLDERID_VideosLibrary", FOLDERID_VideosLibrary },
+    { "FOLDERID_Windows", FOLDERID_Windows }
+};
 
 bool WindowsUtilities::FileExists(const WCHAR* filename)
 {
@@ -121,14 +250,79 @@ bool WindowsUtilities::GetSysDirectory( std::string& path )
     {
         if ( tmpPath != nullptr )
         {
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::wstring systemPath( tmpPath );
-
-            path = converter.to_bytes( systemPath );
+            path = _g_converter.to_bytes( tmpPath );
         }
         
+        CoTaskMemFree( tmpPath );
         ret = true;
     }
     
     return ret;
+}
+
+#define GUID_SIZE 39
+std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstalledPrograms()
+{
+    DWORD dwIndex = 0;
+    DWORD dwStatus = ERROR_SUCCESS;
+    static const DWORD max_size = 1024;
+    DWORD cchdata = max_size;
+    wchar_t data[ max_size ] = { 0 };
+    wchar_t szProductCode[ GUID_SIZE ] = { 0 };
+    std::vector<WindowsInstallProgram> list;
+
+    do {
+        WindowsInstallProgram item;
+        memset( szProductCode, 0, sizeof( szProductCode ) );
+        dwStatus = MsiEnumProducts( dwIndex, szProductCode );
+        if( dwStatus != ERROR_SUCCESS ) {
+            break;
+        }
+
+        cchdata = max_size;
+        if( MsiGetProductInfo( szProductCode, INSTALLPROPERTY_PRODUCTNAME, data, &cchdata ) == 0 ) {
+            item.name = _g_converter.to_bytes( data );
+            cchdata = max_size;
+            if( MsiGetProductInfoW( szProductCode, INSTALLPROPERTY_VERSIONSTRING, data, &cchdata ) == 0 ) {
+                item.version = _g_converter.to_bytes( data );
+                list.push_back( item );
+            }
+        }
+        dwIndex++;
+    } while( dwStatus == ERROR_SUCCESS );
+
+    return list;
+}
+
+std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+{
+    std::string knownFolder;
+
+    if( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
+        PWSTR wpath = NULL;
+        if( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, ( HANDLE )-1, &wpath ) ) ) {
+            knownFolder = _g_converter.to_bytes( wpath );
+            CoTaskMemFree( wpath );
+        }
+    }
+
+    return knownFolder;
+}
+
+std::wstring WindowsUtilities::GetDataDir()
+{
+    PWSTR path = NULL;
+    std::wstring dataDir;
+
+    HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
+
+    if( SUCCEEDED( hr ) ) {
+        dataDir = path;
+        CoTaskMemFree( path );
+        path = NULL;
+        
+        dataDir += L"\\Cisco\\UC";
+    }
+
+    return dataDir;
 }

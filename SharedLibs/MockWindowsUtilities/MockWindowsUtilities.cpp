@@ -8,7 +8,7 @@ void MockWindowsUtilities::Init()
 {
     std::lock_guard<std::mutex> lock( s_mutex );
     if( !s_mock ) {
-        s_mock = new MockWindowsUtilities();
+        s_mock = new NiceMock<MockWindowsUtilities>();
     }
 }
 
@@ -35,6 +35,8 @@ MockWindowsUtilities::MockWindowsUtilities()
     MakeReadFileContentsReturn( "" );
     MakeGetExePathReturn( L"" );
     MakeGetDirPathReturn( L"" );
+    MakeGetInstalledProgramsReturn( m_defaultDiscoveryList );
+    MakeGetDataDirReturn( L"" );
 }
 
 MockWindowsUtilities::~MockWindowsUtilities()
@@ -130,4 +132,34 @@ void MockWindowsUtilities::MakeGetSysDirectoryReturn( bool value )
 void MockWindowsUtilities::ExpectGetSysDirectoryIsNotCalled()
 {
     EXPECT_CALL( *this, GetSysDirectory( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeGetInstalledProgramsReturn( std::vector<WindowsUtilities::WindowsInstallProgram>& value )
+{
+    ON_CALL( *this, GetInstalledPrograms() ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectGetInstalledProgramsIsNotCalled()
+{
+    EXPECT_CALL( *this, GetInstalledPrograms() ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeResolveKnownFolderIdReturn( std::string value )
+{
+    ON_CALL( *this, ResolveKnownFolderId( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectResolveKnownFolderIdIsNotCalled()
+{
+    EXPECT_CALL( *this, ResolveKnownFolderId( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeGetDataDirReturn( std::wstring value )
+{
+    ON_CALL( *this, GetDataDir() ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectGetDataDirIsNotCalled()
+{
+    EXPECT_CALL( *this, GetDataDir() ).Times( 0 );
 }

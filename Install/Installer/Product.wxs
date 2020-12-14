@@ -15,6 +15,14 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
+        <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+        <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
+        <InstallExecuteSequence>
+          <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
+            WIX_UPGRADE_DETECTED
+          </Custom>
+        </InstallExecuteSequence>
+      
         <!--=
         AllowSameVersionUpgrades:
         When set to no (the default), installing a product with the same version and upgrade code (but different product code) is allowed and treated by MSI as two products. 
@@ -36,11 +44,11 @@
         -->
         <MajorUpgrade AllowDowngrades="no"
 					  AllowSameVersionUpgrades="yes"
-                      Schedule="afterInstallExecute"
+            Schedule="afterInstallExecute"
 					  DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         
         <MediaTemplate EmbedCab="yes" />
-
+    
         <Feature Id="UnifiedConnector" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentGroupRef Id="UnifiedConnectorComponents"/>
             <ComponentGroupRef Id="UCServiceComponents" />
@@ -54,6 +62,8 @@
         <Property Id="UC_BASE_DIRECTORY">
             <RegistrySearch Key="Software\Cisco\SecureXYZ\UnifiedConnector" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
         </Property>
+
+        <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
     </Product>
 
     <Fragment>
@@ -347,6 +357,11 @@
             <Component Id="C.BootstrapperConfig" Guid="3D8A1726-FCE9-4E4A-BA9E-07F3CF732617">
                 <CopyFile Id="CF.BootstrapperConfig" SourceProperty="BS_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.BootstrapperConfigName)"/>
                 <Condition>BS_CONFIG</Condition>
+            </Component>
+
+            <Component Id="C.BSConfigName" NeverOverwrite="yes">
+              <File Id="bs.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\bs.json" />
+              <Condition>NOT BS_CONFIG</Condition>
             </Component>
             
             <Component Id="C.Remove.BootstrapperConfig" Guid="D37A0F1E-EF10-479F-B1EF-D48D29A20086">

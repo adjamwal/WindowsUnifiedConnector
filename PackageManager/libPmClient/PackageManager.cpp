@@ -1,0 +1,233 @@
+﻿// PacakgeManager.cpp : Defines the entry point for the application.
+//
+
+#include "PackageManager.h"
+#include "PmLogger.h"
+#include "IWorkerThread.h"
+#include "IPmConfig.h"
+#include "IPmCloud.h"
+#include "IPackageInventoryProvider.h"
+#include "ICheckinFormatter.h"
+#include "IUcidAdapter.h"
+#include "ICertsAdapter.h"
+#include "IPmHttp.h"
+#include "ICheckinManifestRetriever.h"
+#include "IManifestProcessor.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformComponentManager.h"
+#include "IPmPlatformConfiguration.h"
+#include "ICloudEventPublisher.h"
+#include "ICloudEventStorage.h"
+#include "IUcUpgradeEventHandler.h"
+#include "PmTypes.h"
+#include <sstream>
+
+using namespace std;
+
+PackageManager::PackageManager( IPmConfig& config,
+    IPmCloud& cloud,
+    IPackageInventoryProvider& packageInventoryProvider,
+    ICheckinFormatter& checkinFormatter,
+    IUcidAdapter& ucidAdapter,
+    ICertsAdapter& certsAdapter,
+    ICheckinManifestRetriever& manifestRetriever,
+    IManifestProcessor& manifestProcessor,
+    ICloudEventPublisher& cloudEventPublisher,
+    ICloudEventStorage& cloudEventStorage,
+    IUcUpgradeEventHandler& ucUpgradeEventHandler,
+    IWorkerThread& thread ) :
+    m_config( config )
+    , m_cloud( cloud )
+    , m_packageInventoryProvider( packageInventoryProvider )
+    , m_checkinFormatter( checkinFormatter )
+    , m_ucidAdapter( ucidAdapter )
+    , m_certsAdapter( certsAdapter )
+    , m_manifestRetriever( manifestRetriever )
+    , m_manifestProcessor( manifestProcessor )
+    , m_cloudEventPublisher( cloudEventPublisher )
+    , m_cloudEventStorage( cloudEventStorage )
+    , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
+    , m_thread( thread )
+    , m_dependencies( nullptr )
+{
+
+}
+
+PackageManager::~PackageManager()
+{
+
+}
+
+int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFile )
+{
+    int32_t rtn = -1;
+    LOG_DEBUG( "Enter " );
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    m_bsConfigFile = bsConfigFile;
+    m_pmConfigFile = pmConfigFile;
+
+    if( !m_dependencies ) {
+        LOG_ERROR( "Platform dependencies not provided. Cannot start Package Manager" );
+    }
+    else {
+        if ( !LoadPmConfig() ) {
+            LOG_DEBUG( "Failed to load Pm configuration" );
+        }
+
+        if( !LoadBsConfig() ) {
+            LOG_ERROR( "Failed to load Bs configuration" );
+        }
+        else {
+            SetupDiscoveryPackages();
+
+            std::string token = m_ucidAdapter.GetAccessToken();
+            if ( !token.empty() ) {
+                m_cloud.SetToken( token );
+                m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
+                m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
+            }
+
+            m_thread.Start(
+                std::bind( &PackageManager::PmThreadWait, this ),
+                std::bind( &PackageManager::PmWorkflowThread, this )
+            );
+            rtn = 0;
+        }
+    }
+
+    LOG_DEBUG( "Exit %d", rtn );
+    return rtn;
+}
+
+int32_t PackageManager::Stop()
+{
+    int32_t rtn = -1;
+    LOG_DEBUG( "Enter " );
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    if( !m_thread.IsRunning() ) {
+        LOG_DEBUG( "Package Manager is not running" );
+    }
+    else {
+        m_thread.Stop();
+        rtn = 0;
+    }
+
+    LOG_DEBUG( "Exit %d", rtn );
+    return rtn;
+}
+
+bool PackageManager::IsRunning()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    return m_thread.IsRunning();
+}
+
+void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependecies )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    m_dependencies = dependecies;
+
+    try
+    {
+        m_ucidAdapter.Initialize( m_dependencies );
+        m_certsAdapter.Initialize( m_dependencies );
+        m_manifestProcessor.Initialize( m_dependencies );
+        m_packageInventoryProvider.Initialize( m_dependencies );
+        m_cloudEventStorage.Initialize( m_dependencies );
+        m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
+        m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
+        m_ucUpgradeEventHandler.Initialize( m_dependencies );
+    }
+    catch( std::exception& ex )
+    {
+        LOG_ERROR( "Initialization failed: %s", ex.what() );
+    }
+}
+
+std::chrono::milliseconds PackageManager::PmThreadWait()
+{
+    return std::chrono::milliseconds( m_config.GetCloudCheckinInterval() );
+}
+
+void PackageManager::PmWorkflowThread()
+{
+    LOG_DEBUG( "Enter " );
+
+    if ( !LoadPmConfig() ) {
+        LOG_ERROR( "Failed to load PM configuration" );
+        //Send event? might fail without a config/cloudURL
+    }
+
+    try
+    {
+        PackageInventory inventory;
+        m_packageInventoryProvider.GetInventory( inventory );
+
+        std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
+            m_config.GetCloudCheckinUri(),
+            m_checkinFormatter.GetJson( inventory )
+        );
+
+        LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
+        
+        if ( m_manifestProcessor.ProcessManifest( manifest ) )
+        {
+            m_cloudEventPublisher.PublishFailedEvents();
+        }
+    }
+    catch( std::exception& ex )
+    {
+        LOG_ERROR( "Checkin failed: %s", ex.what() );
+    }
+
+}
+
+bool PackageManager::LoadBsConfig()
+{
+    return m_config.LoadBsConfig( m_bsConfigFile ) == 0;
+}
+
+bool PackageManager::LoadPmConfig()
+{
+    return m_config.LoadPmConfig( m_pmConfigFile ) == 0;
+}
+
+bool PackageManager::PmSendEvent( const PmEvent& event )
+{
+    return false;
+}
+
+int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
+{
+    return m_config.VerifyBsFileIntegrity( bsConfigFile );
+}
+
+int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )
+{
+    return m_config.VerifyPmFileIntegrity( pmConfigFile );
+}
+
+void PackageManager::SetupDiscoveryPackages()
+{
+    //TODO: This should be fetched from the cloud for enterprise
+    PmDiscoveryComponent discoveryItem;
+    discoveryItem.packageId = "amp";
+    discoveryItem.packageName = "Immunet";
+    m_discoveryList.push_back( discoveryItem );
+
+    discoveryItem.packageId = "amp";
+    discoveryItem.packageName = "Cisco AMP for Endpoints Connector";
+    m_discoveryList.push_back( discoveryItem );
+
+    for( uint32_t i = 0; i < 10; i++ ) {
+        std::stringstream ss;
+        ss << "test-package-" << i + 1;
+        discoveryItem.packageId = ss.str();
+        discoveryItem.packageName = "TestPackage";
+        m_discoveryList.push_back( discoveryItem );
+    }
+
+    m_packageInventoryProvider.SetDiscoveryList( m_discoveryList );
+}

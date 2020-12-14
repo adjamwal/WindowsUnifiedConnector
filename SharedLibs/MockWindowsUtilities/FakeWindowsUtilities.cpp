@@ -47,3 +47,18 @@ bool WindowsUtilities::GetSysDirectory( std::string& path )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetSysDirectory( path );
 }
+
+std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstalledPrograms()
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->GetInstalledPrograms();
+}
+
+std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderId( knownFolderId );
+}
+
+std::wstring WindowsUtilities::GetDataDir()
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
+}
