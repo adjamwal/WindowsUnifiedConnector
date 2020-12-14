@@ -176,8 +176,8 @@ class Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         ucid_response_json = json.loads(ucid_response)
         if ucid_response_json.has_key("ucid"):
             response_code = 200
-        # special error_code 9999 to trigger "Retry-After" response.
-        elif ucid_response_json.has_key("error_code") and ucid_response_json['error_code'] == 9999:
+        # special error code 9999 to trigger "Retry-After" response.
+        elif ucid_response_json.has_key("code") and ucid_response_json['code'] == 9999:
             response_code = 429
             headers.append(('Retry-After', '7')) # in seconds
         else:
