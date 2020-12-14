@@ -252,7 +252,7 @@ pipeline {
                 nexusVersion: 'nexus3',
                 protocol: 'https',
                 nexusUrl: 'nexus.engine.sourcefire.com',
-                groupId: 'UnifiedConnector/Windows',
+                groupId: "UnifiedConnector/Windows/${env.BRANCH_NAME}"',
                 version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
                 repository: 'raw',
                 credentialsId: 'nexus_credentials',
@@ -271,6 +271,9 @@ pipeline {
                   ]
                 ]
               )
+			}
+          }
+        }
         stage ('Prepare Symbols') {
           when {
             not { changeRequest() }
@@ -312,7 +315,7 @@ pipeline {
                 nexusVersion: 'nexus3',
                 protocol: 'https',
                 nexusUrl: 'nexus.engine.sourcefire.com',
-                groupId: 'UnifiedConnector/Windows',
+                groupId: "UnifiedConnector/Windows/${env.BRANCH_NAME}"',
                 version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
                 repository: 'raw',
                 credentialsId: 'nexus_credentials',
