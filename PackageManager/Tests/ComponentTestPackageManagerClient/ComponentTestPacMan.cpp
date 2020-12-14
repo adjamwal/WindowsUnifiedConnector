@@ -373,7 +373,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     m_fileUtil->MakePmCreateFileReturn( (FileUtilHandle*)1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
-
+    m_fileUtil->MakeFileExistsReturn( true );
     m_platformComponentManager->ExpectDeployConfigurationIsNotCalled();
     EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );

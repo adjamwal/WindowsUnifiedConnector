@@ -200,17 +200,17 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
     int failedConfigs = 0;
     for( auto config : componentPackage.configs )
     {
-        LOG_DEBUG( __FUNCTION__ ": Process %s", config.path );
-        config.forComponentID = componentPackage.packageNameAndVersion;
         bool processed = false;
         
         try
         {
-            m_configProcessor.ProcessConfig( config );
+            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.c_str(), componentPackage.packageNameAndVersion.c_str() );
+            config.forComponentID = componentPackage.packageNameAndVersion;
+            processed = m_configProcessor.ProcessConfig( config );
         }
         catch( ... )
         {
-            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path );
+            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path.c_str() );
         }
 
         failedConfigs += processed ? 0 : 1;
@@ -218,7 +218,7 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
     if( failedConfigs > 0 )
     {
-        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs", failedConfigs );
+        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs for package %s", failedConfigs, componentPackage.packageNameAndVersion.c_str() );
     }
 
     return failedConfigs == 0;

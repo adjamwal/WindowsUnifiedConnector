@@ -11,6 +11,7 @@
 #include "IPmPlatformComponentManager.h"
 #include <sstream>
 #include "RandomUtil.h"
+#include "PackageException.h"
 
 PackageConfigProcessor::PackageConfigProcessor(
     IFileUtil& fileUtil,
@@ -60,8 +61,10 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 {
     bool rtn = false;
 
+    std::stringstream tempFilePath;
     std::vector<uint8_t> configData;
     std::string targetLocation = m_fileUtil.AppendPath( config.installLocation, config.path );
+    FileUtilHandle* handle = NULL;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
     m_eventBuilder.WithNewFile( config.path, config.sha256, 0 );
@@ -71,91 +74,62 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         m_eventBuilder.WithOldFile( config.path, old_sha256.value(), m_fileUtil.FileSize( targetLocation ) );
     }
 
-    if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
-        std::stringstream ssError;
-        ssError << "Failed to decode " << config.contents;
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_DECODE, ssError.str() );
-        LOG_ERROR( "%s", ssError.str().c_str() );
-        m_eventPublisher.Publish( m_eventBuilder );
-
-        return rtn;
-    }
-
-    std::stringstream ss;
-    FileUtilHandle* handle = NULL;
-
-    ss << m_fileUtil.GetTempDir() << "tmpPmConf_" << m_fileCount++ << RandomUtil::GetString( 10 );
-
-    if( ( handle = m_fileUtil.PmCreateFile( ss.str() ) ) == NULL )
+    try
     {
-        std::stringstream ssError;
-        ssError << "Failed to create " << ss.str();
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_CREATE, ssError.str() );
-        LOG_ERROR( "%s", ssError.str().c_str() );
-        m_eventPublisher.Publish( m_eventBuilder );
+        if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
 
-        return rtn;
-    }
+            throw PackageException( "Failed to decode " + config.contents, UCPM_EVENT_ERROR_CONFIG_DECODE );
+        }
 
-    if( m_fileUtil.AppendFile( handle, configData.data(), configData.size() ) == 0 )
-    {
+        tempFilePath << m_fileUtil.GetTempDir() << "tmpPmConf_" << m_fileCount++ << RandomUtil::GetString( 10 );
+        config.verifyPath = tempFilePath.str();
+
+        if( ( handle = m_fileUtil.PmCreateFile( config.verifyPath ) ) == NULL )
+        {
+            throw PackageException( "Failed to create " + config.verifyPath, UCPM_EVENT_ERROR_CONFIG_CREATE );
+        }
+
+        int byteswritten = m_fileUtil.AppendFile( handle, configData.data(), configData.size() );
         m_fileUtil.CloseFile( handle );
 
-        std::stringstream ssError;
-        ssError << "Failed to write to " << ss.str();
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_WRITE, ssError.str() );
-        LOG_ERROR( "%s", ssError.str().c_str() );
-        m_eventPublisher.Publish( m_eventBuilder );
-
-        LOG_DEBUG( "Removing %s", ss.str().c_str() );
-        if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
-            LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
+        if( !byteswritten )
+        {
+            RemoveTempFile( config.verifyPath );
+            throw PackageException( "Failed to write config data to " + config.verifyPath, UCPM_EVENT_ERROR_CONFIG_CREATE );
         }
 
-        return rtn;
+        auto sha256 = m_sslUtil.CalculateSHA256( config.verifyPath );
+        m_eventBuilder.WithNewFile(
+            config.path,
+            sha256.has_value() ? sha256.value() : config.sha256,
+            m_fileUtil.FileSize( config.verifyPath )
+        );
+
+        // only validate hash if installerHash is not empty
+        rtn = ( config.sha256.empty() || sha256 == config.sha256 ) &&
+              ( config.verifyBinPath.empty() || ( m_dependencies->ComponentManager().DeployConfiguration( config ) == 0 ) ) &&
+              ( m_fileUtil.Rename( config.verifyPath, targetLocation ) == 0 );
+
+        if( !rtn )
+        {
+            RemoveTempFile( config.verifyPath );
+            throw PackageException( "Failed to deploy configuration to " + targetLocation, UCPM_EVENT_ERROR_CONFIG_DEPLOY );
+        }
     }
-
-    m_fileUtil.CloseFile( handle );
-    config.verifyPath = ss.str();
-
-    auto sha256 = m_sslUtil.CalculateSHA256( ss.str() );
-    m_eventBuilder.WithNewFile( 
-        config.path, 
-        sha256.has_value() ? sha256.value() : config.sha256,
-        m_fileUtil.FileSize( ss.str() ) 
-    );
-
-    bool moveFile = true;
-
-    // only validate hash if installerHash is not empty
-    if( !config.sha256.empty() )
+    catch( PackageException& ex )
     {
-        if( sha256 != config.sha256 ) {
-            moveFile = false;
-        }
+        m_eventBuilder.WithError( ex.whatCode(), ex.what() );
+        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
     }
-
-    if( moveFile && !config.verifyBinPath.empty() ) {
-        moveFile = m_dependencies->ComponentManager().DeployConfiguration( config ) == 0;
-    }
-
-    if( moveFile ) {
-        if( m_fileUtil.Rename( ss.str(), targetLocation ) == 0 ) {
-            rtn = true;
-        }
-        else {
-            LOG_ERROR( "Rename Failed. Removing %s", ss.str().c_str() );
-            if( m_fileUtil.DeleteFile( ss.str() ) != 0 ) {
-                LOG_ERROR( "Failed to remove %s", ss.str().c_str() );
-            }
-        }
-    }
-
-    if( !rtn )
+    catch( std::exception& ex )
     {
-        std::stringstream ssError;
-        ssError << "Failed to deploy configuration to " << targetLocation;
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_DEPLOY, ssError.str() );
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
+        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+    }
+    catch( ... )
+    {
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
+        LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
     }
 
     m_eventPublisher.Publish( m_eventBuilder );
@@ -170,34 +144,55 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     std::string targetLocation = m_fileUtil.AppendPath( config.installLocation, config.path );
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
-    m_eventBuilder.WithOldFile( 
-        config.path, 
-        sha256.has_value() ? sha256.value() : config.sha256,
-        m_fileUtil.FileSize( targetLocation ) );
+    m_eventBuilder.WithOldFile( config.path, config.sha256, m_fileUtil.FileSize( targetLocation ) );
 
-    if( !targetLocation.empty() ) {
+    try
+    {
+        if( targetLocation.empty() || !m_fileUtil.FileExists( targetLocation ) )
+        {
+            throw PackageException( "Failed to resolve config " + targetLocation, UCPM_EVENT_ERROR_CONFIG_RESOLVE );
+        }
+
+        auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
+        m_eventBuilder.WithOldFile(
+            config.path,
+            sha256.has_value() ? sha256.value() : config.sha256,
+            m_fileUtil.FileSize( targetLocation ) );
+
         if( m_fileUtil.DeleteFile( targetLocation ) != 0 )
         {
-            std::stringstream ssError;
-            ssError << "Failed to remove " << targetLocation;
-            m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_REMOVE, ssError.str() );
-            LOG_ERROR( "%s", ssError.str().c_str() );
+            throw PackageException( "Failed to remove config " + targetLocation, UCPM_EVENT_ERROR_CONFIG_REMOVE );
         }
-        else {
-            LOG_DEBUG( "Removed config file %s", targetLocation.c_str() );
-            rtn = true;
-        }
+
+        LOG_DEBUG( "Removed config file %s", targetLocation.c_str() );
+
+        rtn = true;
     }
-    else
+    catch( PackageException& ex )
     {
-        std::stringstream ssError;
-        ssError << "Failed to resolve file " << targetLocation;
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_CONFIG_RESOLVE, ssError.str() );
-        LOG_ERROR( "%s", ssError.str().c_str() );
+        m_eventBuilder.WithError( ex.whatCode(), ex.what() );
+        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+    }
+    catch( std::exception& ex )
+    {
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
+        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+    }
+    catch( ... )
+    {
+        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
+        LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
     }
 
     m_eventPublisher.Publish( m_eventBuilder );
 
     return rtn;
+}
+
+void PackageConfigProcessor::RemoveTempFile( const std::string& tempFilePath )
+{
+    LOG_ERROR( "Removing %s", tempFilePath.c_str() );
+    if( m_fileUtil.DeleteFile( tempFilePath ) != 0 ) {
+        LOG_ERROR( "Failed to remove %s", tempFilePath.c_str() );
+    }
 }
