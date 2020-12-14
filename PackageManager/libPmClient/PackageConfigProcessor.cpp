@@ -92,7 +92,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         int byteswritten = m_fileUtil.AppendFile( handle, configData.data(), configData.size() );
         m_fileUtil.CloseFile( handle );
 
-        if( byteswritten != configData.size() )
+        if( !byteswritten )
         {
             RemoveTempFile( config.verifyPath );
             throw PackageException( "Failed to write config data to " + config.verifyPath, UCPM_EVENT_ERROR_CONFIG_CREATE );
@@ -107,9 +107,8 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
         // only validate hash if installerHash is not empty
         rtn = ( config.sha256.empty() || sha256 == config.sha256 ) &&
-            !config.verifyBinPath.empty() &&
-            ( m_dependencies->ComponentManager().DeployConfiguration( config ) == 0 ) &&
-            ( m_fileUtil.Rename( config.verifyPath, targetLocation ) == 0 );
+              ( config.verifyBinPath.empty() || ( m_dependencies->ComponentManager().DeployConfiguration( config ) == 0 ) ) &&
+              ( m_fileUtil.Rename( config.verifyPath, targetLocation ) == 0 );
 
         if( !rtn )
         {

@@ -200,13 +200,13 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
     int failedConfigs = 0;
     for( auto config : componentPackage.configs )
     {
-        LOG_DEBUG( __FUNCTION__ ": Process %s", config.path );
-        config.forComponentID = componentPackage.packageNameAndVersion;
         bool processed = false;
         
         try
         {
-            m_configProcessor.ProcessConfig( config );
+            LOG_DEBUG( __FUNCTION__ ": Process %s", config.path );
+            config.forComponentID = componentPackage.packageNameAndVersion;
+            processed = m_configProcessor.ProcessConfig( config );
         }
         catch( ... )
         {
