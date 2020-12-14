@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestPmHttp.cpp" />
+    <ClCompile Include="TestRandomUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Mocks\PmUtilMocks\PmUtilMocks.vcxproj">

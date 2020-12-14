@@ -18,63 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="CertsAdapter.h" />
-    <ClInclude Include="CheckinFormatter.h" />
-    <ClInclude Include="CheckinManifestRetriever.h" />
-    <ClInclude Include="ComponentPackageProcessor.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="IUcUpgradeEventHandler.h" />
-    <ClInclude Include="PackageException.h" />
-    <ClInclude Include="PmConstants.h" />
-    <ClInclude Include="ICertsAdapter.h" />
-    <ClInclude Include="ICheckinFormatter.h" />
-    <ClInclude Include="ICheckinManifestRetriever.h" />
-    <ClInclude Include="IComponentPackageProcessor.h" />
-    <ClInclude Include="IManifestProcessor.h" />
-    <ClInclude Include="IPackageConfigProcessor.h" />
-    <ClInclude Include="IPackageInventoryProvider.h" />
-    <ClInclude Include="IPackageManager.h" />
-    <ClInclude Include="IPmCloud.h" />
-    <ClInclude Include="IPmConfig.h" />
-    <ClInclude Include="IPmManifest.h" />
-    <ClInclude Include="IPmPlatformComponentManager.h" />
-    <ClInclude Include="IPmPlatformConfiguration.h" />
-    <ClInclude Include="IPmPlatformDependencies.h" />
-    <ClInclude Include="IUcidAdapter.h" />
-    <ClInclude Include="ManifestProcessor.h" />
-    <ClInclude Include="PackageConfigProcessor.h" />
-    <ClInclude Include="PackageInventoryProvider.h" />
-    <ClInclude Include="PackageManager.h" />
-    <ClInclude Include="PackageManagerContainer.h" />
-    <ClInclude Include="PmCloud.h" />
-    <ClInclude Include="PmConfig.h" />
-    <ClInclude Include="PmManifest.h" />
-    <ClInclude Include="PmTypes.h" />
-    <ClInclude Include="UcidAdapter.h" />
-    <ClInclude Include="UcUpgradeEventHandler.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="CertsAdapter.cpp" />
-    <ClCompile Include="CheckinFormatter.cpp" />
-    <ClCompile Include="CheckinManifestRetriever.cpp" />
-    <ClCompile Include="ComponentPackageProcessor.cpp" />
-    <ClCompile Include="ManifestProcessor.cpp" />
-    <ClCompile Include="PackageConfigProcessor.cpp" />
-    <ClCompile Include="PackageInventoryProvider.cpp" />
-    <ClCompile Include="PackageManager.cpp" />
-    <ClCompile Include="PackageManagerContainer.cpp" />
-    <ClCompile Include="PmCloud.cpp" />
-    <ClCompile Include="PmConfig.cpp" />
-    <ClCompile Include="PmManifest.cpp" />
-    <ClCompile Include="UcidAdapter.cpp" />
-    <ClCompile Include="UcUpgradeEventHandler.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1f2019e6-7a09-434e-a790-b1e7d0a51f87}</ProjectGuid>
-    <RootNamespace>libPmClient</RootNamespace>
+    <ProjectGuid>{a9adc3fd-3439-4592-af16-a00fcd571bfb}</ProjectGuid>
+    <RootNamespace>MockPmAgent</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -142,10 +90,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CURL_STATICLIB;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -159,10 +107,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CURL_STATICLIB;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -176,10 +124,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CURL_STATICLIB;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -193,10 +141,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CURL_STATICLIB;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -206,6 +154,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="MockPackageDiscovery.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MockPackageDiscovery.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -114,7 +114,6 @@ std::string CloudEventBuilder::Build()
 {
     std::string result = Serialize();
     LOG_DEBUG( __FUNCTION__ ": serialized event: %s", result.c_str() );
-    Reset();
     return result;
 }
 

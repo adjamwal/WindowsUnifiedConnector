@@ -27,6 +27,7 @@
     <ClInclude Include="IWorkerThread.h" />
     <ClInclude Include="PmHttp.h" />
     <ClInclude Include="PmLogger.h" />
+    <ClInclude Include="RandomUtil.h" />
     <ClInclude Include="SslUtil.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="WorkerThread.h" />
@@ -35,6 +36,7 @@
     <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="PmHttp.cpp" />
     <ClCompile Include="PmLogger.cpp" />
+    <ClCompile Include="RandomUtil.cpp" />
     <ClCompile Include="SslUtil.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="WorkerThread.cpp" />

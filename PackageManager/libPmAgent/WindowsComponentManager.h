@@ -4,6 +4,7 @@
 #include "IUcLogger.h"
 #include "IWinApiWrapper.h"
 #include "ICodesignVerifier.h"
+#include "IPackageDiscovery.h"
 #include <string>
 #include <Windows.h>
 #include <PmTypes.h>
@@ -11,7 +12,7 @@
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
 public:
-    WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codeSignVerifier );
+    WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codeSignVerifier, IPackageDiscovery& packageDiscovery );
     virtual ~WindowsComponentManager();
 
     /**
@@ -81,10 +82,8 @@ public:
 private:
     IWinApiWrapper& m_winApiWrapper;
     ICodesignVerifier& m_codeSignVerifier;
+    IPackageDiscovery& m_packageDiscovery;
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
-    PmInstalledPackage BuildUcPackage();
-    PmInstalledPackage HackBuildAmpPackage();
-    void StripBuildNumber( std::string& versionString );
 };
 
