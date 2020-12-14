@@ -197,12 +197,29 @@ void ComponentPackageProcessor::CleanupTempDownload( std::string tempFilePath )
 
 bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& componentPackage )
 {
-    bool rtn = true;
-
-    for( auto config : componentPackage.configs ) {
+    int failedConfigs = 0;
+    for( auto config : componentPackage.configs )
+    {
+        LOG_DEBUG( __FUNCTION__ ": Process %s", config.path );
         config.forComponentID = componentPackage.packageNameAndVersion;
-        rtn = rtn && m_configProcessor.ProcessConfig( config );
+        bool processed = false;
+        
+        try
+        {
+            m_configProcessor.ProcessConfig( config );
+        }
+        catch( ... )
+        {
+            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path );
+        }
+
+        failedConfigs += processed ? 0 : 1;
     }
 
-    return rtn;
+    if( failedConfigs > 0 )
+    {
+        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs", failedConfigs );
+    }
+
+    return failedConfigs == 0;
 }
