@@ -335,11 +335,12 @@ pipeline {
           }
         }
         stage ('Upload Symbols') {
-          agent {
-            label 'Windows-Symbol-Server-Slave'
-          }
           when {
             not { changeRequest() }
+            beforeAgent true
+          }
+          agent {
+            label 'Windows-Symbol-Server-Slave'
           }
           steps {
             script {
