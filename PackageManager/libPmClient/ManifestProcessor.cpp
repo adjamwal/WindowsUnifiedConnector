@@ -36,9 +36,15 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
     int failedPackages = 0;
     for( auto package : m_manifest.GetPackageList() )
     {
-        bool processed = 
-            ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackageBinaries( package ) ) &&
-            ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+        bool processed = false;
+
+        try
+        {
+            processed =
+                ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackageBinaries( package ) ) &&
+                ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+        }
+        catch( ... ) { }
 
         failedPackages += processed ? 0 : 1;
     }
