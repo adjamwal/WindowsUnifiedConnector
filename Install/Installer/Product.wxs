@@ -22,6 +22,16 @@
             WIX_UPGRADE_DETECTED
           </Custom>
         </InstallExecuteSequence>
+
+        <?if $(var.Platform) = x86 ?>
+          <Condition Message="This software cannot be installed on an x64 machine.">
+            <![CDATA[Not VersionNT64]]>
+          </Condition>
+        <?else?>
+          <Condition Message="This software cannot be installed on an x86 machine.">
+            <![CDATA[VersionNT64]]>
+          </Condition>
+        <?endif?>
       
         <!--=
         AllowSameVersionUpgrades:
