@@ -17,22 +17,20 @@
 
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
+        <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <InstallExecuteSequence>
           <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
             WIX_UPGRADE_DETECTED
           </Custom>
+          <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
-          <Condition Message="This software cannot be installed on an x64 machine.">
+          <Condition Message="This application cannot be installed on an x64 machine.">
             <![CDATA[Not VersionNT64]]>
           </Condition>
-        <?else?>
-          <Condition Message="This software cannot be installed on an x86 machine.">
-            <![CDATA[VersionNT64]]>
-          </Condition>
         <?endif?>
-      
+
         <!--=
         AllowSameVersionUpgrades:
         When set to no (the default), installing a product with the same version and upgrade code (but different product code) is allowed and treated by MSI as two products. 

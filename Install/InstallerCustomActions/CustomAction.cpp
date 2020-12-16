@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <Msi.h>
 #include <string>
+#include <versionhelpers.h>
 
 #define GUID_SIZE 39
 #define PRODUCT_NAME L"Cisco Unified Connector"
@@ -100,6 +101,115 @@ LExit:
 	return WcaFinalize(er);
 }
 
+
+std::string GetFileVersion( const std::string filename )
+{
+    DWORD handle = 0;
+    DWORD size = GetFileVersionInfoSizeA( filename.c_str(), &handle );
+    void* block = NULL;
+    std::string fileVersion;
+
+    if ( size ) {
+        block = calloc( 1, size );
+        if ( block ) {
+            if ( GetFileVersionInfoA( filename.c_str(), 0, size, block ) ) {
+                HRESULT hr;
+                UINT cbTranslate = 0;
+
+                struct LANGANDCODEPAGE
+                {
+                    WORD wLanguage;
+                    WORD wCodePage;
+                } *lpTranslate;
+
+                // Read the list of languages and code pages.
+
+                VerQueryValueA( block,
+                    "\\VarFileInfo\\Translation",
+                    ( LPVOID* )&lpTranslate,
+                    &cbTranslate );
+
+                // Read the file description for each language and code page.
+
+                for ( int i = 0; i < ( cbTranslate / sizeof( struct LANGANDCODEPAGE ) ); i++ ) {
+                    char SubBlock[ 100 ] = { 0 };
+                    hr = StringCchPrintfA( SubBlock, 50,
+                        "\\StringFileInfo\\%04x%04x\\FileVersion",
+                        lpTranslate[ i ].wLanguage,
+                        lpTranslate[ i ].wCodePage );
+                    if ( FAILED( hr ) ) {
+                        // TODO: write error handler.
+                    }
+
+                    PVOID lpBuffer = NULL;
+                    UINT dwBytes = 0;
+                    // Retrieve file description for language and code page "i". 
+                    VerQueryValueA( block,
+                        SubBlock,
+                        &lpBuffer,
+                        &dwBytes );
+
+                    fileVersion.assign( ( char* )lpBuffer, dwBytes );
+                    WcaLog( LOGMSG_STANDARD, "File Version %s", fileVersion.c_str() );
+                    break;
+                }
+            }
+            else {
+                WcaLog( LOGMSG_STANDARD, "GetFileVersionInfo failed." );
+            }
+        }
+        else {
+            WcaLog( LOGMSG_STANDARD, "calloc failed." );
+        }
+    }
+    else {
+        WcaLog( LOGMSG_STANDARD, "GetFileVersionInfoSizeA failed." );
+    }
+
+
+    if ( block ) {
+        free( block );
+    }
+
+    return fileVersion;
+}
+
+bool IsGreaterThanWindows10( const std::string fileVersion )
+{
+    bool rtn = false;
+    std::string majorVersion;
+    size_t dot = fileVersion.find_first_of( "." );
+    if ( dot != std::string::npos ) {
+        majorVersion = fileVersion.substr( 0, dot );
+    }
+
+    if ( !majorVersion.empty() && atoi( majorVersion.c_str() ) >= 10 ) {
+        rtn = true;
+    }
+
+    return rtn;
+}
+
+UINT __stdcall DetectWindows10OrGreater(
+    MSIHANDLE hInstall
+)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+    BuildInfo prevBuildInfo;
+    const char* filename = "C:\\Windows\\System32\\ntdll.dll";
+
+    hr = WcaInitialize( hInstall, "DetectWindows10OrGreater" );
+    ExitOnFailure( hr, "Failed to initialize" );
+
+    WcaLog( LOGMSG_STANDARD, "Initialized." );
+
+    hr = IsGreaterThanWindows10( GetFileVersion( filename ) ) ? S_OK : E_FAIL;
+
+LExit:
+    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize( er );
+}
 
 // DllMain - Initialize and cleanup WiX custom action utils.
 extern "C" BOOL WINAPI DllMain(
