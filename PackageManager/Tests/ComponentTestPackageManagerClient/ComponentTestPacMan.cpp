@@ -156,6 +156,25 @@ protected:
         m_patient->Start( "ConfigFile", "ConfigFile" );
     }
 
+    void PublishedEventHasExpectedData(
+        std::string ucid,
+        CloudEventType evtype,
+        std::string packageNameAndVersion,
+        int errCode, std::string errMessage, 
+        std::string oldPath, std::string oldHash, int oldSize,
+        std::string newPath, std::string newHash, int newSize )
+    {
+        CloudEventBuilder expectedEventData {};
+        expectedEventData.WithUCID( ucid );
+        expectedEventData.WithPackageID( "uc/0.0.1" );
+        expectedEventData.WithType( pkginstall );
+        expectedEventData.WithError( errCode, errMessage );
+        expectedEventData.WithOldFile( oldPath, oldHash, oldSize );
+        expectedEventData.WithNewFile( newPath, newHash, newSize );
+
+        EXPECT_EQ( *m_eventBuilder, expectedEventData );
+    }
+
     bool m_configIntervalCalledOnce;
     std::string m_configUrl;
     std::mutex m_mutex;
@@ -242,15 +261,19 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 
     EXPECT_TRUE( pass );
 
-    CloudEventBuilder expectedEventData {};
-    expectedEventData.WithPackageID( "uc/0.0.1" );
-    expectedEventData.WithType( pkginstall );
-    expectedEventData.WithNewFile(
+    PublishedEventHasExpectedData(
+        "",
+        pkginstall,
+        "uc/0.0.1",
+        0,
+        "",
+        "",
+        "",
+        0,
         "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
         "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
-        0 );
-
-    EXPECT_EQ( *m_eventBuilder, expectedEventData );
+        0
+    );
 }
 
 std::string _ucReponseConfigOnly( R"(
