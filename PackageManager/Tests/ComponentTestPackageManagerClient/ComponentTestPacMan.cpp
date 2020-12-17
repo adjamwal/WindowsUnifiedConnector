@@ -3,6 +3,7 @@
 
 #include "PackageManager.h"
 #include "PackageInventoryProvider.h"
+#include "PackageDiscoveryManager.h"
 #include "CheckinFormatter.h"
 #include "UcidAdapter.h"
 #include "CertsAdapter.h"
@@ -45,6 +46,7 @@ protected:
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
         m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) );
+        m_packageDiscoveryManager.reset( new PackageDiscoveryManager( *m_packageInventoryProvider ) );
         m_checkinFormatter.reset( new CheckinFormatter() );
         m_ucidAdapter.reset( new UcidAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
@@ -80,7 +82,7 @@ protected:
 
         m_patient.reset( new PackageManager( *m_config,
             *m_cloud,
-            *m_packageInventoryProvider,
+            *m_packageDiscoveryManager,
             *m_checkinFormatter,
             *m_ucidAdapter,
             *m_certsAdapter,
@@ -167,6 +169,7 @@ protected:
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
+    std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;

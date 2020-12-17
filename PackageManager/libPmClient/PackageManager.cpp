@@ -6,7 +6,7 @@
 #include "IWorkerThread.h"
 #include "IPmConfig.h"
 #include "IPmCloud.h"
-#include "IPackageInventoryProvider.h"
+#include "IPackageDiscoveryManager.h"
 #include "ICheckinFormatter.h"
 #include "IUcidAdapter.h"
 #include "ICertsAdapter.h"
@@ -26,7 +26,7 @@ using namespace std;
 
 PackageManager::PackageManager( IPmConfig& config,
     IPmCloud& cloud,
-    IPackageInventoryProvider& packageInventoryProvider,
+    IPackageDiscoveryManager& packageDiscoveryManager,
     ICheckinFormatter& checkinFormatter,
     IUcidAdapter& ucidAdapter,
     ICertsAdapter& certsAdapter,
@@ -38,7 +38,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
-    , m_packageInventoryProvider( packageInventoryProvider )
+    , m_packageDiscoveryManager( packageDiscoveryManager )
     , m_checkinFormatter( checkinFormatter )
     , m_ucidAdapter( ucidAdapter )
     , m_certsAdapter( certsAdapter )
@@ -79,8 +79,6 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
             LOG_ERROR( "Failed to load Bs configuration" );
         }
         else {
-            SetupDiscoveryPackages();
-
             std::string token = m_ucidAdapter.GetAccessToken();
             if ( !token.empty() ) {
                 m_cloud.SetToken( token );
@@ -134,7 +132,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_ucidAdapter.Initialize( m_dependencies );
         m_certsAdapter.Initialize( m_dependencies );
         m_manifestProcessor.Initialize( m_dependencies );
-        m_packageInventoryProvider.Initialize( m_dependencies );
+        m_packageDiscoveryManager.Initialize( m_dependencies );
         m_cloudEventStorage.Initialize( m_dependencies );
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
         m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
@@ -163,7 +161,7 @@ void PackageManager::PmWorkflowThread()
     try
     {
         PackageInventory inventory;
-        m_packageInventoryProvider.GetInventory( inventory );
+        m_packageDiscoveryManager.DiscoverPackages( inventory );
 
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
             m_config.GetCloudCheckinUri(),
@@ -207,27 +205,4 @@ int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
 int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )
 {
     return m_config.VerifyPmFileIntegrity( pmConfigFile );
-}
-
-void PackageManager::SetupDiscoveryPackages()
-{
-    //TODO: This should be fetched from the cloud for enterprise
-    PmDiscoveryComponent discoveryItem;
-    discoveryItem.packageId = "amp";
-    discoveryItem.packageName = "Immunet";
-    m_discoveryList.push_back( discoveryItem );
-
-    discoveryItem.packageId = "amp";
-    discoveryItem.packageName = "Cisco AMP for Endpoints Connector";
-    m_discoveryList.push_back( discoveryItem );
-
-    for( uint32_t i = 0; i < 10; i++ ) {
-        std::stringstream ss;
-        ss << "test-package-" << i + 1;
-        discoveryItem.packageId = ss.str();
-        discoveryItem.packageName = "TestPackage";
-        m_discoveryList.push_back( discoveryItem );
-    }
-
-    m_packageInventoryProvider.SetDiscoveryList( m_discoveryList );
 }

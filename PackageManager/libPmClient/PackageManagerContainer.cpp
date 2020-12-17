@@ -7,6 +7,7 @@
 #include "WorkerThread.h"
 
 #include "PackageInventoryProvider.h"
+#include "PackageDiscoveryManager.h"
 #include "CheckinFormatter.h"
 #include "UcidAdapter.h"
 #include "CertsAdapter.h"
@@ -40,6 +41,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
     , m_packageInventoryProvider( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) )
+    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_packageInventoryProvider ) )
     , m_checkinFormatter( new CheckinFormatter() )
     , m_ucidAdapter( new UcidAdapter() )
     , m_certsAdapter( new CertsAdapter() )
@@ -64,7 +66,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_pacMan(
         new PackageManager( *m_config,
             *m_cloud,
-            *m_packageInventoryProvider,
+            *m_packageDiscoveryManager,
             *m_checkinFormatter,
             *m_ucidAdapter,
             *m_certsAdapter,

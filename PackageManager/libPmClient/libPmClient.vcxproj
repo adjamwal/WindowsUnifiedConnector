@@ -24,7 +24,9 @@
     <ClInclude Include="CheckinManifestRetriever.h" />
     <ClInclude Include="ComponentPackageProcessor.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IPackageDiscoveryManager.h" />
     <ClInclude Include="IUcUpgradeEventHandler.h" />
+    <ClInclude Include="PackageDiscoveryManager.h" />
     <ClInclude Include="PackageException.h" />
     <ClInclude Include="PmConstants.h" />
     <ClInclude Include="ICertsAdapter.h" />
@@ -61,6 +63,7 @@
     <ClCompile Include="ComponentPackageProcessor.cpp" />
     <ClCompile Include="ManifestProcessor.cpp" />
     <ClCompile Include="PackageConfigProcessor.cpp" />
+    <ClCompile Include="PackageDiscoveryManager.cpp" />
     <ClCompile Include="PackageInventoryProvider.cpp" />
     <ClCompile Include="PackageManager.cpp" />
     <ClCompile Include="PackageManagerContainer.cpp" />
