@@ -160,14 +160,14 @@ protected:
         std::string ucid,
         CloudEventType evtype,
         std::string packageNameAndVersion,
-        int errCode, std::string errMessage, 
+        int errCode, std::string errMessage,
         std::string oldPath, std::string oldHash, int oldSize,
         std::string newPath, std::string newHash, int newSize )
     {
         CloudEventBuilder expectedEventData {};
         expectedEventData.WithUCID( ucid );
         expectedEventData.WithPackageID( "uc/0.0.1" );
-        expectedEventData.WithType( pkginstall );
+        expectedEventData.WithType( evtype );
         expectedEventData.WithError( errCode, errMessage );
         expectedEventData.WithOldFile( oldPath, oldHash, oldSize );
         expectedEventData.WithNewFile( newPath, newHash, newSize );
@@ -489,6 +489,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
             packageUpdated = true;
             return 0;
         } ) );
+
     EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
         {
@@ -498,12 +499,28 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
             return 0;
         } ) );
 
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) ).Times( 2 );
+
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
     EXPECT_TRUE( packageUpdated && configUpdated );
+
+    PublishedEventHasExpectedData(
+        "",
+        pkgreconfig,
+        "uc/0.0.1",
+        0,
+        "",
+        "",
+        "",
+        0,
+        "config.json",
+        "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4",
+        0
+    );
 }
 
 std::string _ucReponseMultiPackageAndConfig( R"(
