@@ -78,7 +78,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /qn /L*V \"" + logFilePath + "\" " + package.installerArgs;
+                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }
