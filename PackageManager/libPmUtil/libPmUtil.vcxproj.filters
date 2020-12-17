@@ -51,6 +51,12 @@
     <ClInclude Include="RandomUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="JsonUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileUtil.cpp">
@@ -72,6 +78,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RandomUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

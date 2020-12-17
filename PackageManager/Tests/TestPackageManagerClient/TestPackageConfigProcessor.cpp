@@ -155,7 +155,7 @@ TEST_F( TestPackageConfigProcessor, WillVerifyConfigFile )
 
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );;
+    m_fileUtil->MakeAppendFileReturn( 1 );
     m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
 
     EXPECT_CALL( *m_pmComponentManager, DeployConfiguration( _ ) );

@@ -21,10 +21,15 @@
 #include "MockPmPlatformComponentManager.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockSslUtil.h"
-#include "MockCloudEventBuilder.h"
+#include "CloudEventBuilder.h"
 #include "MockCloudEventPublisher.h"
 #include "MockCloudEventStorage.h"
 #include "MockUcUpgradeEventHandler.h"
+
+MATCHER_P( CloudEventBuilderMatch, expected, "" )
+{
+    return ( CloudEventBuilder& )arg == ( CloudEventBuilder& )expected;
+}
 
 class ComponentTestPacMan : public ::testing::Test
 {
@@ -49,20 +54,20 @@ protected:
         m_ucidAdapter.reset( new UcidAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
 
-        m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
+        m_eventBuilder.reset( new CloudEventBuilder() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
-        m_componentPackageProcessor.reset( new ComponentPackageProcessor( 
-            *m_cloud, 
-            *m_fileUtil, 
-            *m_sslUtil, 
-            *m_configProcesor, 
-            *m_ucidAdapter, 
-            *m_eventBuilder, 
+        m_componentPackageProcessor.reset( new ComponentPackageProcessor(
+            *m_cloud,
+            *m_fileUtil,
+            *m_sslUtil,
+            *m_configProcesor,
+            *m_ucidAdapter,
+            *m_eventBuilder,
             *m_eventPublisher,
             *m_ucUpgradeEventHandler ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
@@ -71,14 +76,15 @@ protected:
         m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
         ON_CALL( *m_platformConfiguration, GetIdentityToken( _ ) ).WillByDefault( DoAll( SetArgReferee<0>( "token" ), Return( true ) ) );
         ON_CALL( *m_config, GetCloudCheckinInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinInterval ) );
-        ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke( 
+        ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
             []( const std::string& basePath )
             {
                 return basePath;
             }
         ) );
 
-        m_patient.reset( new PackageManager( *m_config,
+        m_patient.reset( new PackageManager(
+            *m_config,
             *m_cloud,
             *m_packageInventoryProvider,
             *m_checkinFormatter,
@@ -163,7 +169,7 @@ protected:
     std::unique_ptr<MockPmPlatformComponentManager> m_platformComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_deps;
     std::unique_ptr<MockSslUtil> m_sslUtil;
-    
+
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
@@ -171,7 +177,7 @@ protected:
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
-    std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
+    std::unique_ptr<CloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;
     std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgradeEventHandler;
@@ -209,8 +215,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 
     m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
-    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke( 
-        [this, &pass ]( const PmComponent& package, std::string& error )
+    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const PmComponent& package, std::string& error )
         {
             EXPECT_EQ( package.installerArgs, "/S /Q " );
             EXPECT_EQ( package.installLocation, "/install/location" );
@@ -225,12 +231,26 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
             return 0;
         } ) );
 
+    //this fails (matcher gets correct params but passes them wrongly to the == operator)
+    //EXPECT_CALL( *m_eventPublisher, Publish( CloudEventBuilderMatch( m_eventBuilder.get() ) ) ).Times( 1 );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) ).Times( 1 );
+
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
     EXPECT_TRUE( pass );
+
+    CloudEventBuilder expectedEventData {};
+    expectedEventData.WithPackageID( "uc/0.0.1" );
+    expectedEventData.WithType( pkginstall );
+    expectedEventData.WithNewFile(
+        "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
+        "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+        0 );
+
+    EXPECT_EQ( *m_eventBuilder, expectedEventData );
 }
 
 std::string _ucReponseConfigOnly( R"(
@@ -370,7 +390,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
 {
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( (FileUtilHandle*)1 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
     m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
     m_fileUtil->MakeFileExistsReturn( true );
@@ -566,46 +586,46 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 packageUpdated++;
                 return 0;
             } ) );
-    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) )
-        .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
-            {
-                EXPECT_EQ( newName, "/install/location/p1_config1.json" );
-                configUpdated++;
-                return 0;
-            } ) )
-        .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
-            {
-                EXPECT_EQ( newName, "/install/location/p1_config2.json" );
-                configUpdated++;
-                return 0;
-            } ) )
-        .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
-            {
-                EXPECT_EQ( newName, "/install/location/p2_config1.json" );
-                configUpdated++;
-                return 0;
-            } ) )
-        .WillOnce( Invoke(
-            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
-            {
-                EXPECT_EQ( newName, "/install/location/p2_config2.json" );
-                configUpdated++;
-                m_cv.notify_one();
+            EXPECT_CALL( *m_fileUtil, Rename( _, _ ) )
+                .WillOnce( Invoke(
+                    [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                    {
+                        EXPECT_EQ( newName, "/install/location/p1_config1.json" );
+                        configUpdated++;
+                        return 0;
+                    } ) )
+                .WillOnce( Invoke(
+                    [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                    {
+                        EXPECT_EQ( newName, "/install/location/p1_config2.json" );
+                        configUpdated++;
+                        return 0;
+                    } ) )
+                        .WillOnce( Invoke(
+                            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                            {
+                                EXPECT_EQ( newName, "/install/location/p2_config1.json" );
+                                configUpdated++;
+                                return 0;
+                            } ) )
+                        .WillOnce( Invoke(
+                            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                            {
+                                EXPECT_EQ( newName, "/install/location/p2_config2.json" );
+                                configUpdated++;
+                                m_cv.notify_one();
 
-                return 0;
-            } ) );
+                                return 0;
+                            } ) );
 
 
-    StartPacMan();
+                            StartPacMan();
 
-    std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+                            std::unique_lock<std::mutex> lock( m_mutex );
+                            m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
-    EXPECT_EQ( packageUpdated, 2 );
-    EXPECT_EQ( configUpdated, 4 );
+                            EXPECT_EQ( packageUpdated, 2 );
+                            EXPECT_EQ( configUpdated, 4 );
 }
 
 std::string _ucReponseWithConfigCloudData( R"(
@@ -711,7 +731,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
 
-    EXPECT_CALL( *m_eventPublisher, PublishFailedEvents( ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_eventPublisher, PublishFailedEvents() ).WillOnce( Invoke(
         [this, &pass]()
         {
             pass = true;
