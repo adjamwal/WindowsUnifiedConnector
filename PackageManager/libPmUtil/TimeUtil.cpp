@@ -1,5 +1,4 @@
 #include "TimeUtil.h"
-#include <Windows.h>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
