@@ -25,20 +25,24 @@
     <ClInclude Include="IPmLogger.h" />
     <ClInclude Include="ISslUtil.h" />
     <ClInclude Include="IWorkerThread.h" />
+    <ClInclude Include="JsonUtil.h" />
     <ClInclude Include="PmHttp.h" />
     <ClInclude Include="PmLogger.h" />
     <ClInclude Include="RandomUtil.h" />
     <ClInclude Include="SslUtil.h" />
     <ClInclude Include="StringUtil.h" />
+    <ClInclude Include="TimeUtil.h" />
     <ClInclude Include="WorkerThread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="JsonUtil.cpp" />
     <ClCompile Include="PmHttp.cpp" />
     <ClCompile Include="PmLogger.cpp" />
     <ClCompile Include="RandomUtil.cpp" />
     <ClCompile Include="SslUtil.cpp" />
     <ClCompile Include="StringUtil.cpp" />
+    <ClCompile Include="TimeUtil.cpp" />
     <ClCompile Include="WorkerThread.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

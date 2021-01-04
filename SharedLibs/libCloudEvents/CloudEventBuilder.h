@@ -47,8 +47,8 @@ public:
     void Reset() override;
 
     static bool Deserialize( ICloudEventBuilder& event, const std::string& eventJson );
-    static bool ExtractJsonInt( Json::Value& root, const std::string& attribute, int& dest );
-    static bool ExtractJsonString( Json::Value& root, const std::string& attribute, std::string& dest );
+
+    bool operator==( const CloudEventBuilder& other ) const;
 
 private:
     std::string m_ucid;
@@ -65,7 +65,6 @@ private:
     int m_newSize;
     std::string m_tse;
 
-    std::string Now_RFC3339();
     void UpdateEventTime();
     std::string Serialize();
 };
