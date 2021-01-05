@@ -23,35 +23,38 @@ PackageInventory PackageDiscovery::GetInstalledPackages( const std::vector<PmDis
     packages.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
     packages.platform = "win";
 
-    packages.packages.push_back( BuildUcPackage() );
-
-    try {
-        packages.packages.push_back( HackBuildAmpPackage() );
-    }
-    catch ( std::exception ex ) {
-        LOG_ERROR( "Failed to build Amp Package: %s", ex.what() );
-    }
-
     auto programList = WindowsUtilities::GetInstalledPrograms();
 
-    for ( auto& program : programList ) {
-        for ( auto& interestingItem : discoveryList ) {
+    for ( auto& interestingItem : discoveryList ) {
+        if ( interestingItem.packageId == "uc" ) {
+            packages.packages.push_back( BuildUcPackage() );
+        }
+        else if ( interestingItem.packageId == "amp" ) {
+            try {
+                packages.packages.push_back( HackBuildAmpPackage() );
+            }
+            catch ( std::exception ex ) {
+                LOG_ERROR( "Failed to build Amp Package: %s", ex.what() );
+            }
+        }
+        else {
+            for ( auto& program : programList ) {
+                if ( interestingItem.packageName == program.name ) {
+                    PmInstalledPackage discoveredPackage;
 
-            if ( interestingItem.packageName == program.name ) {
-                PmInstalledPackage discoveredPackage;
+                    LOG_DEBUG( "Found Matching package %s %s %s",
+                        interestingItem.packageId.c_str(),
+                        program.name.c_str(),
+                        program.version.c_str()
+                    );
 
-                LOG_DEBUG( "Found Matching package %s %s %s",
-                    interestingItem.packageId.c_str(),
-                    program.name.c_str(),
-                    program.version.c_str()
-                );
+                    discoveredPackage.packageName = interestingItem.packageId;
+                    discoveredPackage.packageVersion = program.version;
+                    PadBuildNumber( discoveredPackage.packageVersion );
 
-                discoveredPackage.packageName = interestingItem.packageId;
-                discoveredPackage.packageVersion = program.version;
-                PadBuildNumber( discoveredPackage.packageVersion );
-
-                packages.packages.push_back( discoveredPackage );
-                //don't break. There can be one to many relationship here
+                    packages.packages.push_back( discoveredPackage );
+                    break;
+                }
             }
         }
     }

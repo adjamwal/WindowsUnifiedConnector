@@ -27,7 +27,13 @@ bool PackageDiscoveryManager::DiscoverPackages( PackageInventory& inventory )
 // TODO: This will need to be re-written in enterprise to fetch this from somewhere
 void PackageDiscoveryManager::SetupDiscoveryPackages()
 {
+    m_discoveryList.clear();
+
     PmDiscoveryComponent discoveryItem;
+    discoveryItem.packageId = "uc";
+    discoveryItem.packageName = "Cisco Unified Connector";
+    m_discoveryList.push_back( discoveryItem );
+
     discoveryItem.packageId = "amp";
     discoveryItem.packageName = "Immunet";
     m_discoveryList.push_back( discoveryItem );
