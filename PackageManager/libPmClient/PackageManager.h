@@ -8,7 +8,7 @@
 
 class IPmConfig;
 class IPmCloud;
-class IPackageInventoryProvider;
+class IPackageDiscoveryManager;
 class ICheckinFormatter;
 class IUcidAdapter;
 class ICertsAdapter;
@@ -29,7 +29,7 @@ class PackageManager : public IPackageManager
 public:
     PackageManager( IPmConfig& config,
         IPmCloud& cloud,
-        IPackageInventoryProvider& packageInventoryProvider,
+        IPackageDiscoveryManager& packageDiscoveryManager,
         ICheckinFormatter& checkinFormatter,
         IUcidAdapter& ucidAdapter, 
         ICertsAdapter& certsAdapter,
@@ -51,7 +51,7 @@ public:
 private:
     IPmConfig& m_config;
     IPmCloud& m_cloud;
-    IPackageInventoryProvider& m_packageInventoryProvider;
+    IPackageDiscoveryManager& m_packageDiscoveryManager;
     ICheckinFormatter& m_checkinFormatter;
     IUcidAdapter& m_ucidAdapter;
     ICertsAdapter& m_certsAdapter;
@@ -66,13 +66,10 @@ private:
     std::string m_pmConfigFile;
 
     IPmPlatformDependencies* m_dependencies;
-    std::vector<PmInstalledPackage> m_packages;
-    std::vector<PmDiscoveryComponent> m_discoveryList;
 
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
     bool LoadBsConfig();
     bool LoadPmConfig();
     bool PmSendEvent( const PmEvent& event );
-    void SetupDiscoveryPackages();
 };

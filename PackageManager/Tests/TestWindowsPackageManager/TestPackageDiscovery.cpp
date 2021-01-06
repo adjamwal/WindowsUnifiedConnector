@@ -38,14 +38,73 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillSetOS )
 TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetUC )
 {
     std::vector<PmDiscoveryComponent> discoveryList;
+    PmDiscoveryComponent interestedPrograms;
+    interestedPrograms.packageId = "uc";
+    interestedPrograms.packageName = "Unified Connector";
+    discoveryList.push_back( interestedPrograms );
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
 
     PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
 
-    EXPECT_EQ( installedPackages.packages.front().packageName, "uc" );
+    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.packageId );
     EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
 }
+
+TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetImmuent )
+{
+    std::vector<PmDiscoveryComponent> discoveryList;
+    PmDiscoveryComponent interestedPrograms;
+    interestedPrograms.packageId = "amp";
+    interestedPrograms.packageName = "Immunet";
+    discoveryList.push_back( interestedPrograms );
+    
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
+        .WillByDefault( DoAll( SetArgReferee<3>( L"Immunet" ), Return( true ) ) );
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayVersion" ), _ ) )
+        .WillByDefault( Return( true ) );
+
+    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+
+    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.packageId );
+}
+
+TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetAmp )
+{
+    std::vector<PmDiscoveryComponent> discoveryList;
+    PmDiscoveryComponent interestedPrograms;
+    interestedPrograms.packageId = "amp";
+    interestedPrograms.packageName = "Cisco AMP for Endpoints Connector";
+    discoveryList.push_back( interestedPrograms );
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
+        .WillByDefault( DoAll( SetArgReferee<3>( L"Cisco AMP for Endpoints Connector" ), Return( true ) ) );
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayVersion" ), _ ) )
+        .WillByDefault( Return( true ) );
+
+    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+
+    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.packageId );
+}
+
+TEST_F( TestPackageDiscovery, BuildAmpWillFailOnRegistryFailure )
+{
+    std::vector<PmDiscoveryComponent> discoveryList;
+    PmDiscoveryComponent interestedPrograms;
+    interestedPrograms.packageId = "amp";
+    interestedPrograms.packageName = "Cisco AMP for Endpoints Connector";
+    discoveryList.push_back( interestedPrograms );
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( false );
+
+    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+
+    EXPECT_EQ( installedPackages.packages.size(), 0 );
+}
+
 
 TEST_F( TestPackageDiscovery, GetInstalledPackagesWillDiscoverPrograms )
 {
@@ -67,8 +126,8 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillDiscoverPrograms )
 
     PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
 
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, interestedPrograms.packageId );
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
+    EXPECT_EQ( installedPackages.packages[ 0 ].packageName, interestedPrograms.packageId );
+    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, installedProgram.version );
 }
 
 TEST_F( TestPackageDiscovery, GetInstalledPackagesWillDiscoverManyPrograms )
@@ -95,11 +154,11 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillDiscoverManyPrograms )
 
     PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
 
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, "p1" );
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
+    EXPECT_EQ( installedPackages.packages[ 0 ].packageName, "p1" );
+    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, installedProgram.version );
 
-    EXPECT_EQ( installedPackages.packages[ 2 ].packageName, "p2" );
-    EXPECT_EQ( installedPackages.packages[ 2 ].packageVersion, installedProgram.version );
+    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, "p2" );
+    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
 }
 
 TEST_F( TestPackageDiscovery, GetInstalledPackagesWillPadVersionNumbers )
@@ -122,5 +181,5 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillPadVersionNumbers )
 
     PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
 
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, "1.0.0.0" );
+    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, "1.0.0.0" );
 }

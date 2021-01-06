@@ -117,6 +117,12 @@
     <ClInclude Include="PackageException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IPackageDiscoveryManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PackageDiscoveryManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CertsAdapter.cpp">
@@ -159,6 +165,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UcUpgradeEventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PackageDiscoveryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

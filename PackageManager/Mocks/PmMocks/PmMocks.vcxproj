@@ -24,6 +24,7 @@
     <ClInclude Include="MockComponentPackageProcessor.h" />
     <ClInclude Include="MockManifestProcessor.h" />
     <ClInclude Include="MockPackageConfigProcessor.h" />
+    <ClInclude Include="MockPackageDiscoveryManager.h" />
     <ClInclude Include="MockPackageInventoryProvider.h" />
     <ClInclude Include="MockPmCloud.h" />
     <ClInclude Include="MockPmConfig.h" />
@@ -40,6 +41,7 @@
     <ClCompile Include="MockComponentPackageProcessor.cpp" />
     <ClCompile Include="MockManifestProcessor.cpp" />
     <ClCompile Include="MockPackageConfigProcessor.cpp" />
+    <ClCompile Include="MockPackageDiscoveryManager.cpp" />
     <ClCompile Include="MockPackageInventoryProvider.cpp" />
     <ClCompile Include="MockPmCloud.cpp" />
     <ClCompile Include="MockPmConfig.cpp" />
