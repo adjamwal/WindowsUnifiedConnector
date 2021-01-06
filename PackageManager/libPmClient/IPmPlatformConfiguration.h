@@ -55,6 +55,11 @@ public:
     virtual std::string GetHttpUserAgent() = 0;
 
     /**
+     * @brief Gets the install directory
+     */
+    virtual std::string GetInstallDirectory() = 0;
+
+    /**
      * @brief Gets the data directory
      */
     virtual std::string GetDataDirectory() = 0;

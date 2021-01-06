@@ -169,6 +169,7 @@ TEST_F( TestPackageConfigProcessor, WillMoveConfigFile )
 
     m_patient->Initialize( m_dep.get() );
 
+    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
@@ -186,6 +187,7 @@ TEST_F( TestPackageConfigProcessor, AddFileWillSucceed )
 
     m_patient->Initialize( m_dep.get() );
 
+    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
@@ -202,6 +204,7 @@ TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfAddFileSucceeds )
 
     m_patient->Initialize( m_dep.get() );
 
+    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
@@ -254,6 +257,7 @@ TEST_F( TestPackageConfigProcessor, WillDeleteConfig )
     m_patient->Initialize( m_dep.get() );
 
     m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
+    m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_CALL( *m_fileUtil, DeleteFile( m_configInfo.path ) );
 
@@ -267,6 +271,7 @@ TEST_F( TestPackageConfigProcessor, RemoveConfigWillSucceed )
     m_patient->Initialize( m_dep.get() );
 
     m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
+    m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
 }
@@ -278,6 +283,7 @@ TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfRemoveConfigSucceeds )
     m_patient->Initialize( m_dep.get() );
 
     m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
+    m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );

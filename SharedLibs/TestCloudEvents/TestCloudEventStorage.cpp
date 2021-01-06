@@ -19,7 +19,7 @@ protected:
         m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
         m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
 
-        m_platformConfiguration->MakeGetDataDirectoryReturn(".");
+        m_platformConfiguration->MakeGetInstallDirectoryReturn(".");
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
 
         m_eventStorage->Initialize( m_deps.get() );

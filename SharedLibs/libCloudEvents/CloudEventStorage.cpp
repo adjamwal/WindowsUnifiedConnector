@@ -2,6 +2,7 @@
 #include "CloudEventStorage.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformConfiguration.h"
+#include "IUcLogger.h"
 
 #include <fstream>
 #include <filesystem>
@@ -23,9 +24,11 @@ void CloudEventStorage::Initialize( IPmPlatformDependencies* dep )
     m_dependencies = dep;
 
     //Set full database path
-    std::string filePath = m_dependencies->Configuration().GetDataDirectory();
+    std::string filePath = m_dependencies->Configuration().GetInstallDirectory();
     filePath.append( "\\" ).append( m_fileName );
     m_fullPath = filePath;
+
+    LOG_DEBUG( __FUNCTION__ ": CloudEventStorage path: %s", m_fullPath.c_str() );
 }
 
 bool CloudEventStorage::SaveEvent( ICloudEventBuilder& event )

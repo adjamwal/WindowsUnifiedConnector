@@ -135,16 +135,10 @@ void UCIDLoader::LoadControlModule()
     }
     dllFullPath.append( L"ucidcontrolplugin.dll" );
 
-    std::wstring ucidConfigFile;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"UCID", ucidConfigFile ) )
-    {
-        WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
-        return;
-    }
+    std::wstring pmConfigPath;
 
-    if( !WindowsUtilities::FileExists( ucidConfigFile.c_str() ) )
-    {
-        WLOG_ERROR( L"UnifiedConnectorID Control Module configuration file not found: %s", ucidConfigFile.c_str() );
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\config", L"path", pmConfigPath ) ) {
+        WLOG_ERROR( L"Failed to read config path from registry" );
         return;
     }
 
@@ -175,9 +169,7 @@ void UCIDLoader::LoadControlModule()
         return;
     }
 
-    //HACK to load UCID file. Revet when fix in UCID!!!!!
-    ucidConfigFile = L"\"" + ucidConfigFile + L"\"";
-    if( ( result = m_context.fpStart( ucidDllDir.c_str(), ucidDllDir.c_str(), ucidConfigFile.c_str() ) ) != PM_MODULE_SUCCESS )
+    if( ( result = m_context.fpStart( ucidDllDir.c_str(), ucidDllDir.c_str(), pmConfigPath.c_str() ) ) != PM_MODULE_SUCCESS )
     {
         WLOG_ERROR( L"Failed to start UnifiedConnectorID Control Module: fpStart() returned %d.", result );
         return;

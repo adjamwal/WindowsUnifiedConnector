@@ -26,6 +26,7 @@ public:
 private:
     bool AddConfig( PackageConfigInfo& config );
     bool RemoveConfig( PackageConfigInfo& config );
+    void RemoveTempFile( const std::string& tempFilePath );
 
     IFileUtil& m_fileUtil;
     ISslUtil& m_sslUtil;

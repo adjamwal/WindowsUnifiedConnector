@@ -10,6 +10,7 @@ class IPmManifest;
 class IWorkerThread;
 class IFileUtil;
 class IPackageInventoryProvider;
+class IPackageDiscoveryManager;
 class ICheckinFormatter;
 class IUcidAdapter;
 class ICertsAdapter;
@@ -40,6 +41,7 @@ private:
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
+    std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;

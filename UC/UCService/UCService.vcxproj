@@ -190,7 +190,6 @@
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="ServiceLogManager.h" />
-    <ClInclude Include="ThrowAway_UcidConfigGenerator.h" />
     <ClInclude Include="UCIDLoader.h" />
     <ClInclude Include="UCMCPLoader.h" />
     <ClInclude Include="resource.h" />
