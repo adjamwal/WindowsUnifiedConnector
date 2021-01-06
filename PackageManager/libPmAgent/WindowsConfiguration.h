@@ -53,6 +53,11 @@ public:
     std::string GetHttpUserAgent() override;
 
     /**
+     * @brief Gets the install directory
+     */
+    std::string GetInstallDirectory() override;
+
+    /**
      * @brief Gets the data directory
      */
     std::string GetDataDirectory() override;
