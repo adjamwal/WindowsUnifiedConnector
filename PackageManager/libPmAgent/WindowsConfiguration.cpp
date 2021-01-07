@@ -121,7 +121,7 @@ std::string WindowsConfiguration::GetDataDirectory()
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    return converter.to_bytes( WindowsUtilities::GetDataDir() );
+    return converter.to_bytes( WindowsUtilities::GetLogDir() );
 }
 
 std::string WindowsConfiguration::GetPmVersion()

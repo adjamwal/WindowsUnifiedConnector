@@ -33,7 +33,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
     _In_ LPWSTR    lpCmdLine,
     _In_ int       nCmdShow )
 {
-    std::wstring dataDir = WindowsUtilities::GetDataDir();
+    std::wstring dataDir = WindowsUtilities::GetLogDir();
 
     CrashHandlerClient crashClient( nullptr );
     crashClient.Init( dataDir.c_str(), MiniDumpWithFullMemory );

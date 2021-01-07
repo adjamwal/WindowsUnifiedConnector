@@ -35,5 +35,6 @@ private:
     bool CreateLogFile();
     void RotateLogs();
     void CleanLogs();
+    std::wstring GetLogDir();
     std::wstring GetProgramDataFolder();
 };

@@ -319,7 +319,7 @@ void ServiceBase::DeinitializeLogging()
 
 void ServiceBase::StartCrashHandler()
 {
-    std::wstring dataDir = WindowsUtilities::GetDataDir();
+    std::wstring dataDir = WindowsUtilities::GetLogDir();
 
     m_crashHandler.Init( dataDir.c_str(), MiniDumpWithFullMemory );
     m_crashHandler.SetupCrashHandler();

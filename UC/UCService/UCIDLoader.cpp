@@ -7,6 +7,14 @@
 
 #define UCID_MODULE_INTERFACE_VERSION 1u
 
+#include <filesystem>
+//TODO: Remove when UCID writes datafiles to new location
+//UCID fails to load if its data directory does not exist
+static void HACK_CreatedOldDataDir()
+{
+    std::filesystem::create_directories( WindowsUtilities::GetOldDataDir() );
+}
+
 UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
     , m_controlLib( 0 )
@@ -16,6 +24,7 @@ UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier )
     , m_context( { 0 } )
     , m_isModuleLoaded( false )
 {
+    HACK_CreatedOldDataDir();
 }
 
 UCIDLoader::~UCIDLoader()

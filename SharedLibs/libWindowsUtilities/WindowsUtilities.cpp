@@ -7,6 +7,8 @@
 #include <Msi.h>
 #include <unordered_map>
 
+#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureXYZ\\UnifiedConnector"
+
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> _g_converter;
 // TOOD: Do we acutally need all of thses or just a subset?
 static std::unordered_map< std::string, const GUID> _knownFolderMap = {
@@ -309,18 +311,30 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
     return knownFolder;
 }
 
-std::wstring WindowsUtilities::GetDataDir()
+std::wstring WindowsUtilities::GetLogDir()
+{
+    PWSTR path = NULL;
+    std::wstring logDir;
+
+    if ( !ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
+        logDir = GetOldDataDir();
+    }
+
+    return logDir;
+}
+
+std::wstring WindowsUtilities::GetOldDataDir()
 {
     PWSTR path = NULL;
     std::wstring dataDir;
 
     HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
 
-    if( SUCCEEDED( hr ) ) {
+    if ( SUCCEEDED( hr ) ) {
         dataDir = path;
         CoTaskMemFree( path );
         path = NULL;
-        
+
         dataDir += L"\\Cisco\\UC";
     }
 

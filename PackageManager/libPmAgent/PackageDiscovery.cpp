@@ -6,6 +6,9 @@
 #include <codecvt>
 #include "..\..\GlobalVersion.h"
 
+#define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
+#define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureXYZ\\UnifiedConnector\\config"
+
 PackageDiscovery::PackageDiscovery()
 {
 }
@@ -13,8 +16,6 @@ PackageDiscovery::PackageDiscovery()
 PackageDiscovery::~PackageDiscovery()
 {
 }
-
-#define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
 
 PackageInventory PackageDiscovery::GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList )
 {
@@ -73,6 +74,7 @@ PmInstalledPackage PackageDiscovery::BuildUcPackage()
 {
     PmInstalledPackage ucPackage;
     PackageConfigInfo ucConfig;
+    std::wstring filepath;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     ucPackage.packageName = "uc";
@@ -81,14 +83,25 @@ PmInstalledPackage PackageDiscovery::BuildUcPackage()
 
     ucConfig.deleteConfig = false;
 
-    //TODO: Get these from somewhere. Possibly registry keys
-    ucConfig.path = "C:\\Program Files\\Cisco\\SecureXYZ\\Unified Connector\\Configuration\\id.json";
+    filepath.clear();
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"UCID", filepath ) ) {
+        throw( std::exception( "Failed to read UCID reg key" ) );
+    }
+    ucConfig.path = converter.to_bytes( filepath );
     ucPackage.configs.push_back( ucConfig );
 
-    ucConfig.path = "C:\\Program Files\\Cisco\\SecureXYZ\\Unified Connector\\Configuration\\pm.json";
+    filepath.clear();
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"UCPM", filepath ) ) {
+        throw( std::exception( "Failed to read UCPM reg key" ) );
+    }
+    ucConfig.path = converter.to_bytes( filepath );
     ucPackage.configs.push_back( ucConfig );
 
-    ucConfig.path = "C:\\Program Files\\Cisco\\SecureXYZ\\Unified Connector\\Configuration\\uc.json";
+    filepath.clear();
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"Service", filepath ) ) {
+        throw( std::exception( "Failed to read Service reg key" ) );
+    }
+    ucConfig.path = converter.to_bytes( filepath );
     ucPackage.configs.push_back( ucConfig );
 
     return ucPackage;
