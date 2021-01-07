@@ -7,7 +7,7 @@
 #include "..\..\GlobalVersion.h"
 
 #define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
-#define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureXYZ\\UnifiedConnector\\config"
+#define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector\\config"
 
 PackageDiscovery::PackageDiscovery()
 {

@@ -11,6 +11,8 @@
     <?else ?>
         <?define ProductName =  "Cisco Unified Connector" ?>
     <?endif ?>
+    <?define ProductFamily = "SecureClient" ?>
+  
     <!-- Directory Information -->
     <!-- Directory name used as default installation location -->
     <?define InstallName = "Unified Connector" ?>
@@ -18,7 +20,7 @@
     <?if $(var.UC_CONSUMER) = 1 ?>
         <?define ProductDirectory = "Immunet" ?>
     <?else ?>
-        <?define ProductDirectory = "SecureXYZ" ?>
+        <?define ProductDirectory = "SecureClient" ?>
     <?endif ?>
   
     <?define UnifiedConnectorDirectory = "Unified Connector" ?>

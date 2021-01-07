@@ -7,7 +7,7 @@
 #include <KnownFolders.h>
 #include <ShlObj.h>
 
-#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureXYZ\\UnifiedConnector"
+#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
 UcLogFile::UcLogFile() :
     m_logFileName( L"" )

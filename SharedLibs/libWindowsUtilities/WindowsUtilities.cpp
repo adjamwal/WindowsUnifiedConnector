@@ -7,7 +7,7 @@
 #include <Msi.h>
 #include <unordered_map>
 
-#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureXYZ\\UnifiedConnector"
+#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> _g_converter;
 // TOOD: Do we acutally need all of thses or just a subset?

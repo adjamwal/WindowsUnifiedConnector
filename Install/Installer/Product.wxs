@@ -70,7 +70,7 @@
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
-            <RegistrySearch Key="Software\Cisco\SecureXYZ\UnifiedConnector" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
+            <RegistrySearch Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
         </Property>
 
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
@@ -80,7 +80,7 @@
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="$(var.PlatformProgramFilesFolder)">
                 <Directory Id="CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
-                    <Directory Id="SECUREXYZ_DIRECTORY" Name="$(var.ProductDirectory)">
+                    <Directory Id="PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
                         <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
                             <Directory Id="UC_CONFIG_DIRECTORY" Name="$(var.UCConfigDirectory)" />
                             <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
@@ -103,7 +103,7 @@
             </Directory>
             <Directory Id="CommonAppDataFolder">
                 <Directory Id="PROGRAMDATA_CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
-                    <Directory Id="PROGRAMDATA_SECUREXYZ_DIRECTORY" Name="$(var.ProductDirectory)">
+                    <Directory Id="PROGRAMDATA_PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
                         <Directory Id="UC_LOG_DIRECTORY" Name="$(var.UCLogDirectory)">
                         </Directory>
                     </Directory>
@@ -119,21 +119,21 @@
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector">
                     <RegistryValue Type="string" Name="ProductCode" Value="[ProductCode]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UC_LOG_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector">
                     <RegistryValue Type="string" Name="LogDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
           
             <Component Id="C.RemoveFiles">
                 <RegistryValue Root="HKLM" 
-                               Key="Software\Cisco\SecureXYZ\UnifiedConnector" 
+                               Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" 
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_PROGRAMDATA_DIR" />
@@ -147,7 +147,7 @@
         <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
             <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCSERVICE">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
                     <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
@@ -213,14 +213,14 @@
         <ComponentGroup Id="UCIDComponents" Directory="UCID_DIRECTORY">
             <Component Id="UCID_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
                     <RegistryValue Type="string" Name="Version" Value="$(var.UCIDVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCID">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
                     <RegistryValue Type="string" Name="Path" Value="[UCID_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
@@ -258,14 +258,14 @@
         <ComponentGroup Id="UCPMComponents" Directory="UCPM_DIRECTORY">
             <Component Id="UCPM_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCPM">
                     <RegistryValue Type="string" Name="Version" Value="$(var.UCPMVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCPM_DLL_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\UnifiedConnector\UCPM">
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCPM">
                     <RegistryValue Type="string" Name="DllPath" Value="[UCPM_DIRECTORY]PM_MCP.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
@@ -354,31 +354,31 @@
             <!-- Registry Keys That point to each Config File -->
             <!-- The Registry key will still be writen if the file doesnt exist -->
             <Component Id="C.Registry.Config" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="path" Value="[UC_CONFIG_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="C.Registry.BSConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="Bootstrapper" Value="[UC_CONFIG_DIRECTORY]$(var.BootstrapperConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="C.Registry.ServiceConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="Service" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="C.Registry.UCPMConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="UCPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCPMConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="C.Registry.UCIDConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\SecureXYZ\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
                     <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCIDConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>

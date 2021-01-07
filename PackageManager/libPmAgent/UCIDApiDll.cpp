@@ -182,7 +182,7 @@ bool UCIDApiDll::LoadApi()
 
     std::wstring ucidDllDir;
     std::wstring dllFullPath;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnectorID Api data from registry" );
         return false;
