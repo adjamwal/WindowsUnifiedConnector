@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('JenkinsShared@ReleaseLogging')_
+@Library('JenkinsShared')_
 
 agentLabel = "windowsci2019"
 
@@ -29,7 +29,7 @@ def SetGithubFailureStatus() {
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
   powershell ".\\AmpRepositorySync.exe -cws ."
-  powershell ".\\AmpRepositorySync.exe -cc latest --vs2019"
+  powershell ".\\AmpRepositorySync.exe -cc latest"
 }
 
 def SetupVersion( boolean upgrade ) {
@@ -90,7 +90,9 @@ pipeline {
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
     WIN_DEV_GITHUB_TOKEN = credentials('fireamp-win-dev-git-token')
     CLG5_LAB_PASSWORD = credentials('CLG5_LAB_GENERIC_USER_PW')
+    SIGNING_API_PASSWORD = credentials('VSPHERE_GENERIC_ACCOUNT')
     CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
+    WIN_AMP_OFFICIAL_BUILD = "${env.CHANGE_ID != null ? 0 : 1}"
   }
   stages {
     stage ('Init') {
@@ -238,6 +240,40 @@ pipeline {
             }
           }
         }
+        stage ('Publish') {
+          when {
+            not { changeRequest() }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+
+              nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'https',
+                nexusUrl: 'nexus.engine.sourcefire.com',
+                groupId: "UnifiedConnector/Windows/${env.BRANCH_NAME}",
+                version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
+                repository: 'raw',
+                credentialsId: 'nexus_credentials',
+                artifacts: [
+                  [
+                    artifactId: "Cisco-UC-Installer-x64",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ],
+                  [
+                    artifactId: "Cisco-UC-Installer-x86",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ]
+                ]
+              )
+			}
+          }
+        }
         stage ('Prepare Symbols') {
           when {
             not { changeRequest() }
@@ -274,15 +310,40 @@ pipeline {
               }
 
               archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+
+              nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'https',
+                nexusUrl: 'nexus.engine.sourcefire.com',
+                groupId: "UnifiedConnector/Windows/${env.BRANCH_NAME}",
+                version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
+                repository: 'raw',
+                credentialsId: 'nexus_credentials',
+                artifacts: [
+                  [
+                    artifactId: "Cisco-UC-Installer-x64",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ],
+                  [
+                    artifactId: "Cisco-UC-Installer-x86",
+                    classifier: '',
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    type: 'msi'
+                  ]
+                ]
+              )
             }
           }
         }
         stage ('Upload Symbols') {
-          agent {
-            label 'Windows-Symbol-Server-Slave'
-          }
           when {
             not { changeRequest() }
+            beforeAgent true
+          }
+          agent {
+            label 'Windows-Symbol-Server-Slave'
           }
           steps {
             script {
