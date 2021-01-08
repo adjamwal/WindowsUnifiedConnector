@@ -38,10 +38,6 @@ void PackageDiscoveryManager::SetupDiscoveryPackages()
     discoveryItem.packageName = "Immunet";
     m_discoveryList.push_back( discoveryItem );
 
-    discoveryItem.packageId = "amp";
-    discoveryItem.packageName = "Cisco AMP for Endpoints Connector";
-    m_discoveryList.push_back( discoveryItem );
-
     for ( uint32_t i = 0; i < 10; i++ ) {
         std::stringstream ss;
         ss << "test-package-" << i + 1;
