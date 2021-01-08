@@ -23,7 +23,7 @@
         <?define ProductDirectory = "SecureClient" ?>
     <?endif ?>
   
-    <?define UnifiedConnectorDirectory = "Unified Connector" ?>
+    <?define UnifiedConnectorDirectory = "UC" ?>
     <?define ServiceDictory = "Service" ?>
     <?define UCIDDirectory = "UCID" ?>
     <?define UCPMDirectory = "UCPM" ?>
