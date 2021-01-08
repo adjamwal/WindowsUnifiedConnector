@@ -754,7 +754,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
     EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages )
         {
-            EXPECT_EQ( discoveryList.size(), 13 );
+            EXPECT_EQ( discoveryList.size(), 12 );
 
             pass = true;
             m_cv.notify_one();
