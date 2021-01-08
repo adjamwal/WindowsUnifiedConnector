@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="TestPackageDiscovery.cpp" />
     <ClCompile Include="TestWindowsComponentManager.cpp" />
-    <ClCompile Include="TestWindowsPackageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharedLibs\LibVerifier\LibVerifier.vcxproj">
