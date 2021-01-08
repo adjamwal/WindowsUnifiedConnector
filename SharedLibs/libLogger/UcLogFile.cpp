@@ -7,6 +7,8 @@
 #include <KnownFolders.h>
 #include <ShlObj.h>
 
+#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
+
 UcLogFile::UcLogFile() :
     m_logFileName( L"" )
     , m_file( NULL )
@@ -119,13 +121,49 @@ std::wstring UcLogFile::GetProgramDataFolder()
 
     HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
 
-    if( SUCCEEDED( hr ) ) {
+    if ( SUCCEEDED( hr ) ) {
         programData = path;
         CoTaskMemFree( path );
         path = NULL;
     }
 
     return programData;
+}
+
+static bool ReadRegistryString( HKEY hKey, const std::wstring& subKey, const std::wstring& valueName, std::wstring& data )
+{
+    DWORD dataSize{};
+    LONG retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize );
+
+    if ( retCode != ERROR_SUCCESS ) {
+        return false;
+    }
+
+    data.resize( dataSize / sizeof( wchar_t ) );
+
+    retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, &data[ 0 ], &dataSize );
+    if ( retCode != ERROR_SUCCESS ) {
+        return false;
+    }
+
+    DWORD stringLengthInWchars = dataSize / sizeof( wchar_t );
+    stringLengthInWchars--; // Exclude the NUL written by the Win32 API
+    data.resize( stringLengthInWchars );
+
+    return true;
+}
+
+std::wstring UcLogFile::GetLogDir()
+{
+    PWSTR path = NULL;
+    std::wstring logDir;
+
+    if ( !ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
+        logDir = GetProgramDataFolder();
+        logDir += L"Cisco\\UC";
+    }
+
+    return logDir;
 }
 
 std::filesystem::path UcLogFile::GenerateFileName( const wchar_t* logname )
@@ -140,9 +178,7 @@ std::filesystem::path UcLogFile::GenerateFileName( const wchar_t* logname )
         DWORD dwSize = GetModuleFileName( NULL, swPath, MAX_PATH );
         std::wstring modulePath = swPath;
 
-        filename = GetProgramDataFolder();
-        filename /= L"Cisco";
-        filename /= L"UC";
+        filename = GetLogDir();
 
         if( dwSize && ( modulePath.find_last_of( '\\' ) != std::wstring::npos ) ) {
             modulePath = modulePath.substr( modulePath.find_last_of( '\\' ) + 1 );

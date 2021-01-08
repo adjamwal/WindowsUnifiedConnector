@@ -12,7 +12,7 @@ The UC Service requires a bootstrap file ( bs.json ) in order to start. This fil
 
         msiexec /i Cisco-UC-Installer-x64.msi BS_CONFIG=<bs.json>
 
-2. Drop the file in `C:\Program Files\Cisco\SecureXYZ\Unified Connector\Configuration\bs.json`. Then start the service
+2. Drop the file in `C:\Program Files\Cisco\SecureClient|Immunet\Unified Connector\Configuration\bs.json`. Then start the service
 
 An example file is provided at https://code.engine.sourcefire.com/UnifiedConnector/WindowsUnifiedConnector/blob/master/Resources/config/bs.json
 

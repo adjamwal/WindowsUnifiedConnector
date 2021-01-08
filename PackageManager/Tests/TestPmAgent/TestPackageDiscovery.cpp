@@ -44,6 +44,7 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetUC )
     discoveryList.push_back( interestedPrograms );
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( true );
 
     PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
 

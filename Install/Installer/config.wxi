@@ -6,14 +6,24 @@
     <?define UpgradeCode = "a00ade60-6aa4-431f-8db7-8f9386236798" ?>
 
     <!-- Product name as you want it to appear in Add/Remove Programs-->
-    <?define ProductName =  "Cisco Unified Connector" ?>
-
+    <?if $(var.UC_CONSUMER) = 1 ?>
+        <?define ProductName =  "Immunet Unified Connector" ?>
+    <?else ?>
+        <?define ProductName =  "Cisco Unified Connector" ?>
+    <?endif ?>
+    <?define ProductFamily = "SecureClient" ?>
+  
     <!-- Directory Information -->
     <!-- Directory name used as default installation location -->
     <?define InstallName = "Unified Connector" ?>
     <?define CiscoDirectory = "Cisco" ?>
-    <?define SecureXYZDirectory = "SecureXYZ" ?>
-    <?define UnifiedConnectorDirectory = "Unified Connector" ?>
+    <?if $(var.UC_CONSUMER) = 1 ?>
+        <?define ProductDirectory = "Immunet" ?>
+    <?else ?>
+        <?define ProductDirectory = "SecureClient" ?>
+    <?endif ?>
+  
+    <?define UnifiedConnectorDirectory = "UC" ?>
     <?define ServiceDictory = "Service" ?>
     <?define UCIDDirectory = "UCID" ?>
     <?define UCPMDirectory = "UCPM" ?>

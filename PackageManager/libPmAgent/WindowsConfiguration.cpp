@@ -109,7 +109,7 @@ std::string WindowsConfiguration::GetInstallDirectory()
     std::wstring dir;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureXYZ\\UnifiedConnector", L"Path", dir ) )
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector", L"Path", dir ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnector install path from registry" );
     }
@@ -121,7 +121,7 @@ std::string WindowsConfiguration::GetDataDirectory()
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    return converter.to_bytes( WindowsUtilities::GetDataDir() );
+    return converter.to_bytes( WindowsUtilities::GetLogDir() );
 }
 
 std::string WindowsConfiguration::GetPmVersion()

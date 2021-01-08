@@ -70,7 +70,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
             if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
-                std::string logFilePath = converter.to_bytes(WindowsUtilities::GetDataDir());
+                std::string logFilePath = converter.to_bytes(WindowsUtilities::GetLogDir());
                 std::string logFileName = package.packageNameAndVersion;
 
                 std::replace( logFileName.begin(), logFileName.end(), '/', '.' );

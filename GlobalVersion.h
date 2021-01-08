@@ -5,4 +5,9 @@
 #define STRFORMATPRODVER L"9.0.0.0\0"
 #define STRCOMPANYNAME "Cisco Systems, Inc.\0"
 #define STRLEGALCOPYRIGHT "Copyright Cisco Systems, Inc. All rights reserved.\0"
+
+#if UC_CONSUMER == 1
+#define STRPRODUCTNAME "Immunet Unified Connector"
+#else
 #define STRPRODUCTNAME "Cisco Unified Connector"
+#endif

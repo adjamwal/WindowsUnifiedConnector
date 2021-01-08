@@ -58,7 +58,7 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
     return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderId( knownFolderId );
 }
 
-std::wstring WindowsUtilities::GetDataDir()
+std::wstring WindowsUtilities::GetLogDir()
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
 }
