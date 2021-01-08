@@ -1,56 +1,114 @@
-#include "pch.h"
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
+#include "MocksCommon.h"
 #include "IPmPlatformComponentManager.h"
 #include "WindowsComponentManager.h"
 #include "IUcLogger.h"
 #include "PmTypes.h"
 #include "MockWinApiWrapper.h"
 #include "MockCodesignVerifier.h"
-#include "MockWindowsUtilities.h"
 #include "MockPackageDiscovery.h"
+#include "MockWindowsUtilities.h"
 #include <memory>
 #include <codecvt>
 
-using ::testing::StrEq;
-
-class TestWindowsPackageManager : public ::testing::Test
+class TestWindowsComponentManager : public ::testing::Test
 {
 protected:
     void SetUp()
     {
         MockWindowsUtilities::Init();
-        m_mockCodesignVerifier = std::make_unique<NiceMock<MockCodesignVerifier>>();
-        m_mockWinApiWrapper = std::make_unique<NiceMock<MockWinApiWrapper>>();
-        m_mockPackageDiscovery = std::make_unique<NiceMock<MockPackageDiscovery>>();
-        m_patient = std::make_unique<WindowsComponentManager>( *m_mockWinApiWrapper, *m_mockCodesignVerifier, *m_mockPackageDiscovery );
+        m_winApiWrapper.reset( new NiceMock<MockWinApiWrapper>() );
+        m_codeSignVerifier.reset( new NiceMock<MockCodesignVerifier>() );
+        m_packageDiscovery.reset( new NiceMock<MockPackageDiscovery>() );
+
+        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery ) );
     }
 
     void TearDown()
     {
         m_patient.reset();
-        m_mockWinApiWrapper.reset();
-        m_mockCodesignVerifier.reset();
-        m_mockPackageDiscovery.reset();
+
+        m_winApiWrapper.reset();
+        m_codeSignVerifier.reset();
+        m_packageDiscovery.reset();
 
         MockWindowsUtilities::Deinit();
+        m_expectedComponentPackage = {};
     }
 
-    std::unique_ptr<MockCodesignVerifier> m_mockCodesignVerifier;
-    std::unique_ptr<MockWinApiWrapper> m_mockWinApiWrapper;
-    std::unique_ptr<MockPackageDiscovery> m_mockPackageDiscovery;
+    void SetupComponentPackage()
+    {
+        m_expectedComponentPackage = {
+            "test/1.0.0",
+            "installerUrl",
+            "installerType",
+            "installerArgs",
+            "installLocation",
+            "signerName",
+            "installerHash",
+            "installerPath",
+            {}
+        };
+
+        m_expectedComponentPackage.configs.push_back( {
+            "configpath",
+            "configsha256",
+            "configcontents",
+            "configverifyBinPath",
+            "configverifyPath",
+            "installLocation",
+            "signerName",
+            "test/1.0.0",
+            false
+            } );
+    }
+
+    PmComponent m_expectedComponentPackage;
+    std::unique_ptr<MockWinApiWrapper> m_winApiWrapper;
+    std::unique_ptr<MockCodesignVerifier> m_codeSignVerifier;
+    std::unique_ptr<MockPackageDiscovery> m_packageDiscovery;
+
     std::unique_ptr<WindowsComponentManager> m_patient;
 };
 
-TEST_F( TestWindowsPackageManager, UpdateComponentSuccess )
+TEST_F( TestWindowsComponentManager, WillGetInstalledPackages )
+{
+    EXPECT_CALL( *m_packageDiscovery, GetInstalledPackages( _ ) );
+
+    std::vector<PmDiscoveryComponent> discoveryList;
+    PackageInventory foundPackages;
+    m_patient->GetInstalledPackages( discoveryList, foundPackages );
+}
+
+TEST_F( TestWindowsComponentManager, WillCodeSignVerifyOnUpdateComponent )
+{
+    SetupComponentPackage();
+    EXPECT_CALL( *m_codeSignVerifier, Verify( _, _, _ ) );
+
+    std::string error;
+    m_patient->UpdateComponent( m_expectedComponentPackage, error );
+}
+
+TEST_F( TestWindowsComponentManager, WillCodeSignVerifyOnDeployConfiguration )
+{
+    EXPECT_CALL( *m_codeSignVerifier, Verify( _, _, _ ) );
+
+    PackageConfigInfo config;
+    m_patient->DeployConfiguration( config );
+}
+
+TEST_F( TestWindowsComponentManager, UpdateComponentSuccess )
 {
     std::string error;
     PmComponent c;
     c.installerType = "msi";
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
-    m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
-    m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
-    m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
-    m_mockWinApiWrapper->MakeGetLastErrorReturn( 0 );
+    m_winApiWrapper->MakeCreateProcessWReturn( TRUE );
+    m_winApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
+    m_winApiWrapper->MakeWaitForSingleObjectReturn( 0 );
+    m_winApiWrapper->MakeGetLastErrorReturn( 0 );
 
     int32_t ret = m_patient->UpdateComponent( c, error );
 
@@ -58,7 +116,7 @@ TEST_F( TestWindowsPackageManager, UpdateComponentSuccess )
     EXPECT_EQ( error, "" );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateExeWillAddExeToCmdLine )
+TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeToCmdLine )
 {
     std::string error;
     PmComponent c;
@@ -71,12 +129,12 @@ TEST_F( TestWindowsPackageManager, UpdateExeWillAddExeToCmdLine )
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
 
-    EXPECT_CALL( *m_mockWinApiWrapper, CreateProcessW( _, StrEq( wExpectedCmdLine ), _, _, _, _, _, _, _, _ ) );
+    EXPECT_CALL( *m_winApiWrapper, CreateProcessW( _, StrEq( wExpectedCmdLine ), _, _, _, _, _, _, _, _ ) );
 
     m_patient->UpdateComponent( c, error );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateExeWillAddExeAndDropPath )
+TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeAndDropPath )
 {
     std::string error;
     PmComponent c;
@@ -90,12 +148,12 @@ TEST_F( TestWindowsPackageManager, UpdateExeWillAddExeAndDropPath )
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
 
-    EXPECT_CALL( *m_mockWinApiWrapper, CreateProcessW( _, StrEq( wExpectedCmdLine ), _, _, _, _, _, _, _, _ ) );
+    EXPECT_CALL( *m_winApiWrapper, CreateProcessW( _, StrEq( wExpectedCmdLine ), _, _, _, _, _, _, _, _ ) );
 
     m_patient->UpdateComponent( c, error );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateComponentInvalidPackageType )
+TEST_F( TestWindowsComponentManager, UpdateComponentInvalidPackageType )
 {
     std::string error;
     PmComponent c;
@@ -107,7 +165,7 @@ TEST_F( TestWindowsPackageManager, UpdateComponentInvalidPackageType )
     EXPECT_NE( error, "" );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateComponentFailureToGetSystemDirectory )
+TEST_F( TestWindowsComponentManager, UpdateComponentFailureToGetSystemDirectory )
 {
     std::string error;
     PmComponent c;
@@ -121,30 +179,30 @@ TEST_F( TestWindowsPackageManager, UpdateComponentFailureToGetSystemDirectory )
 }
 
 
-TEST_F( TestWindowsPackageManager, UpdateComponentCreateProcessFailure )
+TEST_F( TestWindowsComponentManager, UpdateComponentCreateProcessFailure )
 {
     std::string error;
     PmComponent c;
     c.installerType = "msi";
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
-    m_mockWinApiWrapper->MakeCreateProcessWReturn( FALSE );
-    m_mockWinApiWrapper->MakeGetLastErrorReturn( 5 );
+    m_winApiWrapper->MakeCreateProcessWReturn( FALSE );
+    m_winApiWrapper->MakeGetLastErrorReturn( 5 );
 
     int32_t ret = m_patient->UpdateComponent( c, error );
-    
+
     EXPECT_EQ( ret, 5 );
     EXPECT_NE( error, "" );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateWaitForSingleObjectFailure )
+TEST_F( TestWindowsComponentManager, UpdateWaitForSingleObjectFailure )
 {
     std::string error;
     PmComponent c;
     c.installerType = "msi";
 
-    m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
-    m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( -1 );
+    m_winApiWrapper->MakeCreateProcessWReturn( TRUE );
+    m_winApiWrapper->MakeWaitForSingleObjectReturn( -1 );
 
     int32_t ret = m_patient->UpdateComponent( c, error );
 
@@ -152,17 +210,17 @@ TEST_F( TestWindowsPackageManager, UpdateWaitForSingleObjectFailure )
     EXPECT_NE( error, "" );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateComponentExitCodeProcessFailure )
+TEST_F( TestWindowsComponentManager, UpdateComponentExitCodeProcessFailure )
 {
     std::string error;
     PmComponent c;
     c.installerType = "msi";
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
-    m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
-    m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
-    m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( FALSE );
-    m_mockWinApiWrapper->MakeGetLastErrorReturn( 5 );
+    m_winApiWrapper->MakeCreateProcessWReturn( TRUE );
+    m_winApiWrapper->MakeWaitForSingleObjectReturn( 0 );
+    m_winApiWrapper->MakeGetExitCodeProcessReturn( FALSE );
+    m_winApiWrapper->MakeGetLastErrorReturn( 5 );
 
     int32_t ret = m_patient->UpdateComponent( c, error );
 
@@ -170,13 +228,13 @@ TEST_F( TestWindowsPackageManager, UpdateComponentExitCodeProcessFailure )
     EXPECT_NE( error, "" );
 }
 
-TEST_F( TestWindowsPackageManager, UpdateComponentVerifyPackageFailure )
+TEST_F( TestWindowsComponentManager, UpdateComponentVerifyPackageFailure )
 {
     std::string error;
     PmComponent c;
     c.installerType = "msi";
 
-    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
+    m_codeSignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
 
     int32_t ret = m_patient->UpdateComponent( c, error );
 
@@ -188,7 +246,7 @@ TEST_F( TestWindowsPackageManager, UpdateComponentVerifyPackageFailure )
 #define TEST_VERIFY_BIN_PATH "TestVerifyBin.exe"
 #define TEST_VERIFY_SIGNER "TEST SIGNER"
 #define TEST_VERIFY_PATH "TestVerifyPath"
-TEST_F( TestWindowsPackageManager, DeployConfigurationWillVerifySigner )
+TEST_F( TestWindowsComponentManager, DeployConfigurationWillVerifySigner )
 {
     std::string error;
     PackageConfigInfo c;
@@ -196,57 +254,57 @@ TEST_F( TestWindowsPackageManager, DeployConfigurationWillVerifySigner )
     c.signerName = TEST_VERIFY_SIGNER;
     c.verifyBinPath = TEST_VERIFY_BIN_PATH;
 
-    EXPECT_CALL( *m_mockCodesignVerifier, Verify( 
+    EXPECT_CALL( *m_codeSignVerifier, Verify(
         std::wstring( _T( TEST_INSTALL_PATH "\\" TEST_VERIFY_BIN_PATH ) ),
-        std::wstring( _T( TEST_VERIFY_SIGNER ) ), 
+        std::wstring( _T( TEST_VERIFY_SIGNER ) ),
         _ ) );
 
-    m_patient->DeployConfiguration( c  );
+    m_patient->DeployConfiguration( c );
 }
 
-TEST_F( TestWindowsPackageManager, DeployConfigurationWillReturnVerifyFailure )
+TEST_F( TestWindowsComponentManager, DeployConfigurationWillReturnVerifyFailure )
 {
     PackageConfigInfo c;
 
-    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
+    m_codeSignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
 
     int32_t ret = m_patient->DeployConfiguration( c );
 
     EXPECT_EQ( ( CodesignStatus )ret, CodesignStatus::CODE_SIGNER_ERROR );
 }
 
-TEST_F( TestWindowsPackageManager, DeployConfigurationWillBuildCommandLine )
+TEST_F( TestWindowsComponentManager, DeployConfigurationWillBuildCommandLine )
 {
     PackageConfigInfo c;
 
     c.verifyPath = TEST_VERIFY_PATH;
-    std::wstring expectedArg = L"--config-path " + std::wstring(_T( TEST_VERIFY_PATH ) );
-    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
+    std::wstring expectedArg = L"--config-path " + std::wstring( _T( TEST_VERIFY_PATH ) );
+    m_codeSignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
 
-    EXPECT_CALL( *m_mockWinApiWrapper, CreateProcessW( _,
+    EXPECT_CALL( *m_winApiWrapper, CreateProcessW( _,
         StrEq( expectedArg.c_str() ),
         _, _, _, _, _, _, _, _ ) );
 
     m_patient->DeployConfiguration( c );
 }
 
-TEST_F( TestWindowsPackageManager, DeployConfigurationSuccess )
+TEST_F( TestWindowsComponentManager, DeployConfigurationSuccess )
 {
     PackageConfigInfo c;
 
-    m_mockCodesignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
+    m_codeSignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_SUCCESS );
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
-    m_mockWinApiWrapper->MakeCreateProcessWReturn( TRUE );
-    m_mockWinApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
-    m_mockWinApiWrapper->MakeWaitForSingleObjectReturn( 0 );
-    m_mockWinApiWrapper->MakeGetLastErrorReturn( 0 );
+    m_winApiWrapper->MakeCreateProcessWReturn( TRUE );
+    m_winApiWrapper->MakeGetExitCodeProcessReturn( TRUE );
+    m_winApiWrapper->MakeWaitForSingleObjectReturn( 0 );
+    m_winApiWrapper->MakeGetLastErrorReturn( 0 );
 
     int32_t ret = m_patient->DeployConfiguration( c );
 
     EXPECT_EQ( ret, 0 );
 }
 
-TEST_F( TestWindowsPackageManager, GetInstalledPackagesSucceed )
+TEST_F( TestWindowsComponentManager, GetInstalledPackagesSucceed )
 {
     PackageInventory installedPackages;
     std::vector<PmDiscoveryComponent> discoveryList;
@@ -256,27 +314,27 @@ TEST_F( TestWindowsPackageManager, GetInstalledPackagesSucceed )
     EXPECT_EQ( ret, 0 );
 }
 
-TEST_F( TestWindowsPackageManager, GetInstalledPackagesWillSearchForPackages )
+TEST_F( TestWindowsComponentManager, GetInstalledPackagesWillSearchForPackages )
 {
     PackageInventory installedPackages;
     std::vector<PmDiscoveryComponent> discoveryList;
 
-    EXPECT_CALL( *m_mockPackageDiscovery, GetInstalledPackages( _ ) );
+    EXPECT_CALL( *m_packageDiscovery, GetInstalledPackages( _ ) );
 
     int32_t ret = m_patient->GetInstalledPackages( discoveryList, installedPackages );
 }
 
-TEST_F( TestWindowsPackageManager, WillResolveKnownFolderID )
+TEST_F( TestWindowsComponentManager, WillResolveKnownFolderID )
 {
     std::string knownFolderString = "_My_KNOWN_FOLDER_";
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeResolveKnownFolderIdReturn( knownFolderString );
 
     std::string rtn = m_patient->ResolvePath( "<FOLDERID_SomeKnownFolder>" );
-    EXPECT_EQ( rtn, knownFolderString);
+    EXPECT_EQ( rtn, knownFolderString );
 }
 
-TEST_F( TestWindowsPackageManager, WillResolveKnownFolderIDWithPrefix )
+TEST_F( TestWindowsComponentManager, WillResolveKnownFolderIDWithPrefix )
 {
     std::string prefix = "prefix";
     std::string knownFolderString = "_My_KNOWN_FOLDER_";
@@ -288,7 +346,7 @@ TEST_F( TestWindowsPackageManager, WillResolveKnownFolderIDWithPrefix )
     EXPECT_EQ( rtn, prefix + knownFolderString + suffix );
 }
 
-TEST_F( TestWindowsPackageManager, WillNotModifyPathWhenKnownFolderIsEmpty )
+TEST_F( TestWindowsComponentManager, WillNotModifyPathWhenKnownFolderIsEmpty )
 {
     std::string folder = "prefix<FOLDERID_SomeKnownFolder>suffix";
 
@@ -300,9 +358,9 @@ TEST_F( TestWindowsPackageManager, WillNotModifyPathWhenKnownFolderIsEmpty )
 }
 
 
-TEST_F( TestWindowsPackageManager, WillNotResolveKnownFolderWhenTagNotFound )
+TEST_F( TestWindowsComponentManager, WillNotResolveKnownFolderWhenTagNotFound )
 {
     MockWindowsUtilities::GetMockWindowUtilities()->ExpectResolveKnownFolderIdIsNotCalled();
 
-    m_patient->ResolvePath( "C:\\Windows\Somthing");
+    m_patient->ResolvePath( "C:\\Windows\\Somthing" );
 }
