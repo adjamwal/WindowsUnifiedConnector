@@ -1,4 +1,6 @@
-#include "pch.h"
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
+#include "MocksCommon.h"
 #include "IPmPlatformComponentManager.h"
 #include "WindowsComponentManager.h"
 #include "IUcLogger.h"
@@ -8,6 +10,7 @@
 #include "MockWindowsUtilities.h"
 #include "MockPackageDiscovery.h"
 #include <memory>
+
 #include <codecvt>
 
 using ::testing::StrEq;
@@ -304,5 +307,5 @@ TEST_F( TestWindowsPackageManager, WillNotResolveKnownFolderWhenTagNotFound )
 {
     MockWindowsUtilities::GetMockWindowUtilities()->ExpectResolveKnownFolderIdIsNotCalled();
 
-    m_patient->ResolvePath( "C:\\Windows\Somthing");
+    m_patient->ResolvePath( "C:\\Windows\\Somthing");
 }

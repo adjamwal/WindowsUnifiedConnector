@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "MocksCommon.h"
 #include "PackageDiscovery.h"
 #include "MockWindowsUtilities.h"
 #include "PmTypes.h"
