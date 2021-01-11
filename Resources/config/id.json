@@ -1,5 +1,1 @@
-{
-	"id": {
-		"loglevel": 7
-	}
-}
+{"id":{"enable_verbose_logs":true}}

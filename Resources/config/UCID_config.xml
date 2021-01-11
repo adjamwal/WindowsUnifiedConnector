@@ -1,5 +1,0 @@
-<identity_config>
-    <business_id>hexmen-dev-demo-bus-id</business_id>
-    <installer_key>11111111-2222-3333-4444-55556c10d048</installer_key>
-    <url>https://4m2294wzqf.execute-api.us-west-1.amazonaws.com/dev/identify</url>
-</identity_config>
