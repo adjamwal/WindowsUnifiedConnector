@@ -104,7 +104,7 @@
 set WLHBASE=$(WLHBASE)
 set IMN_COMMON=$(IMN_COMMON)
 set VC_VARS_PATH=$(VC_VARS_PATH)
-$(SolutionDir)sign.bat "$(IMN_COMMON)common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetDir)en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
+$(SolutionDir)sign.bat $(TargetDir)en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

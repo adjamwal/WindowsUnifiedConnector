@@ -100,7 +100,7 @@
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
+      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,7 +123,7 @@
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
+      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,7 +149,7 @@
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
+      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -175,7 +175,7 @@
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat "$(IMN_COMMON)\common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetPath)</Command>
+      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
