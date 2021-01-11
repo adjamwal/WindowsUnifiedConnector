@@ -41,7 +41,7 @@
   <PropertyGroup>
     <PostBuildEvent>set WLHBASE=$(WLHBASE)
 set IMN_COMMON=$(IMN_COMMON)
-$(SolutionDir)..\..\sign.bat "$(IMN_COMMON)common-windows-build\Tools\signing\MSCV-VSClass3.cer" $(TargetDir)$(TargetFileName)</PostBuildEvent>
+$(SolutionDir)..\..\sign.bat $(TargetDir)$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
