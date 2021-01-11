@@ -8,8 +8,10 @@
     <!-- Product name as you want it to appear in Add/Remove Programs-->
     <?if $(var.UC_CONSUMER) = 1 ?>
         <?define ProductName =  "Immunet Unified Connector" ?>
+        <?define ServiceName =  "ImmunetUnifiedConnector" ?>
     <?else ?>
         <?define ProductName =  "Cisco Unified Connector" ?>
+        <?define ServiceName =  "CiscoUnifiedConnector" ?>
     <?endif ?>
     <?define ProductFamily = "SecureClient" ?>
   
