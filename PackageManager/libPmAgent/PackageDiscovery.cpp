@@ -4,6 +4,7 @@
 #include "PmTypes.h"
 #include "IUcLogger.h"
 #include <codecvt>
+#include <regex>
 #include "..\..\GlobalVersion.h"
 
 #define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
@@ -70,6 +71,12 @@ void PackageDiscovery::PadBuildNumber( std::string& versionString )
     }
 }
 
+void ProgramFilesToKnownFolderId( std::string& programFilesString )
+{
+    std::regex programFilesRegex( R"(^[A-Za-z]+:\\Program Files\\)" );
+    programFilesString = std::regex_replace( programFilesString, programFilesRegex, "<FOLDERID_ProgramFiles>\\" );
+}
+
 PmInstalledPackage PackageDiscovery::BuildUcPackage()
 {
     PmInstalledPackage ucPackage;
@@ -83,11 +90,14 @@ PmInstalledPackage PackageDiscovery::BuildUcPackage()
 
     ucConfig.deleteConfig = false;
 
+    // In the package catalog, the config files use known folder IDs intead of an absolute path.
+    // We need to send back the matching values so we convert 'C:\Program Files\' to '<FOLDERID_ProgramFiles>\'
     filepath.clear();
     if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"UCID", filepath ) ) {
         throw( std::exception( "Failed to read UCID reg key" ) );
     }
     ucConfig.path = converter.to_bytes( filepath );
+    ProgramFilesToKnownFolderId( ucConfig.path );
     ucPackage.configs.push_back( ucConfig );
 
     filepath.clear();
@@ -95,6 +105,7 @@ PmInstalledPackage PackageDiscovery::BuildUcPackage()
         throw( std::exception( "Failed to read UCPM reg key" ) );
     }
     ucConfig.path = converter.to_bytes( filepath );
+    ProgramFilesToKnownFolderId( ucConfig.path );
     ucPackage.configs.push_back( ucConfig );
 
     filepath.clear();
@@ -102,6 +113,7 @@ PmInstalledPackage PackageDiscovery::BuildUcPackage()
         throw( std::exception( "Failed to read Service reg key" ) );
     }
     ucConfig.path = converter.to_bytes( filepath );
+    ProgramFilesToKnownFolderId( ucConfig.path );
     ucPackage.configs.push_back( ucConfig );
 
     return ucPackage;
