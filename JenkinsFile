@@ -387,6 +387,9 @@ pipeline {
           steps {
             script {
               dir('WindowsUnifiedConnector') {
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 /t:clean'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:clean'
+
                 coverityHelper.analyzeUnifiedConnector("${env.BRANCH_NAME}", "${env.WORKSPACE}\\WindowsUnifiedConnector", 1, 1)
               }
             }
