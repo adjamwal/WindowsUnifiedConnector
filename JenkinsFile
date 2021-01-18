@@ -125,7 +125,7 @@ pipeline {
           } else {
             //TODO: Enable when we have a branch build agent
             //TODO: Set production signer cerdentials on branch builds
-            //agentLabel = "branchBuildEnabled"
+            agentLabel = "branchBuildEnabled2019"
           }
         }
       }
@@ -373,6 +373,21 @@ pipeline {
               } finally {
                 // Since this is on a different node, it needs its own clean up call
                 cleanWs cleanWhenAborted: true, cleanWhenFailure: false, cleanWhenSuccess: true
+              }
+            }
+          }
+        }
+        stage ('Coverity') {
+          when {
+            anyOf {
+              not { changeRequest() }
+                expression { env.CHANGE_TITLE.toLowerCase().contains(env.FORCE_COVERITY) }
+            }
+          }
+          steps {
+            script {
+              dir('WindowsUnifiedConnector') {
+                coverityHelper.analyzeUnifiedConnector("${env.BRANCH_NAME}", "${env.WORKSPACE}\\WindowsUnifiedConnector", 1, 1)
               }
             }
           }
