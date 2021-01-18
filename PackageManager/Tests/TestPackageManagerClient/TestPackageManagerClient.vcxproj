@@ -24,6 +24,7 @@
     <ClCompile Include="TestComponentPackageProcessor.cpp" />
     <ClCompile Include="TestManifestProcessor.cpp" />
     <ClCompile Include="TestPackageConfigProcessor.cpp" />
+    <ClCompile Include="TestPackageInventoryProvider.cpp" />
     <ClCompile Include="TestPmConfig.cpp" />
     <ClCompile Include="TestPmManifest.cpp" />
     <ClCompile Include="TestUcUpgradeEventHandler.cpp" />
