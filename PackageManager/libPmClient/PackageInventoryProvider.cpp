@@ -38,15 +38,16 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 
     if( m_dependencies->ComponentManager().GetInstalledPackages( m_discoveryList, detectedPackages ) == 0 ) {
         for( auto &package : detectedPackages.packages ) {
-            for( auto it = package.configs.begin(); it < package.configs.end(); it++ ) {
+            for( auto it = package.configs.begin(); it != package.configs.end();) {
                 std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );
                 if( m_fileUtil.FileExists( resolvedPath ) ) {
                     auto sha256 = m_sslUtil.CalculateSHA256( resolvedPath );
                     it->sha256 = sha256.value();
+                    it++;
                 }
                 else {
                     LOG_DEBUG( "Drop missing config %s", it->path.c_str() );
-                    package.configs.erase( it-- );
+                    it = package.configs.erase( it );
                 }
             }
         }
