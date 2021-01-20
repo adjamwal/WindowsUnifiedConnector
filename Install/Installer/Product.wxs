@@ -323,7 +323,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="UCPMucrtbased.dll" Guid="*">
-                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\$(var.Platform)\ucrt\ucrtbased.dll" />
+                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\10.0.19041.0\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
             <?endif?>
             <?if $(var.Platform) = "x64" ?>
