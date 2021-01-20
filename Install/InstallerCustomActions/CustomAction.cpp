@@ -4,7 +4,6 @@
 #include <versionhelpers.h>
 
 #define GUID_SIZE 39
-#define PRODUCT_NAME L"Cisco Unified Connector"
 
 struct BuildInfo
 {
@@ -33,7 +32,7 @@ bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo )
     return false;
 }
 
-bool GetPreviousBuildVersion( BuildInfo& buildInfo )
+bool GetPreviousBuildVersion( BuildInfo& buildInfo, LPWSTR& productName )
 {
     DWORD dwIndex = 0;
     DWORD dwStatus = ERROR_SUCCESS;
@@ -51,7 +50,7 @@ bool GetPreviousBuildVersion( BuildInfo& buildInfo )
 
         cchdata = MAX_PATH;
         if( MsiGetProductInfoW( szProductCode, INSTALLPROPERTY_PRODUCTNAME, data, &cchdata ) == 0 ) {
-            if( wcscmp( data, PRODUCT_NAME ) == 0 ) {
+            if( wcscmp( data, productName ) == 0 ) {
                 cchdata = MAX_PATH;
                 if( ( dwStatus = MsiGetProductInfoW( szProductCode, INSTALLPROPERTY_VERSIONSTRING, data, &cchdata ) ) == 0 ) {
                     WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": found installed version %S", data );
@@ -78,7 +77,12 @@ UINT __stdcall DetectOlderBuildVersion(
 
 	WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-    if( GetPreviousBuildVersion( prevBuildInfo ) ) {
+    LPWSTR productName = NULL;
+    hr = WcaGetProperty( L"ProductName", &productName );
+    ExitOnFailure( hr, "Failured to get ProductName" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductName %S", productName );
+
+    if( GetPreviousBuildVersion( prevBuildInfo, productName ) ) {
         WCHAR data[ MAX_PATH ] = { 0 };
         DWORD length = MAX_PATH;
 
