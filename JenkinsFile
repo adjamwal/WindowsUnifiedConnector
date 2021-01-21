@@ -150,6 +150,7 @@ pipeline {
                 powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
               }
               SetupVersion(false)
+              currentBuild.description = "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}"
             }
           }
         }
