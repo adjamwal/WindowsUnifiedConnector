@@ -34,7 +34,7 @@ void PackageDiscoveryManager::SetupDiscoveryPackages()
     discoveryItem.packageName = "Cisco Unified Connector";
     m_discoveryList.push_back( discoveryItem );
 
-    discoveryItem.packageId = "amp";
+    discoveryItem.packageId = "Immunet";
     discoveryItem.packageName = "Immunet";
     m_discoveryList.push_back( discoveryItem );
 
