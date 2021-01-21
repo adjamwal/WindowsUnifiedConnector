@@ -49,7 +49,7 @@
     <!-- Version and Service Version will be the same for now, in the future they might be different to support individual module updates -->
     <?define Version = "!(bind.fileVersion.UCService.exe)" ?>
     <?define ServiceVersion = "!(bind.fileVersion.UCService.exe)" ?>
-    <?define UCIDVersion = "!(bind.fileVersion.ucidagent.exe)" ?>
+    <?define UCIDVersion = "!(bind.fileVersion.ucid.exe)" ?>
     <?define UCPMVersion = "!(bind.fileVersion.UC_PM.exe)" ?>
 
     <!-- Minimum version supported if product already installed and this is an upgrade -->

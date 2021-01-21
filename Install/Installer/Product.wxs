@@ -114,8 +114,6 @@
 
     <Fragment>
         <Property Id="UC_PROGRAMDATA_DIR" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.ProductDirectory)" />
-        <!--= REMOVE AFTER UCID completes branding change -->
-        <Property Id="HACK_OLD_UC_DIR" Value="%ProgramData%\$(var.CiscoDirectory)\UC" />
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
@@ -137,8 +135,6 @@
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_PROGRAMDATA_DIR" />
-                <!--= REMOVE AFTER UCID completes branding change -->
-                <util:RemoveFolderEx On="uninstall" Property="HACK_OLD_UC_DIR" />
             </Component>
         </ComponentGroup>
     </Fragment>
@@ -225,8 +221,8 @@
                 </RegistryKey>
             </Component>
 
-            <Component Id="ucidagent.exe" Guid="*">
-                <File Id="ucidagent.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\$(var.Platform)\bin\ucidagent.exe" />
+            <Component Id="ucid.exe" Guid="*">
+                <File Id="ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\$(var.Platform)\bin\ucid.exe" />
             </Component>
 
         </ComponentGroup>

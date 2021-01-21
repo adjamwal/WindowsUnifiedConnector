@@ -24,5 +24,4 @@ public:
     static std::vector<WindowsInstallProgram> GetInstalledPrograms();
     static std::string ResolveKnownFolderId( const std::string& knownFolderId );
     static std::wstring GetLogDir();
-    static std::wstring GetOldDataDir();
 };
