@@ -56,7 +56,7 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetImmuent )
 {
     std::vector<PmDiscoveryComponent> discoveryList;
     PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "amp";
+    interestedPrograms.packageId = "Immunet";
     interestedPrograms.packageName = "Immunet";
     discoveryList.push_back( interestedPrograms );
     
@@ -75,7 +75,7 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetAmp )
 {
     std::vector<PmDiscoveryComponent> discoveryList;
     PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "amp";
+    interestedPrograms.packageId = "Immunet";
     interestedPrograms.packageName = "Cisco AMP for Endpoints Connector";
     discoveryList.push_back( interestedPrograms );
 
@@ -94,7 +94,7 @@ TEST_F( TestPackageDiscovery, BuildAmpWillFailOnRegistryFailure )
 {
     std::vector<PmDiscoveryComponent> discoveryList;
     PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "amp";
+    interestedPrograms.packageId = "Immunet";
     interestedPrograms.packageName = "Cisco AMP for Endpoints Connector";
     discoveryList.push_back( interestedPrograms );
 

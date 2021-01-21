@@ -31,7 +31,7 @@ PackageInventory PackageDiscovery::GetInstalledPackages( const std::vector<PmDis
         if ( interestingItem.packageId == "uc" ) {
             packages.packages.push_back( BuildUcPackage() );
         }
-        else if ( interestingItem.packageId == "amp" ) {
+        else if ( interestingItem.packageId == "Immunet" ) {
             try {
                 packages.packages.push_back( HackBuildAmpPackage() );
             }
@@ -137,7 +137,7 @@ PmInstalledPackage PackageDiscovery::HackBuildAmpPackage()
     }
     else {
         if ( ( displayName == L"Immunet" ) || ( displayName == L"Cisco AMP for Endpoints Connector" ) ) {
-            ampPackage.packageName = "amp";
+            ampPackage.packageName = "Immunet";
         }
         else {
             std::string error = "Unexpected display name: ";
