@@ -316,27 +316,7 @@ std::wstring WindowsUtilities::GetLogDir()
     PWSTR path = NULL;
     std::wstring logDir;
 
-    if ( !ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
-        logDir = GetOldDataDir();
-    }
+    ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir );
 
     return logDir;
-}
-
-std::wstring WindowsUtilities::GetOldDataDir()
-{
-    PWSTR path = NULL;
-    std::wstring dataDir;
-
-    HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
-
-    if ( SUCCEEDED( hr ) ) {
-        dataDir = path;
-        CoTaskMemFree( path );
-        path = NULL;
-
-        dataDir += L"\\Cisco\\UC";
-    }
-
-    return dataDir;
 }
