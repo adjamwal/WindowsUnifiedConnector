@@ -148,8 +148,8 @@
                 </RegistryKey>
             </Component>
         
-            <Component Id="UCService.exe" Guid="*">
-                <File Id="UCService.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\UCService.exe" />
+            <Component Id="ucs.exe" Guid="*">
+                <File Id="ucs.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\ucs.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />
                 <ServiceInstall Id="ServiceInstaller" Name="$(var.ServiceName)" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
                     <util:ServiceConfig RestartServiceDelayInSeconds="60" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
@@ -269,8 +269,8 @@
             <Component Id="PM_MCP.dll" Guid="*">
                 <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
             </Component>
-            <Component Id="UC_PM.exe" Guid="*">
-                <File Id="UC_PM.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\UC_PM.exe" />
+            <Component Id="ucpm.exe" Guid="*">
+                <File Id="ucpm.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucpm.exe" />
             </Component>
             <Component Id="PM_Verify.exe" Guid="*">
               <File Id="PM_Verify.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_Verify.exe" />
