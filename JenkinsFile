@@ -250,7 +250,7 @@ pipeline {
                 bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer* ${BUILD_PATH} /Y"
               }
               
-              archiveArtifacts artifacts: '**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi', fingerprint: true
+              archiveArtifacts artifacts: "**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
             }
           }
         }
@@ -323,7 +323,7 @@ pipeline {
                 bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
               }
 
-              archiveArtifacts artifacts: '**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi', fingerprint: true
+              archiveArtifacts artifacts: "**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
 
               nexusArtifactUploader(
                 nexusVersion: 'nexus3',
