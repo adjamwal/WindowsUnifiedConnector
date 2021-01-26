@@ -163,43 +163,43 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
             if( jsonReader->parse( eventJson.c_str(), eventJson.c_str() + eventJson.length(), &root, &jsonError ) ) {
                 event = root[ "event" ];
 
-                isValid = JsonUtil::ExtractJsonString( event, "ucid", orig_ucid );
+                isValid &= JsonUtil::ExtractJsonString( event, "ucid", orig_ucid );
 
-                isValid = JsonUtil::ExtractJsonString( event, "tse", orig_tse );
+                isValid &= JsonUtil::ExtractJsonString( event, "tse", orig_tse );
 
                 std::string typeString;
-                isValid = JsonUtil::ExtractJsonString( event, "type", typeString );
+                isValid &= JsonUtil::ExtractJsonString( event, "type", typeString );
 
                 if( isValid )
                 {
                     orig_evtype = ConvertCloudEventType( typeString );
                 }
 
-                isValid = JsonUtil::ExtractJsonString( event, "package", orig_packageName );
+                isValid &= JsonUtil::ExtractJsonString( event, "package", orig_packageName );
 
                 if( !event[ "err" ].isNull() ) {
                     error = event[ "err" ];
 
-                    isValid = JsonUtil::ExtractJsonInt( error, "code", orig_errCode );
-                    isValid = JsonUtil::ExtractJsonString( error, "msg", orig_errMessage );
+                    isValid &= JsonUtil::ExtractJsonInt( error, "code", orig_errCode );
+                    isValid &= JsonUtil::ExtractJsonString( error, "msg", orig_errMessage );
                 }
 
                 if( !event[ "old" ].isNull() && event[ "old" ].isArray() && event[ "old" ].size() == 1 ) {
                     oldfilearr = event[ "old" ];
                     oldfile = oldfilearr[ 0 ];
 
-                    isValid = JsonUtil::ExtractJsonString( oldfile, "path", orig_oldPath );
-                    isValid = JsonUtil::ExtractJsonString( oldfile, "sha256", orig_oldHash );
-                    isValid = JsonUtil::ExtractJsonInt( oldfile, "size", orig_oldSize );
+                    isValid &= JsonUtil::ExtractJsonString( oldfile, "path", orig_oldPath );
+                    isValid &= JsonUtil::ExtractJsonString( oldfile, "sha256", orig_oldHash );
+                    isValid &= JsonUtil::ExtractJsonInt( oldfile, "size", orig_oldSize );
                 }
 
                 if( !event[ "new" ].isNull() && event[ "new" ].isArray() && event[ "new" ].size() == 1 ) {
                     newfilearr = event[ "new" ];
                     newfile = newfilearr[ 0 ];
 
-                    isValid = JsonUtil::ExtractJsonString( newfile, "path", orig_newPath );
-                    isValid = JsonUtil::ExtractJsonString( newfile, "sha256", orig_newHash );
-                    isValid = JsonUtil::ExtractJsonInt( newfile, "size", orig_newSize );
+                    isValid &= JsonUtil::ExtractJsonString( newfile, "path", orig_newPath );
+                    isValid &= JsonUtil::ExtractJsonString( newfile, "sha256", orig_newHash );
+                    isValid &= JsonUtil::ExtractJsonInt( newfile, "size", orig_newSize );
                 }
             }
             else {
