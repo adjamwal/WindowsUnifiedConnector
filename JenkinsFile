@@ -102,6 +102,7 @@ pipeline {
     UC_MAJOR = 1
     UC_MINOR = 0
     UC_PATCH = "${params.IMMUNET == '1' ? 0 : 1}"
+    UC_COMPANY = "${params.IMMUNET == '1' ? 'Immunet' : 'Cisco'}"
   }
   stages {
     stage ('Init') {
@@ -148,6 +149,9 @@ pipeline {
                 powershell "git clean -dfx"
                 powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
                 powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
+                if (env.IMMUNET == '0') {
+                    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(<UC_CONSUMER>1<\\/UC_CONSUMER>)', replace: '<UC_CONSUMER>0</UC_CONSUMER>', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Directory.Build.props') ])
+                }
               }
               SetupVersion(false)
               currentBuild.description = "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}"
@@ -239,14 +243,14 @@ pipeline {
                 
                 archiveArtifacts artifacts: '*.zip', fingerprint: true
 
-                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
                 
-                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
-                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer* ${BUILD_PATH} /Y"
+                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer* ${BUILD_PATH} /Y"
+                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer* ${BUILD_PATH} /Y"
               }
               
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+              archiveArtifacts artifacts: "**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
             }
           }
         }
@@ -268,15 +272,15 @@ pipeline {
                 credentialsId: 'nexus_credentials',
                 artifacts: [
                   [
-                    artifactId: "Cisco-UC-Installer-x64",
+                    artifactId: "${UC_COMPANY}-UC-Installer-x64",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ],
                   [
-                    artifactId: "Cisco-UC-Installer-x86",
+                    artifactId: "${UC_COMPANY}-UC-Installer-x86",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ]
                 ]
@@ -315,11 +319,11 @@ pipeline {
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m"
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m"
                 
-                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
               }
 
-              archiveArtifacts artifacts: '**\\Release\\**\\Cisco-UC-Installer*.msi', fingerprint: true
+              archiveArtifacts artifacts: "**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
 
               nexusArtifactUploader(
                 nexusVersion: 'nexus3',
@@ -331,15 +335,15 @@ pipeline {
                 credentialsId: 'nexus_credentials',
                 artifacts: [
                   [
-                    artifactId: "Cisco-UC-Installer-x64",
+                    artifactId: "${UC_COMPANY}-UC-Installer-x64",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ],
                   [
-                    artifactId: "Cisco-UC-Installer-x86",
+                    artifactId: "${UC_COMPANY}-UC-Installer-x86",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ]
                 ]
