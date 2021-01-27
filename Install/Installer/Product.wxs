@@ -322,7 +322,7 @@
                   <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\10.0.19041.0\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
                 <Component Id="UCPMzlibd.dll" Guid="*">
-                  <File Id="UCPMzlibd.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.Platform)\bin\zlibd.dll" />
+                  <File Id="UCPMzlibd.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\zlibd.dll" />
                 </Component>
           <?endif?>
             <?if $(var.Platform) = "x64" ?>
