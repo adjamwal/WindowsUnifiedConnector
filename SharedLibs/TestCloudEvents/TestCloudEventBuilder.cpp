@@ -20,9 +20,17 @@ protected:
     void TearDown()
     {
         m_eventBuilder.Reset();
+        m_restoredEvent.Reset();
+    }
+
+    void BuildAndDeserialize()
+    {
+        std::string eventJson = m_eventBuilder.Build();
+        CloudEventBuilder::Deserialize( m_restoredEvent, eventJson );
     }
 
     CloudEventBuilder m_eventBuilder;
+    CloudEventBuilder m_restoredEvent;
 };
 
 TEST_F( TestCloudEventBuilder, EventJSONContainsUCID )
@@ -65,4 +73,54 @@ TEST_F( TestCloudEventBuilder, EventJSONContainsError )
     std::string eventJson = m_eventBuilder.Build();
 
     ASSERT_TRUE( eventJson.find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeCompletesSuccessfully )
+{
+    std::string eventJson = m_eventBuilder.Build();
+    CloudEventBuilder restoredEvent;
+
+    ASSERT_TRUE( CloudEventBuilder::Deserialize( restoredEvent, eventJson ) );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalUCID )
+{
+    BuildAndDeserialize();
+
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalEventType )
+{
+    BuildAndDeserialize();
+
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"type\":\"pkg-reconfig\"" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalPackage )
+{
+    BuildAndDeserialize();
+
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"package\":\"amp/1.0.0\"" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalOldFile )
+{
+    BuildAndDeserialize();
+
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"old\":[{\"path\":\"oldfile\",\"sha256\":\"oldhash123\",\"size\":123}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalNewFile )
+{
+    BuildAndDeserialize();
+
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"new\":[{\"path\":\"newfile\",\"sha256\":\"newhash123\",\"size\":234}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalError )
+{
+    BuildAndDeserialize();
+
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
 }
