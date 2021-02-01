@@ -9,7 +9,8 @@
 
 CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileUtil& fileUtil ) :
     m_fileName( fileName ),
-    m_fileUtil( fileUtil )
+    m_fileUtil( fileUtil ),
+    m_dependencies( nullptr )
 {
 }
 
