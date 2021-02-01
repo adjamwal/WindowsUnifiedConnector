@@ -156,7 +156,7 @@ int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& new
         ::std::filesystem::rename( ::std::filesystem::path( oldFilename ), target );
         rtn = 0;
     }
-    catch( std::filesystem::filesystem_error ex ) {
+    catch( std::filesystem::filesystem_error& ex ) {
         LOG_ERROR( "%s", ex.what() );
     }
 
