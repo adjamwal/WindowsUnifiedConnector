@@ -46,7 +46,7 @@ void WINAPI ServiceBase::ServiceMain( DWORD dwArgc, PWSTR* pszArgv )
     {
         dwError = GetLastError();
         WLOG_ERROR( L"RegisterServiceCtrlHandler failed, error %d", dwError );
-        throw dwError;
+        throw std::runtime_error( "RegisterServiceCtrlHandler failed, error: " + std::to_string( dwError ) );
     }
 
     s_service->Start( dwArgc, pszArgv );
