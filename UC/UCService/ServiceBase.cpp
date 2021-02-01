@@ -35,6 +35,8 @@ BOOL ServiceBase::Run( ServiceBase& service )
 
 void WINAPI ServiceBase::ServiceMain( DWORD dwArgc, PWSTR* pszArgv )
 {
+    DWORD dwError = 0;
+
     assert( s_service != NULL );
 
     s_service->m_statusHandle = RegisterServiceCtrlHandler(
@@ -42,7 +44,9 @@ void WINAPI ServiceBase::ServiceMain( DWORD dwArgc, PWSTR* pszArgv )
 
     if( s_service->m_statusHandle == NULL )
     {
-        throw GetLastError();
+        dwError = GetLastError();
+        WLOG_ERROR( L"RegisterServiceCtrlHandler failed, error %d", dwError );
+        throw std::runtime_error( "RegisterServiceCtrlHandler failed, error: " + std::to_string( dwError ) );
     }
 
     s_service->Start( dwArgc, pszArgv );

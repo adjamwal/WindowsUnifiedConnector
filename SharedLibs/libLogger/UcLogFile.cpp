@@ -196,11 +196,20 @@ std::filesystem::path UcLogFile::GenerateFileName( const wchar_t* logname )
 
 bool UcLogFile::CreateLogFile()
 {
+    bool ret = true;
+
     if( ( m_file == NULL ) && !m_logFileName.empty() ) {
-        if( !std::filesystem::exists( m_logFileName.parent_path() ) ) {
-            std::filesystem::create_directories( m_logFileName.parent_path() );
+        try
+        {
+            if ( !std::filesystem::exists( m_logFileName.parent_path() ) ) {
+                std::filesystem::create_directories( m_logFileName.parent_path() );
+            }
+            m_file = _wfsopen( m_logFileName.c_str(), L"a+", SH_DENYNO );
         }
-        m_file = _wfsopen( m_logFileName.c_str(), L"a+", SH_DENYNO );
+        catch( ... )
+        {
+            ret = false;
+        }
     }
 
     return m_file ? true : false;

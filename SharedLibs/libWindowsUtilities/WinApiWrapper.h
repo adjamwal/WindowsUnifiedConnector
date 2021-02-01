@@ -6,7 +6,6 @@ class WinApiWrapper : public IWinApiWrapper
 {
 public:
     WinApiWrapper();
-    ~WinApiWrapper();
 
     virtual BOOL CreateProcessW(
         LPCWSTR lpApplicationName,

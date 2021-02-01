@@ -93,7 +93,7 @@ int32_t SslUtil::DecodeBase64( const std::string& base64Str, std::vector<uint8_t
     }
 
     pBioMemory = BIO_push( pBio64, pBioMemory );
-    pBio64 = NULL;
+
     BIO_set_flags( pBioMemory, BIO_FLAGS_BASE64_NO_NL );
     tempOutputBufferSize = BIO_read( pBioMemory, pTempOutputBuffer, base64Str.length() );
 
@@ -105,16 +105,12 @@ int32_t SslUtil::DecodeBase64( const std::string& base64Str, std::vector<uint8_t
         output.resize( tempOutputBufferSize );
         memcpy( output.data(), pTempOutputBuffer, tempOutputBufferSize );
         
-        pTempOutputBuffer = NULL;
         functionStatus = 0;
     }
 
 abort:
     if( pBioMemory ) {
         BIO_free_all( pBioMemory );
-    }
-    if( pBio64 ) {
-        BIO_free_all( pBio64 );
     }
     if( pTempOutputBuffer ) {
         free( pTempOutputBuffer );
