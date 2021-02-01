@@ -38,10 +38,17 @@ int wmain( int argc, wchar_t* argv[] )
     {
         DisplayHelp();
 
-        UCService service( SERVICE_NAME );
-        if( !ServiceBase::Run( service ) )
+        try
         {
-            wprintf( L"%s failed to run w/err 0x%08lx\n", SERVICE_NAME, GetLastError() );
+            UCService service( SERVICE_NAME );
+            if ( !ServiceBase::Run( service ) )
+            {
+                wprintf( L"%s failed to run w/err 0x%08lx\n", SERVICE_NAME, GetLastError() );
+            }
+        }
+        catch ( std::exception& ex )
+        {
+            LOG_ERROR( "Failed to run service: %s", ex.what() );
         }
     }
 
