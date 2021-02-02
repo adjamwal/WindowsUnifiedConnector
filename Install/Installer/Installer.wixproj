@@ -13,25 +13,25 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug;WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
+    <DefineConstants>Debug;UCRT_BIN_BASE=$(UCRT_BIN_BASE);WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
     <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
+    <DefineConstants>UCRT_DLL_BASE=$(UCRT_DLL_BASE);WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
     <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug;WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
+    <DefineConstants>Debug;UCRT_DLL_BASE=$(UCRT_DLL_BASE);WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
     <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
+    <DefineConstants>UCRT_DLL_BASE=$(UCRT_DLL_BASE);WLHBASE=$(WLHBASE);IMN_COMMON=$(IMN_COMMON);UC_CONSUMER=$(UC_CONSUMER)</DefineConstants>
     <Cultures>en-US;</Cultures>
   </PropertyGroup>
   <ItemGroup>

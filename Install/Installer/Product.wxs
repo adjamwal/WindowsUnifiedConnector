@@ -199,7 +199,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="ucrtbased.dll" Guid="*">
-                    <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\10.0.19041.0\$(var.Platform)\ucrt\ucrtbased.dll" />
+                    <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.UCRT_BIN_BASE)\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
             <?endif?>
         </ComponentGroup>
@@ -319,7 +319,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="UCPMucrtbased.dll" Guid="*">
-                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\10.0.19041.0\$(var.Platform)\ucrt\ucrtbased.dll" />
+                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.UCRT_BIN_BASE)\$(var.Platform)\ucrt\ucrtbased.dll" />
                 </Component>
                 <Component Id="UCPMzlibd.dll" Guid="*">
                   <File Id="UCPMzlibd.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\zlibd.dll" />
