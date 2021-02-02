@@ -7,6 +7,7 @@
     <WORKSPACE_PATH>$([System.IO.Path]::GetFullPath('$(UC_PATH)..\'))</WORKSPACE_PATH>
     <IMN_COMMON>$([System.IO.Path]::GetFullPath('$(WORKSPACE_PATH)common\'))</IMN_COMMON>
     <VC_VARS_PATH>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build</VC_VARS_PATH>
+	<UCRT_BIN_BASE>$([System.IO.Path]::GetFullPath('$(WLHBASE)\bin\$(TargetUniversalCRTVersion)'))</UCRT_BIN_BASE>
 	<UC_CONSUMER>1</UC_CONSUMER>
   </PropertyGroup>
   <ItemGroup>
