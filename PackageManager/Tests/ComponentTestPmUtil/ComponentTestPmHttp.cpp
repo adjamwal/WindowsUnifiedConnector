@@ -111,3 +111,33 @@ TEST_F( ComponentTestPmHttp, DownloadTest )
 
     EXPECT_EQ( rtn, 200 );
 }
+
+TEST_F( ComponentTestPmHttp, HttpPostHttpProtocalIsNotValid )
+{
+    std::string response;
+    std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
+    int32_t rtn = 0;
+    int32_t methodRtn = 0;
+
+    m_patient->Init( NULL, NULL, "" );
+    m_patient->SetCerts( m_certList );
+
+    methodRtn = m_patient->HttpPost( "http://postman-echo.com/post", (void*)data.c_str(), data.length(), response, rtn );
+
+    EXPECT_NE( methodRtn, 0 );
+}
+
+TEST_F( ComponentTestPmHttp, HttpPostBlankProtocalIsNotValid )
+{
+    std::string response;
+    std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
+    int32_t rtn = 0;
+    int32_t methodRtn = 0;
+
+    m_patient->Init( NULL, NULL, "" );
+    m_patient->SetCerts( m_certList );
+
+    methodRtn = m_patient->HttpPost( "postman-echo.com/post", (void*)data.c_str(), data.length(), response, rtn );
+
+    EXPECT_NE( methodRtn, 0 );
+}
