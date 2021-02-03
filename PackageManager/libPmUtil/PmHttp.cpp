@@ -297,6 +297,9 @@ int32_t PmHttp::HttpGet( const std::string& url, std::string& response, int32_t 
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
     }
+    else if ( (rtn = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS )) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
     else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
@@ -341,6 +344,9 @@ int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, s
     }
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if ( (rtn = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS )) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDS, data ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
@@ -399,6 +405,9 @@ int32_t PmHttp::HttpDownload( const std::string& url, const std::string& filepat
     }
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    }
+    else if ( (rtn = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS )) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
     else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
