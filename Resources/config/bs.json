@@ -1,7 +1,7 @@
 {
 	"id": {
-		"business_id": "6beeabc6-5a7b-4d63-9ce4-cd700975ca9d",
-		"installer_key": "73d30c08-164a-403e-8ae7-7dc1664a4704",
+		"business_id": "hexmen-dev-demo-bus-id",
+		"installer_key": "5b4007b0-8e0c-4c19-b95b-759d6026e7fb",
 		"url": "https://identify.consumer.uc.amp.cisco.com/identify"
 	},
 	"pm": {
