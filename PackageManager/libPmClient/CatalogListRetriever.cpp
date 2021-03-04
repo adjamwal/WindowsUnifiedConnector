@@ -16,15 +16,13 @@ CatalogListRetriever::~CatalogListRetriever()
 
 std::string CatalogListRetriever::GetCloudCatalog()
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    std::string response;
-    int32_t respStatus;
-
     LOG_DEBUG( "Enter: CatalogListRetriever::GetCloudCatalog" );
 
     std::string uri = m_config.GetCloudCatalogUri();
+    LOG_DEBUG( "Catalog uri = ", uri.c_str() );
 
-    respStatus = InternalGetCloudCatalogFrom( uri, response );
+    std::string response;
+    int32_t respStatus = InternalGetCloudCatalogFrom( uri, response );
 
     if( respStatus != 200 ) {
         if( respStatus != 401 ) {
@@ -54,7 +52,7 @@ int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std
         return 0;
     }
 
-    int32_t httpRetCode;
+    int32_t httpRetCode = 0;
 
     LOG_DEBUG( "Setting Token" );
     m_cloud.SetToken( token );

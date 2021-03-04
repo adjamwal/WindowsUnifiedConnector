@@ -19,7 +19,6 @@ private:
     IUcidAdapter& m_ucidAdapter;
     ICertsAdapter& m_certsAdapter;
     IPmConfig& m_config;
-    std::mutex m_mutex;
 
     int32_t InternalGetCloudCatalogFrom( std::string& uri, std::string& response );
     void HandleHttpError( int32_t respStatus );
