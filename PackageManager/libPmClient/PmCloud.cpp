@@ -50,13 +50,13 @@ int32_t PmCloud::Checkin( const std::string& payload, std::string& response )
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 
-    int32_t respStatus = 0;
-    m_http.HttpPost( m_uri, (void*)payload.c_str(), payload.length() + 1, response, respStatus );
+    int32_t httpStatusResponse = 0;
+    m_http.HttpPost( m_uri, (void*)payload.c_str(), payload.length() + 1, response, httpStatusResponse );
     m_http.Deinit();
-    return respStatus;
+    return httpStatusResponse;
 }
 
-int32_t PmCloud::Get( const std::string& url, std::string& response, int32_t& httpReturn )
+int32_t PmCloud::Get( const std::string& url, std::string& response, int32_t& httpStatusResponse )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -64,14 +64,13 @@ int32_t PmCloud::Get( const std::string& url, std::string& response, int32_t& ht
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 
-    int32_t respStatus = 0;
-    respStatus = m_http.HttpGet( url, response, httpReturn );
+    m_http.HttpGet( url, response, httpStatusResponse );
     m_http.Deinit();
 
-    return respStatus;
+    return httpStatusResponse;
 }
 
-int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize, std::string& response, int32_t& httpReturn )
+int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize, std::string& response, int32_t& httpStatusResponse )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -79,11 +78,10 @@ int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 
-    int32_t respStatus = 0;
-    respStatus = m_http.HttpPost( url, payload, payloadSize, response, httpReturn );
+    m_http.HttpPost( url, payload, payloadSize, response, httpStatusResponse );
     m_http.Deinit();
 
-    return respStatus;
+    return httpStatusResponse;
 }
 
 int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filename )
@@ -94,10 +92,11 @@ int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filenam
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 
-    int32_t respStatus = 0;
-    m_http.HttpDownload( uri, filename, respStatus );
+    int32_t httpStatusResponse = 0;
+    m_http.HttpDownload( uri, filename, httpStatusResponse );
     m_http.Deinit();
-    return respStatus;
+
+    return httpStatusResponse;
 }
 
 int PmCloud::ProgressCallback( PM_TYPEOF_OFF_T dltotal, PM_TYPEOF_OFF_T dlnow, PM_TYPEOF_OFF_T ultotal, PM_TYPEOF_OFF_T ulnow )
