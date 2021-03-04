@@ -20,6 +20,8 @@ std::string CatalogListRetriever::GetCloudCatalog()
     std::string response;
     int32_t respStatus;
 
+    LOG_DEBUG( "Enter: CatalogListRetriever::GetCloudCatalog" );
+
     std::string uri = m_config.GetCloudCatalogUri();
 
     respStatus = InternalGetCloudCatalogFrom( uri, response );
@@ -38,11 +40,15 @@ std::string CatalogListRetriever::GetCloudCatalog()
         }
     }
 
+    LOG_DEBUG( "Exit: CatalogListRetriever::GetCloudCatalog" );
+
     return response;
 }
 
 int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std::string& response )
 {
+    LOG_DEBUG( "Enter: CatalogListRetriever::InternalGetCloudCatalogFrom %s", uri.c_str() );
+
     std::string token = m_ucidAdapter.GetAccessToken();
     if( token.empty() ) {
         return 0;
@@ -50,12 +56,17 @@ int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std
 
     int32_t httpRetCode;
 
+    LOG_DEBUG( "Setting Token" );
     m_cloud.SetToken( token );
+
+    LOG_DEBUG( "Setting Certs" );
     m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
 
-    LOG_DEBUG( "Catalog uri: %s", uri.c_str() );
-
+    LOG_DEBUG( "HTTP Get" );
     return m_cloud.Get( uri, response, httpRetCode );
+    LOG_DEBUG( "m_cloud.Get: %s %s %d", uri.c_str(), response.c_str(), httpRetCode );
+
+    LOG_DEBUG( "Exit: CatalogListRetriever::InternalGetCloudCatalogFrom" );
 }
 
 void CatalogListRetriever::HandleHttpError( int32_t respStatus )

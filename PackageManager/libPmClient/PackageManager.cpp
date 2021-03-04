@@ -158,11 +158,19 @@ void PackageManager::PmWorkflowThread()
         //Send event? might fail without a config/cloudURL
     }
 
+    PackageInventory inventory;
     try
     {
-        PackageInventory inventory;
         m_packageDiscoveryManager.DiscoverPackages( inventory );
+    }
+    catch( std::exception& ex )
+    {
+        LOG_ERROR( "PackageDiscovery failed: %s", ex.what() );
+        return;
+    }
 
+    try
+    {
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
             m_config.GetCloudCheckinUri(),
             m_checkinFormatter.GetJson( inventory )
@@ -179,7 +187,6 @@ void PackageManager::PmWorkflowThread()
     {
         LOG_ERROR( "Checkin failed: %s", ex.what() );
     }
-
 }
 
 bool PackageManager::LoadBsConfig()
