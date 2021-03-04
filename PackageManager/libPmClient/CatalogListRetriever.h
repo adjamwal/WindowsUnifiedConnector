@@ -13,7 +13,7 @@ public:
     CatalogListRetriever( IPmCloud& cloud, IUcidAdapter& ucidAdapter, ICertsAdapter& certsAdapter, IPmConfig& config );
     virtual ~CatalogListRetriever();
 
-    virtual std::string GetCloudCatalog() override;
+    std::string GetCloudCatalog() override;
 private:
     IPmCloud& m_cloud;
     IUcidAdapter& m_ucidAdapter;

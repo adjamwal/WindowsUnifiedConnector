@@ -1,5 +1,5 @@
 #include "CatalogListRetriever.h"
-#include "PmLogger.h"
+#include "IUcLogger.h"
 #include "PmCloud.h"
 
 CatalogListRetriever::CatalogListRetriever( IPmCloud& cloud, IUcidAdapter& ucidAdapter, ICertsAdapter& certsAdapter, IPmConfig& config )
@@ -16,13 +16,10 @@ CatalogListRetriever::~CatalogListRetriever()
 
 std::string CatalogListRetriever::GetCloudCatalog()
 {
-    LOG_DEBUG( "Enter: CatalogListRetriever::GetCloudCatalog" );
-
     std::string uri = m_config.GetCloudCatalogUri();
-    LOG_DEBUG( "Catalog uri = ", uri.c_str() );
 
-    std::string response;
-    int32_t respStatus = InternalGetCloudCatalogFrom( uri, response );
+    std::string catalogData;
+    int32_t respStatus = InternalGetCloudCatalogFrom( uri, catalogData );
 
     if( respStatus != 200 ) {
         if( respStatus != 401 ) {
@@ -30,7 +27,7 @@ std::string CatalogListRetriever::GetCloudCatalog()
         }
         else {
             m_ucidAdapter.Refresh();
-            respStatus = InternalGetCloudCatalogFrom( uri, response );
+            respStatus = InternalGetCloudCatalogFrom( uri, catalogData );
 
             if( respStatus != 200 ) {
                 HandleHttpError( respStatus );
@@ -38,33 +35,25 @@ std::string CatalogListRetriever::GetCloudCatalog()
         }
     }
 
-    LOG_DEBUG( "Exit: CatalogListRetriever::GetCloudCatalog" );
-
-    return response;
+    return catalogData;
 }
 
-int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std::string& response )
+int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std::string& responseData )
 {
-    LOG_DEBUG( "Enter: CatalogListRetriever::InternalGetCloudCatalogFrom %s", uri.c_str() );
-
     std::string token = m_ucidAdapter.GetAccessToken();
     if( token.empty() ) {
         return 0;
     }
 
-    int32_t httpRetCode = 0;
-
-    LOG_DEBUG( "Setting Token" );
     m_cloud.SetToken( token );
-
-    LOG_DEBUG( "Setting Certs" );
     m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
 
-    LOG_DEBUG( "HTTP Get" );
-    return m_cloud.Get( uri, response, httpRetCode );
-    LOG_DEBUG( "m_cloud.Get: %s %s %d", uri.c_str(), response.c_str(), httpRetCode );
+    int httpStatusResponse = 0;
+    int curlErrCode = m_cloud.Get( uri, responseData, httpStatusResponse );
+    LOG_DEBUG( "m_cloud.Get:\n------uri=%s\n------responseData=%s\n------curlErrCode=%d\n------httpStatusResponse=%d\n", 
+        uri.c_str(), responseData.c_str(), curlErrCode, httpStatusResponse );
 
-    LOG_DEBUG( "Exit: CatalogListRetriever::InternalGetCloudCatalogFrom" );
+    return httpStatusResponse;
 }
 
 void CatalogListRetriever::HandleHttpError( int32_t respStatus )

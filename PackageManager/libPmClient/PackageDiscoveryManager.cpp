@@ -19,27 +19,17 @@ PackageDiscoveryManager::~PackageDiscoveryManager()
 
 void PackageDiscoveryManager::Initialize( IPmPlatformDependencies* dep )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
-
-    LOG_DEBUG( "Enter: PackageDiscoveryManager::Initialize" );
     m_packageInventoryProvider.Initialize( dep );
-    LOG_DEBUG( "Exit: PackageDiscoveryManager::Initialize" );
 }
 
 bool PackageDiscoveryManager::DiscoverPackages( PackageInventory& inventory )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    
-    LOG_DEBUG( "Enter: PackageDiscoveryManager::DiscoverPackages" );
-
     PrepareCatalogDataset();
     return m_packageInventoryProvider.GetInventory( inventory );
 }
 
 void PackageDiscoveryManager::PrepareCatalogDataset()
 {
-    LOG_DEBUG( "Enter: PackageDiscoveryManager::PrepareCatalogDataset" );
-
     std::string catalogList = m_catalogListRetriever.GetCloudCatalog();
     LOG_DEBUG( "Retrieved Catalog: %s", catalogList.c_str() );
 
@@ -61,6 +51,6 @@ void PackageDiscoveryManager::PrepareCatalogDataset()
         catalogEntry.packageName = "TestPackage";
         m_catalogDataset.push_back( catalogEntry );
     }
-
+    
     m_packageInventoryProvider.SetCatalogDataset( m_catalogDataset );
 }
