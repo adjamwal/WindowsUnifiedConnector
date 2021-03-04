@@ -10,14 +10,12 @@ protected:
     void SetUp()
     {
         m_fileUtil.reset( new NiceMock<MockFileUtil>() );
-
         m_patient.reset( new PmConfig( *m_fileUtil ) );
     }
 
     void TearDown()
     {
         m_patient.reset();
-
         m_fileUtil.reset();
     }
 
@@ -28,7 +26,8 @@ protected:
     },
     "pm": {
         "url": "https://packagemanager.cisco.com/checkin",
-        "event_url": "https://packagemanager.cisco.com/event/1"
+        "event_url": "https://packagemanager.cisco.com/event/1",
+        "catalog_url": "https://packagemanager.cisco.com/catalog"
     }
 }
 )";
@@ -68,7 +67,7 @@ TEST_F( TestPmConfig, LoadWillReadPmFile )
     m_patient->LoadPmConfig( pmfilename );
 }
 
-TEST_F( TestPmConfig, LoadWillSaveCloudUri )
+TEST_F( TestPmConfig, LoadWillSaveCloudCheckinUri )
 {
     m_fileUtil->MakeReadFileReturn( bsConfigData );
 
@@ -77,7 +76,16 @@ TEST_F( TestPmConfig, LoadWillSaveCloudUri )
     EXPECT_EQ( m_patient->GetCloudCheckinUri(), "https://packagemanager.cisco.com/checkin" );
 }
 
-TEST_F( TestPmConfig, LoadWillSaveInterval )
+TEST_F( TestPmConfig, LoadWillSaveCloudCatalogUri )
+{
+    m_fileUtil->MakeReadFileReturn( bsConfigData );
+
+    m_patient->LoadBsConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetCloudCatalogUri(), "https://packagemanager.cisco.com/catalog" );
+}
+
+TEST_F( TestPmConfig, LoadWillSaveCheckinInterval )
 {
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 

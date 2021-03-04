@@ -8,6 +8,7 @@
 #include "UcidAdapter.h"
 #include "CertsAdapter.h"
 #include "CheckinManifestRetriever.h"
+#include "CatalogListRetriever.h"
 #include "ComponentPackageProcessor.h"
 #include "PackageConfigProcessor.h"
 #include "ManifestProcessor.h"
@@ -51,7 +52,6 @@ protected:
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
         m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) );
-        m_packageDiscoveryManager.reset( new PackageDiscoveryManager( *m_packageInventoryProvider ) );
         m_checkinFormatter.reset( new CheckinFormatter() );
         m_ucidAdapter.reset( new UcidAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
@@ -62,6 +62,8 @@ protected:
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
+        m_catalogListRetriever.reset( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) );
+        m_packageDiscoveryManager.reset( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor(
             *m_cloud,
@@ -110,6 +112,7 @@ protected:
         m_componentPackageProcessor.reset();
         m_configProcesor.reset();
         m_checkinManifestRetriever.reset();
+        m_catalogListRetriever.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
         m_eventStorage.reset();
@@ -151,8 +154,10 @@ protected:
         m_config->MakeLoadBsConfigReturn( 0 );
         m_config->MakeLoadPmConfigReturn( 0 );
         m_config->MakeGetCloudCheckinUriReturn( m_configUrl );
+        m_config->MakeGetCloudCatalogUriReturn( m_configUrl );
 
         m_cloud->MakeDownloadFileReturn( 200 );
+        m_cloud->MakeGetReturn( 200 );
 
         m_patient->SetPlatformDependencies( m_deps.get() );
         m_patient->Start( "ConfigFile", "ConfigFile" );
@@ -199,6 +204,7 @@ protected:
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
+    std::unique_ptr<ICatalogListRetriever> m_catalogListRetriever;
     std::unique_ptr<CloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;

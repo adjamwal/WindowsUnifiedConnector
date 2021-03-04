@@ -52,7 +52,7 @@ TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetUC )
     EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
 }
 
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetImmuent )
+TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetImmunet )
 {
     std::vector<PmDiscoveryComponent> discoveryList;
     PmDiscoveryComponent interestedPrograms;

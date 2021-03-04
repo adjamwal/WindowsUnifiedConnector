@@ -38,6 +38,10 @@ public:
     void MakeGetCloudEventUriReturn( const std::string& value );
     void ExpectGetCloudEventUriIsNotCalled();
 
+    MOCK_METHOD0( GetCloudCatalogUri, const std::string& ( ) );
+    void MakeGetCloudCatalogUriReturn( const std::string& value );
+    void ExpectGetCloudCatalogUriIsNotCalled();
+
     MOCK_METHOD0( GetCloudCheckinInterval, uint32_t() );
     void MakeGetCloudIntervalReturn( uint32_t value );
     void ExpectGetCloudIntervalIsNotCalled();
@@ -54,4 +58,5 @@ private:
     std::string m_identifyUri;
     std::string m_checkinUri;
     std::string m_eventUri;
+    std::string m_catalogUri;
 };

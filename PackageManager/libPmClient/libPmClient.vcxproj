@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CatalogListRetriever.h" />
     <ClInclude Include="CertsAdapter.h" />
     <ClInclude Include="CheckinFormatter.h" />
     <ClInclude Include="CheckinManifestRetriever.h" />
     <ClInclude Include="ComponentPackageProcessor.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ICatalogListRetriever.h" />
     <ClInclude Include="IPackageDiscoveryManager.h" />
     <ClInclude Include="IUcUpgradeEventHandler.h" />
     <ClInclude Include="PackageDiscoveryManager.h" />
@@ -57,6 +59,7 @@
     <ClInclude Include="UcUpgradeEventHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CatalogListRetriever.cpp" />
     <ClCompile Include="CertsAdapter.cpp" />
     <ClCompile Include="CheckinFormatter.cpp" />
     <ClCompile Include="CheckinManifestRetriever.cpp" />
