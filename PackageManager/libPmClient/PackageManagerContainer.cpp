@@ -11,6 +11,7 @@
 #include "CheckinFormatter.h"
 #include "UcidAdapter.h"
 #include "CertsAdapter.h"
+#include "CatalogListRetriever.h"
 #include "CheckinManifestRetriever.h"
 #include "ComponentPackageProcessor.h"
 #include "ManifestProcessor.h"
@@ -41,7 +42,6 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
     , m_packageInventoryProvider( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) )
-    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_packageInventoryProvider ) )
     , m_checkinFormatter( new CheckinFormatter() )
     , m_ucidAdapter( new UcidAdapter() )
     , m_certsAdapter( new CertsAdapter() )
@@ -52,6 +52,8 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILENAME, *m_fileUtil ) )
     , m_ucUpgradeEventHandler( new UcUpgradeEventHandler( *m_eventPublisher, *m_ucUpgradeEventStorage, *m_ucUpgradeEventBuilder ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
+    , m_catalogListRetriever( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) )
+    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_componentPackageProcessor( 
         new ComponentPackageProcessor( *m_cloud, 

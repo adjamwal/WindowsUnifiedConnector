@@ -36,7 +36,7 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         return false;
     }
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( m_discoveryList, detectedPackages ) == 0 ) {
+    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogDataset, detectedPackages ) == 0 ) {
         for( auto &package : detectedPackages.packages ) {
             for( auto it = package.configs.begin(); it != package.configs.end();) {
                 std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );
@@ -58,9 +58,9 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
     return rtn;
 }
 
-void PackageInventoryProvider::SetDiscoveryList( const std::vector<PmDiscoveryComponent>& discoveryList )
+void PackageInventoryProvider::SetCatalogDataset( const std::vector<PmDiscoveryComponent>& discoveryList )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_discoveryList = discoveryList;
+    m_catalogDataset = discoveryList;
 }

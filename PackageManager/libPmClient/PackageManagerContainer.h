@@ -14,6 +14,7 @@ class IPackageDiscoveryManager;
 class ICheckinFormatter;
 class IUcidAdapter;
 class ICertsAdapter;
+class ICatalogListRetriever;
 class ICheckinManifestRetriever;
 class IComponentPackageProcessor;
 class IPackageConfigProcessor;
@@ -41,7 +42,6 @@ private:
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
-    std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
@@ -51,7 +51,9 @@ private:
     std::unique_ptr<ICloudEventBuilder> m_ucUpgradeEventBuilder;
     std::unique_ptr<ICloudEventStorage> m_ucUpgradeEventStorage;
     std::unique_ptr<IUcUpgradeEventHandler> m_ucUpgradeEventHandler;
+    std::unique_ptr<ICatalogListRetriever> m_catalogListRetriever;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
+    std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;

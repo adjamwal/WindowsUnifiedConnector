@@ -8,4 +8,5 @@ public:
     static std::string LTrim( const std::string& s );
     static std::string RTrim( const std::string& s );
     static std::string Trim( const std::string& s );
+    static void ReplaceStringInPlace( std::string& subject, const std::string& search, const std::string& replace );
 };

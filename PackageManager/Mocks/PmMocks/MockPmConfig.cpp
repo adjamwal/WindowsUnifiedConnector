@@ -9,6 +9,7 @@ MockPmConfig::MockPmConfig()
     MakeGetCloudIdentifyUriReturn( "" );
     MakeGetCloudCheckinUriReturn( "" );
     MakeGetCloudEventUriReturn( "" );
+    MakeGetCloudCatalogUriReturn( "" );
     MakeGetCloudIntervalReturn( uint32_t() );
     MakeGetSupportedComponentListReturn( {} );
 }
@@ -88,6 +89,17 @@ void MockPmConfig::MakeGetCloudEventUriReturn( const std::string& value )
 void MockPmConfig::ExpectGetCloudEventUriIsNotCalled()
 {
     EXPECT_CALL( *this, GetCloudEventUri() ).Times( 0 );
+}
+
+void MockPmConfig::MakeGetCloudCatalogUriReturn( const std::string& value )
+{
+    m_catalogUri = value;
+    ON_CALL( *this, GetCloudCatalogUri() ).WillByDefault( ReturnRef( m_catalogUri ) );
+}
+
+void MockPmConfig::ExpectGetCloudCatalogUriIsNotCalled()
+{
+    EXPECT_CALL( *this, GetCloudCatalogUri() ).Times( 0 );
 }
 
 void MockPmConfig::MakeGetCloudIntervalReturn( uint32_t value )

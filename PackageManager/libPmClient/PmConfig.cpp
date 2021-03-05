@@ -91,6 +91,13 @@ const std::string& PmConfig::GetCloudEventUri()
     return m_configData.eventUri;
 }
 
+const std::string& PmConfig::GetCloudCatalogUri()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.catalogUri;
+}
+
 uint32_t PmConfig::GetCloudCheckinInterval()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
@@ -112,7 +119,6 @@ const std::vector<PmComponent>& PmConfig::GetSupportedComponentList()
     return m_ComponentList;
 }
 
-
 int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
 {
     int rtn = -1;
@@ -122,7 +128,7 @@ int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
     std::string jsonError;
 
     if( bsConfig.empty() ) {
-        LOG_ERROR( "config contents is empty" );
+        LOG_ERROR( "Config contents is empty" );
     }
     else if( !jsonReader->parse( bsConfig.c_str(), bsConfig.c_str() + bsConfig.length(), &root, &jsonError ) ) {
         LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
@@ -137,6 +143,7 @@ int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
         pm = root[ "pm" ];
         m_configData.checkinUri = pm[ "url" ].asString();
         m_configData.eventUri = pm[ "event_url" ].asString();
+        m_configData.catalogUri = pm[ "catalog_url" ].asString();
 
         rtn = 0;
     }
@@ -206,6 +213,11 @@ int32_t PmConfig::VerifyBsContents( const std::string& bsData )
             rtn = -1;
         }
 
+        if( !pm[ "catalog_url" ].isString() ) {
+            LOG_ERROR( "Invalid Catalog Url" );
+            rtn = -1;
+        }
+
         if( rtn != 0 ) {
             LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
         }
@@ -268,5 +280,4 @@ int32_t PmConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
     std::string pmData = m_fileUtil.ReadFile( pmConfig );
 
     return VerifyPmContents( pmData );
-
 }
