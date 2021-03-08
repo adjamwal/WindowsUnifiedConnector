@@ -74,6 +74,8 @@
         </Property>
 
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+        <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />
+        <Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
     </Product>
 
     <Fragment>
