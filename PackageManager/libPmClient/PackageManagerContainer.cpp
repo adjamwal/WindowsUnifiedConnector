@@ -20,6 +20,7 @@
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
 #include "UcUpgradeEventHandler.h"
+#include "CatalogJsonParser.h"
 
 #include "FileUtil.h"
 #include "SslUtil.h"
@@ -52,8 +53,9 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILENAME, *m_fileUtil ) )
     , m_ucUpgradeEventHandler( new UcUpgradeEventHandler( *m_eventPublisher, *m_ucUpgradeEventStorage, *m_ucUpgradeEventBuilder ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
+    , m_catalogJsonParser( new CatalogJsonParser() )
     , m_catalogListRetriever( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) )
-    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider ) )
+    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_componentPackageProcessor( 
         new ComponentPackageProcessor( *m_cloud, 

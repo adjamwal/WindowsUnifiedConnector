@@ -14,6 +14,7 @@ class IPackageDiscoveryManager;
 class ICheckinFormatter;
 class IUcidAdapter;
 class ICertsAdapter;
+class ICatalogJsonParser;
 class ICatalogListRetriever;
 class ICheckinManifestRetriever;
 class IComponentPackageProcessor;
@@ -51,6 +52,7 @@ private:
     std::unique_ptr<ICloudEventBuilder> m_ucUpgradeEventBuilder;
     std::unique_ptr<ICloudEventStorage> m_ucUpgradeEventStorage;
     std::unique_ptr<IUcUpgradeEventHandler> m_ucUpgradeEventHandler;
+    std::unique_ptr<ICatalogJsonParser> m_catalogJsonParser;
     std::unique_ptr<ICatalogListRetriever> m_catalogListRetriever;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;

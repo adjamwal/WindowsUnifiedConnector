@@ -9,6 +9,7 @@
 #include "CertsAdapter.h"
 #include "CheckinManifestRetriever.h"
 #include "CatalogListRetriever.h"
+#include "CatalogJsonParser.h"
 #include "ComponentPackageProcessor.h"
 #include "PackageConfigProcessor.h"
 #include "ManifestProcessor.h"
@@ -63,7 +64,8 @@ protected:
 
         m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
         m_catalogListRetriever.reset( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) );
-        m_packageDiscoveryManager.reset( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider ) );
+        m_catalogJsonParser.reset( new CatalogJsonParser() );
+        m_packageDiscoveryManager.reset( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) );
         m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor(
             *m_cloud,
@@ -113,6 +115,7 @@ protected:
         m_configProcesor.reset();
         m_checkinManifestRetriever.reset();
         m_catalogListRetriever.reset();
+        m_catalogJsonParser.reset();
         m_eventBuilder.reset();
         m_eventPublisher.reset();
         m_eventStorage.reset();
@@ -204,6 +207,7 @@ protected:
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
+    std::unique_ptr<ICatalogJsonParser> m_catalogJsonParser;
     std::unique_ptr<ICatalogListRetriever> m_catalogListRetriever;
     std::unique_ptr<CloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;

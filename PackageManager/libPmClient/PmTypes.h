@@ -42,8 +42,18 @@ struct PackageInventory
     std::vector<PmInstalledPackage> packages;
 };
 
+struct PmDiscoveryConfigurable
+{
+    std::string path;
+    std::string formatsCsv;
+    int max_instances;
+    int min_instances;
+}; 
+
 struct PmDiscoveryComponent
 {
     std::string packageId;
     std::string packageName;
+    std::string packageVersion;
+    std::vector<PmDiscoveryConfigurable> configurables;
 };
