@@ -45,10 +45,10 @@ struct PackageInventory
 struct PmDiscoveryConfigurable
 {
     std::string path;
-    std::string formatsCsv;
     int max_instances;
     int min_instances;
-}; 
+    std::vector<std::string> formats;
+};
 
 struct PmDiscoveryComponent
 {
