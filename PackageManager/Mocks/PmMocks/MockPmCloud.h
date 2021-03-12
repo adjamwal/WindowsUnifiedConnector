@@ -31,11 +31,10 @@ public:
 
     MOCK_METHOD3( Get, int32_t( const std::string&, std::string&, int32_t& ) );
     void MakeGetReturn( int32_t value );
-    void MakeGetReturn( int32_t value, int32_t httpResponse );
+    void ExpectGetIsNotCalled();
 
     MOCK_METHOD5( Post, int32_t( const std::string&, void*, size_t, std::string&, int32_t& ) );
     void MakePostReturn( int32_t value );
-    void MakePostReturn( int32_t value, int32_t httpResponse );
     void ExpectPostIsNotCalled();
 
     MOCK_METHOD2( DownloadFile, int32_t( const std::string&, const std::string ) );

@@ -57,7 +57,7 @@ TEST_F( TestUcUpgradeEventHandler, StoreUcUpgradeEventWillClearOldEvents )
     m_patient->Initialize( m_dep.get() );
     ON_CALL( *m_eventBuilder, GetPackageName() ).WillByDefault( Return( UC_PACKAGE_NAME ) );
 
-    EXPECT_CALL( *m_eventStorage, ReadEvents() );
+    EXPECT_CALL( *m_eventStorage, ReadAndRemoveEvents() );
     
     m_patient->StoreUcUpgradeEvent( "" );
 }
@@ -85,7 +85,7 @@ TEST_F( TestUcUpgradeEventHandler, StoreUcUpgradeEventWillIgnoreOtherEvents )
 TEST_F( TestUcUpgradeEventHandler, WillNotPublishEventNotInitialized )
 {
     std::vector<std::string> events = { "Event1" };
-    m_eventStorage->MakeReadEventsReturn( events );
+    m_eventStorage->MakeReadAndRemoveEventsReturn( events );
 
     m_eventPublisher->ExpectPublishNotCalled();
 
@@ -96,7 +96,7 @@ TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillFailWhenNoEventsFoun
 {
     m_patient->Initialize( m_dep.get() );
     std::vector<std::string> events;
-    m_eventStorage->MakeReadEventsReturn( events );
+    m_eventStorage->MakeReadAndRemoveEventsReturn( events );
 
     EXPECT_FALSE( m_patient->PublishUcUpgradeEvent() );
 }
@@ -106,7 +106,7 @@ TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillFlagErrorWhenNotUpgr
     m_patient->Initialize( m_dep.get() );
     std::vector<std::string> events = { "Event1" };
 
-    m_eventStorage->MakeReadEventsReturn( events );
+    m_eventStorage->MakeReadAndRemoveEventsReturn( events );
     ON_CALL( *m_eventBuilder, GetPackageVersion() ).WillByDefault( Return( "new" ) );
     m_pmConfiguration->MakeGetPmVersionReturn( "old" );
 
@@ -120,7 +120,7 @@ TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillSendUpgradeSuccess )
     m_patient->Initialize( m_dep.get() );
     std::vector<std::string> events = { "Event1" };
     std::string version = "version";
-    m_eventStorage->MakeReadEventsReturn( events );
+    m_eventStorage->MakeReadAndRemoveEventsReturn( events );
     ON_CALL( *m_eventBuilder, GetPackageVersion() ).WillByDefault( Return( version ) );
     m_pmConfiguration->MakeGetPmVersionReturn( version );
 
@@ -133,7 +133,7 @@ TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillPublish )
     m_patient->Initialize( m_dep.get() );
     std::vector<std::string> events = { "Event1" };
 
-    m_eventStorage->MakeReadEventsReturn( events );
+    m_eventStorage->MakeReadAndRemoveEventsReturn( events );
 
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
@@ -145,9 +145,8 @@ TEST_F( TestUcUpgradeEventHandler, PublishUcUpgradeEventWillSucceed )
     m_patient->Initialize( m_dep.get() );
     std::vector<std::string> events = { "Event1" };
 
-    m_eventStorage->MakeReadEventsReturn( events );
-
-    ON_CALL( *m_eventPublisher, Publish( _ ) ).WillByDefault( Return( true ) );
+    m_eventStorage->MakeReadAndRemoveEventsReturn( events );
+    m_eventPublisher->MakePublishReturn( 200 );
 
     EXPECT_TRUE( m_patient->PublishUcUpgradeEvent() );
 }

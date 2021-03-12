@@ -14,7 +14,7 @@ public:
     void Initialize( IPmPlatformDependencies* dep ) override;
     bool SaveEvent( ICloudEventBuilder& event ) override;
     bool SaveEvent( const std::string& event ) override;
-    std::vector<std::string> ReadEvents() override;
+    std::vector<std::string> ReadAndRemoveEvents() override;
 
 private:
     IPmPlatformDependencies* m_dependencies;

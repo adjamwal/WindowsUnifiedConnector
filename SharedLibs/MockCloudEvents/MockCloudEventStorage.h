@@ -16,7 +16,7 @@ public:
     void MakeSaveEventReturn( bool value );
     void ExpectSaveEventNotCalled();
 
-    MOCK_METHOD0( ReadEvents, std::vector<std::string>() );
-    void MakeReadEventsReturn( std::vector<std::string> value );
+    MOCK_METHOD0( ReadAndRemoveEvents, std::vector<std::string>() );
+    void MakeReadAndRemoveEventsReturn( std::vector<std::string> value );
     void ExpectReadEventsNotCalled();
 };

@@ -21,12 +21,12 @@ void MockCloudEventStorage::ExpectSaveEventNotCalled()
     EXPECT_CALL( *this, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 0 );
 }
 
-void MockCloudEventStorage::MakeReadEventsReturn( std::vector<std::string> value )
+void MockCloudEventStorage::MakeReadAndRemoveEventsReturn( std::vector<std::string> value )
 {
-    ON_CALL( *this, ReadEvents() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ReadAndRemoveEvents() ).WillByDefault( Return( value ) );
 }
 
 void MockCloudEventStorage::ExpectReadEventsNotCalled()
 {
-    EXPECT_CALL( *this, ReadEvents() ).Times( 0 );
+    EXPECT_CALL( *this, ReadAndRemoveEvents() ).Times( 0 );
 }

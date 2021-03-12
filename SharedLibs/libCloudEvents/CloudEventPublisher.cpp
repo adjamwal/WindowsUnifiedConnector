@@ -47,7 +47,7 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 
     {
         std::lock_guard<std::mutex> lock( m_mutex );
-        events = m_eventStorage.ReadEvents();
+        events = m_eventStorage.ReadAndRemoveEvents();
     }
 
     for ( auto&& e : events )
@@ -55,7 +55,7 @@ int32_t CloudEventPublisher::PublishFailedEvents()
         CloudEventBuilder eventBuilder;
         if ( CloudEventBuilder::Deserialize( eventBuilder, e ) )
         {
-            publishReturn = InternalPublish( eventBuilder.Build() );
+            publishReturn |= InternalPublish( eventBuilder.Build() );
         }
     }
 
@@ -64,23 +64,22 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 
 int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 {
-    int32_t postReturn = 0;
     std::string eventResponse;
     int32_t httpReturn;
 
     std::lock_guard<std::mutex> lock( m_mutex );
     
-    postReturn = m_httpAdapter.Post(
+    m_httpAdapter.Post(
         m_pmConfig.GetCloudEventUri(),
         ( void* )eventJson.c_str(),
         eventJson.length(),
         eventResponse,
         httpReturn );
 
-    if( postReturn || httpReturn < 200 || httpReturn >= 300 )
+    if( httpReturn < 200 || httpReturn >= 300 )
     {
         m_eventStorage.SaveEvent( eventJson );
     }
 
-    return postReturn;
+    return httpReturn;
 }
