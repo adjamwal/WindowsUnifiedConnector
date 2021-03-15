@@ -8,21 +8,26 @@
 
 class ICatalogListRetriever;
 class IPackageInventoryProvider;
+class ICatalogJsonParser;
 
 class PackageDiscoveryManager : public IPackageDiscoveryManager
 {
 public:
-    PackageDiscoveryManager( ICatalogListRetriever& catalogListRetriever, IPackageInventoryProvider& packageInventoryProvider );
+    PackageDiscoveryManager( 
+        ICatalogListRetriever& catalogListRetriever, 
+        IPackageInventoryProvider& packageInventoryProvider,
+        ICatalogJsonParser& catalogJsonParser );
     ~PackageDiscoveryManager();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
     bool DiscoverPackages( PackageInventory& inventory ) override;
 
 private:
-    std::mutex m_mutex;
     ICatalogListRetriever& m_catalogListRetriever;
     IPackageInventoryProvider& m_packageInventoryProvider;
+    ICatalogJsonParser& m_catalogJsonParser;
     std::vector<PmDiscoveryComponent> m_catalogDataset;
-    
+    std::mutex m_mutex;
+
     void PrepareCatalogDataset();
 };
