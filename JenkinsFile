@@ -48,12 +48,10 @@ def SetupVersion( boolean upgrade ) {
         ucMajor = 99
       }
       ucMinor = 0
-      ucPatch = 0
     }
     else if (env.CHANGE_ID != null) {
       ucMajor = 9
       ucMinor = 0
-      ucPatch = 0
     }
                 
     contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(FILEVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'FILEVER\t\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
@@ -75,7 +73,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'100'))
   }
   parameters {
-    choice(name: 'IMMUNET', choices: ['1', '0'], description: 'Create Immunet UC build')
+    choice(name: 'IMMUNET', choices: ['0', '1'], description: 'Create Immunet UC build')
   }
   environment {
     NOTIFICATION_RECIPIENTS = 'fireamp-dev-connector-win@cisco.com'
