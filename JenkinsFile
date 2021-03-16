@@ -73,7 +73,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'100'))
   }
   parameters {
-    choice(name: 'IMMUNET', choices: ['1', '0'], description: 'Create Immunet UC build')
+    choice(name: 'IMMUNET', choices: ['0', '1'], description: 'Create Immunet UC build')
   }
   environment {
     NOTIFICATION_RECIPIENTS = 'fireamp-dev-connector-win@cisco.com'
