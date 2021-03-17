@@ -57,3 +57,39 @@ struct PmDiscoveryComponent
     std::string packageVersion;
     std::vector<PmDiscoveryConfigurable> configurables;
 };
+
+struct PmProductDiscoveryConfigurable
+{
+    std::string path;
+    int max_instances;
+    bool required;
+    std::vector<std::string> formats;
+};
+
+struct PmProductDiscoveryMsiMethod
+{
+    std::string type;
+    std::string name;
+    std::string vendor;
+};
+
+struct PmProductDiscoveryRegKeyType
+{
+    std::string key;
+    std::string type;
+};
+
+struct PmProductDiscoveryRegistryMethod
+{
+    std::string type;
+    PmProductDiscoveryRegKeyType install;
+    PmProductDiscoveryRegKeyType version;
+};
+
+struct PmProductDiscoveryRules
+{
+    std::string product;
+    std::vector<PmProductDiscoveryConfigurable> configurables;
+    std::vector<PmProductDiscoveryMsiMethod> msi_discovery;
+    std::vector<PmProductDiscoveryRegistryMethod> reg_discovery;
+};
