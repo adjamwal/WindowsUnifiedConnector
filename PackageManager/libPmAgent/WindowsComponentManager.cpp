@@ -13,18 +13,16 @@ WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
     , m_codeSignVerifier( codesignVerifier )
     , m_packageDiscovery( packageDiscovery )
 {
-
 }
 
-WindowsComponentManager::~WindowsComponentManager()
-{
+WindowsComponentManager::~WindowsComponentManager() { }
 
-}
-
-int32_t WindowsComponentManager::GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, 
-    PackageInventory& packages )
+int32_t WindowsComponentManager::GetInstalledPackages( 
+    const std::vector<PmDiscoveryComponent>& discoveryList, 
+    const std::vector<PmProductDiscoveryRules>& discoveryRules,
+    PackageInventory& packagesDiscovered )
 {
-    packages = m_packageDiscovery.GetInstalledPackages( discoveryList );
+    packagesDiscovered = m_packageDiscovery.GetInstalledPackages( discoveryList, discoveryRules );
 
     return 0;
 }

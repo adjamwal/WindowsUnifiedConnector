@@ -8,6 +8,7 @@ class IPmPlatformDependencies;
 struct PackageConfigInfo;
 struct PackageInventory;
 struct PmDiscoveryComponent;
+struct PmProductDiscoveryRules;
 
 class IPackageInventoryProvider
 {
@@ -17,5 +18,7 @@ public:
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
     virtual bool GetInventory( PackageInventory& inventory) = 0;
-    virtual void SetCatalogDataset( const std::vector<PmDiscoveryComponent>& discoveryList ) = 0;
+    virtual void SetCatalogDataset( 
+        const std::vector<PmDiscoveryComponent>& discoveryList,
+        const std::vector<PmProductDiscoveryRules>& catalogRules ) = 0;
 };

@@ -34,7 +34,7 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmDiscoveryCo
         for( Json::Value pkg : packages )
         {
             std::vector<PmDiscoveryConfigurable> pkgConfigs;
-            ParseConfigurables( pkg, pkgConfigs );
+            ParsePackageConfigurables( pkg, pkgConfigs );
 
             PmDiscoveryComponent catalogEntry = {
                     pkg[ "name" ].asString(),
@@ -55,7 +55,7 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmDiscoveryCo
     return true;
 }
 
-void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::vector<PmDiscoveryConfigurable>& returnPkgConfigs )
+void CatalogJsonParser::ParsePackageConfigurables( const Json::Value& pkgValue, std::vector<PmDiscoveryConfigurable>& returnPkgConfigs )
 {
     returnPkgConfigs.clear();
 
@@ -93,4 +93,9 @@ void CatalogJsonParser::ParseConfigFormats( const Json::Value& pkgConfigValue, s
     for( Json::Value fmt : pkgConfigValue[ UC_CATALOG_KEY_FORMATS ] ) {
         returnFormats.push_back( fmt.asString() );
     }
+}
+
+bool CatalogJsonParser::ParseProductRules( const std::string json, std::vector<PmProductDiscoveryRules>& returnProductRules )
+{
+    //TODO: parse products
 }

@@ -12,7 +12,8 @@ public:
     virtual ~CatalogJsonParser() {}
 
     bool Parse( const std::string json, std::vector<PmDiscoveryComponent>& returnCatalogDataset ) override;
+    bool ParseProductRules( const std::string json, std::vector<PmProductDiscoveryRules>& returnProductRules ) override;
 private:
-    void ParseConfigurables( const Json::Value& pkgValue, std::vector<PmDiscoveryConfigurable>& returnPkgConfigs );
+    void ParsePackageConfigurables( const Json::Value& pkgValue, std::vector<PmDiscoveryConfigurable>& returnPkgConfigs );
     void ParseConfigFormats( const Json::Value& pkgConfigValue, std::vector<std::string>& returnFormats );
 };

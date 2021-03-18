@@ -15,13 +15,16 @@ public:
 
     void Initialize( IPmPlatformDependencies* dep ) override;
     bool GetInventory( PackageInventory& inventory ) override;
-    void SetCatalogDataset( const std::vector<PmDiscoveryComponent>& discoveryList ) override;
+    void SetCatalogDataset( 
+        const std::vector<PmDiscoveryComponent>& discoveryList,
+        const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
 
 private:
     IFileUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     std::mutex m_mutex;
     std::vector<PmDiscoveryComponent> m_catalogDataset;
+    std::vector<PmProductDiscoveryRules> m_catalogRules;
 
     IPmPlatformDependencies* m_dependencies;
 };

@@ -26,8 +26,10 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    virtual int32_t GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList,
-        PackageInventory& packages ) = 0;
+    virtual int32_t GetInstalledPackages( 
+        const std::vector<PmDiscoveryComponent>& discoveryList,
+        const std::vector<PmProductDiscoveryRules>& discoveryRules,
+        PackageInventory& packagesDiscovered ) = 0;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:

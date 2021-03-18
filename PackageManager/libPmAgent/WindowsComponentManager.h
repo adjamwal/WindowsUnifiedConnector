@@ -21,7 +21,10 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    int32_t GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages ) override;
+    int32_t GetInstalledPackages( 
+        const std::vector<PmDiscoveryComponent>& discoveryList, 
+        const std::vector<PmProductDiscoveryRules>& discoveryRules,
+        PackageInventory& packagesDiscovered ) override;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:

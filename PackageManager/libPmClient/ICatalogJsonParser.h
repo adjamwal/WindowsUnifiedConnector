@@ -12,4 +12,5 @@ public:
     virtual ~ICatalogJsonParser() {}
 
     virtual bool Parse(const std::string json, std::vector<PmDiscoveryComponent>& catalogDataset ) = 0;
+    virtual bool ParseProductRules( const std::string json, std::vector<PmProductDiscoveryRules>& returnProductRules ) = 0;
 };

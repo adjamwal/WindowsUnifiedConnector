@@ -52,8 +52,8 @@ struct PmDiscoveryConfigurable
 
 struct PmDiscoveryComponent
 {
-    std::string packageId;
     std::string packageName;
+    std::string packageProduct;
     std::string packageVersion;
     std::vector<PmDiscoveryConfigurable> configurables;
 };
