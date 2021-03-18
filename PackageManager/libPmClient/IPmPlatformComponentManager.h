@@ -8,6 +8,7 @@ struct PmComponent;
 struct PackageConfigInfo;
 struct PackageInventory;
 struct PmDiscoveryComponent;
+struct PmProductDiscoveryRules;
 
 /**
  * @file IPmPlatformComponentManager.h
@@ -27,7 +28,6 @@ public:
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
     virtual int32_t GetInstalledPackages( 
-        const std::vector<PmDiscoveryComponent>& discoveryList,
         const std::vector<PmProductDiscoveryRules>& discoveryRules,
         PackageInventory& packagesDiscovered ) = 0;
 

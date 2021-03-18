@@ -22,7 +22,6 @@ public:
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
     int32_t GetInstalledPackages( 
-        const std::vector<PmDiscoveryComponent>& discoveryList, 
         const std::vector<PmProductDiscoveryRules>& discoveryRules,
         PackageInventory& packagesDiscovered ) override;
 

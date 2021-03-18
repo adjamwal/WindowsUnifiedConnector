@@ -160,7 +160,8 @@ bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& nameAn
     std::vector<PmDiscoveryComponent> searchFor( { searchTarget } );
     PackageInventory detectedInventory = {};
 
-    m_dependencies->ComponentManager().GetInstalledPackages( searchFor, detectedInventory );
+    // TODO: Fix this
+    //m_dependencies->ComponentManager().GetInstalledPackages( searchFor, detectedInventory );
 
     return detectedInventory.packages.size() > 0;
 }

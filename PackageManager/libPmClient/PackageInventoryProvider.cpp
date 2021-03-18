@@ -38,7 +38,7 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 
     std::vector<PmProductDiscoveryRules> catalogRules;
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogDataset, catalogRules, packagesDiscovered ) == 0 ) {
+    if( m_dependencies->ComponentManager().GetInstalledPackages( catalogRules, packagesDiscovered ) == 0 ) {
         for( auto &package : packagesDiscovered.packages ) {
             for( auto it = package.configs.begin(); it != package.configs.end();) {
                 std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );
@@ -61,11 +61,9 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 }
 
 void PackageInventoryProvider::SetCatalogDataset( 
-    const std::vector<PmDiscoveryComponent>& discoveryList,
     const std::vector<PmProductDiscoveryRules>& discoveryRules )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_catalogDataset = discoveryList;
     m_catalogRules = discoveryRules;
 }

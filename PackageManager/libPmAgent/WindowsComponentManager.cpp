@@ -18,11 +18,11 @@ WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
 WindowsComponentManager::~WindowsComponentManager() { }
 
 int32_t WindowsComponentManager::GetInstalledPackages( 
-    const std::vector<PmDiscoveryComponent>& discoveryList, 
     const std::vector<PmProductDiscoveryRules>& discoveryRules,
     PackageInventory& packagesDiscovered )
 {
-    packagesDiscovered = m_packageDiscovery.GetInstalledPackages( discoveryList, discoveryRules );
+    std::vector<PmDiscoveryComponent> temp_discoveryList; //TODO Remove this
+    packagesDiscovered = m_packageDiscovery.GetInstalledPackages( temp_discoveryList, discoveryRules );
 
     return 0;
 }
