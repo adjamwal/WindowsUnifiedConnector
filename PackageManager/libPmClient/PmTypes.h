@@ -86,10 +86,17 @@ struct PmProductDiscoveryRegistryMethod
     PmProductDiscoveryRegKeyType version;
 };
 
+struct PmProductDiscoveryMsiUpgradeCodeMethod
+{
+    std::string type;
+    std::string upgradeCode;
+};
+
 struct PmProductDiscoveryRules
 {
     std::string product;
     std::vector<PmProductDiscoveryConfigurable> configurables;
+    std::vector<PmProductDiscoveryMsiUpgradeCodeMethod> msiUpgradeCode_discovery;
     std::vector<PmProductDiscoveryMsiMethod> msi_discovery;
     std::vector<PmProductDiscoveryRegistryMethod> reg_discovery;
 };

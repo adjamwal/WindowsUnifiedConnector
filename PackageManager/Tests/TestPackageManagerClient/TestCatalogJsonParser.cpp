@@ -112,6 +112,87 @@ protected:
 	]
 })";
 
+	const std::string m_InvalidConfigurable = R"(
+{
+	"products": [
+		{
+			"product": "test-package-1",
+			"configurables": [
+				{
+					"path": "*.json",
+					"formats": [ "json" ],
+					"max_instances": 10
+				}
+			],
+			"discovery": [
+				{
+					"type": "msi",
+					"MissingName": "TestPackage",
+					"vendor": "TestPackage"
+				}
+			]
+		}
+	]
+})";
+
+	const std::string m_InvalidMsiDiscovery = R"(
+{
+	"products": [
+		{
+			"product": "test-package-1",
+			"configurables": [
+				{
+					"path": "*.json",
+					"Missingformats": [ "json" ],
+					"max_instances": 10
+				}
+			],
+			"discovery": [
+				{
+					"type": "msi",
+					"name": "TestPackage",
+					"vendor": "TestPackage"
+				}
+			]
+		}
+	]
+})";
+
+	const std::string m_InvalidMsiUpgradeCodeDiscovery = R"(
+{
+	"products": [
+		{
+			"product": "test-package-2",
+			"discovery": [
+				{
+					"type": "upgrade_code",
+					"MissingCode": "8c028f5dd91640b5a678f66b9789ec2b"
+				}
+			]
+		}
+	]
+})";
+
+	const std::string m_InvalidRegistryCodeDiscovery = R"(
+{
+	"products": [
+		{
+			"product": "test-package-3",
+			"discovery": [
+				{
+					"type": "registry",
+					"install": {
+						"key": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AD3C0732-A954-43C1-A575-C439A6660AFC}\\InstallLocation"
+					},
+					"version": {
+						"type": "keyType",
+						"Missingkey": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AD3C0732-A954-43C1-A575-C439A6660AFC}\\DisplayVersion"
+					}
+				}
+			]
+		}
+	]
+})";
 };
 
 TEST_F( TestCatalogJsonParser, WillParseCatalogJson )
@@ -133,9 +214,8 @@ TEST_F( TestCatalogJsonParser, WillFailToParseMalformedCatalogJson )
 
 TEST_F( TestCatalogJsonParser, WillFailToParseConfirgurablesWithoutValidFormats )
 {
-    std::string malformed = m_testPackagesCatalogJson;
-    StringUtil::ReplaceStringInPlace( malformed, "formats", "badvalue" );
-    ASSERT_FALSE( m_patient->Parse( malformed, m_discoveryRules ) );
+	m_patient->Parse( m_InvalidConfigurable, m_discoveryRules );
+	EXPECT_TRUE( m_discoveryRules.empty() );
 }
 
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryMsiMethod )
@@ -149,6 +229,15 @@ TEST_F( TestCatalogJsonParser, WillParseDiscoveryMsiMethod )
 	EXPECT_EQ( m_discoveryRules[ 0 ].msi_discovery[ 0 ].vendor, "TestPackage" );
 }
 
+TEST_F( TestCatalogJsonParser, WillParseDiscoveryMsiUpgradeCodeMethod )
+{
+	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+
+	ASSERT_TRUE( m_discoveryRules.size() >= 2 );
+	ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
+
+	EXPECT_EQ( m_discoveryRules[ 1 ].msiUpgradeCode_discovery[ 0 ].upgradeCode, "8c028f5dd91640b5a678f66b9789ec2b" );
+}
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryRegistryMethod )
 {
 	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
@@ -183,4 +272,22 @@ TEST_F( TestCatalogJsonParser, ParseWillIgnoreUnknownMehods )
 
 	EXPECT_EQ( m_discoveryRules[ 4 ].msi_discovery.size(), 1 );
 	EXPECT_EQ( m_discoveryRules[ 4 ].reg_discovery.size(), 1 );
+}
+
+TEST_F( TestCatalogJsonParser, WillNotAddRuleWithInvalidMsiDiscovery )
+{
+	m_patient->Parse( m_InvalidMsiDiscovery, m_discoveryRules );
+	EXPECT_TRUE( m_discoveryRules.empty() );
+}
+
+TEST_F( TestCatalogJsonParser, WillNotAddRuleWithInvalidMsiUpgradeCodeDiscovery )
+{
+	m_patient->Parse( m_InvalidMsiUpgradeCodeDiscovery, m_discoveryRules );
+	EXPECT_TRUE( m_discoveryRules.empty() );
+}
+
+TEST_F( TestCatalogJsonParser, WillNotAddRuleWithInvalidRegistryDiscovery )
+{
+	m_patient->Parse( m_InvalidRegistryCodeDiscovery, m_discoveryRules );
+	EXPECT_TRUE( m_discoveryRules.empty() );
 }

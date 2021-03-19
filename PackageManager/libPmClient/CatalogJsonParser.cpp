@@ -9,6 +9,8 @@
 
 #define UC_CATALOG_DISCOVERY_TYPE_MSI "msi"
 #define UC_CATALOG_DISCOVERY_TYPE_REGISTRY "registry"
+#define UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE "upgrade_code"
+
 bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDiscoveryRules>&returnCatalogDataset )
 {
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
@@ -31,40 +33,43 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDisc
             LOG_ERROR( "Package array not found in Catalog Json" );
             return false;
         }
+    }
+    catch ( ... ) {
+        LOG_ERROR( "Exception error parsing Catalog json" );
+        return false;
+    }
 
-        packages = root[ UC_CATALOG_KEY_PRODUCTS ];
-        for( Json::Value pkg : packages )
-        {
+    packages = root[ UC_CATALOG_KEY_PRODUCTS ];
+    for( Json::Value pkg : packages )
+    {
+        try {
             PmProductDiscoveryRules catalogEntry;
             bool validDiscoveryMechanismFound = false;
             catalogEntry.product = pkg[ "product" ].asString();
             for ( Json::Value discovery : pkg[ "discovery" ] ) {
-                if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI ) {
+                if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE ) {
+                    ParseMsiUpgradeCodeDiscovery( discovery, catalogEntry.msiUpgradeCode_discovery );
+                    validDiscoveryMechanismFound = true;
+                }
+                else if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI ) {
                     ParseMsiDiscovery( discovery, catalogEntry.msi_discovery );
                     validDiscoveryMechanismFound = true;
                 }
-                 else if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) {
+                    else if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) {
                     ParseRegistryDiscovery( discovery, catalogEntry.reg_discovery );
                     validDiscoveryMechanismFound = true;
                 }
-                 else {
+                    else {
                     LOG_DEBUG( "Ignoring Unknown discovery mechanism %s", discovery[ "type" ].asCString() );
                 }
             }
 
-            try {
-                ParseConfigurables( pkg, catalogEntry.configurables );
-                returnCatalogDataset.push_back( catalogEntry );
-            }
-            catch ( std::exception& e ) {
-                LOG_ERROR( "Expection: %s", e.what() );
-            }
+            ParseConfigurables( pkg, catalogEntry.configurables );
+            returnCatalogDataset.push_back( catalogEntry );
         }
-    }
-    catch( ... )
-    {
-        LOG_ERROR( "Exception error parsing Catalog json" );
-        return false;
+        catch ( std::exception& e ) {
+            LOG_ERROR( "Expection: %s", e.what() );
+        }
     }
 
     return true;
@@ -83,7 +88,7 @@ void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::ve
         std::vector<std::string> formats;
 
         ParseConfigFormats( cfg, formats );
-        if( formats.size() == 0 ) throw new std::exception("Configurable must have at least one valid format");
+        if( formats.size() == 0 ) throw std::exception("Configurable must have at least one valid format");
 
         PmProductDiscoveryConfigurable configEntry
         {
@@ -123,6 +128,7 @@ void CatalogJsonParser::ParseMsiDiscovery( const Json::Value & msiValue, std::ve
     }
     else {
         LOG_ERROR( "Failed to parse msi discovery json: %s", msiValue.asCString() );
+        throw std::exception( "Invalid msi discovery json" );
     }
 }
 
@@ -148,5 +154,22 @@ void CatalogJsonParser::ParseRegistryDiscovery( const Json::Value & regValue, st
     }
     else {
         LOG_ERROR( "Failed to parse registry discovery json: %s", regValue.asCString() );
+        throw std::exception( "Invalid registry discovery json" );
+    }
+}
+
+void CatalogJsonParser::ParseMsiUpgradeCodeDiscovery( const Json::Value& msiUpgardeValue, std::vector<PmProductDiscoveryMsiUpgradeCodeMethod>& returnMsi )
+{
+    PmProductDiscoveryMsiUpgradeCodeMethod msiUpgradeDiscovery;
+
+    if ( msiUpgardeValue[ "code" ].isString() ) {
+        msiUpgradeDiscovery.type = UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE;
+        msiUpgradeDiscovery.upgradeCode = msiUpgardeValue[ "code" ].asString();
+
+        returnMsi.push_back( msiUpgradeDiscovery );
+    }
+    else {
+        LOG_ERROR( "Failed to parse msi upgrade code discovery json: %s", msiUpgardeValue.asCString() );
+        throw std::exception( "Invalid msi upgrade code discovery json" );
     }
 }

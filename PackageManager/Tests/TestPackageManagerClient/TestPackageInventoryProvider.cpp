@@ -63,7 +63,7 @@ TEST_F( TestPackageInventoryProvider, GetInventoryWillRetrieveConfigSha )
     package.configs.push_back( config );
     detectedPackages.packages.push_back( package );
     ON_CALL( *m_pmComponentManager, GetInstalledPackages( _ ) )
-        .WillByDefault( DoAll( SetArgReferee<1>( detectedPackages ), Return( 0 ) ) );
+        .WillByDefault( DoAll( SetArgReferee<0>( detectedPackages ), Return( 0 ) ) );
     m_fileUtil->MakeFileExistsReturn( true );
     m_sslUtil->MakeCalculateSHA256Return( sha256 );
     m_patient->Initialize( m_dep.get() );
@@ -84,7 +84,7 @@ TEST_F( TestPackageInventoryProvider, GetInventoryWillDropMissingFiles )
     package.configs.push_back( config );
     detectedPackages.packages.push_back( package );
     ON_CALL( *m_pmComponentManager, GetInstalledPackages( _ ) )
-        .WillByDefault( DoAll( SetArgReferee<1>( detectedPackages ), Return( 0 ) ) );
+        .WillByDefault( DoAll( SetArgReferee<0>( detectedPackages ), Return( 0 ) ) );
     m_fileUtil->MakeFileExistsReturn( false );
     m_patient->Initialize( m_dep.get() );
 
