@@ -10,28 +10,25 @@ public:
     PackageDiscovery();
     ~PackageDiscovery();
 
-    PackageInventory GetInstalledPackages( 
-        const std::vector<PmDiscoveryComponent>& discoveryList,
-        const std::vector<PmProductDiscoveryRules>& catalogRules
-    ) override;
+    PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
+    PackageInventory CachedInventory() override;
 
 private:
-    bool GetMatchingProductRuleSet(
-        const PmDiscoveryComponent& lookupItem,
-        const std::vector<PmProductDiscoveryRules>& catalogRules,
-        PmProductDiscoveryRules& ruleSet );
-    void ApplyDiscoveryForPackage(
-        const PmDiscoveryComponent& lookupItem,
-        const PmProductDiscoveryRules& discoveryRuleSet,
+    void ApplyDiscoveryMethods(
+        const PmProductDiscoveryRules& lookupProduct,
         std::vector<PmInstalledPackage>& detectedInstallations );
-    void DiscoverPackageByMsi(
-        const PmDiscoveryComponent& lookupItem,
+
+    void DiscoverByMsi(
+        const PmProductDiscoveryRules& lookupProduct,
         const PmProductDiscoveryMsiMethod& msiRule,
         std::vector<PmInstalledPackage>& detectedInstallations );
-    void DiscoverPackageByRegistry(
-        const PmDiscoveryComponent& lookupItem,
+
+    void DiscoverByRegistry(
+        const PmProductDiscoveryRules& lookupProduct,
         const PmProductDiscoveryRegistryMethod& regRule,
         std::vector<PmInstalledPackage>& detectedInstallations );
 
     void PadBuildNumber( std::string& versionString );
+
+    PackageInventory m_lastDetectedPackages;
 };

@@ -17,12 +17,9 @@ WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
 
 WindowsComponentManager::~WindowsComponentManager() { }
 
-int32_t WindowsComponentManager::GetInstalledPackages( 
-    const std::vector<PmProductDiscoveryRules>& discoveryRules,
-    PackageInventory& packagesDiscovered )
+int32_t WindowsComponentManager::GetInstalledPackages( PackageInventory& packagesDiscovered )
 {
-    std::vector<PmDiscoveryComponent> temp_discoveryList; //TODO Remove this
-    packagesDiscovered = m_packageDiscovery.GetInstalledPackages( temp_discoveryList, discoveryRules );
+    packagesDiscovered = m_packageDiscovery.CachedInventory();
 
     return 0;
 }

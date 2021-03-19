@@ -36,9 +36,7 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         return false;
     }
 
-    std::vector<PmProductDiscoveryRules> catalogRules;
-
-    if( m_dependencies->ComponentManager().GetInstalledPackages( catalogRules, packagesDiscovered ) == 0 ) {
+    if( m_dependencies->ComponentManager().GetInstalledPackages( packagesDiscovered ) == 0 ) {
         for( auto &package : packagesDiscovered.packages ) {
             for( auto it = package.configs.begin(); it != package.configs.end();) {
                 std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );

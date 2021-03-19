@@ -761,11 +761,11 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
 
-    EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _, _ ) ).WillOnce( Invoke(
-        [this, &pass]( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages )
+    EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _ ) ).WillOnce( Invoke(
+        [this, &pass]( PackageInventory& inventory )
         {
             //TODO: change this as deemed appropriate once the package discovery is complete
-            EXPECT_EQ( discoveryList.size(), 0 );
+            EXPECT_EQ( inventory.packages.size(), 0 );
 
             pass = true;
             m_cv.notify_one();
