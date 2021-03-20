@@ -27,8 +27,8 @@ protected:
         m_inventory->platform = "platform";
 
         PmInstalledPackage package;
-        package.packageName = "Name";
-        package.packageVersion = "Version";
+        package.product = "Name";
+        package.version = "Version";
 
         PackageConfigInfo config;
         config.path = "path";
@@ -46,8 +46,8 @@ protected:
         PackageConfigInfo config;
         PmInstalledPackage package;
 
-        package.packageName = "Package1";
-        package.packageVersion = "Version1";
+        package.product = "Package1";
+        package.version = "Version1";
 
         config.path = "path1";
         config.sha256 = "sha1";
@@ -59,8 +59,8 @@ protected:
         m_inventory->packages.push_back( package );
 
         package.configs.clear();
-        package.packageName = "Package2";
-        package.packageVersion = "Version2";
+        package.product = "Package2";
+        package.version = "Version2";
 
 
         config.path = "path3";
@@ -111,7 +111,7 @@ TEST_F( TestCheckinFormatter, WillBuildPackage )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "installed" ][ 0 ][ "package" ], m_inventory->packages.front().packageName + "/"  + m_inventory->packages.front().packageVersion );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "package" ], m_inventory->packages.front().product + "/"  + m_inventory->packages.front().version );
 }
 
 TEST_F( TestCheckinFormatter, WillBuildPackageConfig )

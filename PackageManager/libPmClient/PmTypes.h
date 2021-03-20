@@ -11,13 +11,13 @@ struct PackageConfigInfo
     std::string verifyPath;
     std::string installLocation;
     std::string signerName;
-    std::string forComponentID; // e.g. 'AMP/1.0.0'
+    std::string forProductAndVersion; // e.g. 'AMP/1.0.0'
     bool deleteConfig;
 };
 
 struct PmComponent
 {
-    std::string packageNameAndVersion;
+    std::string productAndVersion; //e.g. "uc/1.0.0.150"
     std::string installerUrl;
     std::string installerType;
     std::string installerArgs;
@@ -30,8 +30,8 @@ struct PmComponent
 
 struct PmInstalledPackage
 {
-    std::string packageName;
-    std::string packageVersion;
+    std::string product;
+    std::string version;
     std::vector<PackageConfigInfo> configs;
 };
 
@@ -94,7 +94,7 @@ struct PmProductDiscoveryMsiUpgradeCodeMethod
 
 struct PmProductDiscoveryRules
 {
-    std::string product;
+    std::string product; //e.g. "uc"
     std::vector<PmProductDiscoveryConfigurable> configurables;
     std::vector<PmProductDiscoveryMsiUpgradeCodeMethod> msiUpgradeCode_discovery;
     std::vector<PmProductDiscoveryMsiMethod> msi_discovery;

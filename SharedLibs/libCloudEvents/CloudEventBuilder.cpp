@@ -14,6 +14,7 @@
 #include "IUcLogger.h"
 #include "JsonUtil.h"
 #include "TimeUtil.h"
+#include "StringUtil.h"
 #include <iomanip>
 
 CloudEventBuilder::CloudEventBuilder()
@@ -57,13 +58,7 @@ ICloudEventBuilder& CloudEventBuilder::WithPackage( const std::string& name, con
 
 ICloudEventBuilder& CloudEventBuilder::WithPackageID( const std::string& idAsNameAndVersion )
 {
-    std::istringstream original( idAsNameAndVersion );
-    std::vector<std::string> parts;
-    std::string s;
-
-    while( std::getline( original, s, '/' ) ) {
-        parts.push_back( s );
-    }
+    auto parts = StringUtil::Split( idAsNameAndVersion, '/' );
 
     if( parts.size() > 0 ) m_packageName = parts[ 0 ];
     if( parts.size() > 1 ) m_packageVersion = parts[ 1 ];

@@ -47,7 +47,7 @@ bool PackageConfigProcessor::ProcessConfig( PackageConfigInfo& config )
     m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
     m_eventBuilder.Reset();
     m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
-    m_eventBuilder.WithPackageID( config.forComponentID );
+    m_eventBuilder.WithPackageID( config.forProductAndVersion );
 
     if( config.deleteConfig ) {
         return RemoveConfig( config );

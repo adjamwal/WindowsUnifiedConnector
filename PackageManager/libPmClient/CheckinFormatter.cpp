@@ -25,7 +25,7 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
             Json::Value package;
             PmInstalledPackage& packageDetection = inventory.packages[ i ];
 
-            package[ "package" ] = packageDetection.packageName + "/" + packageDetection.packageVersion;
+            package[ "package" ] = packageDetection.product + "/" + packageDetection.version;
             if( packageDetection.configs.size() ) {
                 Json::Value& configs = package[ "configs" ];
                 for( int j = 0; j < packageDetection.configs.size(); j++ ) {

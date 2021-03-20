@@ -47,7 +47,7 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetUC )
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
-    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.product );
+    EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
     EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
 }
 
@@ -66,7 +66,7 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetImmunet )
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
-    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.product );
+    EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
 }
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetAmp )
@@ -84,7 +84,7 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetAmp )
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
-    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.product );
+    EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
 }
 
 TEST_F( TestPackageDiscovery, BuildAmpWillFailOnRegistryFailure )
@@ -122,8 +122,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverPrograms )
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageName, interestedPrograms.product );
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, installedProgram.version );
+    EXPECT_EQ( installedPackages.packages[ 0 ].product, interestedPrograms.product );
+    EXPECT_EQ( installedPackages.packages[ 0 ].version, installedProgram.version );
 }
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverManyPrograms )
@@ -148,11 +148,11 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverManyPrograms 
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageName, "p1" );
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, installedProgram.version );
+    EXPECT_EQ( installedPackages.packages[ 0 ].product, "p1" );
+    EXPECT_EQ( installedPackages.packages[ 0 ].version, installedProgram.version );
 
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, "p2" );
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
+    EXPECT_EQ( installedPackages.packages[ 1 ].product, "p2" );
+    EXPECT_EQ( installedPackages.packages[ 1 ].version, installedProgram.version );
 }
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillPadVersionNumbers )
@@ -174,5 +174,5 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillPadVersionNumbers )
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, "1.0.0.0" );
+    EXPECT_EQ( installedPackages.packages[ 0 ].version, "1.0.0.0" );
 }

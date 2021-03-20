@@ -17,9 +17,16 @@ WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
 
 WindowsComponentManager::~WindowsComponentManager() { }
 
-int32_t WindowsComponentManager::GetInstalledPackages( PackageInventory& packagesDiscovered )
+int32_t WindowsComponentManager::GetInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered )
 {
-    packagesDiscovered = m_packageDiscovery.CachedInventory();
+    packagesDiscovered = m_packageDiscovery.DiscoverInstalledPackages( catalogRules );
+
+    return 0;
+}
+
+int32_t WindowsComponentManager::GetCachedInventory( PackageInventory& cachedInventory )
+{
+    cachedInventory = m_packageDiscovery.CachedInventory();
 
     return 0;
 }
@@ -66,7 +73,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
             if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
                 std::string logFilePath = converter.to_bytes(WindowsUtilities::GetLogDir());
-                std::string logFileName = package.packageNameAndVersion;
+                std::string logFileName = package.productAndVersion;
 
                 std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
                 logFilePath.append( "\\" ).append( logFileName ).append(".log");

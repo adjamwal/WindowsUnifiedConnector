@@ -256,7 +256,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
             EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
             pass = true;
             m_cv.notify_one();
@@ -497,7 +497,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
             EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
             packageUpdated = true;
             return 0;
@@ -620,7 +620,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
                 EXPECT_EQ( package.installerType, "msi" );
                 EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-                EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+                EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
                 packageUpdated++;
                 return 0;
@@ -634,7 +634,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
                 EXPECT_EQ( package.installerType, "exe" );
                 EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-                EXPECT_EQ( package.packageNameAndVersion, "uc2/0.0.1" );
+                EXPECT_EQ( package.productAndVersion, "uc2/0.0.1" );
 
                 packageUpdated++;
                 return 0;
@@ -727,7 +727,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
             EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
             packageUpdated = true;
             return 0;
@@ -761,8 +761,8 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
     bool pass = false;
     ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
 
-    EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _ ) ).WillOnce( Invoke(
-        [this, &pass]( PackageInventory& inventory )
+    EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( std::vector<PmProductDiscoveryRules> catalogRules, PackageInventory& inventory )
         {
             //TODO: change this as deemed appropriate once the package discovery is complete
             EXPECT_EQ( inventory.packages.size(), 0 );

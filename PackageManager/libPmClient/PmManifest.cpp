@@ -96,7 +96,7 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     PmComponent package;
 
     // Required Data
-    package.packageNameAndVersion = GetJsonStringField( packageJson, MANIFEST_FIELD_PACKAGE, true );
+    package.productAndVersion = GetJsonStringField( packageJson, MANIFEST_FIELD_PACKAGE, true );
 
     // Optional Data
     package.installerUrl = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_URI, false );
