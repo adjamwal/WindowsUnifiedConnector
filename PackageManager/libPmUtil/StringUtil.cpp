@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 const std::string WHITESPACE = " \n\r\t\f\v\0";
 
@@ -29,4 +30,16 @@ void StringUtil::ReplaceStringInPlace( std::string& subject, const std::string& 
         subject.replace( pos, search.length(), replace );
         pos += replace.length();
     }
+}
+
+std::vector<std::string> StringUtil::Split( const std::string source, const char separator )
+{
+    std::vector<std::string> parts;
+    std::istringstream stream( source );
+    std::string s;
+    while( getline( stream, s, separator ) ) {
+        parts.push_back( s );
+    }
+
+    return parts;
 }

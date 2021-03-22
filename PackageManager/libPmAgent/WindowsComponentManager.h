@@ -21,7 +21,14 @@ public:
      *
      * @return 0 if the packages have been successfully retrieved. -1 otherwise
      */
-    int32_t GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages ) override;
+    int32_t GetInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered ) override;
+
+    /**
+     * @brief This API is used to retrieve the cached list of packages installed on the client, as detected during the last discovery operation.
+     *
+     * @return 0 if the packages have been successfully retrieved. -1 otherwise
+     */
+    int32_t GetCachedInventory( PackageInventory& cachedInventory ) override;
 
     /**
      * @brief This API will be used to install a package. The package will provide the following:

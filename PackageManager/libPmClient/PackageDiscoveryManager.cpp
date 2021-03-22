@@ -36,7 +36,8 @@ void PackageDiscoveryManager::PrepareCatalogDataset()
     std::string catalogList = m_catalogListRetriever.GetCloudCatalog();
     LOG_DEBUG( "Retrieved Catalog: %s", catalogList.c_str() );
 
-    m_catalogJsonParser.Parse( catalogList, m_catalogDataset );
+    std::vector<PmProductDiscoveryRules> catalogProductRules;
+    m_catalogJsonParser.Parse( catalogList, catalogProductRules );
     
-    m_packageInventoryProvider.SetCatalogDataset( m_catalogDataset );
+    m_packageInventoryProvider.SetCatalogDataset( catalogProductRules );
 }

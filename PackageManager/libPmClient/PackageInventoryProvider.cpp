@@ -28,7 +28,7 @@ void PackageInventoryProvider::Initialize( IPmPlatformDependencies* dep )
 bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 {
     bool rtn = false;
-    PackageInventory detectedPackages;
+    PackageInventory packagesDiscovered;
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -36,8 +36,8 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         return false;
     }
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogDataset, detectedPackages ) == 0 ) {
-        for( auto &package : detectedPackages.packages ) {
+    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogRules, packagesDiscovered ) == 0 ) {
+        for( auto &package : packagesDiscovered.packages ) {
             for( auto it = package.configs.begin(); it != package.configs.end();) {
                 std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );
                 if( m_fileUtil.FileExists( resolvedPath ) ) {
@@ -51,16 +51,17 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
                 }
             }
         }
-        inventory = detectedPackages;
+        inventory = packagesDiscovered;
         rtn = true;
     }
 
     return rtn;
 }
 
-void PackageInventoryProvider::SetCatalogDataset( const std::vector<PmDiscoveryComponent>& discoveryList )
+void PackageInventoryProvider::SetCatalogDataset( 
+    const std::vector<PmProductDiscoveryRules>& discoveryRules )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_catalogDataset = discoveryList;
+    m_catalogRules = discoveryRules;
 }

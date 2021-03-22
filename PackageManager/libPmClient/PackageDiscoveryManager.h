@@ -26,7 +26,6 @@ private:
     ICatalogListRetriever& m_catalogListRetriever;
     IPackageInventoryProvider& m_packageInventoryProvider;
     ICatalogJsonParser& m_catalogJsonParser;
-    std::vector<PmDiscoveryComponent> m_catalogDataset;
     std::mutex m_mutex;
 
     void PrepareCatalogDataset();

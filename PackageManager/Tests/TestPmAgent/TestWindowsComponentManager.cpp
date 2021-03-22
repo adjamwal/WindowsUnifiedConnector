@@ -74,11 +74,11 @@ protected:
 
 TEST_F( TestWindowsComponentManager, WillGetInstalledPackages )
 {
-    EXPECT_CALL( *m_packageDiscovery, GetInstalledPackages( _ ) );
+    EXPECT_CALL( *m_packageDiscovery, DiscoverInstalledPackages( _ ) );
 
-    std::vector<PmDiscoveryComponent> discoveryList;
+    std::vector<PmProductDiscoveryRules> catalogRules;
     PackageInventory foundPackages;
-    m_patient->GetInstalledPackages( discoveryList, foundPackages );
+    m_patient->GetInstalledPackages( catalogRules, foundPackages );
 }
 
 TEST_F( TestWindowsComponentManager, WillCodeSignVerifyOnUpdateComponent )
@@ -306,22 +306,22 @@ TEST_F( TestWindowsComponentManager, DeployConfigurationSuccess )
 
 TEST_F( TestWindowsComponentManager, GetInstalledPackagesSucceed )
 {
+    std::vector<PmProductDiscoveryRules> catalogRules;
     PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
 
-    int32_t ret = m_patient->GetInstalledPackages( discoveryList, installedPackages );
+    int32_t ret = m_patient->GetInstalledPackages( catalogRules, installedPackages );
 
     EXPECT_EQ( ret, 0 );
 }
 
 TEST_F( TestWindowsComponentManager, GetInstalledPackagesWillSearchForPackages )
 {
+    std::vector<PmProductDiscoveryRules> catalogRules;
     PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
 
-    EXPECT_CALL( *m_packageDiscovery, GetInstalledPackages( _ ) );
+    EXPECT_CALL( *m_packageDiscovery, DiscoverInstalledPackages( _ ) );
 
-    int32_t ret = m_patient->GetInstalledPackages( discoveryList, installedPackages );
+    int32_t ret = m_patient->GetInstalledPackages( catalogRules, installedPackages );
 }
 
 TEST_F( TestWindowsComponentManager, WillResolveKnownFolderID )

@@ -86,9 +86,9 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
 
     m_eventBuilder.Reset();
     m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
-    m_eventBuilder.WithPackageID( componentPackage.packageNameAndVersion );
+    m_eventBuilder.WithPackageID( componentPackage.productAndVersion );
 
-    bool isAlreadyInstalled = IsPackageFoundLocally( componentPackage.packageNameAndVersion, m_eventBuilder.GetPackageName() );
+    bool isAlreadyInstalled = IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
     m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 ); //new file info gets updated after download
 
@@ -152,17 +152,21 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
     return rtn;
 }
 
-bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly )
+bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& name, const std::string& version )
 {
     if( !m_dependencies ) return false;
 
-    PmDiscoveryComponent searchTarget = { nameAndVersion, nameOnly };
-    std::vector<PmDiscoveryComponent> searchFor( { searchTarget } );
-    PackageInventory detectedInventory = {};
+    PackageInventory inventory;
+    m_dependencies->ComponentManager().GetCachedInventory( inventory );
 
-    m_dependencies->ComponentManager().GetInstalledPackages( searchFor, detectedInventory );
+    for( auto item : inventory.packages )
+    {
+        if( item.product == name &&
+            ( version.empty() || version == item.version )
+            ) return true;
+    }
 
-    return detectedInventory.packages.size() > 0;
+    return false;
 }
 
 void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& componentPackage, std::string& tempPackageFile )
@@ -204,8 +208,8 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
         
         try
         {
-            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.c_str(), componentPackage.packageNameAndVersion.c_str() );
-            config.forComponentID = componentPackage.packageNameAndVersion;
+            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.c_str(), componentPackage.productAndVersion.c_str() );
+            config.forProductAndVersion = componentPackage.productAndVersion;
             processed = m_configProcessor.ProcessConfig( config );
         }
         catch( ... )
@@ -218,7 +222,7 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
     if( failedConfigs > 0 )
     {
-        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs for package %s", failedConfigs, componentPackage.packageNameAndVersion.c_str() );
+        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs for package %s", failedConfigs, componentPackage.productAndVersion.c_str() );
     }
 
     return failedConfigs == 0;

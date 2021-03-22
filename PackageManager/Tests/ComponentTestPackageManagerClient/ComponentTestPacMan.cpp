@@ -42,17 +42,17 @@ protected:
         m_configUrl = "https://test.com";
         m_configIntervalCalledOnce = false;
 
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
-        m_config.reset( new NiceMock<MockPmConfig>() );
-        m_cloud.reset( new NiceMock<MockPmCloud>() );
-        m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
-        m_platformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
-        m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
-        m_sslUtil.reset( new NiceMock<MockSslUtil>() );
+        m_mockFileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_mockConfig.reset( new NiceMock<MockPmConfig>() );
+        m_mockCloud.reset( new NiceMock<MockPmCloud>() );
+        m_mockPlatformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
+        m_mockPlatformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
+        m_mockDeps.reset( new NiceMock<MockPmPlatformDependencies>() );
+        m_mockSslUtil.reset( new NiceMock<MockSslUtil>() );
 
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
-        m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) );
+        m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_mockFileUtil, *m_mockSslUtil ) );
         m_checkinFormatter.reset( new CheckinFormatter() );
         m_ucidAdapter.reset( new UcidAdapter() );
         m_certsAdapter.reset( new CertsAdapter() );
@@ -62,15 +62,17 @@ protected:
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
-        m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) );
-        m_catalogListRetriever.reset( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) );
+        m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_mockCloud, *m_ucidAdapter, *m_certsAdapter ) );
+        m_catalogListRetriever.reset( new CatalogListRetriever( *m_mockCloud, *m_ucidAdapter, *m_certsAdapter, *m_mockConfig ) );
         m_catalogJsonParser.reset( new CatalogJsonParser() );
-        m_packageDiscoveryManager.reset( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) );
-        m_configProcesor.reset( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
+        m_packageDiscoveryManager.reset( 
+            new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) 
+        );
+        m_configProcesor.reset( new PackageConfigProcessor( *m_mockFileUtil, *m_mockSslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor(
-            *m_cloud,
-            *m_fileUtil,
-            *m_sslUtil,
+            *m_mockCloud,
+            *m_mockFileUtil,
+            *m_mockSslUtil,
             *m_configProcesor,
             *m_ucidAdapter,
             *m_eventBuilder,
@@ -78,11 +80,11 @@ protected:
             *m_ucUpgradeEventHandler ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
-        m_deps->MakeConfigurationReturn( *m_platformConfiguration );
-        m_deps->MakeComponentManagerReturn( *m_platformComponentManager );
-        ON_CALL( *m_platformConfiguration, GetIdentityToken( _ ) ).WillByDefault( DoAll( SetArgReferee<0>( "token" ), Return( true ) ) );
-        ON_CALL( *m_config, GetCloudCheckinInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinInterval ) );
-        ON_CALL( *m_platformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
+        m_mockDeps->MakeConfigurationReturn( *m_mockPlatformConfiguration );
+        m_mockDeps->MakeComponentManagerReturn( *m_mockPlatformComponentManager );
+        ON_CALL( *m_mockPlatformConfiguration, GetIdentityToken( _ ) ).WillByDefault( DoAll( SetArgReferee<0>( "token" ), Return( true ) ) );
+        ON_CALL( *m_mockConfig, GetCloudCheckinInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinInterval ) );
+        ON_CALL( *m_mockPlatformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
             []( const std::string& basePath )
             {
                 return basePath;
@@ -90,8 +92,8 @@ protected:
         ) );
 
         m_patient.reset( new PackageManager(
-            *m_config,
-            *m_cloud,
+            *m_mockConfig,
+            *m_mockCloud,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
             *m_ucidAdapter,
@@ -126,14 +128,14 @@ protected:
         m_packageInventoryProvider.reset();
         m_thread.reset();
         m_manifest.reset();
-        m_sslUtil.reset();
+        m_mockSslUtil.reset();
 
-        m_deps.reset();
-        m_platformComponentManager.reset();
-        m_platformConfiguration.reset();
-        m_cloud.reset();
-        m_config.reset();
-        m_fileUtil.reset();
+        m_mockDeps.reset();
+        m_mockPlatformComponentManager.reset();
+        m_mockPlatformConfiguration.reset();
+        m_mockCloud.reset();
+        m_mockConfig.reset();
+        m_mockFileUtil.reset();
     }
 
     uint32_t GetCloudCheckinInterval()
@@ -153,16 +155,16 @@ protected:
 
     void StartPacMan()
     {
-        m_platformConfiguration->MakeGetSslCertificatesReturn( 0 );
-        m_config->MakeLoadBsConfigReturn( 0 );
-        m_config->MakeLoadPmConfigReturn( 0 );
-        m_config->MakeGetCloudCheckinUriReturn( m_configUrl );
-        m_config->MakeGetCloudCatalogUriReturn( m_configUrl );
+        m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
+        m_mockConfig->MakeLoadBsConfigReturn( 0 );
+        m_mockConfig->MakeLoadPmConfigReturn( 0 );
+        m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
+        m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
 
-        m_cloud->MakeDownloadFileReturn( 200 );
-        m_cloud->MakeGetReturn( 200 );
+        m_mockCloud->MakeDownloadFileReturn( 200 );
+        m_mockCloud->MakeGetReturn( 200 );
 
-        m_patient->SetPlatformDependencies( m_deps.get() );
+        m_patient->SetPlatformDependencies( m_mockDeps.get() );
         m_patient->Start( "ConfigFile", "ConfigFile" );
     }
 
@@ -191,13 +193,13 @@ protected:
     std::mutex m_configMutex;
     std::condition_variable m_cv;
 
-    std::unique_ptr<MockFileUtil> m_fileUtil;
-    std::unique_ptr<MockPmConfig> m_config;
-    std::unique_ptr<MockPmCloud> m_cloud;
-    std::unique_ptr<MockPmPlatformConfiguration> m_platformConfiguration;
-    std::unique_ptr<MockPmPlatformComponentManager> m_platformComponentManager;
-    std::unique_ptr<MockPmPlatformDependencies> m_deps;
-    std::unique_ptr<MockSslUtil> m_sslUtil;
+    std::unique_ptr<MockFileUtil> m_mockFileUtil;
+    std::unique_ptr<MockPmConfig> m_mockConfig;
+    std::unique_ptr<MockPmCloud> m_mockCloud;
+    std::unique_ptr<MockPmPlatformConfiguration> m_mockPlatformConfiguration;
+    std::unique_ptr<MockPmPlatformComponentManager> m_mockPlatformComponentManager;
+    std::unique_ptr<MockPmPlatformDependencies> m_mockDeps;
+    std::unique_ptr<MockSslUtil> m_mockSslUtil;
 
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
@@ -243,11 +245,11 @@ std::string _ucReponseNoConfig( R"(
 TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 {
     bool pass = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
 
-    m_sslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+    m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
-    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const PmComponent& package, std::string& error )
         {
             EXPECT_EQ( package.installerArgs, "/S /Q " );
@@ -256,7 +258,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
             EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
             pass = true;
             m_cv.notify_one();
@@ -318,10 +320,10 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 {
     bool pass = false;
 
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
 
-    ON_CALL( *m_sslUtil, DecodeBase64( _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockSslUtil, DecodeBase64( _, _ ) ).WillByDefault( Invoke(
         []( const std::string& base64Str, std::vector<uint8_t>& output )
         {
             SslUtil sslUtil;
@@ -329,7 +331,7 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
         }
     ) );
 
-    EXPECT_CALL( *m_fileUtil, AppendFile( _, _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockFileUtil, AppendFile( _, _, _ ) ).WillOnce( Invoke(
         [this, &pass]( FileUtilHandle* handle, void* data, size_t dataLen )
         {
             std::string strData( ( char* )data, dataLen );
@@ -351,12 +353,12 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
 {
     bool pass = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_mockFileUtil->MakeAppendFileReturn( 1 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
-    EXPECT_CALL( *m_platformComponentManager, DeployConfiguration( _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockPlatformComponentManager, DeployConfiguration( _ ) ).WillOnce( Invoke(
         [this, &pass]( const PackageConfigInfo& config )
         {
             EXPECT_EQ( config.sha256, "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
@@ -379,15 +381,15 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
 TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
 {
     bool pass = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_mockFileUtil->MakeAppendFileReturn( 1 );
+    m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
-    EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
+    EXPECT_CALL( *m_mockFileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );
-    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
         {
             EXPECT_EQ( newName, "/install/location/config.json" );
@@ -425,15 +427,15 @@ std::string _ucReponseConfigWithoutVerify( R"(
 TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
 {
     bool pass = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_sslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
-    m_fileUtil->MakeFileExistsReturn( true );
-    m_platformComponentManager->ExpectDeployConfigurationIsNotCalled();
-    EXPECT_CALL( *m_fileUtil, AppendPath( "/install/location", "config.json" ) )
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_mockFileUtil->MakeAppendFileReturn( 1 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
+    m_mockFileUtil->MakeFileExistsReturn( true );
+    m_mockPlatformComponentManager->ExpectDeployConfigurationIsNotCalled();
+    EXPECT_CALL( *m_mockFileUtil, AppendPath( "/install/location", "config.json" ) )
         .WillOnce( Return( "/install/location/config.json" ) );
-    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
         {
             EXPECT_EQ( newName, "/install/location/config.json" );
@@ -481,14 +483,14 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
 {
     bool packageUpdated = false;
     bool configUpdated = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfig ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfig ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_mockFileUtil->MakeAppendFileReturn( 1 );
+    m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
-    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
             EXPECT_EQ( package.installerArgs, "/S /Q " );
@@ -497,13 +499,13 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
             EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
             packageUpdated = true;
             return 0;
         } ) );
 
-    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
         {
             configUpdated = true;
@@ -599,18 +601,18 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
 {
     int packageUpdated = 0;
     int configUpdated = 0;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseMultiPackageAndConfig ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseMultiPackageAndConfig ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_mockFileUtil->MakeAppendFileReturn( 1 );
+    m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return oldFilename + '/' + newName;
         } ) );
 
-    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) )
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) )
         .WillOnce( Invoke(
             [this, &packageUpdated]( const PmComponent& package, std::string& error )
             {
@@ -620,7 +622,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
                 EXPECT_EQ( package.installerType, "msi" );
                 EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-                EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+                EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
                 packageUpdated++;
                 return 0;
@@ -634,12 +636,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
                 EXPECT_EQ( package.installerType, "exe" );
                 EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-                EXPECT_EQ( package.packageNameAndVersion, "uc2/0.0.1" );
+                EXPECT_EQ( package.productAndVersion, "uc2/0.0.1" );
 
                 packageUpdated++;
                 return 0;
             } ) );
-            EXPECT_CALL( *m_fileUtil, Rename( _, _ ) )
+            EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) )
                 .WillOnce( Invoke(
                     [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
                     {
@@ -709,17 +711,17 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
 {
     bool packageUpdated = false;
     bool configUpdated = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfigCloudData ), Return( 200 ) ) );
-    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
-    m_fileUtil->MakeAppendFileReturn( 1 );
-    m_platformComponentManager->MakeDeployConfigurationReturn( 0 );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_fileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfigCloudData ), Return( 200 ) ) );
+    m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_mockFileUtil->MakeAppendFileReturn( 1 );
+    m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return newName;
         } ) );
 
-    EXPECT_CALL( *m_platformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
             EXPECT_EQ( package.installerArgs, "/S /Q " );
@@ -727,12 +729,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
             EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
             EXPECT_EQ( package.installerType, "msi" );
             EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.packageNameAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
 
             packageUpdated = true;
             return 0;
         } ) );
-    EXPECT_CALL( *m_fileUtil, Rename( _, _ ) ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
         {
             EXPECT_EQ( newName, "C:\\Program Files\\Cisco\\SecureClient\\UnifiedConnector\\Configuration\\uc.json" );
@@ -759,14 +761,12 @@ std::string _ucReponseNoPackages( R"(
 TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
 {
     bool pass = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
 
-    EXPECT_CALL( *m_platformComponentManager, GetInstalledPackages( _, _ ) ).WillOnce( Invoke(
-        [this, &pass]( const std::vector<PmDiscoveryComponent>& discoveryList, PackageInventory& packages )
+    EXPECT_CALL( *m_mockPlatformComponentManager, GetInstalledPackages( _, _ ) )
+        .WillOnce( Invoke(
+        [this, &pass]( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered )
         {
-            //TODO: change this as deemed appropriate once the package discovery is complete
-            EXPECT_EQ( discoveryList.size(), 0 );
-
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -777,13 +777,15 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
+//    std::this_thread::sleep_for( std::chrono::microseconds( 4000 ) );
+
     EXPECT_TRUE( pass );
 }
 
 TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
 {
     bool pass = false;
-    ON_CALL( *m_cloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
 
     EXPECT_CALL( *m_eventPublisher, PublishFailedEvents() ).WillOnce( Invoke(
         [this, &pass]()

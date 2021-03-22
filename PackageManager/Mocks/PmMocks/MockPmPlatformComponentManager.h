@@ -10,9 +10,11 @@ public:
     MockPmPlatformComponentManager();
     ~MockPmPlatformComponentManager();
 
-    MOCK_METHOD2( GetInstalledPackages, int32_t( const std::vector<PmDiscoveryComponent>&, PackageInventory& ) );
+    MOCK_METHOD2( GetInstalledPackages, int32_t( const std::vector<PmProductDiscoveryRules>&, PackageInventory& ) );
     void MakeGetInstalledPackagesReturn( int32_t value );
     void ExpectGetInstalledPackagesIsNotCalled();
+
+    MOCK_METHOD1( GetCachedInventory, int32_t( PackageInventory& ) );
 
     MOCK_METHOD1( InstallComponent, int32_t( const PmComponent& ) );
     void MakeInstallComponentReturn( int32_t value );

@@ -11,13 +11,13 @@ struct PackageConfigInfo
     std::string verifyPath;
     std::string installLocation;
     std::string signerName;
-    std::string forComponentID; // e.g. 'AMP/1.0.0'
+    std::string forProductAndVersion; // e.g. 'AMP/1.0.0'
     bool deleteConfig;
 };
 
 struct PmComponent
 {
-    std::string packageNameAndVersion;
+    std::string productAndVersion; //e.g. "uc/1.0.0.150"
     std::string installerUrl;
     std::string installerType;
     std::string installerArgs;
@@ -30,8 +30,8 @@ struct PmComponent
 
 struct PmInstalledPackage
 {
-    std::string packageName;
-    std::string packageVersion;
+    std::string product;
+    std::string version;
     std::vector<PackageConfigInfo> configs;
 };
 
@@ -48,14 +48,6 @@ struct PmDiscoveryConfigurable
     int max_instances;
     int min_instances;
     std::vector<std::string> formats;
-};
-
-struct PmDiscoveryComponent
-{
-    std::string packageId;
-    std::string packageName;
-    std::string packageVersion;
-    std::vector<PmDiscoveryConfigurable> configurables;
 };
 
 struct PmProductDiscoveryConfigurable
@@ -86,10 +78,17 @@ struct PmProductDiscoveryRegistryMethod
     PmProductDiscoveryRegKeyType version;
 };
 
+struct PmProductDiscoveryMsiUpgradeCodeMethod
+{
+    std::string type;
+    std::string upgradeCode;
+};
+
 struct PmProductDiscoveryRules
 {
-    std::string product;
+    std::string product; //e.g. "uc"
     std::vector<PmProductDiscoveryConfigurable> configurables;
+    std::vector<PmProductDiscoveryMsiUpgradeCodeMethod> msiUpgradeCode_discovery;
     std::vector<PmProductDiscoveryMsiMethod> msi_discovery;
     std::vector<PmProductDiscoveryRegistryMethod> reg_discovery;
 };

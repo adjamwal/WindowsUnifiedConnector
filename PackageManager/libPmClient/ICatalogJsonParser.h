@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-struct PmDiscoveryComponent;
+struct PmProductDiscoveryRules;
 
 class ICatalogJsonParser
 {
@@ -11,5 +11,5 @@ public:
     ICatalogJsonParser() {}
     virtual ~ICatalogJsonParser() {}
 
-    virtual bool Parse(const std::string json, std::vector<PmDiscoveryComponent>& catalogDataset ) = 0;
+    virtual bool Parse( const std::string json, std::vector<PmProductDiscoveryRules>& returnCatalogDataset ) = 0;
 };
