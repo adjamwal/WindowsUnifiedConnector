@@ -34,7 +34,6 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
     EXPECT_EQ( installedPackages.platform, "win" );
 }
 
-
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetUC )
 {
     std::vector<PmProductDiscoveryRules> catalogRules;
@@ -46,6 +45,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetUC )
     MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( true );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
+
+    ASSERT_TRUE( installedPackages.packages.size() > 0 );
 
     EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
     EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
@@ -66,6 +67,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetImmunet )
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
+    ASSERT_TRUE( installedPackages.packages.size() > 0 );
+
     EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
 }
 
@@ -83,6 +86,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillGetAmp )
         .WillByDefault( Return( true ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
+
+    ASSERT_TRUE( installedPackages.packages.size() > 0 );
 
     EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
 }
@@ -102,7 +107,6 @@ TEST_F( TestPackageDiscovery, BuildAmpWillFailOnRegistryFailure )
     EXPECT_EQ( installedPackages.packages.size(), 0 );
 }
 
-
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverPrograms )
 {
     std::vector<PmProductDiscoveryRules> catalogRules;
@@ -121,6 +125,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverPrograms )
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
+
+    ASSERT_TRUE( installedPackages.packages.size() > 0 );
 
     EXPECT_EQ( installedPackages.packages[ 0 ].product, interestedPrograms.product );
     EXPECT_EQ( installedPackages.packages[ 0 ].version, installedProgram.version );
@@ -148,6 +154,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverManyPrograms 
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
 
+    ASSERT_TRUE( installedPackages.packages.size() > 0 );
+
     EXPECT_EQ( installedPackages.packages[ 0 ].product, "p1" );
     EXPECT_EQ( installedPackages.packages[ 0 ].version, installedProgram.version );
 
@@ -173,6 +181,8 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillPadVersionNumbers )
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
+
+    ASSERT_TRUE( installedPackages.packages.size() > 0 );
 
     EXPECT_EQ( installedPackages.packages[ 0 ].version, "1.0.0.0" );
 }
