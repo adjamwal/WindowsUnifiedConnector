@@ -50,14 +50,6 @@ struct PmDiscoveryConfigurable
     std::vector<std::string> formats;
 };
 
-struct PmDiscoveryComponent
-{
-    std::string packageName;
-    std::string packageProduct;
-    std::string packageVersion;
-    std::vector<PmDiscoveryConfigurable> configurables;
-};
-
 struct PmProductDiscoveryConfigurable
 {
     std::string path;
