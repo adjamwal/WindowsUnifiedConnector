@@ -34,4 +34,42 @@ public:
 
     MOCK_METHOD4( SHGetKnownFolderPath, HRESULT( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath) );
     void MakeSHGetKnownFolderPathReturn( HRESULT );
+
+    MOCK_METHOD8( MsiEnumProductsExW, UINT(
+        LPCWSTR szProductCode,
+        LPCWSTR szUserSid,
+        DWORD dwContext,
+        DWORD dwIndex,
+        WCHAR* szInstalledProductCode,
+        MSIINSTALLCONTEXT* pdwInstalledContext,
+        LPWSTR szSid,
+        LPDWORD pcchSid ) );
+    void MakeMsiEnumProductsExWReturn( UINT value );
+
+    MOCK_METHOD1( MsiQueryProductStateW, INSTALLSTATE(
+        LPCWSTR szProduct ) );
+    void MakeMsiQueryProductStateWReturn( INSTALLSTATE value );
+    
+    MOCK_METHOD6( MsiGetProductInfoExW, UINT(
+        LPCWSTR szProductCode,
+        LPCWSTR szUserSid,
+        MSIINSTALLCONTEXT dwContext,
+        LPCWSTR szProperty,
+        LPWSTR szValue,
+        LPDWORD pcchValue ) );
+    void MakeMsiGetProductInfoExWReturn( UINT value );
+
+    MOCK_METHOD4( MsiGetProductPropertyW, UINT(
+        MSIHANDLE hProduct,
+        LPCWSTR szProperty,
+        LPWSTR lpValueBuf,
+        LPDWORD pcchValueBuf ) );
+    void MakeMsiGetProductPropertyWReturn( UINT value );
+
+    MOCK_METHOD4( MsiEnumRelatedProductsW, UINT(
+        LPCWSTR lpUpgradeCode,
+        DWORD dwReserved,
+        DWORD iProductIndex,
+        LPWSTR lpProductBuf ) );
+    void MakeMsiEnumRelatedProductsWReturn( UINT value );
 };

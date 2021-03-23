@@ -26,5 +26,38 @@ public:
     virtual DWORD GetLastError();
 
     virtual HRESULT SHGetKnownFolderPath( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath );
+
+    virtual UINT MsiEnumProductsExW(
+        LPCWSTR szProductCode,
+        LPCWSTR szUserSid,
+        DWORD dwContext,
+        DWORD dwIndex,
+        WCHAR* szInstalledProductCode,
+        MSIINSTALLCONTEXT* pdwInstalledContext,
+        LPWSTR szSid,
+        LPDWORD pcchSid );
+
+    virtual INSTALLSTATE MsiQueryProductStateW(
+        LPCWSTR szProduct );
+
+    virtual UINT MsiGetProductInfoExW(
+        LPCWSTR szProductCode,
+        LPCWSTR szUserSid,
+        MSIINSTALLCONTEXT dwContext,
+        LPCWSTR szProperty,
+        LPWSTR szValue,
+        LPDWORD pcchValue );
+
+    virtual UINT MsiGetProductPropertyW(
+        MSIHANDLE hProduct,
+        LPCWSTR szProperty,
+        LPWSTR lpValueBuf,
+        LPDWORD pcchValueBuf );
+
+    virtual UINT MsiEnumRelatedProductsW(
+        LPCWSTR lpUpgradeCode,
+        DWORD dwReserved,
+        DWORD iProductIndex,
+        LPWSTR lpProductBuf );
 };
 
