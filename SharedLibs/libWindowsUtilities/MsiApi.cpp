@@ -93,7 +93,6 @@ std::tuple<int32_t, std::vector<MsiApiProductInfo>> MsiApi::QueryProducts(
                 szSid,
                 pcchSid );
 
-            //TODO wtf is this logic
             if ( !productName.empty() || !productPublisher.empty() )
             {
                 if ( productName.compare( currentProduct.Properties.InstalledProductName ) == 0 ||
