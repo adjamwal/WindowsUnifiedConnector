@@ -4,10 +4,12 @@
 #include "PmTypes.h"
 #include <string>
 
+class IMsiApi;
+
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery();
+    PackageDiscovery( IMsiApi& msiApi );
     ~PackageDiscovery();
 
     PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
@@ -31,4 +33,5 @@ private:
     void PadBuildNumber( std::string& versionString );
 
     PackageInventory m_lastDetectedPackages;
+    IMsiApi& m_msiApi;
 };

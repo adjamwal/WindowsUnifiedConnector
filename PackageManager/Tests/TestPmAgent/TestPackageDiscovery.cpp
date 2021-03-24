@@ -2,7 +2,9 @@
 #include "PackageDiscovery.h"
 #include "MockWindowsUtilities.h"
 #include "PmTypes.h"
+#include "MockWinApiWrapper.h"
 #include <memory>
+#include <MockMsiApi.h>
 
 class TestPackageDiscovery : public ::testing::Test
 {
@@ -10,16 +12,19 @@ protected:
     void SetUp()
     {
         MockWindowsUtilities::Init();
-        m_patient = std::make_unique<PackageDiscovery>();
+        m_msiApi.reset( new NiceMock<MockMsiApi>() );
+        m_patient.reset( new PackageDiscovery( *m_msiApi ) );
     }
 
     void TearDown()
     {
+        m_msiApi.reset();
         m_patient.reset();
         MockWindowsUtilities::Deinit();
     }
 
     std::unique_ptr<PackageDiscovery> m_patient;
+    std::unique_ptr<MockMsiApi> m_msiApi;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )

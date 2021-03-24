@@ -3,14 +3,17 @@
 #include "WindowsUtilities.h"
 #include "PmTypes.h"
 #include "IUcLogger.h"
+#include "MsiApi.h"
 #include <codecvt>
 #include <regex>
 #include "..\..\GlobalVersion.h"
+#include <StringUtil.h>
 
 #define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
 #define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector\\config"
 
-PackageDiscovery::PackageDiscovery()
+PackageDiscovery::PackageDiscovery( IMsiApi& msiApi ) :
+    m_msiApi( msiApi )
 {
 }
 
@@ -70,7 +73,22 @@ void PackageDiscovery::DiscoverByMsi(
     const PmProductDiscoveryMsiMethod& msiRule,
     std::vector<PmInstalledPackage>& detectedInstallations )
 {
-    //implement msi discovery method
+    if ( msiRule.type != "msi" ) return;
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring name = converter.from_bytes( msiRule.name );
+    std::wstring publisher = converter.from_bytes( msiRule.vendor );
+
+    auto[retCode, msiList] = m_msiApi.FindProductsByNameAndPublisher( name, publisher );
+
+    for ( auto listItem : msiList )
+    {
+        PmInstalledPackage detected = {};
+        detected.version = converter.to_bytes( listItem.Properties.VersionString );
+        detected.product = converter.to_bytes( listItem.Properties.InstalledProductName );
+
+        detectedInstallations.push_back( detected );
+    }
 }
 
 void PackageDiscovery::DiscoverByRegistry(

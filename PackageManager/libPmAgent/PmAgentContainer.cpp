@@ -11,12 +11,14 @@
 #include "PackageDiscovery.h"
 #include "WinCertLoader.h"
 #include "WinApiWrapper.h"
+#include "MsiApi.h"
 
 PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath ) :
     m_winApiWrapper( new WinApiWrapper() ) 
+    , m_msiApi( new MsiApi( *m_winApiWrapper ))
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer(new CodesignVerifier() )
-    , m_packageDiscovery( new PackageDiscovery() )
+    , m_packageDiscovery( new PackageDiscovery( *m_msiApi ) )
     , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
     , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery ) )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
