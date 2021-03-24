@@ -23,6 +23,11 @@ public:
         const PmProductDiscoveryRegistryMethod& regRule,
         std::vector<PmInstalledPackage>& detectedInstallations );
 
+    void DiscoverByMsiUpgradeCode(
+        const PmProductDiscoveryRules& lookupProduct,
+        const PmProductDiscoveryMsiUpgradeCodeMethod& upgradeCodeRule,
+        std::vector<PmInstalledPackage>& detectedInstallations );
+
 private:
     bool DecodeRegistryPath( const PmProductDiscoveryRegKeyDef& keyDef,
         HKEY& root, std::string& subKey, std::string& valueName, std::string& error );

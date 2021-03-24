@@ -58,8 +58,14 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
     {
         m_methods.DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
     }
+
     for( auto regRule : lookupProduct.reg_discovery )
     {
         m_methods.DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
+    }
+
+    for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery )
+    {
+        m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
     }
 }

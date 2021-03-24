@@ -8,6 +8,7 @@
 #include <codecvt>
 #include <regex>
 #include "..\..\GlobalVersion.h"
+#include <CatalogJsonParser.cpp>
 
 #define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
 #define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector\\config"
@@ -28,13 +29,18 @@ void PackageDiscoveryMethods::DiscoverByMsi(
     const PmProductDiscoveryMsiMethod& msiRule,
     std::vector<PmInstalledPackage>& detectedInstallations )
 {
-    if ( msiRule.type != "msi" ) return;
+    if ( msiRule.type != UC_CATALOG_DISCOVERY_TYPE_MSI ) return;
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring name = converter.from_bytes( msiRule.name );
     std::wstring publisher = converter.from_bytes( msiRule.vendor );
 
     auto [retCode, msiList] = m_msiApi.FindProductsByNameAndPublisher( name, publisher );
+
+    if ( retCode != ERROR_SUCCESS )
+    {
+        LOG_ERROR( "Error with FindRelatedProducts while searchings %ws, %ws: %d", name, publisher, retCode );
+    }
 
     for ( auto listItem : msiList )
     {
@@ -51,7 +57,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     const PmProductDiscoveryRegistryMethod& regRule,
     std::vector<PmInstalledPackage>& detectedInstallations )
 {
-    if( regRule.type != "registry" ) return;
+    if( regRule.type != UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) return;
 
     PmInstalledPackage detected = {};
     detected.product = lookupProduct.product;
@@ -92,6 +98,30 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     PadBuildNumber( detected.version );
 
     detectedInstallations.push_back( detected );
+}
+
+void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscoveryRules& lookupProduct, const PmProductDiscoveryMsiUpgradeCodeMethod& upgradeCodeRule, std::vector<PmInstalledPackage>& detectedInstallations )
+{
+    if ( upgradeCodeRule.type != UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE ) return;
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring upgradeCode = converter.from_bytes( upgradeCodeRule.upgradeCode );
+
+    auto [retCode, msiList] = m_msiApi.FindRelatedProducts( upgradeCode );
+
+    if ( retCode != ERROR_SUCCESS )
+    {
+        LOG_ERROR( "Error with FindRelatedProducts while searchings %ws: %d", upgradeCode, retCode );
+    }
+
+    for ( auto listItem : msiList )
+    {
+        PmInstalledPackage detected = {};
+        detected.version = converter.to_bytes( listItem.Properties.VersionString );
+        detected.product = converter.to_bytes( listItem.Properties.InstalledProductName );
+
+        detectedInstallations.push_back( detected );
+    }
 }
 
 bool PackageDiscoveryMethods::DecodeRegistryPath( const PmProductDiscoveryRegKeyDef& keyDef,
