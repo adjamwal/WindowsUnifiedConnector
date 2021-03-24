@@ -65,7 +65,7 @@ struct PmProductDiscoveryMsiMethod
     std::string vendor;
 };
 
-struct PmProductDiscoveryRegKeyType
+struct PmProductDiscoveryRegKeyDef
 {
     std::string key;
     std::string type;
@@ -74,8 +74,8 @@ struct PmProductDiscoveryRegKeyType
 struct PmProductDiscoveryRegistryMethod
 {
     std::string type;
-    PmProductDiscoveryRegKeyType install;
-    PmProductDiscoveryRegKeyType version;
+    PmProductDiscoveryRegKeyDef install;
+    PmProductDiscoveryRegKeyDef version;
 };
 
 struct PmProductDiscoveryMsiUpgradeCodeMethod

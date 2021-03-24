@@ -157,9 +157,11 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="MockPackageDiscovery.h" />
+    <ClInclude Include="MockPackageDiscoveryMethods.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockPackageDiscovery.cpp" />
+    <ClCompile Include="MockPackageDiscoveryMethods.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

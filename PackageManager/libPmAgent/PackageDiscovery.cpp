@@ -1,16 +1,16 @@
 #include "pch.h"
 #include "PackageDiscovery.h"
-#include "WindowsUtilities.h"
 #include "PmTypes.h"
 #include "IUcLogger.h"
+#include "StringUtil.h"
+#include "WindowsUtilities.h"
+#include "PackageDiscoveryMethods.h"
 #include <codecvt>
 #include <regex>
 #include "..\..\GlobalVersion.h"
 
-#define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
-#define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector\\config"
-
-PackageDiscovery::PackageDiscovery()
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods )
+    : m_methods( methods )
 {
 }
 
@@ -55,35 +55,10 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
 {
     for( auto msiRule : lookupProduct.msi_discovery )
     {
-        DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
+        m_methods.DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
     }
     for( auto regRule : lookupProduct.reg_discovery )
     {
-        DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
-    }
-}
-
-//NOTE: use WindowsUtilities::ResolveKnownFolderId() to translate CSIDL paths for configurables
-
-void PackageDiscovery::DiscoverByMsi(
-    const PmProductDiscoveryRules& lookupProduct,
-    const PmProductDiscoveryMsiMethod& msiRule,
-    std::vector<PmInstalledPackage>& detectedInstallations )
-{
-    //implement msi discovery method
-}
-
-void PackageDiscovery::DiscoverByRegistry(
-    const PmProductDiscoveryRules& lookupProduct,
-    const PmProductDiscoveryRegistryMethod& regRule,
-    std::vector<PmInstalledPackage>& detectedInstallations )
-{
-    //implement registry discovery method
-}
-
-void PackageDiscovery::PadBuildNumber( std::string& versionString )
-{
-    while( std::count( versionString.begin(), versionString.end(), '.' ) < 3 ) {
-        versionString += ".0";
+        m_methods.DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
     }
 }

@@ -1,0 +1,19 @@
+#pragma once
+
+#include <gmock/gmock.h>
+#include "PmTypes.h"
+#include "IPackageDiscoveryMethods.h"
+
+class MockPackageDiscoveryMethods : public IPackageDiscoveryMethods
+{
+public:
+    MockPackageDiscoveryMethods();
+    ~MockPackageDiscoveryMethods();
+
+    MOCK_METHOD3( DiscoverByMsi, void( const PmProductDiscoveryRules&, const PmProductDiscoveryMsiMethod&, std::vector<PmInstalledPackage>& ) );
+    void ExpectDiscoverByMsiIsNotCalled();
+
+    MOCK_METHOD3( DiscoverByRegistry, void( const PmProductDiscoveryRules&, const PmProductDiscoveryRegistryMethod&, std::vector<PmInstalledPackage>& ) );
+    void ExpectDiscoverByRegistryIsNotCalled();
+
+};

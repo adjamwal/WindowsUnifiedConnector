@@ -1,6 +1,7 @@
 #include "MocksCommon.h"
 #include "PackageDiscovery.h"
 #include "MockWindowsUtilities.h"
+#include "MockPackageDiscoveryMethods.h"
 #include "PmTypes.h"
 #include <memory>
 
@@ -10,15 +11,18 @@ protected:
     void SetUp()
     {
         MockWindowsUtilities::Init();
-        m_patient = std::make_unique<PackageDiscovery>();
+        m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
     }
 
     void TearDown()
     {
         m_patient.reset();
+        m_discoveryMethods.reset();
         MockWindowsUtilities::Deinit();
     }
 
+    std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
 };
 
@@ -60,7 +64,7 @@ TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillGetImmunet )
     PmProductDiscoveryRules interestedPrograms;
     interestedPrograms.product = "Immunet";
     catalogRules.push_back( interestedPrograms );
-    
+
     MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
     ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
         .WillByDefault( DoAll( SetArgReferee<3>( L"Immunet" ), Return( true ) ) );
