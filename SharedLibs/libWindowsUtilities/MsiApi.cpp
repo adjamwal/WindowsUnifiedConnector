@@ -42,14 +42,9 @@ std::tuple<int32_t, std::vector<MsiApiProductInfo>> MsiApi::FindRelatedProducts(
 
         if ( retValue == ERROR_SUCCESS )
         {
-            auto[ret, p] = QueryProducts( szProductCode, L"", L"" );
+            auto[retValue, p] = QueryProducts( szProductCode, L"", L"" );
 
             products.insert( std::end( products ), std::begin( p ), std::end( p ) );
-
-            if( ret != ERROR_SUCCESS )
-            {
-                //TODO log error? not sure how to handle this logic
-            }
         }
 
         dwIndex++;
@@ -162,11 +157,6 @@ std::wstring MsiApi::QueryProperty(
     {
         pcchValue++;
         retValue = m_winApiWrapper.MsiGetProductInfoEx( szProductCode, szUserSid, dwContext, szProperty, lpValue, &pcchValue );
-    }
-
-    if ( retValue != ERROR_SUCCESS )
-    {
-        //TODO log error
     }
 
     return std::wstring( lpValue );
