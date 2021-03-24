@@ -3,7 +3,9 @@
 #include "MockWindowsUtilities.h"
 #include "MockPackageDiscoveryMethods.h"
 #include "PmTypes.h"
+#include "MockWinApiWrapper.h"
 #include <memory>
+#include <MockMsiApi.h>
 
 class TestPackageDiscovery : public ::testing::Test
 {

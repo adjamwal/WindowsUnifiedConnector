@@ -30,3 +30,73 @@ HRESULT WinApiWrapper::SHGetKnownFolderPath( REFKNOWNFOLDERID rfid, DWORD dwFlag
 {
     return ::SHGetKnownFolderPath( rfid, dwFlags, hToken, ppszPath );
 }
+
+UINT WinApiWrapper::MsiEnumProductsExW(
+    LPCWSTR szProductCode,
+    LPCWSTR szUserSid,
+    DWORD dwContext,
+    DWORD dwIndex,
+    WCHAR* szInstalledProductCode,
+    MSIINSTALLCONTEXT* pdwInstalledContext,
+    LPWSTR szSid,
+    LPDWORD pcchSid )
+{
+    return ::MsiEnumProductsExW( 
+        szProductCode, 
+        szUserSid,
+        dwContext,
+        dwIndex,
+        szInstalledProductCode,
+        pdwInstalledContext,
+        szSid,
+        pcchSid );
+}
+
+INSTALLSTATE WinApiWrapper::MsiQueryProductStateW(
+    LPCWSTR szProduct )
+{
+    return ::MsiQueryProductStateW( szProduct );
+}
+
+UINT WinApiWrapper::MsiGetProductInfoExW(
+    LPCWSTR szProductCode,
+    LPCWSTR szUserSid,
+    MSIINSTALLCONTEXT dwContext,
+    LPCWSTR szProperty,
+    LPWSTR szValue,
+    LPDWORD pcchValue )
+{
+    return ::MsiGetProductInfoExW(
+        szProductCode,
+        szUserSid,
+        dwContext,
+        szProperty,
+        szValue,
+        pcchValue );
+}
+
+UINT WinApiWrapper::MsiGetProductPropertyW(
+    MSIHANDLE hProduct,
+    LPCWSTR szProperty,
+    LPWSTR lpValueBuf,
+    LPDWORD pcchValueBuf )
+{
+    return ::MsiGetProductPropertyW(
+        hProduct,
+        szProperty,
+        lpValueBuf,
+        pcchValueBuf );
+}
+
+UINT WinApiWrapper::MsiEnumRelatedProductsW(
+    LPCWSTR lpUpgradeCode,
+    DWORD dwReserved,
+    DWORD iProductIndex,
+    LPWSTR lpProductBuf )
+{
+    return ::MsiEnumRelatedProductsW(
+        lpUpgradeCode,
+        dwReserved,
+        iProductIndex,
+        lpProductBuf );
+}

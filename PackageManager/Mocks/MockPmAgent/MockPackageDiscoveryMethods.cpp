@@ -20,3 +20,7 @@ void MockPackageDiscoveryMethods::ExpectDiscoverByRegistryIsNotCalled()
     EXPECT_CALL( *this, DiscoverByRegistry( _, _, _ ) ).Times( 0 );
 }
 
+void MockPackageDiscoveryMethods::ExpectDiscoverByMsiUpgradeCodeIsNotCalled()
+{
+    EXPECT_CALL( *this, DiscoverByRegistry( _, _, _ ) ).Times( 0 );
+}

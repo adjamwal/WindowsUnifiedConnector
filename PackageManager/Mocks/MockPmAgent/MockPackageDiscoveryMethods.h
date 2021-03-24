@@ -16,4 +16,6 @@ public:
     MOCK_METHOD3( DiscoverByRegistry, void( const PmProductDiscoveryRules&, const PmProductDiscoveryRegistryMethod&, std::vector<PmInstalledPackage>& ) );
     void ExpectDiscoverByRegistryIsNotCalled();
 
+    MOCK_METHOD3( DiscoverByMsiUpgradeCode, void( const PmProductDiscoveryRules&, const PmProductDiscoveryMsiUpgradeCodeMethod&, std::vector<PmInstalledPackage>& ) );
+    void ExpectDiscoverByMsiUpgradeCodeIsNotCalled();
 };
