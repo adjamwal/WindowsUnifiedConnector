@@ -2,14 +2,15 @@
 
 #include "IPackageDiscovery.h"
 #include "PmTypes.h"
+#include "Windows.h"
 #include <string>
 
-class IMsiApi;
+class IPackageDiscoveryMethods;
 
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery( IMsiApi& msiApi );
+    PackageDiscovery( IPackageDiscoveryMethods& methods );
     ~PackageDiscovery();
 
     PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
@@ -20,18 +21,6 @@ private:
         const PmProductDiscoveryRules& lookupProduct,
         std::vector<PmInstalledPackage>& detectedInstallations );
 
-    void DiscoverByMsi(
-        const PmProductDiscoveryRules& lookupProduct,
-        const PmProductDiscoveryMsiMethod& msiRule,
-        std::vector<PmInstalledPackage>& detectedInstallations );
-
-    void DiscoverByRegistry(
-        const PmProductDiscoveryRules& lookupProduct,
-        const PmProductDiscoveryRegistryMethod& regRule,
-        std::vector<PmInstalledPackage>& detectedInstallations );
-
-    void PadBuildNumber( std::string& versionString );
-
+    IPackageDiscoveryMethods& m_methods;
     PackageInventory m_lastDetectedPackages;
-    IMsiApi& m_msiApi;
 };

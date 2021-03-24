@@ -43,3 +43,19 @@ std::vector<std::string> StringUtil::Split( const std::string source, const char
 
     return parts;
 }
+
+std::wstring StringUtil::Str2WStr( const std::string& str )
+{
+    auto ws = std::make_unique<wchar_t[]>( str.size() + 1 );
+    mbstowcs_s( nullptr, ws.get(), str.size() + 1, str.c_str(), str.size() );
+    return ws.get();
+}
+
+bool StringUtil::NoCaseEquals( const std::string& a, const std::string& b )
+{
+    return std::equal( a.begin(), a.end(),
+        b.begin(), b.end(),
+        []( char a, char b ) {
+            return tolower( a ) == tolower( b );
+        } );
+}
