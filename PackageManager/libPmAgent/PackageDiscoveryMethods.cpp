@@ -46,7 +46,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
     {
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
-        detected.product = converter.to_bytes( listItem.Properties.InstalledProductName );
+        detected.product = lookupProduct.product;
 
         detectedInstallations.push_back( detected );
     }
@@ -118,7 +118,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
     {
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
-        detected.product = converter.to_bytes( listItem.Properties.InstalledProductName );
+        detected.product = lookupProduct.product;
 
         detectedInstallations.push_back( detected );
     }

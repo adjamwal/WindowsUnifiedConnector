@@ -88,16 +88,10 @@ std::tuple<int32_t, std::vector<MsiApiProductInfo>> MsiApi::QueryProducts(
                 szSid,
                 pcchSid );
 
-            if ( !productName.empty() || !productPublisher.empty() )
-            {
-                if ( productName.compare( currentProduct.Properties.InstalledProductName ) == 0 ||
-                    productPublisher.compare( currentProduct.Properties.Publisher) == 0)
-                {
-                    products.emplace_back( currentProduct );
-                }
-            }
-            else
-            {
+            if ( VerifyMsiMatchesNameAndPublisher( currentProduct, productName, productPublisher ) ||
+                    VerifyMsiMatchesNameOnly( currentProduct, productName, productPublisher ) || 
+                    VerifyMsiMatchesPublisherOnly( currentProduct, productName, productPublisher ) || 
+                    ( productName.empty() && productPublisher.empty() ) ) {
                 products.emplace_back( currentProduct );
             }
 
@@ -160,4 +154,48 @@ std::wstring MsiApi::QueryProperty(
     }
 
     return std::wstring( lpValue );
+}
+
+bool MsiApi::VerifyMsiMatchesNameAndPublisher( MsiApiProductInfo& productInfo,
+    std::wstring productName,
+    std::wstring productPublisher )
+{
+    bool rtn = false;
+    if ( !productName.empty() &&
+            !productPublisher.empty() &&
+            productName.compare( productInfo.Properties.InstalledProductName ) == 0 &&
+            productPublisher.compare( productInfo.Properties.Publisher ) == 0 ) {
+        rtn =  true;
+    }
+
+    return rtn;
+}
+
+bool MsiApi::VerifyMsiMatchesNameOnly( MsiApiProductInfo& productInfo,
+    std::wstring productName,
+    std::wstring productPublisher )
+{
+    bool rtn = false;
+
+    if ( !productName.empty() &&
+            productPublisher.empty() &&
+            productName.compare( productInfo.Properties.InstalledProductName ) == 0 ) {
+        rtn = true;
+    }
+
+    return rtn;
+}
+
+bool MsiApi::VerifyMsiMatchesPublisherOnly( MsiApiProductInfo& productInfo,
+    std::wstring productName,
+    std::wstring productPublisher )
+{
+    bool rtn = false;
+    if ( productName.empty() &&
+        !productPublisher.empty() &&
+        productPublisher.compare( productInfo.Properties.Publisher ) == 0 ) {
+        rtn = true;
+    }
+
+    return rtn;
 }
