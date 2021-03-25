@@ -5,6 +5,7 @@
 struct PmProductDiscoveryRules;
 struct PmProductDiscoveryMsiMethod;
 struct PmProductDiscoveryRegistryMethod;
+struct PmProductDiscoveryMsiUpgradeCodeMethod;
 struct PmInstalledPackage;
 
 class IPackageDiscoveryMethods
