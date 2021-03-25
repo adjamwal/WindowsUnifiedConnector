@@ -38,4 +38,16 @@ private:
         LPCTSTR szUserSid,
         MSIINSTALLCONTEXT dwContext,
         LPCTSTR szProperty );
+
+    bool VerifyMsiMatchesNameAndPublisher( MsiApiProductInfo& productInfo, 
+        std::wstring productName,
+        std::wstring productPublisher );
+
+    bool VerifyMsiMatchesNameOnly( MsiApiProductInfo& productInfo, 
+        std::wstring productName,
+        std::wstring productPublisher );
+
+    bool VerifyMsiMatchesPublisherOnly( MsiApiProductInfo& productInfo, 
+        std::wstring productName,
+        std::wstring productPublisher );
 };

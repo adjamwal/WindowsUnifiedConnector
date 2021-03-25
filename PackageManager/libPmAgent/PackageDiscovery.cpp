@@ -54,18 +54,26 @@ PackageInventory PackageDiscovery::CachedInventory()
 void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& lookupProduct,
     std::vector<PmInstalledPackage>& detectedInstallations )
 {
+    for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery ) {
+        m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
+    }
+
     for( auto msiRule : lookupProduct.msi_discovery )
     {
         m_methods.DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
     }
 
     for( auto regRule : lookupProduct.reg_discovery )
     {
         m_methods.DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
-    }
-
-    for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery )
-    {
-        m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
     }
 }
