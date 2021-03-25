@@ -22,8 +22,6 @@ PackageDiscoveryMethods::~PackageDiscoveryMethods()
 {
 }
 
-//NOTE: use WindowsUtilities::ResolveKnownFolderId() to translate CSIDL paths for configurables
-
 void PackageDiscoveryMethods::DiscoverByMsi(
     const PmProductDiscoveryRules& lookupProduct,
     const PmProductDiscoveryMsiMethod& msiRule,

@@ -13,6 +13,8 @@ protected:
     void SetUp()
     {
         MockWindowsUtilities::Init();
+        m_catalogRules.clear();
+        m_detectedInstallations.clear();
         m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
         m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
     }
@@ -21,179 +23,171 @@ protected:
     {
         m_patient.reset();
         m_discoveryMethods.reset();
+        m_detectedInstallations.clear();
+        m_catalogRules.clear();
         MockWindowsUtilities::Deinit();
     }
 
+    void SetupMsiUpgradeDiscovery( PmProductDiscoveryRules& testProduct )
+    {
+        PmProductDiscoveryMsiUpgradeCodeMethod upgMethod;
+        testProduct.msiUpgradeCode_discovery.push_back( upgMethod );
+
+        PmInstalledPackage detection;
+        detection.version = "msiupg";
+        m_detectedInstallations.push_back( detection );
+
+        ON_CALL( *m_discoveryMethods, DiscoverByMsiUpgradeCode( _, _, _ ) )
+            .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+    }
+
+    void SetupMsiDiscovery( PmProductDiscoveryRules& testProduct )
+    {
+        PmProductDiscoveryMsiMethod msiMethod;
+        testProduct.msi_discovery.push_back( msiMethod );
+
+        PmInstalledPackage detection;
+        detection.version = "msi";
+        m_detectedInstallations.push_back( detection );
+
+        ON_CALL( *m_discoveryMethods, DiscoverByMsi( _, _, _ ) )
+            .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+    }
+
+    void SetupRegistryDiscovery( PmProductDiscoveryRules& testProduct )
+    {
+        PmProductDiscoveryRegistryMethod regMethod;
+        testProduct.reg_discovery.push_back( regMethod );
+
+        PmInstalledPackage detection;
+        detection.version = "reg";
+        m_detectedInstallations.push_back( detection );
+
+        ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+            .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+    }
+
+    std::vector<PmProductDiscoveryRules> m_catalogRules;
+    std::vector<PmInstalledPackage> m_detectedInstallations;
     std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-
     MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
 
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
     EXPECT_EQ( installedPackages.architecture, "x64" );
     EXPECT_EQ( installedPackages.platform, "win" );
 }
 
-//TODO: re-enable & fix once msi & registry discovery methods are implemented
-TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillGetUC )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDetectByMsiUpgradeCode )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "uc";
-    catalogRules.push_back( interestedPrograms );
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiUpgradeDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( true );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
-
-    ASSERT_TRUE( installedPackages.packages.size() > 0 );
-
-    EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
-    EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msiupg", installedPackages.packages[ 0 ].version );
 }
 
-//TODO: re-enable & fix once msi & registry discovery methods are implemented
-TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillGetImmunet )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDetectByMsi )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "Immunet";
-    catalogRules.push_back( interestedPrograms );
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
-        .WillByDefault( DoAll( SetArgReferee<3>( L"Immunet" ), Return( true ) ) );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayVersion" ), _ ) )
-        .WillByDefault( Return( true ) );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
-
-    ASSERT_TRUE( installedPackages.packages.size() > 0 );
-
-    EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msi", installedPackages.packages[ 0 ].version );
 }
 
-//TODO: re-enable & fix once msi & registry discovery methods are implemented
-TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillGetAmp )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDetectByRegistry )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "Immunet";
-    catalogRules.push_back( interestedPrograms );
+    PmProductDiscoveryRules productInCatalog;
+    SetupRegistryDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
-        .WillByDefault( DoAll( SetArgReferee<3>( L"Cisco AMP for Endpoints Connector" ), Return( true ) ) );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayVersion" ), _ ) )
-        .WillByDefault( Return( true ) );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
-
-    ASSERT_TRUE( installedPackages.packages.size() > 0 );
-
-    EXPECT_EQ( installedPackages.packages.front().product, interestedPrograms.product );
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "reg", installedPackages.packages[ 0 ].version );
 }
 
-TEST_F( TestPackageDiscovery, BuildAmpWillFailOnRegistryFailure )
+TEST_F( TestPackageDiscovery, DiscoveryWillCompleteAfterMsiUpgradeCodeMethod )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "Immunet";
-    catalogRules.push_back( interestedPrograms );
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiUpgradeDiscovery( productInCatalog );
+    SetupMsiDiscovery( productInCatalog );
+    SetupRegistryDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( false );
+    m_discoveryMethods->ExpectDiscoverByMsiIsNotCalled();
+    m_discoveryMethods->ExpectDiscoverByRegistryIsNotCalled();
 
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    EXPECT_EQ( installedPackages.packages.size(), 0 );
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msiupg", installedPackages.packages[ 0 ].version );
 }
 
-//TODO: re-enable & fix once msi & registry discovery methods are implemented
-TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillDiscoverPrograms )
+TEST_F( TestPackageDiscovery, DiscoveryWillCompleteAfterMsiMethod )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiDiscovery( productInCatalog );
+    SetupRegistryDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
 
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "p1";
-    catalogRules.push_back( interestedPrograms );
+    m_discoveryMethods->ExpectDiscoverByMsiUpgradeCodeIsNotCalled();
+    m_discoveryMethods->ExpectDiscoverByRegistryIsNotCalled();
 
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.product;
-    installedProgram.version = "1.0.0.0";
-    installedList.push_back( installedProgram );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
-
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
-
-    ASSERT_TRUE( installedPackages.packages.size() > 0 );
-
-    EXPECT_EQ( installedPackages.packages[ 0 ].product, interestedPrograms.product );
-    EXPECT_EQ( installedPackages.packages[ 0 ].version, installedProgram.version );
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msi", installedPackages.packages[ 0 ].version );
 }
 
-//TODO: re-enable & fix once msi & registry discovery methods are implemented
-TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillDiscoverManyPrograms )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverManyPrograms )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
+    PmProductDiscoveryRules productLookup;
+    PmProductDiscoveryRegistryMethod regMethod;
+    productLookup.reg_discovery.push_back( regMethod );
+    for( int i = 0; i < 10; i++ ) {
+        m_catalogRules.push_back( productLookup );
+    }
 
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "p1";
-    catalogRules.push_back( interestedPrograms );
+    PmInstalledPackage detection;
+    m_detectedInstallations.push_back( detection );
+    ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+        .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
 
-    interestedPrograms.product = "p2";
-    catalogRules.push_back( interestedPrograms );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.product;
-    installedProgram.version = "1.0.0.0";
-    installedList.push_back( installedProgram );
-
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
-
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
-
-    ASSERT_TRUE( installedPackages.packages.size() > 0 );
-
-    EXPECT_EQ( installedPackages.packages[ 0 ].product, "p1" );
-    EXPECT_EQ( installedPackages.packages[ 0 ].version, installedProgram.version );
-
-    EXPECT_EQ( installedPackages.packages[ 1 ].product, "p2" );
-    EXPECT_EQ( installedPackages.packages[ 1 ].version, installedProgram.version );
+    ASSERT_EQ( 10, installedPackages.packages.size() );
 }
 
-TEST_F( TestPackageDiscovery, DISABLED_DiscoverInstalledPackagesWillPadVersionNumbers )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillResetTheCacheToLatestDiscoveryValues )
 {
-    std::vector<PmProductDiscoveryRules> catalogRules;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
+    PmProductDiscoveryRules productLookup;
+    PmProductDiscoveryRegistryMethod regMethod;
+    productLookup.reg_discovery.push_back( regMethod );
+    for( int i = 0; i < 10; i++ ) {
+        m_catalogRules.push_back( productLookup );
+    }
 
-    PmProductDiscoveryRules interestedPrograms;
-    interestedPrograms.product = "p1";
-    catalogRules.push_back( interestedPrograms );
+    PmInstalledPackage detection;
+    m_detectedInstallations.push_back( detection );
+    ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+        .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
 
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.product;
-    installedProgram.version = "1";
-    installedList.push_back( installedProgram );
+    m_patient->DiscoverInstalledPackages( m_catalogRules );
+    PackageInventory cache = m_patient->CachedInventory();
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
-
-    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( catalogRules );
-
-    ASSERT_TRUE( installedPackages.packages.size() > 0 );
-
-    EXPECT_EQ( installedPackages.packages[ 0 ].version, "1.0.0.0" );
+    ASSERT_EQ( m_catalogRules.size(), cache.packages.size() );
 }
+

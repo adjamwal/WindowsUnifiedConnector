@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestPackageDiscovery.cpp" />
+    <ClCompile Include="TestPackageDiscoveryMethods.cpp" />
     <ClCompile Include="TestWindowsComponentManager.cpp" />
   </ItemGroup>
   <ItemGroup>
