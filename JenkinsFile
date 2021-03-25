@@ -147,8 +147,8 @@ pipeline {
                 powershell "git clean -dfx"
                 powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
                 powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
-                if (env.IMMUNET == '0') {
-                    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(<UC_CONSUMER>1<\\/UC_CONSUMER>)', replace: '<UC_CONSUMER>0</UC_CONSUMER>', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Directory.Build.props') ])
+                if (env.IMMUNET == '1') {
+                    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(<UC_CONSUMER>0<\\/UC_CONSUMER>)', replace: '<UC_CONSUMER>1</UC_CONSUMER>', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Directory.Build.props') ])
                 }
               }
               SetupVersion(false)
