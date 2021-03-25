@@ -47,13 +47,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
-
-        for ( auto it : lookupProduct.configurables )
-        {
-            PackageConfigInfo configInfo = {};
-            configInfo.path = it.path;
-            detected.configs.push_back( configInfo );
-        }
+        detected.SetConfigInfo( lookupProduct.configurables );
 
         detectedInstallations.push_back( detected );
     }
@@ -104,12 +98,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     detected.version = data;
     PadBuildNumber( detected.version );
 
-    for ( auto it : lookupProduct.configurables )
-    {
-        PackageConfigInfo configInfo = {};
-        configInfo.path = it.path;
-        detected.configs.push_back( configInfo );
-    }
+    detected.SetConfigInfo( lookupProduct.configurables );
 
     detectedInstallations.push_back( detected );
 }
@@ -133,13 +122,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
-
-        for ( auto it : lookupProduct.configurables )
-        {
-            PackageConfigInfo configInfo = {};
-            configInfo.path = it.path;
-            detected.configs.push_back( configInfo );
-        }
+        detected.SetConfigInfo( lookupProduct.configurables );
 
         detectedInstallations.push_back( detected );
     }

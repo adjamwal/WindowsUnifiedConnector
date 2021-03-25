@@ -28,11 +28,29 @@ struct PmComponent
     std::vector<PackageConfigInfo> configs;
 };
 
+struct PmProductDiscoveryConfigurable
+{
+    std::string path;
+    int max_instances;
+    bool required;
+    std::vector<std::string> formats;
+};
+
 struct PmInstalledPackage
 {
     std::string product;
     std::string version;
     std::vector<PackageConfigInfo> configs;
+
+    void SetConfigInfo( const std::vector<PmProductDiscoveryConfigurable> &productDiscoveryConfigurables )
+    {
+        for ( auto &it : productDiscoveryConfigurables )
+        {
+            PackageConfigInfo configInfo = {};
+            configInfo.path = it.path;
+            configs.push_back( configInfo );
+        }
+    }
 };
 
 struct PackageInventory
@@ -47,14 +65,6 @@ struct PmDiscoveryConfigurable
     std::string path;
     int max_instances;
     int min_instances;
-    std::vector<std::string> formats;
-};
-
-struct PmProductDiscoveryConfigurable
-{
-    std::string path;
-    int max_instances;
-    bool required;
     std::vector<std::string> formats;
 };
 
