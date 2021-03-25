@@ -152,7 +152,26 @@ TEST_F( TestPackageDiscovery, DiscoveryWillCompleteAfterMsiMethod )
     ASSERT_EQ( "msi", installedPackages.packages[ 0 ].version );
 }
 
-TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetCache )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverManyPrograms )
+{
+    PmProductDiscoveryRules productLookup;
+    PmProductDiscoveryRegistryMethod regMethod;
+    productLookup.reg_discovery.push_back( regMethod );
+    for( int i = 0; i < 10; i++ ) {
+        m_catalogRules.push_back( productLookup );
+    }
+
+    PmInstalledPackage detection;
+    m_detectedInstallations.push_back( detection );
+    ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+        .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( 10, installedPackages.packages.size() );
+}
+
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillResetTheCacheToLatestDiscoveryValues )
 {
     PmProductDiscoveryRules productLookup;
     PmProductDiscoveryRegistryMethod regMethod;
@@ -169,6 +188,6 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetCache )
     m_patient->DiscoverInstalledPackages( m_catalogRules );
     PackageInventory cache = m_patient->CachedInventory();
 
-    ASSERT_EQ( 10, cache.packages.size() );
+    ASSERT_EQ( m_catalogRules.size(), cache.packages.size() );
 }
 
