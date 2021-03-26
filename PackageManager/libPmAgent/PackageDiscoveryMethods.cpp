@@ -37,7 +37,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
     if ( retCode != ERROR_SUCCESS )
     {
-        LOG_ERROR( "Error with FindRelatedProducts while searchings %ws, %ws: %d", name, publisher, retCode );
+        LOG_ERROR( "Error with FindRelatedProducts while searching %s, %s: %d", msiRule.name, msiRule.vendor, retCode );
     }
 
     for ( auto listItem : msiList )
@@ -113,7 +113,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
     if ( retCode != ERROR_SUCCESS )
     {
-        LOG_ERROR( "Error with FindRelatedProducts while searchings %ws: %d", upgradeCode, retCode );
+        LOG_ERROR( "Error with FindRelatedProducts while searchings %s: %d", upgradeCodeRule.upgradeCode, retCode );
     }
 
     for ( auto listItem : msiList )
