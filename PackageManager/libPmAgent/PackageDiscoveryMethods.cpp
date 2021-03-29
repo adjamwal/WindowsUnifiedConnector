@@ -37,7 +37,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
     if ( retCode != ERROR_SUCCESS )
     {
-        LOG_ERROR( "Error with FindRelatedProducts while searching %s, %s: %d", msiRule.name, msiRule.vendor, retCode );
+        LOG_ERROR( "Error with FindProductsByNameAndPublisher while searching %s, %s: %d", msiRule.name, msiRule.vendor, retCode );
     }
 
     for ( auto listItem : msiList )
