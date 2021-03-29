@@ -9,7 +9,7 @@
 
 #define UC_CATALOG_DISCOVERY_TYPE_MSI "msi"
 #define UC_CATALOG_DISCOVERY_TYPE_REGISTRY "registry"
-#define UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE "upgrade_code"
+#define UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE "msi_upgrade_code"
 
 bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDiscoveryRules>&returnCatalogDataset )
 {
@@ -164,8 +164,10 @@ void CatalogJsonParser::ParseMsiUpgradeCodeDiscovery( const Json::Value& msiUpga
 
     if ( msiUpgardeValue[ "code" ].isString() ) {
         msiUpgradeDiscovery.type = UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE;
-        msiUpgradeDiscovery.upgradeCode = msiUpgardeValue[ "code" ].asString();
-
+        msiUpgradeDiscovery.upgradeCode = "{" + msiUpgardeValue[ "code" ].asString() + "}";
+        for ( auto& c : msiUpgradeDiscovery.upgradeCode ) {
+            c = toupper( c );
+        }
         returnMsi.push_back( msiUpgradeDiscovery );
     }
     else {

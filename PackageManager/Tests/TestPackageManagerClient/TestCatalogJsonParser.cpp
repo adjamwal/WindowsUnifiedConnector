@@ -46,7 +46,7 @@ protected:
 			"product": "test-package-2",
 			"discovery": [
 				{
-					"type": "upgrade_code",
+					"type": "msi_upgrade_code",
 					"code": "8c028f5dd91640b5a678f66b9789ec2b"
 				}
 			]
@@ -165,7 +165,7 @@ protected:
 			"product": "test-package-2",
 			"discovery": [
 				{
-					"type": "upgrade_code",
+					"type": "msi_upgrade_code",
 					"MissingCode": "8c028f5dd91640b5a678f66b9789ec2b"
 				}
 			]
@@ -235,8 +235,16 @@ TEST_F( TestCatalogJsonParser, WillParseDiscoveryMsiUpgradeCodeMethod )
 
 	ASSERT_TRUE( m_discoveryRules.size() >= 2 );
 	ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
+}
 
-	EXPECT_EQ( m_discoveryRules[ 1 ].msiUpgradeCode_discovery[ 0 ].upgradeCode, "8c028f5dd91640b5a678f66b9789ec2b" );
+TEST_F( TestCatalogJsonParser, WillFormatMsiUpgradeCode )
+{
+	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+
+	ASSERT_TRUE( m_discoveryRules.size() >= 2 );
+	ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
+
+	EXPECT_EQ( m_discoveryRules[ 1 ].msiUpgradeCode_discovery[ 0 ].upgradeCode, "{8C028F5DD91640B5A678F66B9789EC2B}" );
 }
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryRegistryMethod )
 {
