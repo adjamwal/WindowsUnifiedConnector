@@ -69,7 +69,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     std::string data;
     DWORD flags = 0;
 
-    if ( regRule.type == "WOW6432" && WindowsUtilities::Is64BitWindows() ) {
+    if ( regRule.install.type == "WOW6432" && WindowsUtilities::Is64BitWindows() ) {
         flags = RRF_RT_REG_SZ | RRF_SUBKEY_WOW6432KEY;
     }
     else {
@@ -94,7 +94,15 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
         LOG_INFO( "Detected '%s' in registry by install key but data is empty.", lookupProduct.product.c_str() );
     }
 
+    if ( regRule.version.type == "WOW6432" && WindowsUtilities::Is64BitWindows() ) {
+        flags = RRF_RT_REG_SZ | RRF_SUBKEY_WOW6432KEY;
+    }
+    else {
+        flags = RRF_RT_REG_SZ;
+    }
+
     if( !DecodeRegistryPath( regRule.version, regRoot, regSubKey, regValueName, errorStr ) ) {
+
         LOG_ERROR( "Failed to decode registry path '%s': %s",
             regRule.version.key.c_str(), errorStr.c_str() );
         return;
@@ -104,6 +112,12 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     {
         LOG_INFO( "Failed to detect product '%s' in registry by version key '%s'",
             lookupProduct.product.c_str(), regRule.version.key.c_str() );
+        return;
+    }
+
+    if ( data.empty() )
+    {
+        LOG_ERROR( "Detected '%s' in registry by version key but data is empty.", lookupProduct.product.c_str() );
         return;
     }
 
