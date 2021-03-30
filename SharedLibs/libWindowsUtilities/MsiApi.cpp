@@ -144,6 +144,7 @@ std::wstring MsiApi::QueryProperty(
     MSIINSTALLCONTEXT dwContext, 
     LPCTSTR szProperty )
 {
+    std::wstring retString(L"");
     std::vector<WCHAR> lpValue;
 
     DWORD pcchValue = 0;
@@ -154,9 +155,14 @@ std::wstring MsiApi::QueryProperty(
         pcchValue++;
         lpValue.resize( pcchValue );
         retValue = m_winApiWrapper.MsiGetProductInfoEx( szProductCode, szUserSid, dwContext, szProperty, lpValue.data(), &pcchValue );
+    
+        if ( retValue == ERROR_SUCCESS && lpValue.data() != nullptr )
+        {
+            retString = std::wstring( lpValue.data() );
+        }
     }
 
-    return std::wstring( lpValue.data() );
+    return retString;
 }
 
 bool MsiApi::VerifyMsiMatchesNameAndPublisher( MsiApiProductInfo& productInfo,
