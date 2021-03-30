@@ -65,7 +65,7 @@ protected:
 
     void SetupProductDiscoveryMsiUpgradeCodeMethod( PmProductDiscoveryMsiUpgradeCodeMethod& msiRule )
     {
-        msiRule.type = "upgrade_code";
+        msiRule.type = "msi_upgrade_code";
         msiRule.upgradeCode = "{0010278}";
     }
 
