@@ -82,11 +82,16 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
         return;
     }
 
-    if( !WindowsUtilities::ReadRegistryStringA( regRoot, regSubKey, regValueName, flags, data ) || data.empty() )
+    if( !WindowsUtilities::ReadRegistryStringA( regRoot, regSubKey, regValueName, flags, data ) )
     {
         LOG_INFO( "Failed to detect product '%s' in registry by install key '%s'",
             lookupProduct.product.c_str(), regRule.install.key.c_str() );
         return;
+    }
+
+    if ( data.empty() )
+    {
+        LOG_INFO( "Detected '%s' in registry by install key but data is empty.", lookupProduct.product.c_str() );
     }
 
     if( !DecodeRegistryPath( regRule.version, regRoot, regSubKey, regValueName, errorStr ) ) {
