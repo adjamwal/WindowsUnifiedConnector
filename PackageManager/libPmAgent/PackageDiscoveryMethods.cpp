@@ -69,7 +69,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     std::string data;
     DWORD flags = 0;
 
-    if ( regRule.type == "WOW6432" ) {
+    if ( regRule.type == "WOW6432" && WindowsUtilities::Is64BitWindows() ) {
         flags = RRF_RT_REG_SZ | RRF_SUBKEY_WOW6432KEY;
     }
     else {
