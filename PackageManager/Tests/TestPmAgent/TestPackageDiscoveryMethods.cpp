@@ -34,9 +34,9 @@ protected:
         regRule.version.type = "WOW6432";
 
         ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, std::string( "InstallDir" ), _, _ ) )
-            .WillByDefault( DoAll( SetArgReferee<3>( "data" ), Return( true ) ) );
+            .WillByDefault( DoAll( SetArgReferee<4>( "data" ), Return( true ) ) );
         ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, std::string( "DisplayVersion" ), _, _ ) )
-            .WillByDefault( DoAll( SetArgReferee<3>( "1" ), Return( true ) ) );
+            .WillByDefault( DoAll( SetArgReferee<4>( "1" ), Return( true ) ) );
     }
 
     void SetupProductDiscoveryRules( PmProductDiscoveryRules& lookupProduct )
