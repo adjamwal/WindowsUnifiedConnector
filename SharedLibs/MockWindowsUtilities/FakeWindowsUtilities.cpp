@@ -38,9 +38,9 @@ bool WindowsUtilities::ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstri
     return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryString( hKey, subKey, valueName, data );
 }
 
-bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _Out_ std::string& data )
+bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _In_ DWORD flags, _Out_ std::string& data )
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryStringA( hKey, subKey, valueName, data );
+    return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryStringA( hKey, subKey, valueName, flags, data );
 }
 
 bool WindowsUtilities::Is64BitWindows()
