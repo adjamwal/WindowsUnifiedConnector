@@ -156,7 +156,7 @@ std::wstring MsiApi::QueryProperty(
         lpValue.resize( pcchValue );
         retValue = m_winApiWrapper.MsiGetProductInfoEx( szProductCode, szUserSid, dwContext, szProperty, lpValue.data(), &pcchValue );
     
-        if ( retValue == ERROR_SUCCESS )
+        if ( retValue == ERROR_SUCCESS && lpValue.data() != nullptr )
         {
             retString = std::wstring( lpValue.data() );
         }
