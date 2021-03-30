@@ -158,6 +158,10 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 bool PackageDiscoveryMethods::DecodeRegistryPath( const PmProductDiscoveryRegKeyDef& keyDef,
     HKEY& root, std::string& subKey, std::string& valueName, std::string& error )
 {
+    subKey.clear();
+    valueName.clear();
+    error.clear();
+
     auto regStr = StringUtil::Split( keyDef.key, '\\' );
 
     //must have at least 3 parts such as: root \\ subkey \\ valueName
