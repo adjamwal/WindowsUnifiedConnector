@@ -100,6 +100,20 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillGetUC )
     EXPECT_EQ( detectedInstallations.front().configs.size(), 2 );
 }
 
+TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillDecodeRegistryLocationsCorrectly )
+{
+    PmProductDiscoveryRules lookupProduct;
+    PmProductDiscoveryRegistryMethod regRule;
+    SetupRegistryDiscoveryLookup( lookupProduct, regRule );
+
+    InSequence S;
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, "SOFTWARE\\Immunet Protect", "InstallDir", _, _ ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect", "DisplayVersion", _, _ ) );
+
+    std::vector<PmInstalledPackage> detectedInstallations;
+    m_patient->DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
+}
+
 TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillFailOnRegistryFailure )
 {
     PmProductDiscoveryRules lookupProduct;
