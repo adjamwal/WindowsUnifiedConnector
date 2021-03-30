@@ -65,13 +65,15 @@ std::tuple<int32_t, std::vector<MsiApiProductInfo>> MsiApi::QueryProducts(
     TCHAR szInstalledProductCode[39] = { 0 };
     TCHAR szSid[128] = { 0 };
     DWORD pcchSid = 128;
-    MSIINSTALLCONTEXT pdwInstalledContext;
+    MSIINSTALLCONTEXT pdwInstalledContext = {};
 
     do {
+        pcchSid = 128;
+
         retValue = m_winApiWrapper.MsiEnumProductsExW(
             productCode,
             L"s-1-1-0",
-            MSIINSTALLCONTEXT_USERMANAGED | MSIINSTALLCONTEXT_USERUNMANAGED | MSIINSTALLCONTEXT_MACHINE,
+            MSIINSTALLCONTEXT_ALL,
             dwIndex,
             szInstalledProductCode,
             &pdwInstalledContext,
