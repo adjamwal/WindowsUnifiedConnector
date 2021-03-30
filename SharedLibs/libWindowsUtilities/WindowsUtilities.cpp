@@ -228,10 +228,10 @@ bool WindowsUtilities::ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstrin
     return true;
 }
 
-bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _Out_ std::string& data )
+bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _In_ DWORD flags, _Out_ std::string& data )
 {
     DWORD dataSize {};
-    LONG retCode = ::RegGetValueA( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize );
+    LONG retCode = ::RegGetValueA( hKey, subKey.c_str(), valueName.c_str(), flags, nullptr, nullptr, &dataSize );
 
     if( retCode != ERROR_SUCCESS )
     {
@@ -240,7 +240,7 @@ bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::stri
 
     data.resize( dataSize / sizeof( char ) );
 
-    retCode = ::RegGetValueA( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, &data[ 0 ], &dataSize );
+    retCode = ::RegGetValueA( hKey, subKey.c_str(), valueName.c_str(), flags, nullptr, &data[ 0 ], &dataSize );
     if( retCode != ERROR_SUCCESS )
     {
         return false;

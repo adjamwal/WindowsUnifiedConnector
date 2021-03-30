@@ -33,9 +33,9 @@ protected:
         regRule.version.key = "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect\\DisplayVersion";
         regRule.version.type = "WOW6432";
 
-        ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, std::string( "InstallDir" ), _ ) )
+        ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, std::string( "InstallDir" ), _, _ ) )
             .WillByDefault( DoAll( SetArgReferee<3>( "data" ), Return( true ) ) );
-        ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, std::string( "DisplayVersion" ), _ ) )
+        ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, std::string( "DisplayVersion" ), _, _ ) )
             .WillByDefault( DoAll( SetArgReferee<3>( "1" ), Return( true ) ) );
     }
 
@@ -90,7 +90,7 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillGetUC )
     PmProductDiscoveryRegistryMethod regRule;
     SetupRegistryDiscoveryLookup( lookupProduct, regRule );
 
-    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, _, _ ) ).Times( 2 );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringA( _, _, _, _, _ ) ).Times( 2 );
 
     std::vector<PmInstalledPackage> detectedInstallations;
     m_patient->DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );

@@ -41,7 +41,7 @@ public:
     void MakeReadRegistryStringReturn( bool value );
     void ExpectReadRegistryStringIsNotCalled();
 
-    MOCK_METHOD4( ReadRegistryStringA, bool( HKEY, const std::string&, const std::string&, std::string& ) );
+    MOCK_METHOD5( ReadRegistryStringA, bool( HKEY, const std::string&, const std::string&, DWORD flags, std::string& ) );
     void MakeReadRegistryStringAReturn( bool value );
     void ExpectReadRegistryStringAIsNotCalled();
 

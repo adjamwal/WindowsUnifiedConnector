@@ -116,12 +116,12 @@ void MockWindowsUtilities::ExpectReadRegistryStringIsNotCalled()
 
 void MockWindowsUtilities::MakeReadRegistryStringAReturn( bool value )
 {
-    ON_CALL( *this, ReadRegistryStringA( _, _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ReadRegistryStringA( _, _, _, _, _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockWindowsUtilities::ExpectReadRegistryStringAIsNotCalled()
 {
-    EXPECT_CALL( *this, ReadRegistryStringA( _, _, _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ReadRegistryStringA( _, _, _, _, _ ) ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeIs64BitWindowsReturn( bool value )
