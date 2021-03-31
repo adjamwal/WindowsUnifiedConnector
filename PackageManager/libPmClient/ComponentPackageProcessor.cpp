@@ -52,9 +52,11 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
     m_ucUpgradeEventHandler.Initialize( dep );
 }
 
-bool ComponentPackageProcessor::IsActionable( PmComponent& componentPackage )
+bool ComponentPackageProcessor::HasDownloadedBinary( PmComponent& componentPackage )
 {
-    return ( componentPackage.installerUrl.length() > 0 && componentPackage.installerType.length() > 0 );
+    return !componentPackage.downloadedInstallerPath.empty() && 
+        m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
+        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath) > 0 );
 }
 
 bool ComponentPackageProcessor::HasConfigs( PmComponent& componentPackage )
@@ -62,16 +64,25 @@ bool ComponentPackageProcessor::HasConfigs( PmComponent& componentPackage )
     return componentPackage.configs.size() > 0;
 }
 
-bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPackage )
+bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPackage )
 {
-    if( !IsActionable( componentPackage ) )
+    componentPackage.downloadedInstallerPath = "";
+    if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 )
     {
         return false;
     }
 
+    std::string tempPackageFile;
+    DownloadAsTempFile( componentPackage, tempPackageFile );
+    componentPackage.downloadedInstallerPath = tempPackageFile;
+
+    return HasDownloadedBinary( componentPackage );
+}
+
+bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPackage )
+{
     bool rtn = false;
     std::stringstream ssError;
-    std::string tempPackageFile;
     std::optional<std::string> tempSha256;
 
     std::lock_guard<std::mutex> lock( m_mutex );
@@ -90,30 +101,31 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
 
     bool isAlreadyInstalled = IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
-    m_eventBuilder.WithNewFile( componentPackage.installerUrl, componentPackage.installerHash, 0 ); //new file info gets updated after download
+    m_eventBuilder.WithNewFile( 
+        componentPackage.installerUrl, 
+        componentPackage.installerHash, 
+        m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
 
     try
     {
-        DownloadAsTempFile( componentPackage, tempPackageFile );
-        componentPackage.installerPath = tempPackageFile;
-
-        tempSha256 = m_sslUtil.CalculateSHA256( tempPackageFile );
+        tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath );
         if( !tempSha256.has_value() )
         {
-            ssError << "Failed to calculate sha256 of " << tempPackageFile;
+            ssError << "Failed to calculate sha256 of " << componentPackage.downloadedInstallerPath;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_CALC );
         }
 
         m_eventBuilder.WithNewFile(
             componentPackage.installerUrl,
             tempSha256.has_value() ? tempSha256.value() : componentPackage.installerHash,
-            tempPackageFile.empty() ? 0 : m_fileUtil.FileSize( tempPackageFile ) );
+            m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
 
         // only validate hash if installerHash is not empty
         if( !componentPackage.installerHash.empty() &&
             tempSha256.value() != componentPackage.installerHash )
         {
-            ssError << "Failed to match hash of download. Calculated Hash: " << tempSha256.value() << ", Cloud Hash: " << componentPackage.installerHash;
+            ssError << "Failed to match hash of download. Calculated Hash: " << tempSha256.value() << 
+                ", Cloud Hash: " << componentPackage.installerHash;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH );
         }
 
@@ -147,7 +159,7 @@ bool ComponentPackageProcessor::ProcessPackageBinaries( PmComponent& componentPa
 
     m_eventPublisher.Publish( m_eventBuilder );
 
-    CleanupTempDownload( tempPackageFile );
+    CleanupTempDownload( componentPackage.downloadedInstallerPath );
 
     return rtn;
 }
@@ -174,7 +186,7 @@ void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& component
     std::stringstream ss;
     std::stringstream ssError;
 
-    ss << m_fileUtil.GetTempDir() << "tmpPmInst_" << m_fileCount++ << RandomUtil::GetString(10) << "." << componentPackage.installerType;
+    ss << m_fileUtil.GetTempDir() << "tmpPmInst_" << m_fileCount++ << RandomUtil::GetString( 10 ) << "." << componentPackage.installerType;
 
     if( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) != 200 )
     {
@@ -205,7 +217,7 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
     for( auto config : componentPackage.configs )
     {
         bool processed = false;
-        
+
         try
         {
             LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.c_str(), componentPackage.productAndVersion.c_str() );

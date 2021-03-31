@@ -119,7 +119,7 @@ TEST_F( TestComponentPackageProcessor, WillTryToDownloadIfInitialized )
 
     EXPECT_CALL( *m_cloud, DownloadFile( m_expectedComponentPackage.installerUrl, _ ) ).Times( 1 );
 
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
@@ -128,7 +128,7 @@ TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
 
     EXPECT_CALL( *m_pmComponentManager, UpdateComponent( _, _ ) );
 
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
@@ -137,7 +137,7 @@ TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
 
     EXPECT_CALL( *m_ucUpgradeEventHandler, StoreUcUpgradeEvent( _ ) );
 
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
@@ -149,14 +149,14 @@ TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
     m_fileUtil->MakeFileExistsReturn( true );
     EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
 
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillNotProcessComponentPackageIfNotInitialized )
 {
     SetupComponentPackage();
     m_cloud->ExpectDownloadFileIsNotCalled();
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillProcessConfig )
@@ -175,7 +175,7 @@ TEST_F( TestComponentPackageProcessor, WillSendSuccessEventIfProcessComponentPac
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPackageFails )
@@ -186,6 +186,6 @@ TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPac
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
-    m_patient->ProcessPackageBinaries( m_expectedComponentPackage );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 

@@ -33,6 +33,33 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
 
+    PreDownloadAllFromManifest();
+    ProcessDownloadedPackagesAndConfigs();
+
+    //PmSendEvent() success
+
+    return true;
+}
+
+void ManifestProcessor::PreDownloadAllFromManifest()
+{
+    for( auto package : m_manifest.GetPackageList() )
+    {
+        try
+        {
+            m_componentProcessor.DownloadPackageBinary( package );
+        }
+        catch( ... )
+        {
+            throw std::exception(
+                ( __FUNCTION__ ": Failed to download binary for package: " + package.productAndVersion ).c_str()
+            );
+        }
+    }
+}
+
+void ManifestProcessor::ProcessDownloadedPackagesAndConfigs()
+{
     int failedPackages = 0;
     for( auto package : m_manifest.GetPackageList() )
     {
@@ -41,10 +68,14 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         try
         {
             processed =
-                ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackageBinaries( package ) ) &&
+                ( !m_componentProcessor.HasDownloadedBinary( package ) || m_componentProcessor.ProcessPackageBinary( package ) ) &&
                 ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
         }
-        catch( ... ) { }
+        catch( ... ) {
+            throw std::exception(
+                ( __FUNCTION__ ": Failed to process package " + package.productAndVersion ).c_str()
+            );
+        }
 
         failedPackages += processed ? 0 : 1;
     }
@@ -55,8 +86,4 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         ss << __FUNCTION__ << ": Failed to process " << failedPackages << " component package(s)";
         throw std::exception( ss.str().c_str() );
     }
-
-    //PmSendEvent() success
-
-    return true;
 }

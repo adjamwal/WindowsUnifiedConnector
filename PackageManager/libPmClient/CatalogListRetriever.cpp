@@ -37,9 +37,6 @@ std::string CatalogListRetriever::GetCloudCatalog()
         }
     }
 
-    StringUtil::ReplaceStringInPlace( catalogData, "\\u003c", "<" );
-    StringUtil::ReplaceStringInPlace( catalogData, "\\u003e", ">" );
-
     return catalogData;
 }
 

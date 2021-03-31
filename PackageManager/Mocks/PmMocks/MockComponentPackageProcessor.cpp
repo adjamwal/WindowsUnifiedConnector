@@ -2,9 +2,10 @@
 
 MockComponentPackageProcessor::MockComponentPackageProcessor()
 {
-    MakeIsActionableReturn( false );
+    MakeHasDownloadedBinaryReturn( false );
     MakeHasConfigsReturn( false );
-    MakeProcessPackageBinariesReturn( false );
+    MakeDownloadPackageBinaryReturn( false );
+    MakeProcessPackageBinaryReturn( false );
     MakeProcessConfigsForPackageReturn( false );
 }
 
@@ -17,14 +18,14 @@ void MockComponentPackageProcessor::ExpectInitializeIsNotCalled()
     EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
 }
 
-void MockComponentPackageProcessor::MakeIsActionableReturn( bool value )
+void MockComponentPackageProcessor::MakeHasDownloadedBinaryReturn( bool value )
 {
-    ON_CALL( *this, IsActionable( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, HasDownloadedBinary( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockComponentPackageProcessor::ExpectIsActionableIsNotCalled()
+void MockComponentPackageProcessor::ExpectHasDownloadedBinaryIsNotCalled()
 {
-    EXPECT_CALL( *this, IsActionable( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, HasDownloadedBinary( _ ) ).Times( 0 );
 }
 
 void MockComponentPackageProcessor::MakeHasConfigsReturn( bool value )
@@ -37,14 +38,24 @@ void MockComponentPackageProcessor::ExpectHasConfigsIsNotCalled()
     EXPECT_CALL( *this, HasConfigs( _ ) ).Times( 0 );
 }
 
-void MockComponentPackageProcessor::MakeProcessPackageBinariesReturn( bool value )
+void MockComponentPackageProcessor::MakeDownloadPackageBinaryReturn( bool value )
 {
-    ON_CALL( *this, ProcessPackageBinaries( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, DownloadPackageBinary( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockComponentPackageProcessor::ExpectProcessPackageBinariesIsNotCalled()
+void MockComponentPackageProcessor::ExpectDownloadPackageBinaryIsNotCalled()
 {
-    EXPECT_CALL( *this, ProcessPackageBinaries( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, DownloadPackageBinary( _ ) ).Times( 0 );
+}
+
+void MockComponentPackageProcessor::MakeProcessPackageBinaryReturn( bool value )
+{
+    ON_CALL( *this, ProcessPackageBinary( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockComponentPackageProcessor::ExpectProcessPackageBinaryIsNotCalled()
+{
+    EXPECT_CALL( *this, ProcessPackageBinary( _ ) ).Times( 0 );
 }
 
 void MockComponentPackageProcessor::MakeProcessConfigsForPackageReturn( bool value )

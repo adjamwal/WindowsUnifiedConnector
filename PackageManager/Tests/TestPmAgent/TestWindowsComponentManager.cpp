@@ -122,8 +122,8 @@ TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeToCmdLine )
     PmComponent c;
     c.installerType = "exe";
     c.installerArgs = " /args";
-    c.installerPath = "update.exe";
-    std::string expectedCmdLine = c.installerPath + " " + c.installerArgs;
+    c.downloadedInstallerPath = "update.exe";
+    std::string expectedCmdLine = c.downloadedInstallerPath + " " + c.installerArgs;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
 
@@ -141,7 +141,7 @@ TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeAndDropPath )
     c.installerType = "exe";
     c.installerArgs = " /args";
     std::string updateExe = "update.exe";
-    c.installerPath = "path\\" + updateExe;
+    c.downloadedInstallerPath = "path\\" + updateExe;
     std::string expectedCmdLine = updateExe + " " + c.installerArgs;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );

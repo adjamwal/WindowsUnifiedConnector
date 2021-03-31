@@ -15,6 +15,9 @@ public:
     bool ProcessManifest( std::string checkinManifest ) override;
 
 private:
+    void PreDownloadAllFromManifest();
+    void ProcessDownloadedPackagesAndConfigs();
+
     std::mutex m_mutex;
     IPmManifest& m_manifest;
     IComponentPackageProcessor& m_componentProcessor;
