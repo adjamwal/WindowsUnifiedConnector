@@ -112,8 +112,6 @@ std::string CloudEventBuilder::Build()
 
 void CloudEventBuilder::Reset()
 {
-    LOG_DEBUG( __FUNCTION__ ": Enter" );
-
     m_ucid = "";
     m_evtype = CloudEventType( 0 );
     m_packageName = "";
@@ -127,8 +125,6 @@ void CloudEventBuilder::Reset()
     m_newHash = "";
     m_newSize = 0;
     UpdateEventTime();
-
-    LOG_DEBUG( __FUNCTION__ ": Exit" );
 }
 
 bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std::string& eventJson )

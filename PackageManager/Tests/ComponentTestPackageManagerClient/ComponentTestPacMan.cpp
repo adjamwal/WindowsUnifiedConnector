@@ -184,7 +184,7 @@ protected:
         expectedEventData.WithOldFile( oldPath, oldHash, oldSize );
         expectedEventData.WithNewFile( newPath, newHash, newSize );
 
-        EXPECT_EQ( *m_eventBuilder, expectedEventData );
+        EXPECT_EQ( expectedEventData, *m_eventBuilder );
     }
 
     bool m_configIntervalCalledOnce;
@@ -238,7 +238,7 @@ std::string _ucReponseNoConfig( R"(
       "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
       "package": "uc/0.0.1"
     }
-  ]
+  ] 
 }
 )" );
 
@@ -247,18 +247,21 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
     bool pass = false;
     ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
 
+    m_mockFileUtil->MakeFileExistsReturn( true );
+    m_mockFileUtil->MakeFileSizeReturn( 100 );
+    m_mockFileUtil->MakeDeleteFileReturn( 0 );
     m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const PmComponent& package, std::string& error )
         {
-            EXPECT_EQ( package.installerArgs, "/S /Q " );
-            EXPECT_EQ( package.installLocation, "/install/location" );
-            EXPECT_EQ( package.installerHash, "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
-            EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
-            EXPECT_EQ( package.installerType, "msi" );
-            EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( "/S /Q ", package.installerArgs );
+            EXPECT_EQ( "/install/location", package.installLocation );
+            EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash,  );
+            EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
+            EXPECT_EQ( "msi", package.installerType );
+            EXPECT_EQ( "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", package.installerUrl );
+            EXPECT_EQ( "uc/0.0.1", package.productAndVersion );
 
             pass = true;
             m_cv.notify_one();
@@ -267,6 +270,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 
     //this fails (matcher gets correct params but passes them wrongly to the == operator)
     //EXPECT_CALL( *m_eventPublisher, Publish( CloudEventBuilderMatch( m_eventBuilder.get() ) ) ).Times( 1 );
+    
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) ).Times( 1 );
 
     StartPacMan();
@@ -287,7 +291,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
         0,
         "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
         "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
-        0
+        100
     );
 }
 
@@ -361,9 +365,9 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
     EXPECT_CALL( *m_mockPlatformComponentManager, DeployConfiguration( _ ) ).WillOnce( Invoke(
         [this, &pass]( const PackageConfigInfo& config )
         {
-            EXPECT_EQ( config.sha256, "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
-            EXPECT_EQ( config.verifyBinPath, "verify.exe" );
-            EXPECT_NE( config.verifyPath.find( "tmpPmConf_" ), std::string::npos );
+            EXPECT_EQ( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4", config.sha256 );
+            EXPECT_EQ( "verify.exe", config.verifyBinPath );
+            EXPECT_NE( std::string::npos, config.verifyPath.find( "tmpPmConf_" ) );
 
             pass = true;
             m_cv.notify_one();
@@ -392,7 +396,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
         {
-            EXPECT_EQ( newName, "/install/location/config.json" );
+            EXPECT_EQ( "/install/location/config.json", newName );
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -438,7 +442,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::string& oldFilename, const std::string& newName )
         {
-            EXPECT_EQ( newName, "/install/location/config.json" );
+            EXPECT_EQ( "/install/location/config.json", newName );
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -487,19 +491,24 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+
+    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 0 ) );
+
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
-            EXPECT_EQ( package.installerArgs, "/S /Q " );
-            EXPECT_EQ( package.installLocation, "/install/location" );
-            EXPECT_EQ( package.installerHash, "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
-            EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
-            EXPECT_EQ( package.installerType, "msi" );
-            EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( "/S /Q ", package.installerArgs );
+            EXPECT_EQ( "/install/location", package.installLocation );
+            EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash );
+            EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
+            EXPECT_EQ( "msi", package.installerType );
+            EXPECT_EQ( "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", package.installerUrl );
+            EXPECT_EQ( "uc/0.0.1", package.productAndVersion );
 
             packageUpdated = true;
             return 0;
@@ -605,6 +614,11 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+
+    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 0 ) );
+
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
     ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
@@ -616,13 +630,13 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
         .WillOnce( Invoke(
             [this, &packageUpdated]( const PmComponent& package, std::string& error )
             {
-                EXPECT_EQ( package.installerArgs, "/S /Q " );
-                EXPECT_EQ( package.installLocation, "/install/location" );
-                EXPECT_EQ( package.installerHash, "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
-                EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
-                EXPECT_EQ( package.installerType, "msi" );
-                EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-                EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
+                EXPECT_EQ( "/S /Q ", package.installerArgs );
+                EXPECT_EQ( "/install/location", package.installLocation );
+                EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash );
+                EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
+                EXPECT_EQ( "msi", package.installerType );
+                EXPECT_EQ( "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", package.installerUrl );
+                EXPECT_EQ( "uc/0.0.1", package.productAndVersion );
 
                 packageUpdated++;
                 return 0;
@@ -630,13 +644,13 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
         .WillOnce( Invoke(
             [this, &packageUpdated]( const PmComponent& package, std::string& error )
             {
-                EXPECT_EQ( package.installerArgs, "/S /Q " );
-                EXPECT_EQ( package.installLocation, "/install/location" );
-                EXPECT_EQ( package.installerHash, "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
-                EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
-                EXPECT_EQ( package.installerType, "exe" );
-                EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-                EXPECT_EQ( package.productAndVersion, "uc2/0.0.1" );
+                EXPECT_EQ( "/S /Q ", package.installerArgs );
+                EXPECT_EQ( "/install/location", package.installLocation );
+                EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash );
+                EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
+                EXPECT_EQ( "exe", package.installerType );
+                EXPECT_EQ( "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", package.installerUrl );
+                EXPECT_EQ( "uc2/0.0.1", package.productAndVersion );
 
                 packageUpdated++;
                 return 0;
@@ -645,28 +659,28 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                 .WillOnce( Invoke(
                     [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
                     {
-                        EXPECT_EQ( newName, "/install/location/p1_config1.json" );
+                        EXPECT_EQ( "/install/location/p1_config1.json", newName );
                         configUpdated++;
                         return 0;
                     } ) )
                 .WillOnce( Invoke(
                     [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
                     {
-                        EXPECT_EQ( newName, "/install/location/p1_config2.json" );
+                        EXPECT_EQ( "/install/location/p1_config2.json", newName );
                         configUpdated++;
                         return 0;
                     } ) )
                         .WillOnce( Invoke(
                             [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
                             {
-                                EXPECT_EQ( newName, "/install/location/p2_config1.json" );
+                                EXPECT_EQ( "/install/location/p2_config1.json", newName );
                                 configUpdated++;
                                 return 0;
                             } ) )
                         .WillOnce( Invoke(
                             [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
                             {
-                                EXPECT_EQ( newName, "/install/location/p2_config2.json" );
+                                EXPECT_EQ( "/install/location/p2_config2.json", newName );
                                 configUpdated++;
                                 m_cv.notify_one();
 
@@ -679,8 +693,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
                             std::unique_lock<std::mutex> lock( m_mutex );
                             m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
-                            EXPECT_EQ( packageUpdated, 2 );
-                            EXPECT_EQ( configUpdated, 4 );
+                            EXPECT_EQ( 2, packageUpdated );
+                            EXPECT_EQ( 4, configUpdated );
 }
 
 std::string _ucReponseWithConfigCloudData( R"(
@@ -715,6 +729,11 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
+
+    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 0 ) );
+
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
@@ -724,12 +743,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
-            EXPECT_EQ( package.installerArgs, "/S /Q " );
-            EXPECT_EQ( package.installerHash, "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
-            EXPECT_EQ( package.signerName, "Cisco Systems, Inc." );
-            EXPECT_EQ( package.installerType, "msi" );
-            EXPECT_EQ( package.installerUrl, "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi" );
-            EXPECT_EQ( package.productAndVersion, "uc/0.0.1" );
+            EXPECT_EQ( "/S /Q ", package.installerArgs );
+            EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash );
+            EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
+            EXPECT_EQ( "msi", package.installerType );
+            EXPECT_EQ( "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", package.installerUrl );
+            EXPECT_EQ( "uc/0.0.1", package.productAndVersion );
 
             packageUpdated = true;
             return 0;
@@ -737,7 +756,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
         {
-            EXPECT_EQ( newName, "C:\\Program Files\\Cisco\\SecureClient\\UnifiedConnector\\Configuration\\uc.json" );
+            EXPECT_EQ( "C:\\Program Files\\Cisco\\SecureClient\\UnifiedConnector\\Configuration\\uc.json", newName );
             configUpdated = true;
             m_cv.notify_one();
 

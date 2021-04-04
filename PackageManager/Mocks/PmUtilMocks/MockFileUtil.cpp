@@ -114,6 +114,16 @@ void MockFileUtil::ExpectFileExistsNotCalled()
     EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
 }
 
+void MockFileUtil::MakeFileSizeReturn( size_t value )
+{
+    ON_CALL( *this, FileSize( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectFileSizeNotCalled()
+{
+    EXPECT_CALL( *this, FileSize( _ ) ).Times( 0 );
+}
+
 void MockFileUtil::MakeAppendPathReturn( std::string value )
 {
     ON_CALL( *this, AppendPath( _, _ ) ).WillByDefault( Return( value ) );

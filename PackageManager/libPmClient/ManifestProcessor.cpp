@@ -1,5 +1,6 @@
 #include "ManifestProcessor.h"
 #include "PmTypes.h"
+#include "PmLogger.h"
 #include <iostream>
 #include <sstream>
 
@@ -33,35 +34,36 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
 
-    PreDownloadAllFromManifest();
-    ProcessDownloadedPackagesAndConfigs();
+    auto packages = m_manifest.GetPackageList();
+
+    PreDownloadAllFromManifest( packages );
+    ProcessDownloadedPackagesAndConfigs( packages );
 
     //PmSendEvent() success
 
     return true;
 }
 
-void ManifestProcessor::PreDownloadAllFromManifest()
+void ManifestProcessor::PreDownloadAllFromManifest( std::vector<PmComponent>& packages )
 {
-    for( auto package : m_manifest.GetPackageList() )
+    for( auto& package : packages )
     {
         try
         {
             m_componentProcessor.DownloadPackageBinary( package );
+            LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", package.downloadedInstallerPath.c_str() );
         }
         catch( ... )
         {
-            throw std::exception(
-                ( __FUNCTION__ ": Failed to download binary for package: " + package.productAndVersion ).c_str()
-            );
+            LOG_ERROR( __FUNCTION__ ": Failed to download binary for package: %s", package.productAndVersion.c_str() );
         }
     }
 }
 
-void ManifestProcessor::ProcessDownloadedPackagesAndConfigs()
+void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmComponent>& packages )
 {
     int failedPackages = 0;
-    for( auto package : m_manifest.GetPackageList() )
+    for( auto& package : packages )
     {
         bool processed = false;
 
@@ -70,11 +72,11 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs()
             processed =
                 ( !m_componentProcessor.HasDownloadedBinary( package ) || m_componentProcessor.ProcessPackageBinary( package ) ) &&
                 ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+
+            LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s", processed, package.productAndVersion.c_str() );
         }
         catch( ... ) {
-            throw std::exception(
-                ( __FUNCTION__ ": Failed to process package " + package.productAndVersion ).c_str()
-            );
+            LOG_ERROR( __FUNCTION__ ": Failed to process package: %s", package.productAndVersion.c_str() );
         }
 
         failedPackages += processed ? 0 : 1;

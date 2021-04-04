@@ -54,14 +54,26 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
 
 bool ComponentPackageProcessor::HasDownloadedBinary( PmComponent& componentPackage )
 {
-    return !componentPackage.downloadedInstallerPath.empty() && 
+    bool result = !componentPackage.downloadedInstallerPath.empty() &&
         m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
-        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath) > 0 );
+        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 );
+
+    LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
+        componentPackage.productAndVersion.c_str(),
+        result );
+
+    return result;
 }
 
 bool ComponentPackageProcessor::HasConfigs( PmComponent& componentPackage )
 {
-    return componentPackage.configs.size() > 0;
+    bool result = componentPackage.configs.size() > 0;
+
+    LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
+        componentPackage.productAndVersion.c_str(),
+        result );
+
+    return result;
 }
 
 bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPackage )
@@ -93,6 +105,10 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         return false;
     }
 
+    LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
+        componentPackage.downloadedInstallerPath.c_str(),
+        m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
+
     m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
 
     m_eventBuilder.Reset();
@@ -101,9 +117,9 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     bool isAlreadyInstalled = IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
-    m_eventBuilder.WithNewFile( 
-        componentPackage.installerUrl, 
-        componentPackage.installerHash, 
+    m_eventBuilder.WithNewFile(
+        componentPackage.installerUrl,
+        componentPackage.installerHash,
         m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
 
     try
@@ -124,7 +140,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         if( !componentPackage.installerHash.empty() &&
             tempSha256.value() != componentPackage.installerHash )
         {
-            ssError << "Failed to match hash of download. Calculated Hash: " << tempSha256.value() << 
+            ssError << "Failed to match hash of download. Calculated Hash: " << tempSha256.value() <<
                 ", Cloud Hash: " << componentPackage.installerHash;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH );
         }

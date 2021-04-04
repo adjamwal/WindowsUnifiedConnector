@@ -93,6 +93,15 @@ TEST_F( TestManifestProcessor, ProcessManifestWillGetPackageList )
     m_patient->ProcessManifest( "test" );
 }
 
+TEST_F( TestManifestProcessor, ProcessManifestWillDownloadPackageBinaries )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        DownloadPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_patient->ProcessManifest( "test" );
+}
 TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
 {
     SetupPackageList( 2 );

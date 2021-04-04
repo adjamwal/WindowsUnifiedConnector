@@ -4,6 +4,7 @@
 #include "IPmManifest.h"
 #include "IComponentPackageProcessor.h"
 #include <mutex>
+#include <vector>
 
 class ManifestProcessor : public IManifestProcessor
 {
@@ -15,8 +16,8 @@ public:
     bool ProcessManifest( std::string checkinManifest ) override;
 
 private:
-    void PreDownloadAllFromManifest();
-    void ProcessDownloadedPackagesAndConfigs();
+    void PreDownloadAllFromManifest( std::vector<PmComponent>& packages );
+    void ProcessDownloadedPackagesAndConfigs( std::vector<PmComponent>& packages );
 
     std::mutex m_mutex;
     IPmManifest& m_manifest;

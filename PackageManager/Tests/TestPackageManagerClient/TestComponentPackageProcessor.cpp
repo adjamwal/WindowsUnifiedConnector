@@ -112,14 +112,14 @@ protected:
     std::unique_ptr<ComponentPackageProcessor> m_patient;
 };
 
-TEST_F( TestComponentPackageProcessor, WillTryToDownloadIfInitialized )
+TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillTryToDownload )
 {
-    SetupComponentPackage();
+    SetupComponentPackageWithConfig();
     m_patient->Initialize( m_dep.get() );
 
     EXPECT_CALL( *m_cloud, DownloadFile( m_expectedComponentPackage.installerUrl, _ ) ).Times( 1 );
 
-    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+    m_patient->DownloadPackageBinary( m_expectedComponentPackage );
 }
 
 TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )

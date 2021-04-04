@@ -49,6 +49,8 @@ public:
     void ExpectFileExistsNotCalled();
 
     MOCK_METHOD1( FileSize, size_t( const std::string& ) );
+    void MakeFileSizeReturn( size_t value );
+    void ExpectFileSizeNotCalled();
 
     MOCK_METHOD2( AppendPath, std::string( const std::string&, const std::string& ) );
     void MakeAppendPathReturn( std::string value );
