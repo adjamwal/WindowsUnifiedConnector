@@ -43,7 +43,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     CodesignStatus status = m_codeSignVerifier.Verify( 
-        converter.from_bytes( package.installerPath ),
+        converter.from_bytes( package.downloadedInstallerPath ),
         converter.from_bytes( package.signerName ), 
         SIGTYPE_DEFAULT );
 
@@ -52,18 +52,18 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
         if ( package.installerType == "exe" )
         {
             std::string exeCmdline;
-            size_t idx = package.installerPath.find_last_of( '\\' );
+            size_t idx = package.downloadedInstallerPath.find_last_of( '\\' );
             if( idx != std::string::npos ) {
-                exeCmdline = package.installerPath.substr( idx + 1 );
+                exeCmdline = package.downloadedInstallerPath.substr( idx + 1 );
             }
             else {
-                exeCmdline = package.installerPath;
+                exeCmdline = package.downloadedInstallerPath;
             }
 
             exeCmdline += " ";
             exeCmdline += package.installerArgs;
 
-            ret = RunPackage( package.installerPath, exeCmdline, error );
+            ret = RunPackage( package.downloadedInstallerPath, exeCmdline, error );
         }
         else if ( package.installerType == "msi" )
         {
@@ -80,7 +80,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
+                msiCmdline = " /package \"" + package.downloadedInstallerPath + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }

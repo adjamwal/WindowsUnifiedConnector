@@ -24,7 +24,7 @@ struct PmComponent
     std::string installLocation;
     std::string signerName;
     std::string installerHash;
-    std::string installerPath;
+    std::string downloadedInstallerPath;
     std::vector<PackageConfigInfo> configs;
 };
 

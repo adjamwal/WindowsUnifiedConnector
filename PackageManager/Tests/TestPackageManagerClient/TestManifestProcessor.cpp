@@ -14,7 +14,7 @@ MATCHER_P( PmComponentMatch, expected, "" ) {
         arg.installLocation.compare( expected.installLocation ) == 0 &&
         arg.signerName.compare( expected.signerName ) == 0 &&
         arg.installerHash.compare( expected.installerHash ) == 0 &&
-        arg.installerPath.compare( expected.installerPath ) == 0;
+        arg.downloadedInstallerPath.compare( expected.downloadedInstallerPath ) == 0;
 }
 
 class TestManifestProcessor : public ::testing::Test
@@ -55,9 +55,9 @@ protected:
         }
 
         m_pmManifest->MakeGetPackageListReturn( m_packageList );
-        m_componentProcessor->MakeIsActionableReturn( true );
+        m_componentProcessor->MakeHasDownloadedBinaryReturn( true );
         m_componentProcessor->MakeHasConfigsReturn( true );
-        m_componentProcessor->MakeProcessPackageBinariesReturn( true );
+        m_componentProcessor->MakeProcessPackageBinaryReturn( true );
         m_componentProcessor->MakeProcessConfigsForPackageReturn( true );
     }
 
@@ -93,11 +93,20 @@ TEST_F( TestManifestProcessor, ProcessManifestWillGetPackageList )
     m_patient->ProcessManifest( "test" );
 }
 
+TEST_F( TestManifestProcessor, ProcessManifestWillDownloadPackageBinaries )
+{
+    SetupPackageList( 2 );
+    EXPECT_CALL( *m_componentProcessor,
+        DownloadPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
+    ).Times( m_packageList.size() );
+
+    m_patient->ProcessManifest( "test" );
+}
 TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
 {
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor, 
-        ProcessPackageBinaries( PmComponentMatch( m_expectedComponentPackage ) ) 
+        ProcessPackageBinary( PmComponentMatch( m_expectedComponentPackage ) ) 
     ).Times( m_packageList.size() );
 
     m_patient->ProcessManifest( "test" );
@@ -107,17 +116,17 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessAllPackagesRegardlessOf
 {
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
-        ProcessPackageBinaries( PmComponentMatch( m_expectedComponentPackage ) )
+        ProcessPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
     ).Times( m_packageList.size() );
 
-    m_componentProcessor->MakeProcessPackageBinariesReturn( false );
+    m_componentProcessor->MakeProcessPackageBinaryReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
 }
 
 TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessComponentPackageFailed )
 {
     SetupPackageList( 1 );
-    m_componentProcessor->MakeProcessPackageBinariesReturn( false );
+    m_componentProcessor->MakeProcessPackageBinaryReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test" ), std::exception );
 }
 
@@ -138,7 +147,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForNonActionable
         ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
     ).Times( m_packageList.size() );
 
-    m_componentProcessor->MakeIsActionableReturn( false );
+    m_componentProcessor->MakeHasDownloadedBinaryReturn( false );
     m_patient->ProcessManifest( "test" );
 }
 

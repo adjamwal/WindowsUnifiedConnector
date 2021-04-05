@@ -30,10 +30,12 @@ public:
 
     void Initialize( IPmPlatformDependencies* dep ) override;
 
-    bool IsActionable( PmComponent& componentPackage ) override;
+    bool HasDownloadedBinary( PmComponent& componentPackage ) override;
     bool HasConfigs( PmComponent& componentPackage ) override;
 
-    bool ProcessPackageBinaries( PmComponent& componentPackage ) override;
+    bool DownloadPackageBinary( PmComponent& componentPackage ) override;
+
+    bool ProcessPackageBinary( PmComponent& componentPackage ) override;
     bool ProcessConfigsForPackage( PmComponent& componentPackage ) override;
 
 private:
