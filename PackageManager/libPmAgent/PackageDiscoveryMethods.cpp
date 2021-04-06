@@ -48,6 +48,11 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
         CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
 
+        LOG_INFO( "DiscoverByMsi found: %s, %s, %s", 
+            msiRule.name.c_str(), 
+            msiRule.vendor.c_str(),
+            converter.to_bytes( listItem.InstalledProductCode ).c_str() );
+
         detectedInstallations.push_back( detected );
     }
 }
@@ -58,7 +63,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     std::vector<PmInstalledPackage>& detectedInstallations )
 {
     if( regRule.type != UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) return;
-
+    
     PmInstalledPackage detected = {};
     detected.product = lookupProduct.product;
 
@@ -126,6 +131,12 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
 
     CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
 
+    LOG_INFO( "DiscoverByRegistry found: %s, %s, %s (%s)",
+        lookupProduct.product.c_str(),
+        regRule.install.key.c_str(),
+        regRule.version.key.c_str(),
+        detected.version.c_str() );
+
     detectedInstallations.push_back( detected );
 }
 
@@ -150,6 +161,10 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
         detected.product = lookupProduct.product;
 
         CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
+
+        LOG_INFO( "DiscoverByMsiUpgradeCode found: %s, %s",
+            upgradeCodeRule.upgradeCode.c_str(),
+            converter.to_bytes( listItem.InstalledProductCode ).c_str() );
 
         detectedInstallations.push_back( detected );
     }
