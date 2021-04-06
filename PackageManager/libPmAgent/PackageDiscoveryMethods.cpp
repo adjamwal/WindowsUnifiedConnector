@@ -37,7 +37,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
     if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_INFO( "DiscoverByMsi could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
+        LOG_ERROR( "DiscoverByMsi could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -48,7 +48,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
         CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
 
-        LOG_INFO( "DiscoverByMsi found: %s, %s, %s", 
+        LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
             msiRule.name.c_str(), 
             msiRule.vendor.c_str(),
             converter.to_bytes( listItem.InstalledProductCode ).c_str() );
@@ -89,14 +89,14 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
 
     if( !WindowsUtilities::ReadRegistryStringA( regRoot, regSubKey, regValueName, flags, data ) )
     {
-        LOG_INFO( "Failed to detect product '%s' in registry by install key '%s'",
+        LOG_ERROR( "Failed to detect product '%s' in registry by install key '%s'",
             lookupProduct.product.c_str(), regRule.install.key.c_str() );
         return;
     }
 
     if ( data.empty() )
     {
-        LOG_INFO( "Detected '%s' in registry by install key but data is empty.", lookupProduct.product.c_str() );
+        LOG_DEBUG( "Detected '%s' in registry by install key but data is empty.", lookupProduct.product.c_str() );
     }
 
     if ( regRule.version.type == "WOW6432" && WindowsUtilities::Is64BitWindows() ) {
@@ -115,7 +115,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
 
     if( !WindowsUtilities::ReadRegistryStringA( regRoot, regSubKey, regValueName, flags, data ) )
     {
-        LOG_INFO( "Failed to detect product '%s' in registry by version key '%s'",
+        LOG_ERROR( "Failed to detect product '%s' in registry by version key '%s'",
             lookupProduct.product.c_str(), regRule.version.key.c_str() );
         return;
     }
@@ -131,7 +131,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
 
     CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
 
-    LOG_INFO( "DiscoverByRegistry found: %s, %s, %s (%s)",
+    LOG_DEBUG( "DiscoverByRegistry found: %s, %s, %s (%s)",
         lookupProduct.product.c_str(),
         regRule.install.key.c_str(),
         regRule.version.key.c_str(),
@@ -151,7 +151,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
     if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_INFO( "DiscoverByMsiUpgradeCode could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
+        LOG_ERROR( "DiscoverByMsiUpgradeCode could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -162,7 +162,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
         CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
 
-        LOG_INFO( "DiscoverByMsiUpgradeCode found: %s, %s",
+        LOG_DEBUG( "DiscoverByMsiUpgradeCode found: %s, %s",
             upgradeCodeRule.upgradeCode.c_str(),
             converter.to_bytes( listItem.InstalledProductCode ).c_str() );
 
