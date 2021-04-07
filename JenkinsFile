@@ -124,9 +124,13 @@ pipeline {
               return;
             }
           } else {
-            //TODO: Enable when we have a branch build agent
-            //TODO: Set production signer cerdentials on branch builds
             agentLabel = "branchBuildEnabled2019"
+			
+            throttle(['BuildNumberManagment']) {
+              node("master") {
+                updateBuildNumber( "UnifiedConnector" )
+              }
+            }
           }
         }
       }
