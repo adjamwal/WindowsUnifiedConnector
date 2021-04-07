@@ -151,7 +151,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
         if( updErrCode != 0 )
         {
-            ssError << "Failed to Validate Component Hash. Error " << updErrCode << ": " << updErrText;
+            ssError << "Failed to update package. Error: " << updErrCode << ": " << updErrText;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
         }
 
