@@ -25,6 +25,7 @@ struct PmComponent
     std::string signerName;
     std::string installerHash;
     std::string downloadedInstallerPath;
+    bool postInstallRebootRequired;
     std::vector<PackageConfigInfo> configs;
 };
 

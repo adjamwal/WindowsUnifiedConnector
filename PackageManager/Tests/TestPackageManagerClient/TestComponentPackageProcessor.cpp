@@ -64,7 +64,7 @@ protected:
         m_expectedComponentPackage = {
             "test/1.0.0",
             "installerUrl",
-            "installerType",
+            "msi",
             "installerArgs",
             "installLocation",
             "signerName",
@@ -129,6 +129,16 @@ TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
     EXPECT_CALL( *m_pmComponentManager, UpdateComponent( _, _ ) );
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillFlagForRebootWhenMsiReturnCode3010 )
+{
+    SetupComponentPackageWithConfig();
+
+    m_pmComponentManager->MakeUpdateComponentReturn( 3010 );
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+
+    EXPECT_TRUE( m_expectedComponentPackage.postInstallRebootRequired );
 }
 
 TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )

@@ -149,7 +149,13 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         std::string updErrText;
         int32_t updErrCode = m_dependencies->ComponentManager().UpdateComponent( componentPackage, updErrText );
 
-        if( updErrCode != 0 )
+        if( updErrCode == 3010 && componentPackage.installerType == "msi" )
+        {
+            LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
+                componentPackage.downloadedInstallerPath.c_str() );
+            componentPackage.postInstallRebootRequired = true;
+        }
+        else if( updErrCode != 0 )
         {
             ssError << "Failed to update package. Error: " << updErrCode << ": " << updErrText;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
