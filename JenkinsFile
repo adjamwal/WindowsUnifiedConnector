@@ -55,12 +55,13 @@ def SetupVersion( boolean upgrade ) {
       ucMinor = 0
       ucPatch = 0
     }
-                
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(FILEVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'FILEVER\t\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(PRODUCTVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'PRODUCTVER\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRFILEVER).+\\"(\\d+, \\d+, \\d+, \\d+)', replace: 'STRFILEVER\t"' + ucMajor + ', ' + ucMinor + ', ' + ucPatch + ', ${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRPRODUCTVER).+\\"(\\d+, \\d+, \\d+, \\d+)', replace: 'STRPRODUCTVER\t"' + ucMajor + ', ' + ucMinor + ', ' + ucPatch + ', ${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRFORMATPRODVER).+L\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'STRFORMATPRODVER\tL"' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.${BUILD_ID}', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+
+    buildId = env.BUILD_ID
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(FILEVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'FILEVER\t\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(PRODUCTVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'PRODUCTVER\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRFILEVER).+\\"(\\d+, \\d+, \\d+, \\d+)', replace: 'STRFILEVER\t"' + ucMajor + ', ' + ucMinor + ', ' + ucPatch + ', ' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRPRODUCTVER).+\\"(\\d+, \\d+, \\d+, \\d+)', replace: 'STRPRODUCTVER\t"' + ucMajor + ', ' + ucMinor + ', ' + ucPatch + ', ' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(STRFORMATPRODVER).+L\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'STRFORMATPRODVER\tL"' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
 
     // contentReplace removes the last newline which is required
     bat 'echo. >> GlobalVersion.h'
