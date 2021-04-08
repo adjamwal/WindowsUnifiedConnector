@@ -132,7 +132,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
         regRule.install.key.c_str(),
         regRule.version.key.c_str(),
         detected.version.c_str() );
-    
+
     detectedInstallations.push_back( detected );
 }
 

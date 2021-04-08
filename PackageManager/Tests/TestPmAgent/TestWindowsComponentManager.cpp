@@ -357,6 +357,7 @@ TEST_F( TestWindowsComponentManager, WillNotModifyPathWhenKnownFolderIsEmpty )
     EXPECT_EQ( rtn, folder );
 }
 
+
 TEST_F( TestWindowsComponentManager, WillNotResolveKnownFolderWhenTagNotFound )
 {
     MockWindowsUtilities::GetMockWindowUtilities()->ExpectResolveKnownFolderIdIsNotCalled();
