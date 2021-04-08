@@ -13,6 +13,7 @@
 #include "PmConstants.h"
 #include "PackageException.h"
 #include "RandomUtil.h"
+#include "WinError.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -149,11 +150,17 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         std::string updErrText;
         int32_t updErrCode = m_dependencies->ComponentManager().UpdateComponent( componentPackage, updErrText );
 
-        if( updErrCode == 3010 && componentPackage.installerType == "msi" )
+
+        if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" )
         {
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
                 componentPackage.downloadedInstallerPath.c_str() );
             componentPackage.postInstallRebootRequired = true;
+        }
+        else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
+        {
+            LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, reboot initiated by msi",
+                componentPackage.downloadedInstallerPath.c_str() );
         }
         else if( updErrCode != 0 )
         {
