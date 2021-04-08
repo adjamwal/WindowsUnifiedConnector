@@ -35,9 +35,9 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
     auto [retCode, msiList] = m_msiApi.FindProductsByNameAndPublisher( name, publisher );
 
-    if ( retCode != ERROR_SUCCESS )
+    if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_INFO( "FindProductsByNameAndPublisher could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
+        LOG_ERROR( "DiscoverByMsi could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -45,6 +45,11 @@ void PackageDiscoveryMethods::DiscoverByMsi(
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
+
+        LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
+            msiRule.name.c_str(), 
+            msiRule.vendor.c_str(),
+            converter.to_bytes( listItem.InstalledProductCode ).c_str() );
 
         detectedInstallations.push_back( detected );
     }
@@ -56,7 +61,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     std::vector<PmInstalledPackage>& detectedInstallations )
 {
     if( regRule.type != UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) return;
-
+    
     PmInstalledPackage detected = {};
     detected.product = lookupProduct.product;
 
@@ -82,14 +87,14 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
 
     if( !WindowsUtilities::ReadRegistryStringA( regRoot, regSubKey, regValueName, flags, data ) )
     {
-        LOG_INFO( "Failed to detect product '%s' in registry by install key '%s'",
+        LOG_ERROR( "Failed to detect product '%s' in registry by install key '%s'",
             lookupProduct.product.c_str(), regRule.install.key.c_str() );
         return;
     }
 
     if ( data.empty() )
     {
-        LOG_INFO( "Detected '%s' in registry by install key but data is empty.", lookupProduct.product.c_str() );
+        LOG_DEBUG( "Detected '%s' in registry by install key but data is empty.", lookupProduct.product.c_str() );
     }
 
     if ( regRule.version.type == "WOW6432" && WindowsUtilities::Is64BitWindows() ) {
@@ -108,7 +113,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
 
     if( !WindowsUtilities::ReadRegistryStringA( regRoot, regSubKey, regValueName, flags, data ) )
     {
-        LOG_INFO( "Failed to detect product '%s' in registry by version key '%s'",
+        LOG_ERROR( "Failed to detect product '%s' in registry by version key '%s'",
             lookupProduct.product.c_str(), regRule.version.key.c_str() );
         return;
     }
@@ -122,6 +127,12 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     detected.version = data;
     PadBuildNumber( detected.version );
 
+    LOG_DEBUG( "DiscoverByRegistry found: %s, %s, %s (%s)",
+        lookupProduct.product.c_str(),
+        regRule.install.key.c_str(),
+        regRule.version.key.c_str(),
+        detected.version.c_str() );
+    
     detectedInstallations.push_back( detected );
 }
 
@@ -134,9 +145,9 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
     auto [retCode, msiList] = m_msiApi.FindRelatedProducts( upgradeCode );
 
-    if ( retCode != ERROR_SUCCESS )
+    if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_INFO( "FindRelatedProducts could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
+        LOG_ERROR( "DiscoverByMsiUpgradeCode could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -144,6 +155,10 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
+
+        LOG_DEBUG( "DiscoverByMsiUpgradeCode found: %s, %s",
+            upgradeCodeRule.upgradeCode.c_str(),
+            converter.to_bytes( listItem.InstalledProductCode ).c_str() );
 
         detectedInstallations.push_back( detected );
     }
