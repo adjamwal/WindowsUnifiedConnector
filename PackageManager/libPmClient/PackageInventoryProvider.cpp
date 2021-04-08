@@ -43,7 +43,11 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
             for ( auto &configFile : package.configs )
             {
                 auto sha256 = m_sslUtil.CalculateSHA256( configFile.path );
-                configFile.sha256 = sha256.value();
+
+                if ( sha256.has_value() )
+                {
+                    configFile.sha256 = sha256.value();
+                }
             }
         }
 
