@@ -10,6 +10,7 @@
 #include "MockCloudEventPublisher.h"
 #include "MockUcidAdapter.h"
 #include "MockUcUpgradeEventHandler.h"
+#include "WinError.h"
 
 #include <memory>
 
@@ -29,13 +30,13 @@ protected:
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
-        m_patient.reset( new ComponentPackageProcessor( *m_cloud, 
-            *m_fileUtil, 
-            *m_sslUtil, 
-            *m_configProcessor, 
-            *m_ucidAdapter, 
-            *m_eventBuilder, 
-            *m_eventPublisher, 
+        m_patient.reset( new ComponentPackageProcessor( *m_cloud,
+            *m_fileUtil,
+            *m_sslUtil,
+            *m_configProcessor,
+            *m_ucidAdapter,
+            *m_eventBuilder,
+            *m_eventPublisher,
             *m_ucUpgradeEventHandler ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
@@ -64,7 +65,7 @@ protected:
         m_expectedComponentPackage = {
             "test/1.0.0",
             "installerUrl",
-            "installerType",
+            "msi",
             "installerArgs",
             "installLocation",
             "signerName",
@@ -129,6 +130,36 @@ TEST_F( TestComponentPackageProcessor, WillUpdateWhenDownloadIsSuccesful )
     EXPECT_CALL( *m_pmComponentManager, UpdateComponent( _, _ ) );
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillFlagForRebootWhenMsiReturnCode3010 )
+{
+    SetupComponentPackageWithConfig();
+
+    m_pmComponentManager->MakeUpdateComponentReturn( ERROR_SUCCESS_REBOOT_REQUIRED );
+
+    EXPECT_TRUE( m_patient->ProcessPackageBinary( m_expectedComponentPackage ) );
+    EXPECT_TRUE( m_expectedComponentPackage.postInstallRebootRequired );
+}
+
+TEST_F( TestComponentPackageProcessor, WillFlagForRebootWhenMsiReturnCode3011 )
+{
+    SetupComponentPackageWithConfig();
+
+    m_pmComponentManager->MakeUpdateComponentReturn( ERROR_SUCCESS_RESTART_REQUIRED );
+
+    EXPECT_TRUE( m_patient->ProcessPackageBinary( m_expectedComponentPackage ) );
+    EXPECT_TRUE( m_expectedComponentPackage.postInstallRebootRequired );
+}
+
+TEST_F( TestComponentPackageProcessor, WillSucceedWhenMsiReturnCode1641 )
+{
+    SetupComponentPackageWithConfig();
+
+    m_pmComponentManager->MakeUpdateComponentReturn( ERROR_SUCCESS_REBOOT_INITIATED );
+
+    EXPECT_TRUE( m_patient->ProcessPackageBinary( m_expectedComponentPackage ) );
+    EXPECT_FALSE( m_expectedComponentPackage.postInstallRebootRequired );
 }
 
 TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
