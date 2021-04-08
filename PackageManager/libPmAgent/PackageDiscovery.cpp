@@ -89,21 +89,18 @@ void PackageDiscovery::DiscoverPackageConfigurables(
 
         m_componentMgr.FileSearchWithWildCard( resolvedPath, fileList );
 
-        if ( configurable.max_instances == 0 )
+        if ( fileList.size() > configurable.max_instances )
         {
-            if ( fileList.size() > configurable.max_instances )
+            if ( configurable.max_instances == 0 )
             {
                 fileList = std::vector<std::filesystem::path>( fileList.begin(), fileList.begin() + 1 );
             }
-        }
-        else
-        {
-            if ( fileList.size() > configurable.max_instances )
+            else
             {
                 fileList = std::vector<std::filesystem::path>( fileList.begin(), fileList.begin() + configurable.max_instances );
             }
         }
-
+        
         for ( auto &foundFile : fileList )
         {
             PackageConfigInfo configInfo = {};

@@ -8,6 +8,7 @@ MockPmPlatformComponentManager::MockPmPlatformComponentManager()
     MakeUninstallComponentReturn( int32_t() );
     MakeDeployConfigurationReturn( int32_t() );
     MakeResolvePathReturn( "" );
+    MakeFileSearchWithWildCardReturn( int32_t() );
 }
 
 MockPmPlatformComponentManager::~MockPmPlatformComponentManager()
