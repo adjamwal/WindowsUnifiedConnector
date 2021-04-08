@@ -100,3 +100,36 @@ UINT WinApiWrapper::MsiEnumRelatedProductsW(
         iProductIndex,
         lpProductBuf );
 }
+
+HANDLE WinApiWrapper::FindFirstFileExW(
+    LPCWSTR lpFileName,
+    FINDEX_INFO_LEVELS fInfoLevelId,
+    LPVOID lpFindFileData,
+    FINDEX_SEARCH_OPS fSearchOp,
+    LPVOID lpSearchFilter,
+    DWORD dwAdditionalFlags )
+{
+    return ::FindFirstFileExW(
+        lpFileName,
+        fInfoLevelId,
+        lpFindFileData,
+        fSearchOp,
+        lpSearchFilter,
+        dwAdditionalFlags );
+}
+
+BOOL WinApiWrapper::FindNextFileW(
+    HANDLE hFindFile,
+    LPWIN32_FIND_DATAW lpFindFileData )
+{
+    return ::FindNextFileW(
+        hFindFile,
+        lpFindFileData );
+}
+
+BOOL WinApiWrapper::FindClose(
+    HANDLE hFindFile )
+{
+    return ::FindClose(
+        hFindFile );
+}

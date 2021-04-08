@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 struct PmComponent;
 struct PackageConfigInfo;
@@ -91,4 +92,21 @@ public:
      * @return string contaning the resolved
      */
     virtual std::string ResolvePath( const std::string& basePath ) = 0;
+
+    /**
+    * Searches an absolute path for all files or configurables that match wildcard searches
+    * Returns a list of all matching absolute paths of files found
+    *
+    * star is 0 or many
+    * question mark is exactly one
+    *
+    * Examples of valid searches
+    * C:\\ProgramData\\Cisco\\SecureClient\\UC\\policy.xml
+    * C:\\ProgramData\\Cisco\\SecureClient\\UC\\*.xml
+    * C:\\ProgramData\\Cisco\\SecureClient\\*\\policy.xml
+    * C:\\ProgramData\\Cisco\\SecureClient*\\UC\\*.xml
+    * C:\\ProgramData\\Cisco\\Secure*Client\\UC\\*.xml
+    * C:\\ProgramData\\Cisco\\SecureClient\\UC\\*.???
+    */
+    virtual int32_t FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results ) = 0;
 };

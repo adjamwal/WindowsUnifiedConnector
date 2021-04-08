@@ -42,18 +42,6 @@ protected:
     void SetupProductDiscoveryRules( PmProductDiscoveryRules& lookupProduct )
     {
         lookupProduct.product = "uc";
-
-        PmProductDiscoveryConfigurable configurable1 = {};
-        configurable1.path = "Test\\Path";
-        configurable1.max_instances = 7;
-        configurable1.required = true;
-        lookupProduct.configurables.push_back( configurable1 );
-
-        PmProductDiscoveryConfigurable configurable2 = {};
-        configurable2.path = "c:\\Test\\Path.config";
-        configurable2.max_instances = 6;
-        configurable2.required = false;
-        lookupProduct.configurables.push_back( configurable2 );
     }
 
     void SetupProductDiscoveryMsiMethod( PmProductDiscoveryMsiMethod& msiRule )
@@ -97,7 +85,6 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillGetUC )
 
     ASSERT_EQ( 1, detectedInstallations.size() );
     EXPECT_EQ( lookupProduct.product, detectedInstallations.front().product );
-    EXPECT_EQ( 2, detectedInstallations.front().configs.size() );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillDecodeRegistryLocationsCorrectly )
@@ -183,8 +170,6 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiProductFound )
     ASSERT_EQ( 1, detectedInstallations.size() );
     EXPECT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
     EXPECT_EQ( "testVersion", detectedInstallations[ 0 ].version );
-    EXPECT_EQ( lookupProduct.configurables[0].path, detectedInstallations[ 0 ].configs[ 0 ].path );
-    EXPECT_EQ( lookupProduct.configurables[1].path, detectedInstallations[ 0 ].configs[ 1 ].path );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductNone )
@@ -229,6 +214,4 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductFound )
     ASSERT_EQ( 1, detectedInstallations.size() );
     EXPECT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
     EXPECT_EQ( "testVersion", detectedInstallations[ 0 ].version );
-    EXPECT_EQ( lookupProduct.configurables[0].path, detectedInstallations[ 0 ].configs[ 0 ].path );
-    EXPECT_EQ( lookupProduct.configurables[1].path, detectedInstallations[ 0 ].configs[ 1 ].path );
 }

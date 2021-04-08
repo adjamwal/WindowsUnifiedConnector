@@ -72,23 +72,3 @@ TEST_F( TestPackageInventoryProvider, GetInventoryWillRetrieveConfigSha )
 
     EXPECT_EQ( inventory.packages[ 0 ].configs[ 0 ].sha256, sha256 );
 }
-
-TEST_F( TestPackageInventoryProvider, GetInventoryWillDropMissingFiles )
-{
-    PackageConfigInfo config;
-    PmInstalledPackage package;
-    PackageInventory inventory;
-    PackageInventory detectedPackages;
-    std::string sha256 = "Sha256";
-
-    package.configs.push_back( config );
-    detectedPackages.packages.push_back( package );
-    ON_CALL( *m_pmComponentManager, GetInstalledPackages( _, _ ) )
-        .WillByDefault( DoAll( SetArgReferee<1>( detectedPackages ), Return( 0 ) ) );
-    m_fileUtil->MakeFileExistsReturn( false );
-    m_patient->Initialize( m_dep.get() );
-
-    m_patient->GetInventory( inventory );
-
-    EXPECT_EQ( inventory.packages[ 0 ].configs.size(), 0 );
-}

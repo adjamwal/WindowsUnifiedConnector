@@ -6,6 +6,7 @@
 #include "MockWinApiWrapper.h"
 #include <memory>
 #include <MockMsiApi.h>
+#include <PmMocks/MockPmPlatformComponentManager.h>
 
 class TestPackageDiscovery : public ::testing::Test
 {
@@ -16,7 +17,8 @@ protected:
         m_catalogRules.clear();
         m_detectedInstallations.clear();
         m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
-        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
+        m_pmPlatformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>());
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods, *m_pmPlatformComponentManager );
     }
 
     void TearDown()
@@ -71,6 +73,7 @@ protected:
     std::vector<PmInstalledPackage> m_detectedInstallations;
     std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
+    std::unique_ptr<IPmPlatformComponentManager> m_pmPlatformComponentManager;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
@@ -191,3 +194,19 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillResetTheCacheToLatest
     ASSERT_EQ( m_catalogRules.size(), cache.packages.size() );
 }
 
+TEST_F( TestPackageDiscovery, ConfigurablesAreFound )
+{
+    PmProductDiscoveryRules lookupProduct;
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = "Test\\Path";
+    configurable1.max_instances = 7;
+    configurable1.required = true;
+    lookupProduct.configurables.push_back( configurable1 );
+
+    PmProductDiscoveryConfigurable configurable2 = {};
+    configurable2.path = "c:\\Test\\Path.config";
+    configurable2.max_instances = 6;
+    configurable2.required = false;
+    lookupProduct.configurables.push_back( configurable2 );
+}

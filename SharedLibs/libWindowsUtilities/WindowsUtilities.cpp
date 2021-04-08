@@ -345,3 +345,145 @@ std::wstring WindowsUtilities::GetLogDir()
 
     return logDir;
 }
+
+
+
+struct ENUM_CONTEXT : WIN32_FIND_DATA
+{
+    PCWSTR _szMask;
+    PCWSTR* _pszMask;
+    ULONG _MaskCount;
+    ULONG _MaxLevel;
+    ULONG _nFiles;
+    ULONG _nFolders;
+    WCHAR _FileName[MAXSHORT + 1];
+
+    void StartEnum( PCWSTR pcszRoot, PCWSTR pszMask[], ULONG MaskCount, PCWSTR szMask, ULONG MaxLevel, PSTR prefix )
+    {
+        SIZE_T len = wcslen( pcszRoot );
+
+        if ( len < RTL_NUMBER_OF( _FileName ) )
+        {
+            memcpy( _FileName, pcszRoot, len * sizeof( WCHAR ) );
+
+            _szMask = szMask, _pszMask = pszMask, _MaskCount = MaskCount;
+            _MaxLevel = szMask ? MaxLevel : MaskCount;
+            _nFolders = 0, _nFolders = 0;
+
+            Enum( _FileName + len, 0, prefix );
+        }
+    }
+
+    void Enum( PWSTR pszEnd, ULONG nLevel, PSTR prefix );
+};
+
+//void ENUM_CONTEXT::Enum( PWSTR pszEnd, ULONG nLevel, PSTR prefix )
+//{
+//    if ( nLevel > _MaxLevel )
+//    {
+//        return;
+//    }
+//
+//    PCWSTR lpFileName = _FileName;
+//
+//    SIZE_T cb = lpFileName + RTL_NUMBER_OF( _FileName ) - pszEnd;
+//
+//    PCWSTR szMask = nLevel < _MaskCount ? _pszMask[nLevel] : _szMask;
+//
+//    SIZE_T cchMask = wcslen( szMask ) + 1;
+//
+//    if ( cb < cchMask + 1 )
+//    {
+//        return;
+//    }
+//
+//    *pszEnd++ = L'\\', cb--;
+//
+//    DbgPrint( "%s[<%.*S>]\n", prefix, pszEnd - lpFileName, lpFileName );
+//
+//    memcpy( pszEnd, szMask, cchMask * sizeof( WCHAR ) );
+//
+//    ULONG dwError;
+//
+//    HANDLE hFindFile = FindFirstFileEx( lpFileName, FindExInfoBasic, this, FindExSearchNameMatch, 0, FIND_FIRST_EX_LARGE_FETCH );
+//
+//    if ( hFindFile != INVALID_HANDLE_VALUE )
+//    {
+//        PWSTR FileName = cFileName;
+//
+//        do
+//        {
+//            SIZE_T FileNameLength = wcslen( FileName );
+//
+//            switch ( FileNameLength )
+//            {
+//            case 2:
+//                if ( FileName[1] != '.' ) break;
+//            case 1:
+//                if ( FileName[0] == '.' ) continue;
+//            }
+//
+//            if ( dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+//            {
+//                _nFolders++;
+//
+//                if ( !(dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) )
+//                {
+//                    if ( cb < FileNameLength )
+//                    {
+//                        __debugbreak();
+//                    }
+//                    else
+//                    {
+//                        memcpy( pszEnd, FileName, FileNameLength * sizeof( WCHAR ) );
+//                        Enum( pszEnd + FileNameLength, nLevel + 1, prefix - 1 );
+//                    }
+//                }
+//            }
+//            else if ( nLevel >= _MaskCount || (!_szMask && nLevel == _MaskCount - 1) )
+//            {
+//                _nFiles++;
+//
+//                DbgPrint( "%s%u%u <%.*S>\n", prefix, nFileSizeLow, nFileSizeHigh, FileNameLength, FileName );
+//            }
+//
+//        } while ( FindNextFile( hFindFile, this ) );
+//
+//        if ( (dwError = GetLastError()) == ERROR_NO_MORE_FILES )
+//        {
+//            dwError = NOERROR;
+//        }
+//
+//        FindClose( hFindFile );
+//    }
+//    else
+//    {
+//        dwError = GetLastError();
+//    }
+//
+//    if ( dwError && dwError != ERROR_FILE_NOT_FOUND )
+//    {
+//        DbgPrint( "%s[<%.*S>] err = %u\n", prefix, pszEnd - lpFileName, lpFileName, dwError );
+//    }
+//}
+//
+//void Test( PCWSTR pcszRoot )
+//{
+//    char prefix[MAXUCHAR + 1];
+//    memset( prefix, '\t', RTL_NUMBER_OF( prefix ) - 1 );
+//    prefix[RTL_NUMBER_OF( prefix ) - 1] = 0;
+//
+//    ENUM_CONTEXT ectx;
+//
+//    static PCWSTR Masks[] = { L"Program*", L"*", L"*.txt" };
+//    static PCWSTR Masks2[] = { L"Program*", L"*" };
+//    static PCWSTR Masks3[] = { L"Program Files*", L"Internet Explorer" };
+//
+//    // search Program*\*\*.txt with fixed deep level
+//    ectx.StartEnum( pcszRoot, Masks, RTL_NUMBER_OF( Masks ), 0, RTL_NUMBER_OF( prefix ) - 1, prefix + RTL_NUMBER_OF( prefix ) - 1 );
+//    // search *.txt files from Program*\*\ - any deep level
+//    ectx.StartEnum( pcszRoot, Masks2, RTL_NUMBER_OF( Masks2 ), L"*.txt", RTL_NUMBER_OF( prefix ) - 1, prefix + RTL_NUMBER_OF( prefix ) - 1 );
+//    // search all files (*) from Program Files*\Internet Explorer\ 
+//    ectx.StartEnum( pcszRoot, Masks3, RTL_NUMBER_OF( Masks3 ), L"*", RTL_NUMBER_OF( prefix ) - 1, prefix + RTL_NUMBER_OF( prefix ) - 1 );
+//
+//}

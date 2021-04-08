@@ -42,6 +42,9 @@
     <ProjectReference Include="..\..\Mocks\MockPmAgent\MockPmAgent.vcxproj">
       <Project>{a9adc3fd-3439-4592-af16-a00fcd571bfb}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Mocks\PmMocks\PmMocks.vcxproj">
+      <Project>{55cd001d-26a5-4864-89c6-ebdae64551a0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

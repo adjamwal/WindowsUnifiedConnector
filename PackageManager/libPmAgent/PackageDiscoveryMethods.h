@@ -34,9 +34,5 @@ private:
 
     void PadBuildNumber( std::string& versionString );
 
-    void CopyDiscoveryConfigurablesToPackageConfig(
-        std::vector<PackageConfigInfo>& configInfoList,
-        const std::vector<PmProductDiscoveryConfigurable>& productDiscoveryConfigurables );
-
     IMsiApi& m_msiApi;
 };
