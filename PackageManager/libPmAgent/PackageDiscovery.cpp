@@ -83,28 +83,53 @@ void PackageDiscovery::DiscoverPackageConfigurables(
 {
     for ( auto& configurable : configurables )
     {
-        std::vector<std::filesystem::path> fileList;
+        std::string knownFolderId = "";
+        std::string knownFolderIdConversion = "";
+        std::vector<std::filesystem::path> discoveredFiles;
 
         std::string resolvedPath = m_componentMgr.ResolvePath( configurable.path );
 
-        m_componentMgr.FileSearchWithWildCard( resolvedPath, fileList );
+        if ( resolvedPath != configurable.path )
+        {
+            //Resolved path is deferent which means we must calculate the knownfolderid
+            size_t first = configurable.path.find( "<FOLDERID_" );
+            size_t last = configurable.path.find_first_of( ">" );
+            knownFolderId = configurable.path.substr( first, last + 1);
+            std::string remainingPath = configurable.path.substr( last + 1, configurable.path.length() );
 
-        if ( fileList.size() > configurable.max_instances )
+            first = resolvedPath.find( remainingPath );
+
+            knownFolderIdConversion = resolvedPath.substr( 0, first );
+        }
+
+        m_componentMgr.FileSearchWithWildCard( resolvedPath, discoveredFiles );
+
+        if ( discoveredFiles.size() > configurable.max_instances )
         {
             if ( configurable.max_instances == 0 )
             {
-                fileList = std::vector<std::filesystem::path>( fileList.begin(), fileList.begin() + 1 );
+                discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + 1 );
             }
             else
             {
-                fileList = std::vector<std::filesystem::path>( fileList.begin(), fileList.begin() + configurable.max_instances );
+                discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + configurable.max_instances );
             }
         }
         
-        for ( auto &foundFile : fileList )
+        for ( auto &discoveredFile : discoveredFiles )
         {
             PackageConfigInfo configInfo = {};
-            configInfo.path = foundFile.generic_string();
+
+            std::string tempPath = discoveredFile.make_preferred().generic_string();
+
+            if ( knownFolderId != "" )
+            {
+                //We need to convert the path to include knownfolderid
+                tempPath = tempPath.substr( knownFolderIdConversion.length(), tempPath.length() );
+                tempPath = knownFolderId + tempPath;
+            }
+
+            configInfo.path = tempPath;
             packageConfigs.push_back( configInfo );
         }  
     }
