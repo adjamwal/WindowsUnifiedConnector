@@ -259,7 +259,7 @@ int32_t WindowsComponentManager::SearchFiles( std::filesystem::path searchPath,
                 }
                 else
                 {
-                    results.push_back( findFileData.cFileName );
+                    results.push_back( searchPath.parent_path().append( findFileData.cFileName ) );
                 }
             } while ( m_winApiWrapper.FindNextFile( hFindFile, &findFileData ) );
 
