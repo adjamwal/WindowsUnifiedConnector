@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ComponentTestWindowsComponentManager.cpp" />
     <ClCompile Include="TestPackageDiscovery.cpp" />
     <ClCompile Include="TestPackageDiscoveryMethods.cpp" />
     <ClCompile Include="TestWindowsComponentManager.cpp" />
@@ -26,6 +27,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharedLibs\LibVerifier\LibVerifier.vcxproj">
       <Project>{780b5314-e3ca-4427-96e0-9262f8c7a2ce}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
+      <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\SharedLibs\MockVerifier\MockVerifier.vcxproj">
       <Project>{19428466-59e6-4a11-b6b2-ed1dc71bcb0c}</Project>
