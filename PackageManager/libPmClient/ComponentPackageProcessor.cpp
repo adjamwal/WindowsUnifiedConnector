@@ -13,6 +13,7 @@
 #include "PmConstants.h"
 #include "PackageException.h"
 #include "RandomUtil.h"
+#include "WinError.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -149,9 +150,21 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         std::string updErrText;
         int32_t updErrCode = m_dependencies->ComponentManager().UpdateComponent( componentPackage, updErrText );
 
-        if( updErrCode != 0 )
+
+        if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" )
         {
-            ssError << "Failed to Validate Component Hash. Error " << updErrCode << ": " << updErrText;
+            LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
+                componentPackage.downloadedInstallerPath.c_str() );
+            componentPackage.postInstallRebootRequired = true;
+        }
+        else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
+        {
+            LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, reboot initiated by msi",
+                componentPackage.downloadedInstallerPath.c_str() );
+        }
+        else if( updErrCode != 0 )
+        {
+            ssError << "Failed to update package. Error: " << updErrCode << ": " << updErrText;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
         }
 
