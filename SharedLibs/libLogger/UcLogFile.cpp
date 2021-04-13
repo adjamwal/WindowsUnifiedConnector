@@ -9,6 +9,12 @@
 
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
+#if UC_CONSUMER == 1
+#define UC_DEFAULT_LOG_PATH L"\\Cisco\\Immunet\\UC"
+#else
+#define UC_DEFAULT_LOG_PATH L"\\Cisco\\SecureClient\\UC"
+#endif
+
 UcLogFile::UcLogFile() :
     m_logFileName( L"" )
     , m_file( NULL )
@@ -160,7 +166,7 @@ std::wstring UcLogFile::GetLogDir()
 
     if ( !ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
         logDir = GetProgramDataFolder();
-        logDir += L"Cisco\\UC";
+        logDir += UC_DEFAULT_LOG_PATH;
     }
 
     return logDir;

@@ -3,6 +3,7 @@
 #include <string>
 #include <Windows.h>
 #include <vector>
+#include <filesystem>
 
 class WindowsUtilities
 {
@@ -25,4 +26,14 @@ public:
     static std::vector<WindowsInstallProgram> GetInstalledPrograms();
     static std::string ResolveKnownFolderId( const std::string& knownFolderId );
     static std::wstring GetLogDir();
+    static std::string ResolvePath( const std::string& basePath );
+
+    static int32_t FileSearchWithWildCard(
+        const std::filesystem::path& searchPath,
+        std::vector<std::filesystem::path>& results );
+
+    static int32_t SearchFiles( std::filesystem::path searchPath,
+        std::vector<std::filesystem::path>::iterator begin,
+        std::vector<std::filesystem::path>::iterator end,
+        std::vector<std::filesystem::path>& results );
 };

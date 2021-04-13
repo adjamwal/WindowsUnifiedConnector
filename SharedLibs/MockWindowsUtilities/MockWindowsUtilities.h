@@ -65,6 +65,22 @@ public:
     void MakeGetDataDirReturn( std::wstring value );
     void ExpectGetDataDirIsNotCalled();
 
+    MOCK_METHOD1( ResolvePath, std::string( const std::string& ) );
+    void MakeResolvePathReturn( std::string value );
+    void ExpectResolvePathIsNotCalled();
+
+    MOCK_METHOD2( FileSearchWithWildCard, int32_t( const std::filesystem::path&, std::vector<std::filesystem::path>& ) );
+    void MakeFileSearchWithWildCardReturn( int32_t value );
+    void ExpectFileSearchWithWildCardIsNotCalled();
+
+    MOCK_METHOD4( SearchFiles, int32_t( std::filesystem::path searchPath,
+        std::vector<std::filesystem::path>::iterator begin,
+        std::vector<std::filesystem::path>::iterator end,
+        std::vector<std::filesystem::path>& results ) );
+    void MakeSearchFilesReturn( int32_t value );
+    void ExpectSearchFilesIsNotCalled();
+
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();
