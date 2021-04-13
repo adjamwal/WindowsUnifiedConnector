@@ -10,7 +10,7 @@
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
 #if UC_CONSUMER == 1
-#define UC_DEFAULT_LOG_PATH L"\\Cisco\\UC"
+#define UC_DEFAULT_LOG_PATH L"\\Cisco\\Immunet\\UC"
 #else
 #define UC_DEFAULT_LOG_PATH L"\\Cisco\\SecureClient\\UC"
 #endif
