@@ -1,3 +1,4 @@
+#include "pch.h"
 
 #include "MocksCommon.h"
 #include "WindowsComponentManager.h"
@@ -37,7 +38,7 @@ protected:
         {
             auto p = file.parent_path();
             std::filesystem::create_directories( p );
-            
+
             std::ofstream ofs( file.string() );
             ofs << "This is a test file.\n";
             ofs.close();
