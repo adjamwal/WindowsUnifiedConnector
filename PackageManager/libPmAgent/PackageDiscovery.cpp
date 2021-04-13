@@ -10,8 +10,9 @@
 #include "..\..\GlobalVersion.h"
 #include <StringUtil.h>
 
-PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods )
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IPmPlatformComponentManager& componentManager )
     : m_methods( methods )
+    , m_componentMgr( componentManager )
 {
 }
 
@@ -30,9 +31,11 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
     {
         std::vector<PmInstalledPackage> detectedInstallations;
         ApplyDiscoveryMethods( lookupProduct, detectedInstallations );
-
+        
         for( auto& detectedItem : detectedInstallations )
         {
+            DiscoverPackageConfigurables( lookupProduct.configurables, detectedItem.configs );
+
             inventory.packages.push_back( detectedItem );
         }
     }
@@ -71,5 +74,63 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
         if ( !detectedInstallations.empty() ) {
             return;
         }
+    }
+}
+
+void PackageDiscovery::DiscoverPackageConfigurables( 
+    const std::vector<PmProductDiscoveryConfigurable>& configurables, 
+    std::vector<PackageConfigInfo>& packageConfigs )
+{
+    for ( auto& configurable : configurables )
+    {
+        std::string knownFolderId = "";
+        std::string knownFolderIdConversion = "";
+        std::vector<std::filesystem::path> discoveredFiles;
+
+        std::string resolvedPath = m_componentMgr.ResolvePath( configurable.path );
+
+        if ( resolvedPath != configurable.path )
+        {
+            //Resolved path is deferent which means we must calculate the knownfolderid
+            size_t first = configurable.path.find( "<FOLDERID_" );
+            size_t last = configurable.path.find_first_of( ">" );
+            knownFolderId = configurable.path.substr( first, last + 1);
+            std::string remainingPath = configurable.path.substr( last + 1, configurable.path.length() );
+
+            first = resolvedPath.find( remainingPath );
+
+            knownFolderIdConversion = resolvedPath.substr( 0, first );
+        }
+
+        m_componentMgr.FileSearchWithWildCard( resolvedPath, discoveredFiles );
+
+        if ( discoveredFiles.size() > configurable.max_instances )
+        {
+            if ( configurable.max_instances == 0 )
+            {
+                discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + 1 );
+            }
+            else
+            {
+                discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + configurable.max_instances );
+            }
+        }
+        
+        for ( auto &discoveredFile : discoveredFiles )
+        {
+            PackageConfigInfo configInfo = {};
+
+            std::string tempPath = discoveredFile.make_preferred().generic_string();
+
+            if ( knownFolderId != "" )
+            {
+                //We need to convert the path to include knownfolderid
+                tempPath = tempPath.substr( knownFolderIdConversion.length(), tempPath.length() );
+                tempPath = knownFolderId + tempPath;
+            }
+
+            configInfo.path = tempPath;
+            packageConfigs.push_back( configInfo );
+        }  
     }
 }

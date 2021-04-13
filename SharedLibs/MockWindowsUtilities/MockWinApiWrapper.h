@@ -72,4 +72,22 @@ public:
         DWORD iProductIndex,
         LPWSTR lpProductBuf ) );
     void MakeMsiEnumRelatedProductsWReturn( UINT value );
+
+    MOCK_METHOD6( FindFirstFileExW, HANDLE(
+        LPCWSTR lpFileName,
+        FINDEX_INFO_LEVELS fInfoLevelId,
+        LPVOID lpFindFileData,
+        FINDEX_SEARCH_OPS fSearchOp,
+        LPVOID lpSearchFilter,
+        DWORD dwAdditionalFlags ) );
+    void MakeFindFirstFileExWReturn( HANDLE value );
+
+    MOCK_METHOD2( FindNextFileW, BOOL(
+        HANDLE hFindFile,
+        LPWIN32_FIND_DATAW lpFindFileData ) );
+    void MakeFindNextFileWReturn( BOOL value );
+
+    MOCK_METHOD1( FindClose, BOOL(
+        HANDLE hFindFile  ) );
+    void MakeFindCloseReturn( BOOL value );
 };

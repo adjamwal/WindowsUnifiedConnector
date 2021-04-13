@@ -207,3 +207,74 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
 
     return ret;
 }
+
+int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results )
+{
+    int32_t dwError = 0;
+
+    std::vector<std::filesystem::path> searchList;
+
+    for ( const auto& part : searchPath.relative_path() )
+    {
+        searchList.emplace_back( part );
+    }
+
+    dwError = SearchFiles( searchPath.root_path(), searchList.begin(), searchList.end(), results );
+
+    return dwError;
+}
+
+int32_t WindowsComponentManager::SearchFiles( std::filesystem::path searchPath,
+    std::vector<std::filesystem::path>::iterator begin,
+    std::vector<std::filesystem::path>::iterator end,
+    std::vector<std::filesystem::path>& results )
+{
+    int32_t dwError = 0;
+
+    if ( begin != end )
+    {
+        searchPath /= *begin;
+
+        WIN32_FIND_DATAW findFileData = { 0 };
+
+        HANDLE hFindFile = m_winApiWrapper.FindFirstFileExW(
+            searchPath.generic_wstring().c_str(),
+            FindExInfoBasic,
+            &findFileData,
+            FindExSearchNameMatch,
+            0,
+            FIND_FIRST_EX_LARGE_FETCH );
+
+        if ( hFindFile != INVALID_HANDLE_VALUE )
+        {
+            do
+            {
+                if ( findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+                {
+                    auto tempIterator = begin;
+                    std::filesystem::path directoryPath = searchPath.parent_path();
+                    directoryPath /= findFileData.cFileName;
+            
+                    dwError = SearchFiles( directoryPath, ++tempIterator, end, results );
+                }
+                else
+                {
+                    results.push_back( searchPath.parent_path().append( findFileData.cFileName ) );
+                }
+            } while ( m_winApiWrapper.FindNextFile( hFindFile, &findFileData ) );
+
+            if ( (dwError = m_winApiWrapper.GetLastError()) == ERROR_NO_MORE_FILES )
+            {
+                dwError = NOERROR;
+            }
+
+            m_winApiWrapper.FindClose( hFindFile );
+        }
+        else
+        {
+            dwError = m_winApiWrapper.GetLastError();
+        }
+    }
+
+    return dwError;
+}

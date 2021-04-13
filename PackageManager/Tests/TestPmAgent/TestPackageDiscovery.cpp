@@ -6,6 +6,7 @@
 #include "MockWinApiWrapper.h"
 #include <memory>
 #include <MockMsiApi.h>
+#include <PmMocks/MockPmPlatformComponentManager.h>
 
 class TestPackageDiscovery : public ::testing::Test
 {
@@ -16,7 +17,8 @@ protected:
         m_catalogRules.clear();
         m_detectedInstallations.clear();
         m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
-        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
+        m_pmPlatformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>());
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods, *m_pmPlatformComponentManager );
     }
 
     void TearDown()
@@ -71,6 +73,7 @@ protected:
     std::vector<PmInstalledPackage> m_detectedInstallations;
     std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
+    std::unique_ptr<MockPmPlatformComponentManager> m_pmPlatformComponentManager;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
@@ -191,3 +194,264 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillResetTheCacheToLatest
     ASSERT_EQ( m_catalogRules.size(), cache.packages.size() );
 }
 
+TEST_F( TestPackageDiscovery, OneConfigurableIsFound )
+{
+    std::string path1 = "c:\\test\\one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+    
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+    
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+}
+
+TEST_F( TestPackageDiscovery, MultipleConfigurablesAreFound )
+{
+    std::string path1 = "c:\\test\\one.xml";
+    std::string path2 = "c:\\test\\two.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    PmProductDiscoveryConfigurable configurable2 = {};
+    configurable2.path = path2;
+    configurable2.max_instances = 1;
+    configurable2.required = false;
+    productDiscoveryRules.configurables.push_back( configurable2 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    std::vector<std::filesystem::path> configs2;
+    configs2.push_back( std::filesystem::path( path2 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) )
+        .WillOnce( Return( path2 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs2 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 2 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[1].path ),
+        std::filesystem::path( path2 ) );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedOne )
+{
+    std::string path1 = "c:\\test\\one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( "c:\\test\\one.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:\\test\\three.xml" ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedTwo )
+{
+    std::string path1 = path1;
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 2;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( "c:\\test\\one.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:\\test\\three.xml" ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 2 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( "c:\\test\\one.xml" ) );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[1].path ),
+        std::filesystem::path( "c:\\test\\two.xml" ) );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstances )
+{
+    std::string path1 = "c:\\test\\one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstancesReached )
+{
+    std::string path1 = "c:\\test\\one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+    configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableNoneAreFound )
+{
+    std::string path1 = "c:\\test\\one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 0 );
+}
+
+TEST_F( TestPackageDiscovery, ConfigurablePathWillBeUnresolved )
+{
+    std::string path1 = "C:\\ProgramData\\test\\one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = "<FOLDERID_ProgramData>\\test\\one.xml";
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+        .WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( "<FOLDERID_ProgramData>\\test\\one.xml" ) );
+}

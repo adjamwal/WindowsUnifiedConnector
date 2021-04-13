@@ -8,6 +8,7 @@
 #include <string>
 #include <Windows.h>
 #include <PmTypes.h>
+#include <filesystem>
 
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
@@ -86,11 +87,31 @@ public:
      */
     std::string ResolvePath( const std::string& basePath ) override;
 
+    /**
+    * Searches an absolute path for all files or configurables that match wildcard searches
+    * Returns a list of all matching absolute paths of files found
+    * 
+    * star is 0 or many
+    * question mark is exactly one
+    * 
+    * Examples of valid searches
+    * C:\\ProgramData\\Cisco\\SecureClient\\UC\\policy.xml
+    * C:\\ProgramData\\Cisco\\SecureClient\\UC\\*.xml
+    * C:\\ProgramData\\Cisco\\SecureClient\\*\\policy.xml
+    * C:\\ProgramData\\Cisco\\SecureClient*\\UC\\*.xml
+    * C:\\ProgramData\\Cisco\\Secure*Client\\UC\\*.xml
+    * C:\\ProgramData\\Cisco\\SecureClient\\UC\\*.???
+    */
+    int32_t FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results ) override;
 private:
     IWinApiWrapper& m_winApiWrapper;
     ICodesignVerifier& m_codeSignVerifier;
     IPackageDiscovery& m_packageDiscovery;
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
-};
 
+    int32_t SearchFiles( std::filesystem::path searchPath,
+        std::vector<std::filesystem::path>::iterator begin,
+        std::vector<std::filesystem::path>::iterator end,
+        std::vector<std::filesystem::path>& results );
+};

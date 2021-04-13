@@ -36,21 +36,21 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         return false;
     }
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogRules, packagesDiscovered ) == 0 ) {
-        for( auto &package : packagesDiscovered.packages ) {
-            for( auto it = package.configs.begin(); it != package.configs.end();) {
-                std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );
-                if( m_fileUtil.FileExists( resolvedPath ) ) {
-                    auto sha256 = m_sslUtil.CalculateSHA256( resolvedPath );
-                    it->sha256 = sha256.value();
-                    it++;
-                }
-                else {
-                    LOG_DEBUG( "Drop missing config %s", it->path.c_str() );
-                    it = package.configs.erase( it );
+    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogRules, packagesDiscovered ) == 0 ) 
+    {
+        for( auto &package : packagesDiscovered.packages ) 
+        {
+            for ( auto &configFile : package.configs )
+            {
+                auto sha256 = m_sslUtil.CalculateSHA256( configFile.path );
+
+                if ( sha256.has_value() )
+                {
+                    configFile.sha256 = sha256.value();
                 }
             }
         }
+
         inventory = packagesDiscovered;
         rtn = true;
     }

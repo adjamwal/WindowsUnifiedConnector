@@ -4,13 +4,14 @@
 #include "PmTypes.h"
 #include "Windows.h"
 #include <string>
+#include "IPmPlatformComponentManager.h"
 
 class IPackageDiscoveryMethods;
 
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery( IPackageDiscoveryMethods& methods );
+    PackageDiscovery( IPackageDiscoveryMethods& methods, IPmPlatformComponentManager& componentManager );
     ~PackageDiscovery();
 
     PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
@@ -21,6 +22,11 @@ private:
         const PmProductDiscoveryRules& lookupProduct,
         std::vector<PmInstalledPackage>& detectedInstallations );
 
+    void DiscoverPackageConfigurables( 
+        const std::vector<PmProductDiscoveryConfigurable>& configurables, 
+        std::vector<PackageConfigInfo>& packageConfigs );
+
     IPackageDiscoveryMethods& m_methods;
     PackageInventory m_lastDetectedPackages;
+    IPmPlatformComponentManager& m_componentMgr;
 };

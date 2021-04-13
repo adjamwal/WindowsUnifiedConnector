@@ -46,8 +46,6 @@ void PackageDiscoveryMethods::DiscoverByMsi(
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
 
-        CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
-
         LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
             msiRule.name.c_str(), 
             msiRule.vendor.c_str(),
@@ -129,8 +127,6 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     detected.version = data;
     PadBuildNumber( detected.version );
 
-    CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
-
     LOG_DEBUG( "DiscoverByRegistry found: %s, %s, %s (%s)",
         lookupProduct.product.c_str(),
         regRule.install.key.c_str(),
@@ -159,8 +155,6 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
         PmInstalledPackage detected = {};
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
-
-        CopyDiscoveryConfigurablesToPackageConfig( detected.configs, lookupProduct.configurables );
 
         LOG_DEBUG( "DiscoverByMsiUpgradeCode found: %s, %s",
             upgradeCodeRule.upgradeCode.c_str(),
@@ -217,17 +211,5 @@ void PackageDiscoveryMethods::PadBuildNumber( std::string& versionString )
 {
     while( std::count( versionString.begin(), versionString.end(), '.' ) < 3 ) {
         versionString += ".0";
-    }
-}
-
-void PackageDiscoveryMethods::CopyDiscoveryConfigurablesToPackageConfig( 
-    std::vector<PackageConfigInfo>& configInfoList,
-    const std::vector<PmProductDiscoveryConfigurable>& productDiscoveryConfigurables )
-{
-    for ( auto& it : productDiscoveryConfigurables )
-    {
-        PackageConfigInfo configInfo = {};
-        configInfo.path = it.path;
-        configInfoList.push_back( configInfo );
     }
 }

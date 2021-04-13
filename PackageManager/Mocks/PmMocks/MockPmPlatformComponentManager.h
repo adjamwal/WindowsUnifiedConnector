@@ -35,4 +35,8 @@ public:
     MOCK_METHOD1( ResolvePath, std::string( const std::string& ) );
     void MakeResolvePathReturn( std::string value );
     void ExpectResolvePathIsNotCalled();
+
+    MOCK_METHOD2( FileSearchWithWildCard, int32_t( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results ) );
+    void MakeFileSearchWithWildCardReturn( int32_t value );
+    void ExpectFileSearchWithWildCardNotCalled();
 };

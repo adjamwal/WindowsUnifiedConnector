@@ -8,6 +8,7 @@ MockPmPlatformComponentManager::MockPmPlatformComponentManager()
     MakeUninstallComponentReturn( int32_t() );
     MakeDeployConfigurationReturn( int32_t() );
     MakeResolvePathReturn( "" );
+    MakeFileSearchWithWildCardReturn( int32_t() );
 }
 
 MockPmPlatformComponentManager::~MockPmPlatformComponentManager()
@@ -71,4 +72,14 @@ void MockPmPlatformComponentManager::MakeResolvePathReturn( std::string value )
 void MockPmPlatformComponentManager::ExpectResolvePathIsNotCalled()
 {
     EXPECT_CALL( *this, ResolvePath( _ ) ).Times( 0 );
+}
+
+void MockPmPlatformComponentManager::MakeFileSearchWithWildCardReturn( int32_t value )
+{
+    ON_CALL( *this, FileSearchWithWildCard( _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformComponentManager::ExpectFileSearchWithWildCardNotCalled()
+{
+    EXPECT_CALL( *this, FileSearchWithWildCard( _, _ ) ).Times( 0 );
 }
