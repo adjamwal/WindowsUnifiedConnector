@@ -26,6 +26,19 @@ TEST_F( TestRandomUtil, WillGenerateDifferentInts )
     ASSERT_NE( intarr1, intarr2 );
 }
 
+TEST_F( TestRandomUtil, WillGenerateDifferentIntsWithinInterval )
+{
+    int intmin = 2;
+    int intmax = 20000;
+    for( int i = 0; i < 1000; i++ )
+    {
+        int result = RandomUtil::GetInt( intmin, intmax );
+
+        ASSERT_LE( intmin, result ); // intmin <= result
+        ASSERT_GE( intmax, result ); // intmax >= result
+    }
+}
+
 TEST_F( TestRandomUtil, WillGenerateDifferentStrings )
 {
     std::string prevstr = "";

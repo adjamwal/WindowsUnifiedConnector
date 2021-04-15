@@ -173,12 +173,31 @@ size_t FileUtil::FileSize( const std::string& filename )
     size_t rtn = 0;
 
     try {
-        rtn = ::std::filesystem::file_size( filename );
+        if( !filename.empty() && FileExists( filename ) )
+        {
+            rtn = ::std::filesystem::file_size( filename );
+        }
     }
     catch( std::filesystem::filesystem_error ex ) {
         LOG_ERROR( "%s", ex.what() );
     }
 
+    return rtn;
+}
+
+std::filesystem::file_time_type FileUtil::FileTime( const std::string& filename )
+{
+    std::filesystem::file_time_type rtn; //=0
+    try
+    {
+        if( !filename.empty() && FileExists( filename ) )
+        {
+            rtn = std::filesystem::last_write_time( filename );
+        }
+    }
+    catch( std::filesystem::filesystem_error ex ) {
+        LOG_ERROR( "%s", ex.what() );
+    }
     return rtn;
 }
 

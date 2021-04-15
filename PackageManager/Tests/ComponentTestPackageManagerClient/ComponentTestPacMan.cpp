@@ -83,7 +83,7 @@ protected:
         m_mockDeps->MakeConfigurationReturn( *m_mockPlatformConfiguration );
         m_mockDeps->MakeComponentManagerReturn( *m_mockPlatformComponentManager );
         ON_CALL( *m_mockPlatformConfiguration, GetIdentityToken( _ ) ).WillByDefault( DoAll( SetArgReferee<0>( "token" ), Return( true ) ) );
-        ON_CALL( *m_mockConfig, GetCloudCheckinInterval ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinInterval ) );
+        ON_CALL( *m_mockConfig, GetCloudCheckinIntervalMs ).WillByDefault( Invoke( this, &ComponentTestPacMan::GetCloudCheckinIntervalMs ) );
         ON_CALL( *m_mockPlatformComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
             []( const std::string& basePath )
             {
@@ -138,7 +138,7 @@ protected:
         m_mockFileUtil.reset();
     }
 
-    uint32_t GetCloudCheckinInterval()
+    uint32_t GetCloudCheckinIntervalMs()
     {
         std::unique_lock<std::mutex> lock( m_configMutex );
 

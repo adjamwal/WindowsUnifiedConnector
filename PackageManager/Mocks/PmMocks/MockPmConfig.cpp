@@ -10,7 +10,7 @@ MockPmConfig::MockPmConfig()
     MakeGetCloudCheckinUriReturn( "" );
     MakeGetCloudEventUriReturn( "" );
     MakeGetCloudCatalogUriReturn( "" );
-    MakeGetCloudIntervalReturn( uint32_t() );
+    MakeGetCloudCheckinIntervalMsReturn( uint32_t() );
     MakeGetSupportedComponentListReturn( {} );
 }
 
@@ -36,6 +36,16 @@ void MockPmConfig::ExpectLoadBsConfigIsNotCalled()
 void MockPmConfig::ExpectLoadPmConfigIsNotCalled()
 {
     EXPECT_CALL( *this, LoadPmConfig( _ ) ).Times( 0 );
+}
+
+void MockPmConfig::MakePmConfigFileChangedReturn( bool value )
+{
+    ON_CALL( *this, PmConfigFileChanged( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectPmConfigFileChangedIsNotCalled()
+{
+    EXPECT_CALL( *this, PmConfigFileChanged( _ ) ).Times( 0 );
 }
 
 void MockPmConfig::MakeVerifyBsFileIntegrityReturn( int32_t value )
@@ -102,14 +112,14 @@ void MockPmConfig::ExpectGetCloudCatalogUriIsNotCalled()
     EXPECT_CALL( *this, GetCloudCatalogUri() ).Times( 0 );
 }
 
-void MockPmConfig::MakeGetCloudIntervalReturn( uint32_t value )
+void MockPmConfig::MakeGetCloudCheckinIntervalMsReturn( uint32_t value )
 {
-    ON_CALL( *this, GetCloudCheckinInterval() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, GetCloudCheckinIntervalMs() ).WillByDefault( Return( value ) );
 }
 
-void MockPmConfig::ExpectGetCloudIntervalIsNotCalled()
+void MockPmConfig::ExpectGetCloudCheckinIntervalMsIsNotCalled()
 {
-    EXPECT_CALL( *this, GetCloudCheckinInterval() ).Times( 0 );
+    EXPECT_CALL( *this, GetCloudCheckinIntervalMs() ).Times( 0 );
 }
 
 void MockPmConfig::MakeGetSupportedComponentListReturn( const std::vector<PmComponent>& value )

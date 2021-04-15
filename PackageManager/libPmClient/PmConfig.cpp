@@ -3,9 +3,11 @@
 #include "IFileUtil.h"
 #include <json/json.h>
 #include "PmLogger.h"
+#include "RandomUtil.h"
 
-PmConfig::PmConfig( IFileUtil& fileUtil ) :
-    m_fileUtil( fileUtil )
+PmConfig::PmConfig( IFileUtil& fileUtil )
+    : m_fileUtil( fileUtil )
+    , m_isFirstCheckin( true )
 {
 }
 
@@ -45,6 +47,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
     std::lock_guard<std::mutex> lock( m_mutex );
 
     std::string pmData = m_fileUtil.ReadFile( pmConfig );
+    m_pmConfigFileTimestamp = m_fileUtil.FileTime( pmConfig );
 
     rtn = ParsePmConfig( pmData );
 
@@ -60,7 +63,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
         else {
             LOG_ERROR( "Failed to parse %s", ( pmConfig + ".bak" ).c_str() );
 
-            m_configData.interval = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT;
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
         }
     }
@@ -68,6 +71,13 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
     GetPMLogger()->SetLogLevel( ( IPMLogger::Severity )m_configData.log_level );
 
     return rtn;
+}
+
+bool PmConfig::PmConfigFileChanged( const std::string& pmConfig )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_pmConfigFileTimestamp != m_fileUtil.FileTime( pmConfig );
 }
 
 const std::string& PmConfig::GetCloudIdentifyUri()
@@ -98,11 +108,18 @@ const std::string& PmConfig::GetCloudCatalogUri()
     return m_configData.catalogUri;
 }
 
-uint32_t PmConfig::GetCloudCheckinInterval()
+uint32_t PmConfig::GetCloudCheckinIntervalMs()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
+    uint32_t retval = m_configData.intervalMs;
+    if( m_isFirstCheckin )
+    {
+        m_isFirstCheckin = false;
+        retval = RandomUtil::GetInt( 2000, retval );
+        LOG_DEBUG( "Random first time checkin delay: %d", retval );
+    }
 
-    return m_configData.interval;
+    return retval;
 }
 
 uint32_t PmConfig::GetLogLevel()
@@ -171,7 +188,7 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
     else {
         pm = root[ "pm" ];
         m_configData.log_level = pm[ "loglevel" ].asUInt();
-        m_configData.interval = pm[ "CheckinInterval" ].asUInt();
+        m_configData.intervalMs = pm[ "CheckinInterval" ].asUInt();
 
         rtn = 0;
     }
