@@ -39,7 +39,7 @@ protected:
     "pm": {
         "loglevel": 7,
         "CheckinInterval": 150000,
-		"MaxStartupDelay": 300000
+        "MaxStartupDelay": 200000
     }
 }
 )";
@@ -105,7 +105,7 @@ TEST_F( TestPmConfig, FirstCheckinIntervalIsRandomizedWithinCustomRange )
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), 150000 );
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), 200000 );
 }
 
 TEST_F( TestPmConfig, LoadBsConfigWillSucceed )
