@@ -71,7 +71,7 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         LOG_ERROR( "Platform dependencies not provided. Cannot start Package Manager" );
     }
     else {
-        if ( !LoadPmConfig() ) {
+        if( !LoadPmConfig() ) {
             LOG_DEBUG( "Failed to load Pm configuration" );
         }
 
@@ -80,7 +80,7 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         }
         else {
             std::string token = m_ucidAdapter.GetAccessToken();
-            if ( !token.empty() ) {
+            if( !token.empty() ) {
                 m_cloud.SetToken( token );
                 m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
                 m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
@@ -146,14 +146,18 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
 
 std::chrono::milliseconds PackageManager::PmThreadWait()
 {
-    return std::chrono::milliseconds( m_config.GetCloudCheckinInterval() );
+    if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
+        LOG_DEBUG( "Failed to load modified Pm configuration" );
+    }
+
+    return std::chrono::milliseconds( m_config.GetCloudCheckinIntervalMs() );
 }
 
 void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    if ( !LoadPmConfig() ) {
+    if( !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
         //Send event? might fail without a config/cloudURL
     }
@@ -177,8 +181,8 @@ void PackageManager::PmWorkflowThread()
         );
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
-        
-        if ( m_manifestProcessor.ProcessManifest( manifest ) )
+
+        if( m_manifestProcessor.ProcessManifest( manifest ) )
         {
             m_cloudEventPublisher.PublishFailedEvents();
         }

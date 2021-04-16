@@ -1,6 +1,7 @@
 {
 	"pm": {
 		"loglevel": 7,
-		"CheckinInterval": 300000
+		"CheckinInterval": 300000,
+		"MaxStartupDelay": 300000
 	}
 }

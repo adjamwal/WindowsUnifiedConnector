@@ -52,6 +52,7 @@ std::vector<uint64_t> RandomUtil::QWords( std::size_t count )
 
 int RandomUtil::GetInt( int min, int max )
 {
+    if( min > max ) { std::swap( min, max ); }
     std::uniform_int_distribution<int> range( min, max );
     return range( generator );
 }

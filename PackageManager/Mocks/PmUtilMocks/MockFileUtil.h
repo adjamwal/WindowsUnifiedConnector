@@ -52,6 +52,10 @@ public:
     void MakeFileSizeReturn( size_t value );
     void ExpectFileSizeNotCalled();
 
+    MOCK_METHOD1( FileTime, std::filesystem::file_time_type( const std::string& ) );
+    void MakeFileTimeReturn( std::filesystem::file_time_type value );
+    void ExpectFileTimeNotCalled();
+
     MOCK_METHOD2( AppendPath, std::string( const std::string&, const std::string& ) );
     void MakeAppendPathReturn( std::string value );
     void ExpectAppendPathCalled();
