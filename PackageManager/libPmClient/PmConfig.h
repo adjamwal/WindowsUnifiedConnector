@@ -16,6 +16,7 @@ struct PmConfigData
     std::string eventUri;
     std::string catalogUri;
     uint32_t intervalMs;
+    uint32_t maxDelayMs;
     uint32_t log_level;
 };
 

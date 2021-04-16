@@ -33,12 +33,13 @@ protected:
 }
 )";
 
-    //custom CheckinInterval value different than PM_CONFIG_INTERVAL_DEFAULT
+    //test with a custom CheckinInterval value different than PM_CONFIG_INTERVAL_DEFAULT
     const std::string pmConfigData = R"(
 {
     "pm": {
         "loglevel": 7,
-        "CheckinInterval": 150000
+        "CheckinInterval": 150000,
+		"MaxStartupDelay": 300000
     }
 }
 )";

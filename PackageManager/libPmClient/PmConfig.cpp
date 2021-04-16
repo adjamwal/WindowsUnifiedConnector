@@ -64,6 +64,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
             LOG_ERROR( "Failed to parse %s", ( pmConfig + ".bak" ).c_str() );
 
             m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT;
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
         }
     }
@@ -115,7 +116,7 @@ uint32_t PmConfig::GetCloudCheckinIntervalMs()
     if( m_isFirstCheckin )
     {
         m_isFirstCheckin = false;
-        retval = RandomUtil::GetInt( 2000, retval );
+        retval = RandomUtil::GetInt( 2000, m_configData.maxDelayMs );
         LOG_DEBUG( "Random first time checkin delay: %d", retval );
     }
 
@@ -189,6 +190,7 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
         pm = root[ "pm" ];
         m_configData.log_level = pm[ "loglevel" ].asUInt();
         m_configData.intervalMs = pm[ "CheckinInterval" ].asUInt();
+        m_configData.maxDelayMs = pm[ "MaxStartupDelay" ].asUInt();
 
         rtn = 0;
     }
@@ -271,8 +273,17 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
             LOG_ERROR( "Invalid CheckinInterval" );
             rtn = -1;
         }
-        else if( pm[ "CheckinInterval" ].asUInt() == 0 ) {
-            LOG_ERROR( "CheckinInterval cannot be 0" );
+        else if( pm[ "CheckinInterval" ].asUInt() < 2000 ) {
+            LOG_ERROR( "CheckinInterval cannot be less than 2000 ms" );
+            rtn = -1;
+        }
+
+        if( !pm[ "MaxStartupDelay" ].isUInt() ) {
+            LOG_ERROR( "Invalid MaxStartupDelay" );
+            rtn = -1;
+        }
+        else if( pm[ "MaxStartupDelay" ].asUInt() < 2000 ) {
+            LOG_ERROR( "MaxStartupDelay cannot be less than 2000 ms" );
             rtn = -1;
         }
 
