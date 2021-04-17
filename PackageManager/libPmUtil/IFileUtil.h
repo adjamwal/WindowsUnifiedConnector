@@ -23,4 +23,5 @@ public:
     virtual bool FileExists( const std::string& filename ) = 0;
     virtual size_t FileSize( const std::string& filename ) = 0;
     virtual std::string AppendPath( const std::string& basePath, const std::string& configPath ) = 0;
+    virtual time_t LastWriteTime( const std::string& filename ) = 0;
 };

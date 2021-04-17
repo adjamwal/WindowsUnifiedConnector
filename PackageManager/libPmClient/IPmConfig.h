@@ -23,4 +23,5 @@ public:
     virtual uint32_t GetCloudCheckinInterval() = 0;
     virtual uint32_t GetLogLevel() = 0;
     virtual const std::vector<PmComponent>& GetSupportedComponentList() = 0;
+    virtual uint32_t GetMaxFileCacheAge() = 0;
 };

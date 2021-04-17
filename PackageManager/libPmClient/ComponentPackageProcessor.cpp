@@ -1,5 +1,5 @@
 #include "ComponentPackageProcessor.h"
-#include "IPmCloud.h"
+#include "IInstallerCacheManager.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
 #include "IFileUtil.h"
@@ -19,7 +19,7 @@
 #include <vector>
 
 ComponentPackageProcessor::ComponentPackageProcessor(
-    IPmCloud& pmCloud,
+    IInstallerCacheManager& installerManager,
     IFileUtil& fileUtil,
     ISslUtil& sslUtil,
     IPackageConfigProcessor& configProcessor,
@@ -27,7 +27,7 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     ICloudEventBuilder& eventBuilder,
     ICloudEventPublisher& eventPublisher,
     IUcUpgradeEventHandler& ucUpgradeEventHandler )
-    : m_pmCloud( pmCloud )
+    : m_installerManager( installerManager )
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_configProcessor( configProcessor )
@@ -51,6 +51,7 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
     m_dependencies = dep;
     m_configProcessor.Initialize( dep );
     m_ucUpgradeEventHandler.Initialize( dep );
+    m_installerManager.Initialize( dep );
 }
 
 bool ComponentPackageProcessor::HasDownloadedBinary( PmComponent& componentPackage )
@@ -85,9 +86,9 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
         return false;
     }
 
-    std::string tempPackageFile;
-    DownloadAsTempFile( componentPackage, tempPackageFile );
-    componentPackage.downloadedInstallerPath = tempPackageFile;
+    std::string installerPath;
+
+    componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
 
     return HasDownloadedBinary( componentPackage );
 }
@@ -97,6 +98,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     bool rtn = false;
     std::stringstream ssError;
     std::optional<std::string> tempSha256;
+    size_t installerSize = 0;
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -106,9 +108,12 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         return false;
     }
 
-    LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
-        componentPackage.downloadedInstallerPath.c_str(),
-        m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
+    if ( !componentPackage.downloadedInstallerPath.empty() ) {
+        installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
+        LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
+            componentPackage.downloadedInstallerPath.c_str(),
+            installerSize );
+    }
 
     m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
 
@@ -118,13 +123,19 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     bool isAlreadyInstalled = IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() );
     m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
+
     m_eventBuilder.WithNewFile(
         componentPackage.installerUrl,
         componentPackage.installerHash,
-        m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
+        installerSize );
 
     try
     {
+        if ( componentPackage.downloadedInstallerPath.empty() ) {
+            ssError << "Failed to download " << componentPackage.installerUrl;
+            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
+        }
+
         tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath );
         if( !tempSha256.has_value() )
         {
@@ -188,7 +199,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     m_eventPublisher.Publish( m_eventBuilder );
 
-    CleanupTempDownload( componentPackage.downloadedInstallerPath );
+    m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
 
     return rtn;
 }
@@ -208,36 +219,6 @@ bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& name, 
     }
 
     return false;
-}
-
-void ComponentPackageProcessor::DownloadAsTempFile( const PmComponent& componentPackage, std::string& tempPackageFile )
-{
-    std::stringstream ss;
-    std::stringstream ssError;
-
-    ss << m_fileUtil.GetTempDir() << "tmpPmInst_" << m_fileCount++ << RandomUtil::GetString( 10 ) << "." << componentPackage.installerType;
-
-    if( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, ss.str() ) != 200 )
-    {
-        ssError << "Failed to download " << componentPackage.installerUrl << " to \"" << ss.str() << "\". HTTP result: " << httpResult;
-        throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
-    }
-
-    tempPackageFile = ss.str();
-}
-
-void ComponentPackageProcessor::CleanupTempDownload( std::string tempFilePath )
-{
-    if( tempFilePath.empty() || !m_fileUtil.FileExists( tempFilePath ) )
-    {
-        return;
-    }
-
-    LOG_DEBUG( "Removing %s", tempFilePath.c_str() );
-    if( m_fileUtil.DeleteFile( tempFilePath ) != 0 )
-    {
-        LOG_ERROR( __FUNCTION__ ": Failed to remove %s", tempFilePath.c_str() );
-    }
 }
 
 bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& componentPackage )

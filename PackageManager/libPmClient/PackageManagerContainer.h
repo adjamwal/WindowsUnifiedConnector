@@ -25,6 +25,7 @@ class ICloudEventStorage;
 class ICloudEventBuilder;
 class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
+class IInstallerCacheManager;
 
 class PackageManagerContainer
 {
@@ -39,6 +40,7 @@ private:
     std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;
+    std::unique_ptr<IInstallerCacheManager> m_installeracheMgr;
     std::unique_ptr<IPmConfig> m_config;
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;

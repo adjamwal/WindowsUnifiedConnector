@@ -19,6 +19,7 @@
 #include "ICloudEventPublisher.h"
 #include "ICloudEventStorage.h"
 #include "IUcUpgradeEventHandler.h"
+#include "IInstallerCacheManager.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -26,6 +27,7 @@ using namespace std;
 
 PackageManager::PackageManager( IPmConfig& config,
     IPmCloud& cloud,
+    IInstallerCacheManager& installerCacheMgr,
     IPackageDiscoveryManager& packageDiscoveryManager,
     ICheckinFormatter& checkinFormatter,
     IUcidAdapter& ucidAdapter,
@@ -38,6 +40,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
+    , m_installerCacheMgr( installerCacheMgr )
     , m_packageDiscoveryManager( packageDiscoveryManager )
     , m_checkinFormatter( checkinFormatter )
     , m_ucidAdapter( ucidAdapter )
@@ -159,18 +162,19 @@ void PackageManager::PmWorkflowThread()
     }
 
     PackageInventory inventory;
-    try
-    {
+    try {
         m_packageDiscoveryManager.DiscoverPackages( inventory );
     }
-    catch( std::exception& ex )
-    {
+    catch( std::exception& ex ) {
         LOG_ERROR( "PackageDiscovery failed: %s", ex.what() );
         return;
     }
+    catch ( ... ) {
+        LOG_ERROR( "PackageDiscovery failed: Unkown expcetion" );
+        return;
+    }
 
-    try
-    {
+    try {
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
             m_config.GetCloudCheckinUri(),
             m_checkinFormatter.GetJson( inventory )
@@ -180,13 +184,29 @@ void PackageManager::PmWorkflowThread()
         
         if ( m_manifestProcessor.ProcessManifest( manifest ) )
         {
-            m_cloudEventPublisher.PublishFailedEvents();
+            LOG_ERROR( "ProcessManifest failed" );
         }
     }
-    catch( std::exception& ex )
-    {
+    catch( std::exception& ex ) {
         LOG_ERROR( "Checkin failed: %s", ex.what() );
     }
+    catch ( ... ) {
+        LOG_ERROR( "Checkin failed: Unknown exception" );
+    }
+
+
+    try {
+        LOG_DEBUG( "Post Checkin Steps" );
+        m_cloudEventPublisher.PublishFailedEvents();
+        m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAge() );
+    }
+    catch ( std::exception& ex ) {
+        LOG_ERROR( "Post Checkin failed: %s", ex.what() );
+    }
+    catch ( ... ) {
+        LOG_ERROR( "Post Checkin failed: Unknown exception" );
+    }
+
 }
 
 bool PackageManager::LoadBsConfig()

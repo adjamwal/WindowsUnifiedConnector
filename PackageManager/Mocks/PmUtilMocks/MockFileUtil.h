@@ -54,7 +54,11 @@ public:
 
     MOCK_METHOD2( AppendPath, std::string( const std::string&, const std::string& ) );
     void MakeAppendPathReturn( std::string value );
-    void ExpectAppendPathCalled();
+    void ExpectAppendPathIsNotCalled();
+
+    MOCK_METHOD1( LastWriteTime, time_t( const std::string& ) );
+    void MakeLastWriteTimeReturn( time_t value );
+    void ExpectLastWriteTimeIsNotCalled();
 
 private:
     std::string m_defaultString;

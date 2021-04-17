@@ -28,6 +28,7 @@
 #include "MockCloudEventPublisher.h"
 #include "MockCloudEventStorage.h"
 #include "MockUcUpgradeEventHandler.h"
+#include "MockInstallerCacheManager.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -49,6 +50,7 @@ protected:
         m_mockPlatformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_mockDeps.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_mockSslUtil.reset( new NiceMock<MockSslUtil>() );
+        m_mockInstallerCacheMgr.reset( new NiceMock<MockInstallerCacheManager>() );
 
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
@@ -70,7 +72,7 @@ protected:
         );
         m_configProcesor.reset( new PackageConfigProcessor( *m_mockFileUtil, *m_mockSslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor(
-            *m_mockCloud,
+            *m_mockInstallerCacheMgr,
             *m_mockFileUtil,
             *m_mockSslUtil,
             *m_configProcesor,
@@ -94,6 +96,7 @@ protected:
         m_patient.reset( new PackageManager(
             *m_mockConfig,
             *m_mockCloud,
+            *m_mockInstallerCacheMgr,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
             *m_ucidAdapter,
@@ -128,6 +131,7 @@ protected:
         m_packageInventoryProvider.reset();
         m_thread.reset();
         m_manifest.reset();
+        m_mockInstallerCacheMgr.reset();
         m_mockSslUtil.reset();
 
         m_mockDeps.reset();
@@ -160,9 +164,8 @@ protected:
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
-
-        m_mockCloud->MakeDownloadFileReturn( 200 );
         m_mockCloud->MakeGetReturn( 200 );
+        m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
 
         m_patient->SetPlatformDependencies( m_mockDeps.get() );
         m_patient->Start( "ConfigFile", "ConfigFile" );
@@ -200,6 +203,7 @@ protected:
     std::unique_ptr<MockPmPlatformComponentManager> m_mockPlatformComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_mockDeps;
     std::unique_ptr<MockSslUtil> m_mockSslUtil;
+    std::unique_ptr<MockInstallerCacheManager> m_mockInstallerCacheMgr;
 
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
@@ -257,7 +261,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
         {
             EXPECT_EQ( "/S /Q ", package.installerArgs );
             EXPECT_EQ( "/install/location", package.installLocation );
-            EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash,  );
+            EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash );
             EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
             EXPECT_EQ( "msi", package.installerType );
             EXPECT_EQ( "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", package.installerUrl );
@@ -492,11 +496,11 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
@@ -615,11 +619,11 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
     ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
@@ -730,11 +734,11 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "tmpPmInst_" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "_0" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
         {
             return newName;
@@ -808,6 +812,26 @@ TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
 
     EXPECT_CALL( *m_eventPublisher, PublishFailedEvents() ).WillOnce( Invoke(
         [this, &pass]()
+        {
+            pass = true;
+            m_cv.notify_one();
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+
+    EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillPruneInstallers )
+{
+    bool pass = false;
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+    EXPECT_CALL( *m_mockInstallerCacheMgr, PruneInstallers( _ ) ).WillOnce( Invoke(
+        [this, &pass]( uint32_t ageInSeconds )
         {
             pass = true;
             m_cv.notify_one();
