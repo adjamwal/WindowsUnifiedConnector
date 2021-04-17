@@ -173,3 +173,33 @@ void MockWindowsUtilities::ExpectGetDataDirIsNotCalled()
 {
     EXPECT_CALL( *this, GetDataDir() ).Times( 0 );
 }
+
+void MockWindowsUtilities::MakeResolvePathReturn( std::string value )
+{
+    ON_CALL( *this, ResolvePath( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectResolvePathIsNotCalled()
+{
+    EXPECT_CALL( *this, ResolvePath( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeFileSearchWithWildCardReturn( int32_t value )
+{
+    ON_CALL( *this, FileSearchWithWildCard( _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectFileSearchWithWildCardIsNotCalled()
+{
+    EXPECT_CALL( *this, FileSearchWithWildCard( _, _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeSearchFilesReturn( int32_t value )
+{
+    ON_CALL( *this, SearchFiles( _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectSearchFilesIsNotCalled()
+{
+    EXPECT_CALL( *this, SearchFiles( _, _, _, _ ) ).Times( 0 );
+}

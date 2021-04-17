@@ -10,9 +10,7 @@
 #include "..\..\GlobalVersion.h"
 #include <StringUtil.h>
 
-PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IPmPlatformComponentManager& componentManager )
-    : m_methods( methods )
-    , m_componentMgr( componentManager )
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods ) : m_methods( methods )
 {
 }
 
@@ -87,7 +85,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         std::string knownFolderIdConversion = "";
         std::vector<std::filesystem::path> discoveredFiles;
 
-        std::string resolvedPath = m_componentMgr.ResolvePath( configurable.path );
+        std::string resolvedPath = WindowsUtilities::ResolvePath( configurable.path );
 
         if ( resolvedPath != configurable.path )
         {
@@ -102,7 +100,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
             knownFolderIdConversion = resolvedPath.substr( 0, first );
         }
 
-        m_componentMgr.FileSearchWithWildCard( resolvedPath, discoveredFiles );
+        WindowsUtilities::FileSearchWithWildCard( resolvedPath, discoveredFiles );
 
         if ( discoveredFiles.size() > configurable.max_instances )
         {
@@ -120,7 +118,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         {
             PackageConfigInfo configInfo = {};
 
-            std::string tempPath = discoveredFile.make_preferred().generic_string();
+            std::string tempPath = discoveredFile.make_preferred().string();
 
             if ( knownFolderId != "" )
             {

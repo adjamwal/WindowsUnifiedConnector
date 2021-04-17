@@ -345,3 +345,108 @@ std::wstring WindowsUtilities::GetLogDir()
 
     return logDir;
 }
+
+std::string WindowsUtilities::ResolvePath( const std::string& basePath )
+{
+    size_t begin = basePath.find( "<FOLDERID_" );
+    if ( begin != std::string::npos ) {
+        size_t end = basePath.find( ">", begin + strlen( "<FOLDERID_" ) );
+        if ( end != std::string::npos ) {
+            begin;
+
+            std::string knownFolder = WindowsUtilities::ResolveKnownFolderId( basePath.substr( begin + 1, end - (begin + 1) ) );
+            if ( !knownFolder.empty() ) {
+                knownFolder = basePath.substr( 0, begin ) + knownFolder + basePath.substr( end + 1 );
+                return knownFolder;
+            }
+        }
+    }
+
+    return basePath;
+}
+
+/**
+* Searches an absolute path for all files or configurables that match wildcard searches
+* Returns a list of all matching absolute paths of files found
+*
+* star is 0 or many
+* question mark is exactly one
+*
+* Examples of valid searches
+* C:\\ProgramData\\Cisco\\SecureClient\\UC\\policy.xml
+* C:\\ProgramData\\Cisco\\SecureClient\\UC\\*.xml
+* C:\\ProgramData\\Cisco\\SecureClient\\*\\policy.xml
+* C:\\ProgramData\\Cisco\\SecureClient*\\UC\\*.xml
+* C:\\ProgramData\\Cisco\\Secure*Client\\UC\\*.xml
+* C:\\ProgramData\\Cisco\\SecureClient\\UC\\*.???
+*/
+int32_t WindowsUtilities::FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results )
+{
+    int32_t dwError = 0;
+
+    std::vector<std::filesystem::path> searchList;
+
+    for ( const auto& part : searchPath.relative_path() )
+    {
+        searchList.emplace_back( part );
+    }
+
+    dwError = WindowsUtilities::SearchFiles( searchPath.root_path(), searchList.begin(), searchList.end(), results );
+
+    return dwError;
+}
+
+int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
+    std::vector<std::filesystem::path>::iterator begin,
+    std::vector<std::filesystem::path>::iterator end,
+    std::vector<std::filesystem::path>& results )
+{
+    int32_t dwError = 0;
+
+    if ( begin != end )
+    {
+        searchPath /= *begin;
+
+        WIN32_FIND_DATAW findFileData = { 0 };
+
+        HANDLE hFindFile = FindFirstFileExW(
+            searchPath.generic_wstring().c_str(),
+            FindExInfoBasic,
+            &findFileData,
+            FindExSearchNameMatch,
+            0,
+            FIND_FIRST_EX_LARGE_FETCH );
+
+        if ( hFindFile != INVALID_HANDLE_VALUE )
+        {
+            do
+            {
+                if ( findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+                {
+                    auto tempIterator = begin;
+                    std::filesystem::path directoryPath = searchPath.parent_path();
+                    directoryPath /= findFileData.cFileName;
+
+                    dwError = WindowsUtilities::SearchFiles( directoryPath, ++tempIterator, end, results );
+                }
+                else
+                {
+                    results.push_back( searchPath.parent_path().append( findFileData.cFileName ) );
+                }
+            } while ( FindNextFile( hFindFile, &findFileData ) );
+
+            if ( (dwError = GetLastError()) == ERROR_NO_MORE_FILES )
+            {
+                dwError = NOERROR;
+            }
+
+            FindClose( hFindFile );
+        }
+        else
+        {
+            dwError = GetLastError();
+        }
+    }
+
+    return dwError;
+}

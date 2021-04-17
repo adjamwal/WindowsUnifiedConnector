@@ -28,7 +28,8 @@ protected:
 {
     "cloud": {
         "CheckinUri": "https://packagemanager.cisco.com/checkin",
-        "CheckinInterval": 1000
+        "CheckinInterval": 2000,
+		"MaxStartupDelay": 2000
     }
 }
 )";

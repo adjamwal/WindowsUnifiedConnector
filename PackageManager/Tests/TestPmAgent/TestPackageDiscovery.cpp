@@ -17,8 +17,7 @@ protected:
         m_catalogRules.clear();
         m_detectedInstallations.clear();
         m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
-        m_pmPlatformComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>());
-        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods, *m_pmPlatformComponentManager );
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
     }
 
     void TearDown()
@@ -73,7 +72,6 @@ protected:
     std::vector<PmInstalledPackage> m_detectedInstallations;
     std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
-    std::unique_ptr<MockPmPlatformComponentManager> m_pmPlatformComponentManager;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
@@ -211,10 +209,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFound )
     std::vector<std::filesystem::path> configs1;
     configs1.push_back( std::filesystem::path( path1 ) );
     
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
@@ -252,11 +249,11 @@ TEST_F( TestPackageDiscovery, MultipleConfigurablesAreFound )
     std::vector<std::filesystem::path> configs2;
     configs2.push_back( std::filesystem::path( path2 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) )
         .WillOnce( Return( path1 ) )
         .WillOnce( Return( path2 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs2 ), Return( 0 ) ) );
 
@@ -289,10 +286,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedOne )
     configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
     configs1.push_back( std::filesystem::path( "c:\\test\\three.xml" ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
@@ -322,10 +318,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedTwo )
     configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
     configs1.push_back( std::filesystem::path( "c:\\test\\three.xml" ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
@@ -354,10 +349,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstances )
     std::vector<std::filesystem::path> configs1;
     configs1.push_back( std::filesystem::path( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
@@ -385,10 +379,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstancesReached )
     configs1.push_back( std::filesystem::path( path1 ) );
     configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
@@ -414,10 +407,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableNoneAreFound )
 
     std::vector<std::filesystem::path> configs1;
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
@@ -442,10 +434,9 @@ TEST_F( TestPackageDiscovery, ConfigurablePathWillBeUnresolved )
     std::vector<std::filesystem::path> configs1;
     configs1.push_back( std::filesystem::path( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, ResolvePath )
-        .WillOnce( Return( path1 ) );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_CALL( *m_pmPlatformComponentManager, FileSearchWithWildCard( _, _ ) )
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
         .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );

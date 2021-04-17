@@ -11,7 +11,7 @@ class IPackageDiscoveryMethods;
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery( IPackageDiscoveryMethods& methods, IPmPlatformComponentManager& componentManager );
+    PackageDiscovery( IPackageDiscoveryMethods& methods );
     ~PackageDiscovery();
 
     PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
@@ -28,5 +28,4 @@ private:
 
     IPackageDiscoveryMethods& m_methods;
     PackageInventory m_lastDetectedPackages;
-    IPmPlatformComponentManager& m_componentMgr;
 };

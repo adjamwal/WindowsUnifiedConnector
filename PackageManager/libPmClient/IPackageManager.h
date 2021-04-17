@@ -16,14 +16,15 @@ public:
     virtual ~IPackageManager() {}
 
     /**
-     * @brief Starts the package manager. This starts are thread that will periodically check for updates from the 
+     * @brief Starts the package manager. This starts are thread that will periodically check for updates from the
      *   cloud
      * @param[in] configFile - Path to the configuration file. This is a json file that will provide the PM cloud
      *   URL and the thread interval. The file should be in the form:
      *   {
      *       "cloud": {
      *           "CheckinUri": "https://packagemanager.cisco.com/checkin",
-     *           "CheckinInterval": 1000
+     *           "CheckinInterval": 20000,
+     *           "MaxStartupDelay": 20000
      *       }
      *   }
      *

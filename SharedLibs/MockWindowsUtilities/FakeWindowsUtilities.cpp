@@ -67,3 +67,21 @@ std::wstring WindowsUtilities::GetLogDir()
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
 }
+
+std::string WindowsUtilities::ResolvePath( const std::string& basePath )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolvePath( basePath );
+}
+
+int32_t WindowsUtilities::FileSearchWithWildCard( const std::filesystem::path& path, std::vector<std::filesystem::path>& results )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->FileSearchWithWildCard( path, results );
+}
+
+int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
+    std::vector<std::filesystem::path>::iterator begin,
+    std::vector<std::filesystem::path>::iterator end,
+    std::vector<std::filesystem::path>& results )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->SearchFiles( searchPath, begin, end, results );
+}
