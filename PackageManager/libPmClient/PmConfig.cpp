@@ -66,6 +66,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
             m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT;
             m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT;
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
+            m_configData.maxFileCacheAge = PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS;
         }
     }
 
@@ -137,6 +138,13 @@ const std::vector<PmComponent>& PmConfig::GetSupportedComponentList()
     return m_ComponentList;
 }
 
+uint32_t PmConfig::GetMaxFileCacheAge()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.maxFileCacheAge;
+}
+
 int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
 {
     int rtn = -1;
@@ -191,6 +199,14 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
         m_configData.log_level = pm[ "loglevel" ].asUInt();
         m_configData.intervalMs = pm[ "CheckinInterval" ].asUInt();
         m_configData.maxDelayMs = pm[ "MaxStartupDelay" ].asUInt();
+
+        //optional fields
+        if ( pm.isMember( "maxFileCacheAge_s" ) ) {
+            m_configData.maxFileCacheAge = pm[ "maxFileCacheAge_s" ].asUInt();
+        }
+        else {
+            m_configData.maxFileCacheAge = PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS;
+        }
 
         rtn = 0;
     }
@@ -284,6 +300,10 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
         }
         else if( pm[ "MaxStartupDelay" ].asUInt() < 2000 ) {
             LOG_ERROR( "MaxStartupDelay cannot be less than 2000 ms" );
+            rtn = -1;
+        }
+        else if ( pm.isMember( "maxFileCacheAge_s" ) && !pm[ "maxFileCacheAge_s" ].isUInt() ) {
+            LOG_ERROR( "Invalid maxFileCacheAge_s" );
             rtn = -1;
         }
 

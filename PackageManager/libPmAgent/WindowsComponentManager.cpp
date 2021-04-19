@@ -192,3 +192,8 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
 
     return ret;
 }
+
+int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results )
+{
+    return WindowsUtilities::FileSearchWithWildCard( searchPath, results );
+}

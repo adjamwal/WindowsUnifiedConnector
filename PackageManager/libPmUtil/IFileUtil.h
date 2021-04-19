@@ -25,4 +25,5 @@ public:
     virtual size_t FileSize( const std::string& filename ) = 0;
     virtual std::filesystem::file_time_type FileTime( const std::string& filename ) = 0;
     virtual std::string AppendPath( const std::string& basePath, const std::string& configPath ) = 0;
+    virtual time_t LastWriteTime( const std::string& filename ) = 0;
 };

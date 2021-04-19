@@ -58,6 +58,10 @@ public:
     void MakeGetSupportedComponentListReturn( const std::vector<PmComponent>& value );
     void ExpectGetSupportedComponentListIsNotCalled();
 
+    MOCK_METHOD0( GetMaxFileCacheAge, uint32_t() );
+    void MakeGetMaxFileCacheAgeReturn( uint32_t value );
+    void ExpectGetMaxFileCacheAgeIsNotCalled();
+
 private:
     std::string m_identifyUri;
     std::string m_checkinUri;

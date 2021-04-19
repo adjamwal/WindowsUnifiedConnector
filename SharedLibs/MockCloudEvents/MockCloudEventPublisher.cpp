@@ -12,6 +12,11 @@ MockCloudEventPublisher::~MockCloudEventPublisher()
 
 }
 
+void MockCloudEventPublisher::ExpectSetTokenNotCalled()
+{
+    EXPECT_CALL( *this, SetToken( _ ) ).Times( 0 );
+}
+
 void MockCloudEventPublisher::MakePublishReturn( int32_t value )
 {
     ON_CALL( *this, Publish( _ ) ).WillByDefault( Return( value ) );

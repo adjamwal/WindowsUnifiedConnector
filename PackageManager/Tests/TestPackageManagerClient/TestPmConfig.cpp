@@ -39,7 +39,8 @@ protected:
     "pm": {
         "loglevel": 7,
         "CheckinInterval": 150000,
-        "MaxStartupDelay": 200000
+        "MaxStartupDelay": 200000,
+        "maxFileCacheAge_s": 1000
     }
 }
 )";
@@ -167,21 +168,52 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceed )
     EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceedWillFailOnEmptyContents )
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillFailOnEmptyContents )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWillFailOnEmptyContents )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailOnEmptyContents )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
     EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidJson )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProvided )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "pm": {
+        "loglevel": 7,
+        "CheckinInterval": 150000,
+        "MaxStartupDelay": 200000
+    }
+}
+)" );
+
+    EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailIfMaxFileCacheAgeIsInvalid )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "pm": {
+        "loglevel": 7,
+        "CheckinInterval": 150000,
+        "MaxStartupDelay": 200000,
+        "maxFileCacheAge_s": "Invalid"
+    }
+}
+)" );
+
+    EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillNotAcceptInvalidJson )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
@@ -191,7 +223,7 @@ TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidJson )
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillNotAcceptInvalidURL )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {

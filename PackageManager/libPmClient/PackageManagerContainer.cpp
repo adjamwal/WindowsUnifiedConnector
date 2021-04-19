@@ -26,6 +26,7 @@
 #include "SslUtil.h"
 #include "PmLogger.h"
 #include "PmConstants.h"
+#include "InstallerCacheManager.h"
 
 #include <mutex>
 #include <exception>
@@ -39,6 +40,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_sslUtil( new SslUtil() )
     , m_http( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )
+    , m_installeracheMgr( new InstallerCacheManager( *m_cloud, *m_fileUtil, *m_sslUtil ) )
     , m_config( new PmConfig( *m_fileUtil ) )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
@@ -58,7 +60,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_componentPackageProcessor( 
-        new ComponentPackageProcessor( *m_cloud, 
+        new ComponentPackageProcessor( *m_installeracheMgr,
             *m_fileUtil, 
             *m_sslUtil, 
             *m_packageConfigProcessor, 
@@ -70,6 +72,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_pacMan(
         new PackageManager( *m_config,
             *m_cloud,
+            *m_installeracheMgr,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
             *m_ucidAdapter,

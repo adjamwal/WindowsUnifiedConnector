@@ -139,7 +139,17 @@ void MockFileUtil::MakeAppendPathReturn( std::string value )
     ON_CALL( *this, AppendPath( _, _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectAppendPathCalled()
+void MockFileUtil::ExpectAppendPathIsNotCalled()
 {
     EXPECT_CALL( *this, AppendPath( _, _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeLastWriteTimeReturn( time_t value )
+{
+    ON_CALL( *this, LastWriteTime( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectLastWriteTimeIsNotCalled()
+{
+    EXPECT_CALL( *this, LastWriteTime( _ ) ).Times( 0 );
 }

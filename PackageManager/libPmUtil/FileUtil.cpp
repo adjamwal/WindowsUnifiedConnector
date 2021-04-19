@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+#include <chrono>
 
 struct FileUtilHandle
 {
@@ -82,6 +83,9 @@ FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
         WLOG_ERROR( L"filename is empty" );
     }
     else {
+        ::std::filesystem::path target( filename );
+        ::std::filesystem::create_directories( target.parent_path() );
+
         handle = ( FileUtilHandle* )malloc( sizeof( FileUtilHandle ) );
         errno_t rtn = fopen_s( &handle->file, filename.c_str(), "wb" );
         if( rtn != 0 ) {
@@ -220,4 +224,19 @@ std::string FileUtil::AppendPath( const std::string& basePath, const std::string
     LOG_DEBUG( "Path resolved to %s", path.string().c_str() );
 
     return path.string();
+}
+
+time_t FileUtil::LastWriteTime( const std::string& filename )
+{
+    time_t rtn = -1;
+
+    struct _stat64 fileInfo;
+    if ( _stati64( filename.c_str(), &fileInfo ) != 0 ) {
+        LOG_ERROR( "_stati64 failed on file %s", filename.c_str() );
+    }
+    else {
+        rtn = fileInfo.st_mtime;
+    }
+
+    return rtn;
 }
