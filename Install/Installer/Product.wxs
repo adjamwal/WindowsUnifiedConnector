@@ -18,11 +18,13 @@
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
+        <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <InstallExecuteSequence>
           <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
             WIX_UPGRADE_DETECTED
           </Custom>
           <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
+          <Custom Action="SetCacheDirectory" After="FindRelatedProducts" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
@@ -141,6 +143,7 @@
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_PROGRAMDATA_DIR" />
+                <util:RemoveFolderEx On="uninstall" Property="UC_INSTALLCACHE_DIR" />
             </Component>
         </ComponentGroup>
     </Fragment>

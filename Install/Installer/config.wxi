@@ -31,6 +31,7 @@
     <?define UCPMDirectory = "UCPM" ?>
     <?define UCConfigDirectory = "Configuration" ?>
     <?define UCLogDirectory = "UC" ?>
+    <?define PmInstallCacheDirectory = "Cisco-UC" ?>
 
     <!-- Config File Information -->
     <?define BootstrapperConfigName = "bs.json" ?>
