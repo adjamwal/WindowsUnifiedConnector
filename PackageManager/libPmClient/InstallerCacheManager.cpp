@@ -124,19 +124,24 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
 
     std::vector<std::filesystem::path> results;
     std::filesystem::path searchPath = m_downloadPath / "*";
+    searchPath.make_preferred();
+
+    LOG_DEBUG( "Searching for Installers in %s", searchPath.string().c_str() );
     if ( m_componentMgr->FileSearchWithWildCard( searchPath, results ) == 0 ) {
         time_t now = time( NULL );
 
         LOG_DEBUG( "Removing installers older than %d", now - ageInSeconds );
 
-        for ( auto file : results ) {
-            time_t lwt = m_fileUtil.LastWriteTime( file.string() );
+        for ( auto& file : results ) {
+            std::string filename = file.make_preferred().string();
 
-            LOG_DEBUG( "Checking cache file: %s LastWrite %d", file.string(), lwt );
+            time_t lwt = m_fileUtil.LastWriteTime( filename );
+
+            LOG_DEBUG( "Checking cache file: %s LastWrite %d", filename.c_str(), lwt );
 
             if( now - lwt > ageInSeconds ) {
-                LOG_DEBUG( "Removing file from cache: %s", file.string() );
-                m_fileUtil.DeleteFile( file.string() );
+                LOG_DEBUG( "Removing file from cache: %s", filename.c_str() );
+                m_fileUtil.DeleteFile( filename );
             }
         }
     }

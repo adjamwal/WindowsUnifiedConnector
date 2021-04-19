@@ -228,14 +228,14 @@ std::string FileUtil::AppendPath( const std::string& basePath, const std::string
 
 time_t FileUtil::LastWriteTime( const std::string& filename )
 {
-    time_t rtn = 0;
+    time_t rtn = -1;
 
-    try {
-        auto ftime = std::filesystem::last_write_time( filename );
-        rtn = std::chrono::duration_cast< std::chrono::seconds >( ftime.time_since_epoch() ).count();
+    struct _stat64 fileInfo;
+    if ( _stati64( filename.c_str(), &fileInfo ) != 0 ) {
+        LOG_ERROR( "_stati64 failed on file %s", filename.c_str() );
     }
-    catch ( std::filesystem::filesystem_error ex ) {
-        LOG_ERROR( "%s", ex.what() );
+    else {
+        rtn = fileInfo.st_mtime;
     }
 
     return rtn;

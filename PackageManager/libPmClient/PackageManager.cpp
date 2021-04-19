@@ -186,7 +186,7 @@ void PackageManager::PmWorkflowThread()
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
 
-        if( m_manifestProcessor.ProcessManifest( manifest ) )
+        if( !m_manifestProcessor.ProcessManifest( manifest ) )
         {
             LOG_ERROR( "ProcessManifest failed" );
         }

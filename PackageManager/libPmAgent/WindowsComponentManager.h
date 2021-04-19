@@ -87,6 +87,16 @@ public:
      */
     std::string ResolvePath( const std::string& basePath ) override;
 
+    /**
+    * Searches an absolute path for all files or configurables that match wildcard searches
+    * Returns a list of all matching absolute paths of files found
+    *
+    * star is 0 or many
+    * question mark is exactly one
+    *
+    */
+    int32_t FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results );
+
 private:
     IWinApiWrapper& m_winApiWrapper;
     ICodesignVerifier& m_codeSignVerifier;
