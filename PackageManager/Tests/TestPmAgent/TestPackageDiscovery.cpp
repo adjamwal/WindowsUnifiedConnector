@@ -194,7 +194,7 @@ TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillResetTheCacheToLatest
 
 TEST_F( TestPackageDiscovery, OneConfigurableIsFound )
 {
-    std::string path1 = "c:\\test\\one.xml";
+    std::string path1 = "c:/test/one.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
@@ -224,8 +224,8 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFound )
 
 TEST_F( TestPackageDiscovery, MultipleConfigurablesAreFound )
 {
-    std::string path1 = "c:\\test\\one.xml";
-    std::string path2 = "c:\\test\\two.xml";
+    std::string path1 = "c:/test/one.xml";
+    std::string path2 = "c:/test/two.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
@@ -269,7 +269,7 @@ TEST_F( TestPackageDiscovery, MultipleConfigurablesAreFound )
 
 TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedOne )
 {
-    std::string path1 = "c:\\test\\one.xml";
+    std::string path1 = "c:/test/one.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
@@ -282,9 +282,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedOne )
     m_catalogRules.push_back( productDiscoveryRules );
 
     std::vector<std::filesystem::path> configs1;
-    configs1.push_back( std::filesystem::path( "c:\\test\\one.xml" ) );
-    configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
-    configs1.push_back( std::filesystem::path( "c:\\test\\three.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/one.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/three.xml" ) );
 
     EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
@@ -314,9 +314,9 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedTwo )
     m_catalogRules.push_back( productDiscoveryRules );
 
     std::vector<std::filesystem::path> configs1;
-    configs1.push_back( std::filesystem::path( "c:\\test\\one.xml" ) );
-    configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
-    configs1.push_back( std::filesystem::path( "c:\\test\\three.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/one.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/three.xml" ) );
 
     EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
@@ -328,14 +328,14 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedTwo )
     EXPECT_EQ( installedPackages.packages.size(), 1 );
     EXPECT_EQ( installedPackages.packages[0].configs.size(), 2 );
     EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
-        std::filesystem::path( "c:\\test\\one.xml" ) );
+        std::filesystem::path( "c:/test/one.xml" ) );
     EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[1].path ),
-        std::filesystem::path( "c:\\test\\two.xml" ) );
+        std::filesystem::path( "c:/test/two.xml" ) );
 }
 
 TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstances )
 {
-    std::string path1 = "c:\\test\\one.xml";
+    std::string path1 = "c:/test/one.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
@@ -364,7 +364,7 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstances )
 
 TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstancesReached )
 {
-    std::string path1 = "c:\\test\\one.xml";
+    std::string path1 = "c:/test/one.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
@@ -377,7 +377,7 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstancesReached )
 
     std::vector<std::filesystem::path> configs1;
     configs1.push_back( std::filesystem::path( path1 ) );
-    configs1.push_back( std::filesystem::path( "c:\\test\\two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/two.xml" ) );
 
     EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
@@ -394,7 +394,7 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstancesReached )
 
 TEST_F( TestPackageDiscovery, OneConfigurableNoneAreFound )
 {
-    std::string path1 = "c:\\test\\one.xml";
+    std::string path1 = "c:/test/one.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
@@ -420,13 +420,13 @@ TEST_F( TestPackageDiscovery, OneConfigurableNoneAreFound )
 
 TEST_F( TestPackageDiscovery, ConfigurablePathWillBeUnresolved )
 {
-    std::string path1 = "C:\\ProgramData\\test\\one.xml";
+    std::string path1 = "C:/ProgramData/test/one.xml";
 
     PmProductDiscoveryRules productDiscoveryRules;
     SetupMsiDiscovery( productDiscoveryRules );
 
     PmProductDiscoveryConfigurable configurable1 = {};
-    configurable1.path = "<FOLDERID_ProgramData>\\test\\one.xml";
+    configurable1.path = "<FOLDERID_ProgramData>/test/one.xml";
     productDiscoveryRules.configurables.push_back( configurable1 );
 
     m_catalogRules.push_back( productDiscoveryRules );
@@ -444,5 +444,5 @@ TEST_F( TestPackageDiscovery, ConfigurablePathWillBeUnresolved )
     EXPECT_EQ( installedPackages.packages.size(), 1 );
     EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
     EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
-        std::filesystem::path( "<FOLDERID_ProgramData>\\test\\one.xml" ) );
+        std::filesystem::path( "<FOLDERID_ProgramData>/test/one.xml" ) );
 }

@@ -118,7 +118,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         {
             PackageConfigInfo configInfo = {};
 
-            std::string tempPath = discoveredFile.make_preferred().string();
+            std::string tempPath = discoveredFile.generic_string();
 
             if ( knownFolderId != "" )
             {

@@ -53,7 +53,7 @@ protected:
         }
     }
 
-    std::filesystem::path m_baseTestPath = "C:\\ProgramData\\Test\\";
+    std::filesystem::path m_baseTestPath = "C:/ProgramData/Test/";
 };
 
 TEST_P( ComponentTestWindowsUtilites, VerifyKnownFolderId )
@@ -419,38 +419,38 @@ TEST_F( ComponentTestWindowsUtilites, SingleCharacterWildcardSearch )
 
 TEST_F( ComponentTestWindowsUtilites, SearchWithDirectoryWildcard )
 {
-    std::filesystem::path path( m_baseTestPath / "Temp*Path\\test.xml" );
+    std::filesystem::path path( m_baseTestPath / "Temp*Path/test.xml" );
 
     std::vector<std::filesystem::path> files;
-    files.push_back( m_baseTestPath / "TempPath\\test.xml" );
-    files.push_back( m_baseTestPath / "TempPath\\other.xml" );
-    files.push_back( m_baseTestPath / "TempNewPath\\test.xml" );
-    files.push_back( m_baseTestPath / "TempNewPath\\other.xml" );
+    files.push_back( m_baseTestPath / "TempPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempPath/other.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/other.xml" );
 
     std::vector<std::filesystem::path> expected;
-    expected.push_back( m_baseTestPath / "TempPath\\test.xml" );
-    expected.push_back( m_baseTestPath / "TempNewPath\\test.xml" );
+    expected.push_back( m_baseTestPath / "TempPath/test.xml" );
+    expected.push_back( m_baseTestPath / "TempNewPath/test.xml" );
 
     ExecuteTestSearch( path, files, expected );
 }
 
 TEST_F( ComponentTestWindowsUtilites, SearchWithDirectoryWildcardAndFileWildcard )
 {
-    std::filesystem::path path( m_baseTestPath / "Temp*Path\\*.xml" );
+    std::filesystem::path path( m_baseTestPath / "Temp*Path/*.xml" );
 
     std::vector<std::filesystem::path> files;
-    files.push_back( m_baseTestPath / "TempPath\\test.xml" );
-    files.push_back( m_baseTestPath / "TempPath\\test2.xml" );
-    files.push_back( m_baseTestPath / "TempPath\\test.txt" );
-    files.push_back( m_baseTestPath / "TempNewPath\\test.xml" );
-    files.push_back( m_baseTestPath / "TempNewPath\\test2.xml" );
-    files.push_back( m_baseTestPath / "TempNewPath\\test.txt" );
+    files.push_back( m_baseTestPath / "TempPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempPath/test2.xml" );
+    files.push_back( m_baseTestPath / "TempPath/test.txt" );
+    files.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/test2.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/test.txt" );
 
     std::vector<std::filesystem::path> expected;
-    expected.push_back( m_baseTestPath / "TempPath\\test.xml" );
-    expected.push_back( m_baseTestPath / "TempPath\\test2.xml" );
-    expected.push_back( m_baseTestPath / "TempNewPath\\test.xml" );
-    expected.push_back( m_baseTestPath / "TempNewPath\\test2.xml" );
+    expected.push_back( m_baseTestPath / "TempPath/test.xml" );
+    expected.push_back( m_baseTestPath / "TempPath/test2.xml" );
+    expected.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+    expected.push_back( m_baseTestPath / "TempNewPath/test2.xml" );
 
     ExecuteTestSearch( path, files, expected );
 }
@@ -458,7 +458,7 @@ TEST_F( ComponentTestWindowsUtilites, SearchWithDirectoryWildcardAndFileWildcard
 TEST_F( ComponentTestWindowsUtilites, WillResolveKnownFolderID )
 {
     std::string knownFolderString = "C:\\ProgramData";
-    std::string rtn = WindowsUtilities::ResolvePath( "<FOLDERID_ProgramData>" );
+    auto rtn = WindowsUtilities::ResolvePath( "<FOLDERID_ProgramData>" );
 
     EXPECT_EQ( rtn, knownFolderString );
 }
@@ -469,7 +469,7 @@ TEST_F( ComponentTestWindowsUtilites, WillResolveKnownFolderIDWithPrefix )
     std::string knownFolderString = "C:\\ProgramData";
     std::string suffix = "suffix";
 
-    std::string rtn = WindowsUtilities::ResolvePath( prefix + "<FOLDERID_ProgramData>" + suffix );
+    auto rtn = WindowsUtilities::ResolvePath( prefix + "<FOLDERID_ProgramData>" + suffix );
 
     EXPECT_EQ( rtn, prefix + knownFolderString + suffix );
 }
@@ -478,14 +478,28 @@ TEST_F( ComponentTestWindowsUtilites, WillNotModifyPathWhenKnownFolderIsEmpty )
 {
     std::string folder = "prefix<FOLDERID_SomeKnownFolder>suffix";
 
-    std::string rtn = WindowsUtilities::ResolvePath( folder );
+    auto rtn = WindowsUtilities::ResolvePath( folder );
 
     EXPECT_EQ( rtn, folder );
 }
 
 TEST_F( ComponentTestWindowsUtilites, WillNotResolveKnownFolderWhenTagNotFound )
 {
-    std::string rtn = WindowsUtilities::ResolvePath( "C:\\Windows\\Somthing" );
+    auto rtn = WindowsUtilities::ResolvePath( "C:/Windows/Somthing" );
 
-    EXPECT_EQ( rtn, "C:\\Windows\\Somthing" );
+    EXPECT_EQ( rtn, "C:/Windows/Somthing" );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArgumentsForwardSlash )
+{
+    std::string arg = "/arg2 <FOLDERID_ProgramFiles>\\Cisco\\policy.xml";
+
+    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\Program Files\\Cisco\\policy.xml" );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArgumentsBackSlash )
+{
+    std::string arg = "/arg2 <FOLDERID_ProgramData>\\Cisco\\policy.xml";
+
+    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\ProgramData\\Cisco\\policy.xml" );
 }
