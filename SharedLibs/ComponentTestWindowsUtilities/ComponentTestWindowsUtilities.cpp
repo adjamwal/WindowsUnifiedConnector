@@ -494,5 +494,5 @@ TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArguments )
 {
     std::string arg = "/arg2 <FOLDERID_ProgramData>/Cisco/policy.xml";
 
-    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:/ProgramData/Cisco/policy.xml" );
+    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\ProgramData/Cisco/policy.xml" );
 }
