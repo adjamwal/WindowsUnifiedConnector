@@ -490,16 +490,9 @@ TEST_F( ComponentTestWindowsUtilites, WillNotResolveKnownFolderWhenTagNotFound )
     EXPECT_EQ( rtn, "C:/Windows/Somthing" );
 }
 
-TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArgumentsForwardSlash )
+TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArguments )
 {
-    std::string arg = "/arg2 <FOLDERID_ProgramFiles>\\Cisco\\policy.xml";
+    std::string arg = "/arg2 <FOLDERID_ProgramData>/Cisco/policy.xml";
 
-    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\Program Files\\Cisco\\policy.xml" );
-}
-
-TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArgumentsBackSlash )
-{
-    std::string arg = "/arg2 <FOLDERID_ProgramData>\\Cisco\\policy.xml";
-
-    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\ProgramData\\Cisco\\policy.xml" );
+    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:/ProgramData/Cisco/policy.xml" );
 }

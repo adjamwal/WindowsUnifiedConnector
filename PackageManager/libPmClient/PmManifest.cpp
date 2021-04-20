@@ -107,7 +107,7 @@ void PmManifest::AddPackage( Json::Value& packageJson )
         }
 
         for( Json::Value::ArrayIndex i = 0; i != packageJson[ MANIFEST_FIELD_INSTALL_ARGS ].size(); i++ ) {
-            package.installerArgs += m_dependencies->ComponentManager().ResolvePath( packageJson[MANIFEST_FIELD_INSTALL_ARGS][i].asString() ) + " ";
+            package.installerArgs += m_dependencies->ComponentManager().ResolvePath( packageJson[ MANIFEST_FIELD_INSTALL_ARGS ][ i ].asString() ) + " ";
         }
     }
     package.installLocation = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_LOCATION, false ) );
