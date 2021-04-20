@@ -124,3 +124,39 @@ TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalError )
 
     ASSERT_TRUE( m_restoredEvent.Build().find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
 }
+
+TEST_F( TestCloudEventBuilder, EventJSONContainsOldFileBackslash )
+{
+    m_eventBuilder.WithOldFile( "c:\\path\\test.file", "oldhash", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"old\":[{\"path\":\"c:/path/test.file\",\"sha256\":\"oldhash\",\"size\":123}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, EventJSONContainsOldFileForwardslash )
+{
+    m_eventBuilder.WithOldFile( "c:/path/test.file", "oldhash", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"old\":[{\"path\":\"c:/path/test.file\",\"sha256\":\"oldhash\",\"size\":123}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, EventJSONContainsNewFileBackslash )
+{
+    m_eventBuilder.WithNewFile( "c:\\path\\test.file", "newhash", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"new\":[{\"path\":\"c:/path/test.file\",\"sha256\":\"newhash\",\"size\":123}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, EventJSONContainsNewFileForwardslash )
+{
+    m_eventBuilder.WithNewFile( "c:/path/test.file", "newhash", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"new\":[{\"path\":\"c:/path/test.file\",\"sha256\":\"newhash\",\"size\":123}]" ) != std::string::npos );
+}

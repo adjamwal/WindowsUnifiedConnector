@@ -231,10 +231,10 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
         m_packageVersion._Equal( other.m_packageVersion ) &&
         m_errCode == other.m_errCode &&
         m_errMessage._Equal( other.m_errMessage ) &&
-        m_oldPath._Equal( other.m_oldPath ) &&
+        m_oldPath == other.m_oldPath &&
         m_oldHash._Equal( other.m_oldHash ) &&
         m_oldSize == other.m_oldSize &&
-        m_newPath._Equal( other.m_newPath ) &&
+        m_newPath == other.m_newPath &&
         m_newHash._Equal( other.m_newHash ) &&
         m_newSize == other.m_newSize;
 }
@@ -254,22 +254,22 @@ std::string CloudEventBuilder::Serialize()
 
     if( m_evtype == pkgreconfig )
     {
-        if( m_oldPath.length() > 0 )
+        if( !m_oldPath.empty() )
         {
             Json::Value oldfilearr;
             Json::Value oldfile;
-            oldfile[ "path" ] = m_oldPath;
+            oldfile[ "path" ] = m_oldPath.generic_string();
             oldfile[ "sha256" ] = m_oldHash;
             oldfile[ "size" ] = m_oldSize;
             oldfilearr[ 0 ] = oldfile;
             event[ "old" ] = oldfilearr;
         }
 
-        if( m_newPath.length() > 0 )
+        if( !m_newPath.empty() )
         {
             Json::Value newfilearr;
             Json::Value newfile;
-            newfile[ "path" ] = m_newPath;
+            newfile[ "path" ] = m_newPath.generic_string();
             newfile[ "sha256" ] = m_newHash;
             newfile[ "size" ] = m_newSize;
             newfilearr[ 0 ] = newfile;

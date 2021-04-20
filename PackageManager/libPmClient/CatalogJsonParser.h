@@ -4,8 +4,6 @@
 #include "PmTypes.h"
 #include <json/json.h>
 
-struct PmDiscoveryConfigurable;
-
 class CatalogJsonParser : public ICatalogJsonParser
 {
 public:
