@@ -179,6 +179,8 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
         }
 
+        m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
+
         rtn = true;
     }
     catch( PackageException& ex )
@@ -198,8 +200,6 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     }
 
     m_eventPublisher.Publish( m_eventBuilder );
-
-    m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
 
     return rtn;
 }

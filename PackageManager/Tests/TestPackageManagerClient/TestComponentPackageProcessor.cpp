@@ -172,12 +172,23 @@ TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
-TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
+TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenInstallIsSuccesful )
 {
-    SetupComponentPackage();
+    SetupComponentPackageWithConfig();
     m_patient->Initialize( m_dep.get() );
 
     EXPECT_CALL( *m_installerCacheMgr, DeleteInstaller( _ ) );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillNotRemoveFileWhenInstallFails )
+{
+    SetupComponentPackageWithConfig();
+    m_patient->Initialize( m_dep.get() );
+
+    m_pmComponentManager->MakeUpdateComponentReturn( 1 );
+    m_installerCacheMgr->ExpectDeleteInstallerIsNotCalled();
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
