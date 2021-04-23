@@ -147,7 +147,19 @@ std::string FileUtil::GetTempDir()
 
 int32_t FileUtil::DeleteFile( const std::string& filename )
 {
-    return ( FileExists( filename ) && ::std::filesystem::remove( ::std::filesystem::path( filename ) ) ) ? 0 : -1;
+    int32_t rtn = -1;
+ 
+    try {
+        if ( FileExists( filename ) ) {
+            ::std::filesystem::remove( ::std::filesystem::path( filename ) );
+            rtn = 0;
+        }
+    }
+    catch ( std::filesystem::filesystem_error& ex ) {
+        LOG_ERROR( "%s", ex.what() );
+    }
+
+    return rtn;
 }
 
 int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& newName )
