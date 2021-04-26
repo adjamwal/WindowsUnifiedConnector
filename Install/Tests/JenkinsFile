@@ -2,7 +2,7 @@
 
 @Library('JenkinsShared')_
 
-agentLabel = "VS2019"
+agentLabel = "windowsci2019"
 
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
