@@ -241,7 +241,8 @@ pipeline {
                 dir('Symbols') {
                   powershell "Move-Item -Path ..\\Win32\\Release\\ -Destination Win32"
                   powershell "Move-Item -Path ..\\x64\\Release\\ -Destination x64"
-                  powershell "Move-Item -Path ..\\Resources\\UCID\\obj\\ -Destination ucid"
+                  powershell "Move-Item -Path ..\\Resources\\UCID\\x86\symbols\\ -Destination ucid\\x86"
+                  powershell "Move-Item -Path ..\\Resources\\UCID\\x64\symbols\\ -Destination ucid\\x64"
                 }
                 powershell 'Compress-Archive -Path "Symbols\\*" -DestinationPath "Symbols.zip"'
                 
