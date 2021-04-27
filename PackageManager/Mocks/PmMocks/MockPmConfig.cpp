@@ -132,3 +132,22 @@ void MockPmConfig::ExpectGetSupportedComponentListIsNotCalled()
     EXPECT_CALL( *this, GetSupportedComponentList() ).Times( 0 );
 }
 
+void MockPmConfig::MakeGetLogLevelReturn( uint32_t value )
+{
+    ON_CALL( *this, GetLogLevel() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetLogLevelIsNotCalled()
+{
+    EXPECT_CALL( *this, GetLogLevel() ).Times( 0 );
+}
+
+void MockPmConfig::MakeGetMaxFileCacheAgeReturn( uint32_t value )
+{
+    ON_CALL( *this, GetMaxFileCacheAge() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetMaxFileCacheAgeIsNotCalled()
+{
+    EXPECT_CALL( *this, GetMaxFileCacheAge() ).Times( 0 );
+}

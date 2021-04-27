@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "ComponentPackageProcessor.h"
-#include "MockPmCloud.h"
+#include "MockInstallerCacheManager.h"
 #include "MockFileUtil.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
@@ -19,7 +19,7 @@ class TestComponentPackageProcessor : public ::testing::Test
 protected:
     void SetUp()
     {
-        m_cloud.reset( new NiceMock<MockPmCloud>() );
+        m_installerCacheMgr.reset( new NiceMock<MockInstallerCacheManager>() );
         m_fileUtil.reset( new NiceMock<MockFileUtil>() );
         m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
@@ -30,7 +30,7 @@ protected:
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
-        m_patient.reset( new ComponentPackageProcessor( *m_cloud,
+        m_patient.reset( new ComponentPackageProcessor( *m_installerCacheMgr,
             *m_fileUtil,
             *m_sslUtil,
             *m_configProcessor,
@@ -46,7 +46,7 @@ protected:
     {
         m_patient.reset();
 
-        m_cloud.reset();
+        m_installerCacheMgr.reset();
         m_fileUtil.reset();
         m_dep.reset();
         m_pmComponentManager.reset();
@@ -71,6 +71,7 @@ protected:
             "signerName",
             "installerHash",
             "installerPath",
+            false,
             {}
         };
 
@@ -83,7 +84,7 @@ protected:
             "installLocation",
             "signerName",
             "test/1.0.0",
-            false
+            false,
             } );
     }
 
@@ -92,14 +93,14 @@ protected:
         SetupComponentPackage();
         m_expectedComponentPackage.installerHash = "";
         m_patient->Initialize( m_dep.get() );
-        m_cloud->MakeDownloadFileReturn( 200 );
         m_sslUtil->MakeCalculateSHA256Return( "installerHash" );
         m_pmComponentManager->MakeUpdateComponentReturn( 0 );
+        m_fileUtil->MakeFileSizeReturn( 1 );
         m_fileUtil->MakeFileExistsReturn( true );
     }
 
     PmComponent m_expectedComponentPackage;
-    std::unique_ptr<MockPmCloud> m_cloud;
+    std::unique_ptr<MockInstallerCacheManager> m_installerCacheMgr;
     std::unique_ptr<MockFileUtil> m_fileUtil;
     std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
@@ -118,7 +119,7 @@ TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillTryToDownload )
     SetupComponentPackageWithConfig();
     m_patient->Initialize( m_dep.get() );
 
-    EXPECT_CALL( *m_cloud, DownloadFile( m_expectedComponentPackage.installerUrl, _ ) ).Times( 1 );
+    EXPECT_CALL( *m_installerCacheMgr, DownloadOrUpdateInstaller( _ ) ).Times( 1 );
 
     m_patient->DownloadPackageBinary( m_expectedComponentPackage );
 }
@@ -171,14 +172,23 @@ TEST_F( TestComponentPackageProcessor, WillStoreUcUpgradeEvent )
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
-TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
+TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenInstallIsSuccesful )
 {
-    SetupComponentPackage();
+    SetupComponentPackageWithConfig();
     m_patient->Initialize( m_dep.get() );
 
-    m_cloud->MakeDownloadFileReturn( 200 );
-    m_fileUtil->MakeFileExistsReturn( true );
-    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
+    EXPECT_CALL( *m_installerCacheMgr, DeleteInstaller( _ ) );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillNotRemoveFileWhenInstallFails )
+{
+    SetupComponentPackageWithConfig();
+    m_patient->Initialize( m_dep.get() );
+
+    m_pmComponentManager->MakeUpdateComponentReturn( 1 );
+    m_installerCacheMgr->ExpectDeleteInstallerIsNotCalled();
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
@@ -186,7 +196,7 @@ TEST_F( TestComponentPackageProcessor, WillRemoveFileWhenDownloadIsSuccesful )
 TEST_F( TestComponentPackageProcessor, WillNotProcessComponentPackageIfNotInitialized )
 {
     SetupComponentPackage();
-    m_cloud->ExpectDownloadFileIsNotCalled();
+    m_eventPublisher->ExpectSetTokenNotCalled();
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 

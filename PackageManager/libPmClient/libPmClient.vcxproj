@@ -28,6 +28,8 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="ICatalogJsonParser.h" />
     <ClInclude Include="ICatalogListRetriever.h" />
+    <ClInclude Include="IInstallerCacheManager.h" />
+    <ClInclude Include="InstallerCacheManager.h" />
     <ClInclude Include="IPackageDiscoveryManager.h" />
     <ClInclude Include="IUcUpgradeEventHandler.h" />
     <ClInclude Include="PackageDiscoveryManager.h" />
@@ -67,6 +69,7 @@
     <ClCompile Include="CheckinFormatter.cpp" />
     <ClCompile Include="CheckinManifestRetriever.cpp" />
     <ClCompile Include="ComponentPackageProcessor.cpp" />
+    <ClCompile Include="InstallerCacheManager.cpp" />
     <ClCompile Include="ManifestProcessor.cpp" />
     <ClCompile Include="PackageConfigProcessor.cpp" />
     <ClCompile Include="PackageDiscoveryManager.cpp" />

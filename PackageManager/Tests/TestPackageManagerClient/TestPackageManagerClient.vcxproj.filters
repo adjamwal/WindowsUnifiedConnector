@@ -48,5 +48,8 @@
     <ClCompile Include="TestCatalogJsonParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestInstallerCacheManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

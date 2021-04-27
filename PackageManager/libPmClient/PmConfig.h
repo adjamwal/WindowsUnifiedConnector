@@ -6,6 +6,7 @@
 
 #define PM_CONFIG_LOGLEVEL_DEFAULT 7
 #define PM_CONFIG_INTERVAL_DEFAULT 300000
+#define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
 
 class IFileUtil;
 
@@ -18,6 +19,7 @@ struct PmConfigData
     uint32_t intervalMs;
     uint32_t maxDelayMs;
     uint32_t log_level;
+    uint32_t maxFileCacheAge;
 };
 
 class PmConfig : public IPmConfig
@@ -38,6 +40,7 @@ public:
     uint32_t GetCloudCheckinIntervalMs() override;
     uint32_t GetLogLevel() override;
     const std::vector<PmComponent>& GetSupportedComponentList() override;
+    uint32_t GetMaxFileCacheAge() override;
 
 private:
     IFileUtil& m_fileUtil;
