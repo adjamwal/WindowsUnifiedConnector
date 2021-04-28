@@ -7,8 +7,9 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>56782fa8-1d79-4a65-99fe-87d552f23304</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>TestPackage</OutputName>
+    <OutputName>TestPackageA</OutputName>
     <OutputType>Package</OutputType>
+    <Name>TestPackageA</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
