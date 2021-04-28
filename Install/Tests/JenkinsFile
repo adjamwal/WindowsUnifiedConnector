@@ -81,10 +81,10 @@ pipeline {
 				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
 				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
 				
-				bat "RENAME TestPackage\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-1.0.0.0.msi"
-				bat "RENAME TestPackage\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-1.0.0.0.msi"
-                bat "RENAME TestPackage\\bin\\x86\\Release\\TestPackageB.msi TestPackageB-x86-1.0.0.0.msi"
-				bat "RENAME TestPackage\\bin\\x64\\Release\\TestPackageB.msi TestPackageB-x64-1.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-1.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-1.0.0.0.msi"
+                bat "RENAME TestPackageB\\bin\\x86\\Release\\TestPackageB.msi TestPackageB-x86-1.0.0.0.msi"
+				bat "RENAME TestPackageB\\bin\\x64\\Release\\TestPackageB.msi TestPackageB-x64-1.0.0.0.msi"
 				bat "RENAME TestPackageBootstrapper\\bin\\Release\\TestPackageBootstrapper.exe TestPackageBootstrapper-1.0.0.0.exe"
               }
               
@@ -107,10 +107,10 @@ pipeline {
 				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
 				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
                 
-				bat "RENAME TestPackage\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-2.0.0.0.msi"
-				bat "RENAME TestPackage\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-2.0.0.0.msi"
-                bat "RENAME TestPackage\\bin\\x64\\Release\\TestPackageB.msi TestPackageB-x64-2.0.0.0.msi"
-				bat "RENAME TestPackage\\bin\\x86\\Release\\TestPackageB.msi TestPackageB-x86-2.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-2.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-2.0.0.0.msi"
+                bat "RENAME TestPackageB\\bin\\x64\\Release\\TestPackageB.msi TestPackageB-x64-2.0.0.0.msi"
+				bat "RENAME TestPackageB\\bin\\x86\\Release\\TestPackageB.msi TestPackageB-x86-2.0.0.0.msi"
 				bat "RENAME TestPackageBootstrapper\\bin\\Release\\TestPackageBootstrapper.exe TestPackageBootstrapper-2.0.0.0.exe"
               }
               
