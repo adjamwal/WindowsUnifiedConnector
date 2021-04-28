@@ -66,6 +66,14 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
+    <ProjectReference Include="..\..\UCID\UCID.vcxproj">
+      <Name>UCID _UCID\UCID_</Name>
+      <Project>{d25927eb-2f30-41bf-b338-8d06e1bd0a54}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\..\UC\UCService\UCService.vcxproj">
       <Name>UCService</Name>
       <Project>{ed56f555-f214-4b00-805e-e6564e9c1bf2}</Project>
