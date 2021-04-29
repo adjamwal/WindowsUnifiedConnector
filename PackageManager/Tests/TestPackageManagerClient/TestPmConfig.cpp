@@ -40,7 +40,8 @@ protected:
         "loglevel": 7,
         "CheckinInterval": 150000,
         "MaxStartupDelay": 200000,
-        "maxFileCacheAge_s": 1000
+        "maxFileCacheAge_s": 1000,
+		"AllowPostInstallReboots": true
     }
 }
 )";
@@ -189,7 +190,8 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProv
     "pm": {
         "loglevel": 7,
         "CheckinInterval": 150000,
-        "MaxStartupDelay": 200000
+        "MaxStartupDelay": 200000,
+		"AllowPostInstallReboots": true
     }
 }
 )" );
@@ -205,7 +207,8 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailIfMaxFileCacheAgeIsInvalid )
         "loglevel": 7,
         "CheckinInterval": 150000,
         "MaxStartupDelay": 200000,
-        "maxFileCacheAge_s": "Invalid"
+        "maxFileCacheAge_s": "Invalid",
+		"AllowPostInstallReboots": true
     }
 }
 )" );

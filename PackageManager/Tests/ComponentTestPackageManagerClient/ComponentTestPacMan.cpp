@@ -164,6 +164,7 @@ protected:
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
+        m_mockConfig->MakeAllowPostInstallRebootsReturn( true );
         m_mockCloud->MakeGetReturn( 200 );
         m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
 

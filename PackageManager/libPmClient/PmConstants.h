@@ -8,12 +8,15 @@
 #define UCPM_EVENT_ERROR_COMPONENT_HASH_CALC            0x00000005
 #define UCPM_EVENT_ERROR_COMPONENT_UC_UPDATE            0x00000006
 
-#define UCPM_EVENT_ERROR_CONFIG_DECODE                  0x00000011
-#define UCPM_EVENT_ERROR_CONFIG_CREATE                  0x00000012
-#define UCPM_EVENT_ERROR_CONFIG_WRITE                   0x00000013
-#define UCPM_EVENT_ERROR_CONFIG_DEPLOY                  0x00000014
-#define UCPM_EVENT_ERROR_CONFIG_REMOVE                  0x00000015
-#define UCPM_EVENT_ERROR_CONFIG_RESOLVE                 0x00000016
+#define UCPM_EVENT_ERROR_CONFIG_DECODE                  0x00000010
+#define UCPM_EVENT_ERROR_CONFIG_CREATE                  0x00000011
+#define UCPM_EVENT_ERROR_CONFIG_WRITE                   0x00000012
+#define UCPM_EVENT_ERROR_CONFIG_DEPLOY                  0x00000013
+#define UCPM_EVENT_ERROR_CONFIG_REMOVE                  0x00000014
+#define UCPM_EVENT_ERROR_CONFIG_RESOLVE                 0x00000015
+
+#define UCPM_EVENT_SUCCESS_REBOOT_REQ                   0x00000050
+#define UCPM_EVENT_SUCCESS_REBOOT_INIT                  0x00000051
 
 #define UC_PACKAGE_NAME                                 "uc"
 

@@ -20,6 +20,7 @@ struct PmConfigData
     uint32_t maxDelayMs;
     uint32_t log_level;
     uint32_t maxFileCacheAge;
+    bool allowPostInstallReboots;
 };
 
 class PmConfig : public IPmConfig
@@ -41,6 +42,7 @@ public:
     uint32_t GetLogLevel() override;
     const std::vector<PmComponent>& GetSupportedComponentList() override;
     uint32_t GetMaxFileCacheAge() override;
+    bool AllowPostInstallReboots() override;
 
 private:
     IFileUtil& m_fileUtil;
