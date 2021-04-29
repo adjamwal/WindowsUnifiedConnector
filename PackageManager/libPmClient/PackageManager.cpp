@@ -213,7 +213,7 @@ void PackageManager::PmWorkflowThread()
             }
             else
             { 
-                LOG_DEBUG( "Post-install reboots disabled by PM configuration" );
+                LOG_ERROR( "Post-install reboots disabled by PM configuration" );
             }
         }
     }
