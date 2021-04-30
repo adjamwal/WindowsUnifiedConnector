@@ -285,6 +285,7 @@ int32_t PmHttp::HttpGet( const std::string& url, std::string& response, int32_t 
         return -1;
     }
 
+    response.clear();
     if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
@@ -333,6 +334,7 @@ int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, s
         return -1;
     }
 
+    response.clear();
     if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
