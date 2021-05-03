@@ -232,6 +232,13 @@
                 </RegistryKey>
             </Component>
 
+            <Component Id="UCID_DATA_DIR" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
+                    <RegistryValue Type="string" Name="DataDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
             <Component Id="ucid.exe" Guid="*">
                 <File Id="ucid.exe" Name="ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucid_$(var.Platform).exe" />
             </Component>
