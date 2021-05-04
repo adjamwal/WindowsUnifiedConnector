@@ -328,7 +328,7 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
     EXPECT_TRUE( pass );
 }
 
-TEST_F( ComponentTestPacMan, PacManRebootCodeWillSendRebootEvent )
+TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
 {
     bool pass = false;
     ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
