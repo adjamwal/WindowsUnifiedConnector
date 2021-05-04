@@ -323,7 +323,7 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
 
     EXPECT_TRUE( pass );
 }
@@ -349,7 +349,9 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
+
+    EXPECT_TRUE( pass );
 
     PublishedEventHasExpectedData(
         "",
