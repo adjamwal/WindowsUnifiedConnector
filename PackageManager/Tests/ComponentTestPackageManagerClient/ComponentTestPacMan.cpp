@@ -15,6 +15,7 @@
 #include "ManifestProcessor.h"
 #include "WorkerThread.h"
 #include "PmManifest.h"
+#include "PmConstants.h"
 #include "SslUtil.h"
 
 #include "MockFileUtil.h"
@@ -291,6 +292,71 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
         "uc/0.0.1",
         0,
         "",
+        "",
+        "",
+        0,
+        "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
+        "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+        100
+    );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
+{
+    bool pass = false;
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+
+    m_mockFileUtil->MakeFileExistsReturn( true );
+    m_mockFileUtil->MakeFileSizeReturn( 100 );
+    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const PmComponent& package, std::string& error )
+        {
+            pass = true;
+            m_cv.notify_one();
+            return ERROR_SUCCESS_REBOOT_REQUIRED;
+        } ) );
+    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).Times( 1 );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+
+    EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacMan, PacManRebootCodeWillSendRebootEvent )
+{
+    bool pass = false;
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+
+    m_mockFileUtil->MakeFileExistsReturn( true );
+    m_mockFileUtil->MakeFileSizeReturn( 100 );
+    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const PmComponent& package, std::string& error )
+        {
+            pass = true;
+            m_cv.notify_one();
+            return ERROR_SUCCESS_REBOOT_REQUIRED;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+
+    PublishedEventHasExpectedData(
+        "",
+        pkginstall,
+        "uc/0.0.1",
+        UCPM_EVENT_SUCCESS_REBOOT_REQ,
+        "Reboot required event",
         "",
         "",
         0,
