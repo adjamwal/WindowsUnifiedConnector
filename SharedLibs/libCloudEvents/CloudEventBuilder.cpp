@@ -256,7 +256,7 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
             "'" << m_newHash << "' ?= '" << other.m_newHash << "', " <<
             "'" << m_newSize << "' ?= '" << other.m_newSize << "'";
 
-        LOG_ERROR( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
+        LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
     }
 
     return result;
