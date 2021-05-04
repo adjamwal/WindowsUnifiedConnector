@@ -318,12 +318,12 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
             m_cv.notify_one();
             return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
-    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).Times( 1 );
 
     StartPacMan();
+    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).Times( 1 );
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
     EXPECT_TRUE( pass );
 }
@@ -349,7 +349,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 10 ) );
 
     EXPECT_TRUE( pass );
 
