@@ -328,7 +328,7 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
     EXPECT_TRUE( pass );
 }
 
-TEST_F( ComponentTestPacMan, DISABLED_PacManWillSendRebootEventWhenRebootIsFlagged )
+TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
 {
     bool pass = false;
     ON_CALL( *m_mockCloud, Checkin( _, _ ) ).
@@ -350,9 +350,10 @@ TEST_F( ComponentTestPacMan, DISABLED_PacManWillSendRebootEventWhenRebootIsFlagg
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 10 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
     EXPECT_TRUE( pass );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ) );
 
     PublishedEventHasExpectedData(
         "",
