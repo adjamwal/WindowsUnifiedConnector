@@ -314,13 +314,17 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const PmComponent& package, std::string& error )
         {
-            pass = true;
-            m_cv.notify_one();
             return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
 
+    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
+        [this, &pass]()
+        {
+            pass = true;
+            m_cv.notify_one();
+        } ) );
+
     StartPacMan();
-    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).Times( 1 );
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
@@ -342,9 +346,14 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const PmComponent& package, std::string& error )
         {
+            return ERROR_SUCCESS_REBOOT_REQUIRED;
+        } ) );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
+        [this, &pass]()
+        {
             pass = true;
             m_cv.notify_one();
-            return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
 
     StartPacMan();
@@ -353,7 +362,6 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
 
     EXPECT_TRUE( pass );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ) );
 
     PublishedEventHasExpectedData(
         "",
