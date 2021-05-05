@@ -283,6 +283,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 
@@ -328,6 +329,7 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -360,6 +362,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 
@@ -433,6 +436,7 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -461,6 +465,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -489,6 +494,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -535,6 +541,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -612,6 +619,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( packageUpdated && configUpdated );
 
@@ -775,6 +783,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
 
                             std::unique_lock<std::mutex> lock( m_mutex );
                             m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+                            lock.unlock();
 
                             EXPECT_EQ( 2, packageUpdated );
                             EXPECT_EQ( 4, configUpdated );
@@ -850,6 +859,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( packageUpdated && configUpdated );
 }
@@ -878,6 +888,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
 //    std::this_thread::sleep_for( std::chrono::microseconds( 4000 ) );
 
@@ -901,6 +912,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -921,6 +933,7 @@ TEST_F( ComponentTestPacMan, PacManWillPruneInstallers )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
