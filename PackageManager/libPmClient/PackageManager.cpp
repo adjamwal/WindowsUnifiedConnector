@@ -166,6 +166,8 @@ void PackageManager::PmWorkflowThread()
     }
 
     PackageInventory inventory;
+    bool isRebootRequired = false;
+
     try {
         m_packageDiscoveryManager.DiscoverPackages( inventory );
     }
@@ -186,7 +188,7 @@ void PackageManager::PmWorkflowThread()
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
 
-        if( !m_manifestProcessor.ProcessManifest( manifest ) )
+        if( !m_manifestProcessor.ProcessManifest( manifest, isRebootRequired ) )
         {
             LOG_ERROR( "ProcessManifest failed" );
         }
@@ -198,11 +200,22 @@ void PackageManager::PmWorkflowThread()
         LOG_ERROR( "Checkin failed: Unknown exception" );
     }
 
-
     try {
         LOG_DEBUG( "Post Checkin Steps" );
         m_cloudEventPublisher.PublishFailedEvents();
         m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAge() );
+
+        if( isRebootRequired )
+        {
+            if( m_config.AllowPostInstallReboots() ) 
+            {
+                m_dependencies->ComponentManager().InitiateSystemRestart();
+            }
+            else
+            { 
+                LOG_ERROR( "Post-install reboots disabled by PM configuration" );
+            }
+        }
     }
     catch ( std::exception& ex ) {
         LOG_ERROR( "Post Checkin failed: %s", ex.what() );
@@ -210,7 +223,6 @@ void PackageManager::PmWorkflowThread()
     catch ( ... ) {
         LOG_ERROR( "Post Checkin failed: Unknown exception" );
     }
-
 }
 
 bool PackageManager::LoadBsConfig()

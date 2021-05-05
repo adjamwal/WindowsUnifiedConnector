@@ -133,3 +133,22 @@ BOOL WinApiWrapper::FindClose(
     return ::FindClose(
         hFindFile );
 }
+
+BOOL WinApiWrapper::InitiateSystemShutdownExA(
+    LPSTR lpMachineName,
+    LPSTR lpMessage,
+    DWORD dwTimeout,
+    BOOL  bForceAppsClosed,
+    BOOL  bRebootAfterShutdown,
+    DWORD dwReason
+)
+{
+    return ::InitiateSystemShutdownExA(
+        lpMachineName,
+        lpMessage,
+        dwTimeout,
+        bForceAppsClosed,
+        bRebootAfterShutdown,
+        dwReason
+    );
+}

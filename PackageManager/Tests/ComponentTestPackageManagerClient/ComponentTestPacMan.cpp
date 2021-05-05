@@ -15,6 +15,7 @@
 #include "ManifestProcessor.h"
 #include "WorkerThread.h"
 #include "PmManifest.h"
+#include "PmConstants.h"
 #include "SslUtil.h"
 
 #include "MockFileUtil.h"
@@ -164,6 +165,7 @@ protected:
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
+        m_mockConfig->MakeAllowPostInstallRebootsReturn( true );
         m_mockCloud->MakeGetReturn( 200 );
         m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
 
@@ -281,6 +283,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 
@@ -290,6 +293,85 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
         "uc/0.0.1",
         0,
         "",
+        "",
+        "",
+        0,
+        "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
+        "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
+        100
+    );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
+{
+    bool pass = false;
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+
+    m_mockFileUtil->MakeFileExistsReturn( true );
+    m_mockFileUtil->MakeFileSizeReturn( 100 );
+    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const PmComponent& package, std::string& error )
+        {
+            return ERROR_SUCCESS_REBOOT_REQUIRED;
+        } ) );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
+        [this, &pass]()
+        {
+            pass = true;
+            m_cv.notify_one();
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
+
+    EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
+{
+    bool pass = false;
+    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).
+        WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+
+    m_mockFileUtil->MakeFileExistsReturn( true );
+    m_mockFileUtil->MakeFileSizeReturn( 100 );
+    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
+        [this, &pass]( const PmComponent& package, std::string& error )
+        {
+            return ERROR_SUCCESS_REBOOT_REQUIRED;
+        } ) );
+
+    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
+        [this, &pass]()
+        {
+            pass = true;
+            m_cv.notify_one();
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
+
+    EXPECT_TRUE( pass );
+
+    PublishedEventHasExpectedData(
+        "",
+        pkginstall,
+        "uc/0.0.1",
+        UCPM_EVENT_SUCCESS_REBOOT_REQ,
+        "Reboot required event",
         "",
         "",
         0,
@@ -354,6 +436,7 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -382,6 +465,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -410,6 +494,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -456,6 +541,7 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -533,6 +619,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( packageUpdated && configUpdated );
 
@@ -696,6 +783,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
 
                             std::unique_lock<std::mutex> lock( m_mutex );
                             m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+                            lock.unlock();
 
                             EXPECT_EQ( 2, packageUpdated );
                             EXPECT_EQ( 4, configUpdated );
@@ -771,6 +859,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( packageUpdated && configUpdated );
 }
@@ -799,6 +888,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
 //    std::this_thread::sleep_for( std::chrono::microseconds( 4000 ) );
 
@@ -822,6 +912,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }
@@ -842,6 +933,7 @@ TEST_F( ComponentTestPacMan, PacManWillPruneInstallers )
 
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 
     EXPECT_TRUE( pass );
 }

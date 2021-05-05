@@ -62,6 +62,9 @@ public:
     void MakeGetMaxFileCacheAgeReturn( uint32_t value );
     void ExpectGetMaxFileCacheAgeIsNotCalled();
 
+    MOCK_METHOD0( AllowPostInstallReboots, bool() );
+    void MakeAllowPostInstallRebootsReturn( bool value );
+
 private:
     std::string m_identifyUri;
     std::string m_checkinUri;

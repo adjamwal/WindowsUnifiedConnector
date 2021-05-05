@@ -197,3 +197,18 @@ int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::
 {
     return WindowsUtilities::FileSearchWithWildCard( searchPath, results );
 }
+
+void WindowsComponentManager::InitiateSystemRestart()
+{
+    const char* lpMessage = "A Cisco Unified Connector package update has requested a reboot";
+    m_winApiWrapper.InitiateSystemShutdownExA(
+        /*lpMachineName*/           NULL, 
+        /*lpMessage*/               (LPSTR)lpMessage, //message to log in Event Viewer
+        /*dwTimeout*/               0, //prevent aborting the reboot
+        /*bForceAppsClosed*/        false, //user prompted to save any pending work
+        /*bRebootAfterShutdown*/    true,
+        /*dwReason*/                SHTDN_REASON_MAJOR_SOFTWARE | 
+                                    SHTDN_REASON_MINOR_INSTALLATION | 
+                                    SHTDN_REASON_FLAG_PLANNED
+    );
+}
