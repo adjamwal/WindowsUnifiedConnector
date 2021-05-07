@@ -25,14 +25,14 @@ std::string CatalogListRetriever::GetCloudCatalog()
 
     if( httpStatusResponse != 200 ) {
         if( httpStatusResponse != 401 ) {
-            HandleHttpError( httpStatusResponse );
+            ThrowHttpError( httpStatusResponse );
         }
         else {
             m_ucidAdapter.Refresh();
             httpStatusResponse = InternalGetCloudCatalogFrom( uri, catalogData );
 
             if( httpStatusResponse != 200 ) {
-                HandleHttpError( httpStatusResponse );
+                ThrowHttpError( httpStatusResponse );
             }
         }
     }
@@ -58,9 +58,8 @@ int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std
     return httpStatusResponse;
 }
 
-void CatalogListRetriever::HandleHttpError( int32_t httpStatusResponse )
+void CatalogListRetriever::ThrowHttpError( int32_t httpStatusResponse )
 {
-    std::string s = __FUNCTION__ ": Http Get status ";
-    s += std::to_string( httpStatusResponse );
+    std::string s = __FUNCTION__ ": Http Get status " + std::to_string( httpStatusResponse );
     throw std::exception( s.c_str() );
 }
