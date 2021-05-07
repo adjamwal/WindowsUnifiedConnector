@@ -41,12 +41,14 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="MockMsiApi.h" />
     <ClInclude Include="MockWinApiWrapper.h" />
     <ClInclude Include="MockWindowsUtilities.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FakeWindowsUtilities.cpp" />
+    <ClCompile Include="MockMsiApi.cpp" />
     <ClCompile Include="MockWinApiWrapper.cpp" />
     <ClCompile Include="MockWindowsUtilities.cpp" />
     <ClCompile Include="pch.cpp">

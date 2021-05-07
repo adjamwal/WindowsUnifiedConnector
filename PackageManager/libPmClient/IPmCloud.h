@@ -17,6 +17,7 @@ public:
     virtual void SetUserAgent( const std::string& userAgent ) = 0;
     virtual void SetShutdownFunc( std::function<bool()> shutdownFunc ) = 0;
     virtual int32_t Checkin( const std::string& payload, std::string& response ) = 0;
-    virtual int32_t Post( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t& httpReturn ) = 0;
+    virtual int32_t Get( const std::string& url, std::string& response, int32_t& httpReturn ) = 0;
+    virtual int32_t Post( const std::string& url, void* payload, size_t payloadSize, std::string& response, int32_t& httpReturn ) = 0;
     virtual int32_t DownloadFile( const std::string& uri, const std::string filename ) = 0;
 };

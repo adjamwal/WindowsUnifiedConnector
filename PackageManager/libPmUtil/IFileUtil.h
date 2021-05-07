@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 struct FileUtilHandle;
 
@@ -22,5 +23,7 @@ public:
     virtual int32_t Rename( const std::string& oldFilename, const std::string& newName ) = 0;
     virtual bool FileExists( const std::string& filename ) = 0;
     virtual size_t FileSize( const std::string& filename ) = 0;
+    virtual std::filesystem::file_time_type FileTime( const std::string& filename ) = 0;
     virtual std::string AppendPath( const std::string& basePath, const std::string& configPath ) = 0;
+    virtual time_t LastWriteTime( const std::string& filename ) = 0;
 };

@@ -19,11 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CatalogJsonParser.h" />
+    <ClInclude Include="CatalogListRetriever.h" />
     <ClInclude Include="CertsAdapter.h" />
     <ClInclude Include="CheckinFormatter.h" />
     <ClInclude Include="CheckinManifestRetriever.h" />
     <ClInclude Include="ComponentPackageProcessor.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ICatalogJsonParser.h" />
+    <ClInclude Include="ICatalogListRetriever.h" />
+    <ClInclude Include="IInstallerCacheManager.h" />
+    <ClInclude Include="InstallerCacheManager.h" />
     <ClInclude Include="IPackageDiscoveryManager.h" />
     <ClInclude Include="IUcUpgradeEventHandler.h" />
     <ClInclude Include="PackageDiscoveryManager.h" />
@@ -57,10 +63,13 @@
     <ClInclude Include="UcUpgradeEventHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CatalogJsonParser.cpp" />
+    <ClCompile Include="CatalogListRetriever.cpp" />
     <ClCompile Include="CertsAdapter.cpp" />
     <ClCompile Include="CheckinFormatter.cpp" />
     <ClCompile Include="CheckinManifestRetriever.cpp" />
     <ClCompile Include="ComponentPackageProcessor.cpp" />
+    <ClCompile Include="InstallerCacheManager.cpp" />
     <ClCompile Include="ManifestProcessor.cpp" />
     <ClCompile Include="PackageConfigProcessor.cpp" />
     <ClCompile Include="PackageDiscoveryManager.cpp" />
@@ -147,7 +156,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -164,7 +173,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -181,7 +190,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -198,7 +207,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>CURL_STATICLIB;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

@@ -44,22 +44,6 @@ protected:
     std::unique_ptr<PmHttp> m_patient;
 };
 
-TEST_F( ComponentTestPmHttp, DISABLED__CanPostToCheckinURL )
-{
-    std::string response;
-    int32_t rtn = 0;
-
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
-    m_patient->SetToken( "v2.public.eyJVQ0lEIjoiNDI2Y2JjMjYtOTlmMS00ZTA1LTgzMTYtMmVkN2YwODk4OGYyIiwiYmlkIjoiZGVtby1idXMtaWQiLCJleHAiOiIyMDIwLTEwLTE2VDE3OjUxOjEzWiIsImlhdCI6IjIwMjAtMTAtMTZUMTc6NDY6MTNaIiwiaXNzIjoiQ2lzY28gSWRlbnRpdHkgU2VydmljZXMiLCJqdGkiOiIxNjAyODcwMzczLjE2MDI4NzAzNzMxNzc4OTgxNjYuMTExMTI4MDc2MTQ3MjYyODMiLCJuYmYiOiIyMDIwLTEwLTE2VDE3OjQ2OjEzWiJ9XuVulBsLgElQyA4S6NL4RuG7_6uKzkiiNyYa5jbSYx-rRQ4dPlsTLd5IFes1RzFUm7PVwxwJdeF5QfgY4BGGAg.eyJraWQiOiJrZXktZCJ9" );
-    
-    // TODO: Will need to change this to the real thing
-    m_patient->HttpPost( "https://z0w2hzsjcg.execute-api.us-west-1.amazonaws.com/dev/checkin", ( void* )"{}", 3, response, rtn );
-
-    // Expect 403 because the token has expired
-    EXPECT_EQ( rtn, 403 );
-}
-
 TEST_F( ComponentTestPmHttp, GetTest )
 {
     std::string response;
@@ -69,7 +53,6 @@ TEST_F( ComponentTestPmHttp, GetTest )
     m_patient->SetCerts( m_certList );
 
     m_patient->HttpGet( "https://postman-echo.com/get?foo1=bar1&foo2=bar2", response, rtn );
-    printf( "%s\n", response.c_str() );
     EXPECT_EQ( rtn, 200 );
 }
 
@@ -84,7 +67,6 @@ TEST_F( ComponentTestPmHttp, PostTest )
     
     m_patient->HttpPost( "https://postman-echo.com/post", ( void* )data.c_str(), data.length(), response, rtn );
 
-    printf( "%s\n", response.c_str() );
     EXPECT_EQ( rtn, 200 );
 }
 
@@ -100,9 +82,6 @@ TEST_F( ComponentTestPmHttp, DownloadTest )
     EXPECT_CALL( *m_fileUtil, PmCreateFile( _ ) ).WillOnce( Return( ( FileUtilHandle* )1) );
     ON_CALL( *m_fileUtil, AppendFile( _, _, _ ) ).WillByDefault( Invoke( []( FileUtilHandle* handle, void* data, size_t dataLen )
         {
-            if( data && dataLen ) {
-                printf( "%s\n", ( const char* )data );
-            }
             return dataLen;
         } ) );
     EXPECT_CALL( *m_fileUtil, CloseFile( _ ) );
@@ -140,4 +119,33 @@ TEST_F( ComponentTestPmHttp, HttpPostBlankProtocalIsNotValid )
     methodRtn = m_patient->HttpPost( "postman-echo.com/post", (void*)data.c_str(), data.length(), response, rtn );
 
     EXPECT_NE( methodRtn, 0 );
+}
+
+TEST_F( ComponentTestPmHttp, GetWillClearResponse)
+{
+    std::string badText = "Invalid Text";
+    std::string response = badText;
+    int32_t rtn = 0;
+
+    m_patient->Init( NULL, NULL, "" );
+    m_patient->SetCerts( m_certList );
+
+    m_patient->HttpGet( "https://postman-echo.com/get?foo1=bar1&foo2=bar2", response, rtn );
+
+    EXPECT_NE( response.find( badText ), 0 );
+}
+
+TEST_F( ComponentTestPmHttp, PostWillClearResponse )
+{
+    std::string badText = "Invalid Text";
+    std::string response = badText;
+    std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
+    int32_t rtn = 0;
+
+    m_patient->Init( NULL, NULL, "" );
+    m_patient->SetCerts( m_certList );
+
+    m_patient->HttpPost( "https://postman-echo.com/post", ( void* )data.c_str(), data.length(), response, rtn );
+
+    EXPECT_NE( response.find( badText ), 0 );
 }

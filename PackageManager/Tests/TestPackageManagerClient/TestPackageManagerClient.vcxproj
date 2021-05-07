@@ -19,9 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="TestCatalogJsonParser.cpp" />
+    <ClCompile Include="TestCatalogListRetriever.cpp" />
     <ClCompile Include="TestCheckinFormatter.cpp" />
     <ClCompile Include="TestCheckinManifestRetriever.cpp" />
     <ClCompile Include="TestComponentPackageProcessor.cpp" />
+    <ClCompile Include="TestInstallerCacheManager.cpp" />
     <ClCompile Include="TestManifestProcessor.cpp" />
     <ClCompile Include="TestPackageConfigProcessor.cpp" />
     <ClCompile Include="TestPackageInventoryProvider.cpp" />

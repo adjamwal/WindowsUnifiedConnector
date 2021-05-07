@@ -25,6 +25,11 @@
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
 
+        <InstallExecuteSequence>
+            <ScheduleReboot After="InstallFinalize">SR</ScheduleReboot>
+            <ForceReboot After="InstallInitialize">FR</ForceReboot>
+        </InstallExecuteSequence>
+
         <Condition Message="Failed">NOT FAIL</Condition>
 	</Product>
 

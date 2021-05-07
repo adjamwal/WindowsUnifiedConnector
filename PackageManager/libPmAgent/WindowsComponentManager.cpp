@@ -4,7 +4,6 @@
 #include <sstream>
 #include <locale>
 #include <codecvt>
-#include <filesystem>
 
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, 
     ICodesignVerifier& codesignVerifier, 
@@ -13,18 +12,20 @@ WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
     , m_codeSignVerifier( codesignVerifier )
     , m_packageDiscovery( packageDiscovery )
 {
-
 }
 
-WindowsComponentManager::~WindowsComponentManager()
-{
+WindowsComponentManager::~WindowsComponentManager() { }
 
+int32_t WindowsComponentManager::GetInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered )
+{
+    packagesDiscovered = m_packageDiscovery.DiscoverInstalledPackages( catalogRules );
+
+    return 0;
 }
 
-int32_t WindowsComponentManager::GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList, 
-    PackageInventory& packages )
+int32_t WindowsComponentManager::GetCachedInventory( PackageInventory& cachedInventory )
 {
-    packages = m_packageDiscovery.GetInstalledPackages( discoveryList );
+    cachedInventory = m_packageDiscovery.CachedInventory();
 
     return 0;
 }
@@ -41,7 +42,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     CodesignStatus status = m_codeSignVerifier.Verify( 
-        converter.from_bytes( package.installerPath ),
+        converter.from_bytes( package.downloadedInstallerPath ),
         converter.from_bytes( package.signerName ), 
         SIGTYPE_DEFAULT );
 
@@ -50,18 +51,18 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
         if ( package.installerType == "exe" )
         {
             std::string exeCmdline;
-            size_t idx = package.installerPath.find_last_of( '\\' );
+            size_t idx = package.downloadedInstallerPath.find_last_of( '\\' );
             if( idx != std::string::npos ) {
-                exeCmdline = package.installerPath.substr( idx + 1 );
+                exeCmdline = package.downloadedInstallerPath.substr( idx + 1 );
             }
             else {
-                exeCmdline = package.installerPath;
+                exeCmdline = package.downloadedInstallerPath;
             }
 
             exeCmdline += " ";
             exeCmdline += package.installerArgs;
 
-            ret = RunPackage( package.installerPath, exeCmdline, error );
+            ret = RunPackage( package.downloadedInstallerPath, exeCmdline, error );
         }
         else if ( package.installerType == "msi" )
         {
@@ -71,14 +72,14 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
             if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
                 std::string logFilePath = converter.to_bytes(WindowsUtilities::GetLogDir());
-                std::string logFileName = package.packageNameAndVersion;
+                std::string logFileName = package.productAndVersion;
 
                 std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
                 logFilePath.append( "\\" ).append( logFileName ).append(".log");
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.installerPath + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
+                msiCmdline = " /package \"" + package.downloadedInstallerPath + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }
@@ -135,21 +136,7 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
 
 std::string WindowsComponentManager::ResolvePath( const std::string& basePath )
 {
-    size_t begin = basePath.find( "<FOLDERID_" );
-    if( begin != std::string::npos ) {
-        size_t end = basePath.find( ">", begin + strlen( "<FOLDERID_" ) );
-        if( end != std::string::npos ) {
-            begin;
-
-            std::string knownFolder = WindowsUtilities::ResolveKnownFolderId( basePath.substr( begin + 1, end - (begin + 1 ) ) );
-            if( !knownFolder.empty() ) {
-                knownFolder = basePath.substr( 0, begin ) + knownFolder + basePath.substr( end + 1 );
-                return knownFolder;
-            }
-        }
-    }
-
-    return basePath;
+    return WindowsUtilities::ResolvePath( basePath );
 }
 
 int32_t WindowsComponentManager::RunPackage( std::string executable, std::string cmdline, std::string& error )
@@ -204,4 +191,24 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     }
 
     return ret;
+}
+
+int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results )
+{
+    return WindowsUtilities::FileSearchWithWildCard( searchPath, results );
+}
+
+void WindowsComponentManager::InitiateSystemRestart()
+{
+    const char* lpMessage = "A Cisco Unified Connector package update has requested a reboot";
+    m_winApiWrapper.InitiateSystemShutdownExA(
+        /*lpMachineName*/           NULL, 
+        /*lpMessage*/               (LPSTR)lpMessage, //message to log in Event Viewer
+        /*dwTimeout*/               0, //prevent aborting the reboot
+        /*bForceAppsClosed*/        false, //user prompted to save any pending work
+        /*bRebootAfterShutdown*/    true,
+        /*dwReason*/                SHTDN_REASON_MAJOR_SOFTWARE | 
+                                    SHTDN_REASON_MINOR_INSTALLATION | 
+                                    SHTDN_REASON_FLAG_PLANNED
+    );
 }

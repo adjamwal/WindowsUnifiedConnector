@@ -14,6 +14,8 @@ class IPackageDiscoveryManager;
 class ICheckinFormatter;
 class IUcidAdapter;
 class ICertsAdapter;
+class ICatalogJsonParser;
+class ICatalogListRetriever;
 class ICheckinManifestRetriever;
 class IComponentPackageProcessor;
 class IPackageConfigProcessor;
@@ -23,6 +25,7 @@ class ICloudEventStorage;
 class ICloudEventBuilder;
 class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
+class IInstallerCacheManager;
 
 class PackageManagerContainer
 {
@@ -37,11 +40,11 @@ private:
     std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;
+    std::unique_ptr<IInstallerCacheManager> m_installeracheMgr;
     std::unique_ptr<IPmConfig> m_config;
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
-    std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
@@ -51,7 +54,10 @@ private:
     std::unique_ptr<ICloudEventBuilder> m_ucUpgradeEventBuilder;
     std::unique_ptr<ICloudEventStorage> m_ucUpgradeEventStorage;
     std::unique_ptr<IUcUpgradeEventHandler> m_ucUpgradeEventHandler;
+    std::unique_ptr<ICatalogJsonParser> m_catalogJsonParser;
+    std::unique_ptr<ICatalogListRetriever> m_catalogListRetriever;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
+    std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;

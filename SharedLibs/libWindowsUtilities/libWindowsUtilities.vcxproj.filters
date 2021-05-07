@@ -30,6 +30,12 @@
     <ClInclude Include="IWinApiWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IMsiApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsiApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -39,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinApiWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MsiApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

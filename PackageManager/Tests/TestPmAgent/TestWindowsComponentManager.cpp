@@ -74,11 +74,11 @@ protected:
 
 TEST_F( TestWindowsComponentManager, WillGetInstalledPackages )
 {
-    EXPECT_CALL( *m_packageDiscovery, GetInstalledPackages( _ ) );
+    EXPECT_CALL( *m_packageDiscovery, DiscoverInstalledPackages( _ ) );
 
-    std::vector<PmDiscoveryComponent> discoveryList;
+    std::vector<PmProductDiscoveryRules> catalogRules;
     PackageInventory foundPackages;
-    m_patient->GetInstalledPackages( discoveryList, foundPackages );
+    m_patient->GetInstalledPackages( catalogRules, foundPackages );
 }
 
 TEST_F( TestWindowsComponentManager, WillCodeSignVerifyOnUpdateComponent )
@@ -122,8 +122,8 @@ TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeToCmdLine )
     PmComponent c;
     c.installerType = "exe";
     c.installerArgs = " /args";
-    c.installerPath = "update.exe";
-    std::string expectedCmdLine = c.installerPath + " " + c.installerArgs;
+    c.downloadedInstallerPath = "update.exe";
+    std::string expectedCmdLine = c.downloadedInstallerPath + " " + c.installerArgs;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
 
@@ -141,7 +141,7 @@ TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeAndDropPath )
     c.installerType = "exe";
     c.installerArgs = " /args";
     std::string updateExe = "update.exe";
-    c.installerPath = "path\\" + updateExe;
+    c.downloadedInstallerPath = "path\\" + updateExe;
     std::string expectedCmdLine = updateExe + " " + c.installerArgs;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
@@ -306,61 +306,20 @@ TEST_F( TestWindowsComponentManager, DeployConfigurationSuccess )
 
 TEST_F( TestWindowsComponentManager, GetInstalledPackagesSucceed )
 {
+    std::vector<PmProductDiscoveryRules> catalogRules;
     PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
 
-    int32_t ret = m_patient->GetInstalledPackages( discoveryList, installedPackages );
+    int32_t ret = m_patient->GetInstalledPackages( catalogRules, installedPackages );
 
     EXPECT_EQ( ret, 0 );
 }
 
 TEST_F( TestWindowsComponentManager, GetInstalledPackagesWillSearchForPackages )
 {
+    std::vector<PmProductDiscoveryRules> catalogRules;
     PackageInventory installedPackages;
-    std::vector<PmDiscoveryComponent> discoveryList;
 
-    EXPECT_CALL( *m_packageDiscovery, GetInstalledPackages( _ ) );
+    EXPECT_CALL( *m_packageDiscovery, DiscoverInstalledPackages( _ ) );
 
-    int32_t ret = m_patient->GetInstalledPackages( discoveryList, installedPackages );
-}
-
-TEST_F( TestWindowsComponentManager, WillResolveKnownFolderID )
-{
-    std::string knownFolderString = "_My_KNOWN_FOLDER_";
-
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeResolveKnownFolderIdReturn( knownFolderString );
-
-    std::string rtn = m_patient->ResolvePath( "<FOLDERID_SomeKnownFolder>" );
-    EXPECT_EQ( rtn, knownFolderString );
-}
-
-TEST_F( TestWindowsComponentManager, WillResolveKnownFolderIDWithPrefix )
-{
-    std::string prefix = "prefix";
-    std::string knownFolderString = "_My_KNOWN_FOLDER_";
-    std::string suffix = "suffix";
-
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeResolveKnownFolderIdReturn( knownFolderString );
-
-    std::string rtn = m_patient->ResolvePath( prefix + "<FOLDERID_SomeKnownFolder>" + suffix );
-    EXPECT_EQ( rtn, prefix + knownFolderString + suffix );
-}
-
-TEST_F( TestWindowsComponentManager, WillNotModifyPathWhenKnownFolderIsEmpty )
-{
-    std::string folder = "prefix<FOLDERID_SomeKnownFolder>suffix";
-
-    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolveKnownFolderId( _ ) ).WillOnce( Return( "" ) );
-
-    std::string rtn = m_patient->ResolvePath( folder );
-
-    EXPECT_EQ( rtn, folder );
-}
-
-
-TEST_F( TestWindowsComponentManager, WillNotResolveKnownFolderWhenTagNotFound )
-{
-    MockWindowsUtilities::GetMockWindowUtilities()->ExpectResolveKnownFolderIdIsNotCalled();
-
-    m_patient->ResolvePath( "C:\\Windows\\Somthing" );
+    int32_t ret = m_patient->GetInstalledPackages( catalogRules, installedPackages );
 }

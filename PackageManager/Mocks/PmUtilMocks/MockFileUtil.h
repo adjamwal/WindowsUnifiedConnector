@@ -49,10 +49,20 @@ public:
     void ExpectFileExistsNotCalled();
 
     MOCK_METHOD1( FileSize, size_t( const std::string& ) );
+    void MakeFileSizeReturn( size_t value );
+    void ExpectFileSizeNotCalled();
+
+    MOCK_METHOD1( FileTime, std::filesystem::file_time_type( const std::string& ) );
+    void MakeFileTimeReturn( std::filesystem::file_time_type value );
+    void ExpectFileTimeNotCalled();
 
     MOCK_METHOD2( AppendPath, std::string( const std::string&, const std::string& ) );
     void MakeAppendPathReturn( std::string value );
-    void ExpectAppendPathCalled();
+    void ExpectAppendPathIsNotCalled();
+
+    MOCK_METHOD1( LastWriteTime, time_t( const std::string& ) );
+    void MakeLastWriteTimeReturn( time_t value );
+    void ExpectLastWriteTimeIsNotCalled();
 
 private:
     std::string m_defaultString;

@@ -1,16 +1,16 @@
 #include "pch.h"
 #include "PackageDiscovery.h"
-#include "WindowsUtilities.h"
 #include "PmTypes.h"
 #include "IUcLogger.h"
+#include "StringUtil.h"
+#include "WindowsUtilities.h"
+#include "PackageDiscoveryMethods.h"
 #include <codecvt>
 #include <regex>
 #include "..\..\GlobalVersion.h"
+#include <StringUtil.h>
 
-#define IMMUNET_REG_KEY L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect"
-#define UC_CONFIG_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector\\config"
-
-PackageDiscovery::PackageDiscovery()
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods ) : m_methods( methods )
 {
 }
 
@@ -18,136 +18,117 @@ PackageDiscovery::~PackageDiscovery()
 {
 }
 
-PackageInventory PackageDiscovery::GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList )
+PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules )
 {
-    PackageInventory packages;
+    PackageInventory inventory;
 
-    packages.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
-    packages.platform = "win";
+    inventory.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
+    inventory.platform = "win";
 
-    auto programList = WindowsUtilities::GetInstalledPrograms();
+    for( auto& lookupProduct : catalogRules )
+    {
+        std::vector<PmInstalledPackage> detectedInstallations;
+        ApplyDiscoveryMethods( lookupProduct, detectedInstallations );
+        
+        for( auto& detectedItem : detectedInstallations )
+        {
+            DiscoverPackageConfigurables( lookupProduct.configurables, detectedItem.configs );
 
-    for ( auto& interestingItem : discoveryList ) {
-        if ( interestingItem.packageId == "uc" ) {
-            packages.packages.push_back( BuildUcPackage() );
+            inventory.packages.push_back( detectedItem );
         }
-        else if ( interestingItem.packageId == "Immunet" ) {
-            try {
-                packages.packages.push_back( HackBuildAmpPackage() );
+    }
+
+    m_lastDetectedPackages = inventory;
+
+    return inventory;
+}
+
+PackageInventory PackageDiscovery::CachedInventory()
+{
+    return m_lastDetectedPackages;
+}
+
+void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& lookupProduct,
+    std::vector<PmInstalledPackage>& detectedInstallations )
+{
+    for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery ) {
+        m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
+    }
+
+    for( auto msiRule : lookupProduct.msi_discovery )
+    {
+        m_methods.DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
+    }
+
+    for( auto regRule : lookupProduct.reg_discovery )
+    {
+        m_methods.DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
+    }
+}
+
+void PackageDiscovery::DiscoverPackageConfigurables( 
+    const std::vector<PmProductDiscoveryConfigurable>& configurables, 
+    std::vector<PackageConfigInfo>& packageConfigs )
+{
+    for ( auto& configurable : configurables )
+    {
+        std::string knownFolderId = "";
+        std::string knownFolderIdConversion = "";
+        std::vector<std::filesystem::path> discoveredFiles;
+
+        std::string resolvedPath = WindowsUtilities::ResolvePath( configurable.path );
+
+        if ( resolvedPath != configurable.path )
+        {
+            //Resolved path is deferent which means we must calculate the knownfolderid
+            size_t first = configurable.path.find( "<FOLDERID_" );
+            size_t last = configurable.path.find_first_of( ">" );
+            knownFolderId = configurable.path.substr( first, last + 1);
+            std::string remainingPath = configurable.path.substr( last + 1, configurable.path.length() );
+
+            first = resolvedPath.find( remainingPath );
+
+            knownFolderIdConversion = resolvedPath.substr( 0, first );
+        }
+
+        WindowsUtilities::FileSearchWithWildCard( resolvedPath, discoveredFiles );
+
+        if ( discoveredFiles.size() > configurable.max_instances )
+        {
+            if ( configurable.max_instances == 0 )
+            {
+                discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + 1 );
             }
-            catch ( std::exception ex ) {
-                LOG_ERROR( "Failed to build Amp Package: %s", ex.what() );
+            else
+            {
+                discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + configurable.max_instances );
             }
         }
-        else {
-            for ( auto& program : programList ) {
-                if ( interestingItem.packageName == program.name ) {
-                    PmInstalledPackage discoveredPackage;
+        
+        for ( auto &discoveredFile : discoveredFiles )
+        {
+            PackageConfigInfo configInfo = {};
 
-                    LOG_DEBUG( "Found Matching package %s %s %s",
-                        interestingItem.packageId.c_str(),
-                        program.name.c_str(),
-                        program.version.c_str()
-                    );
+            std::string tempPath = discoveredFile.generic_string();
 
-                    discoveredPackage.packageName = interestingItem.packageId;
-                    discoveredPackage.packageVersion = program.version;
-                    PadBuildNumber( discoveredPackage.packageVersion );
-
-                    packages.packages.push_back( discoveredPackage );
-                    break;
-                }
+            if ( knownFolderId != "" )
+            {
+                //We need to convert the path to include knownfolderid
+                tempPath = tempPath.substr( knownFolderIdConversion.length(), tempPath.length() );
+                tempPath = knownFolderId + tempPath;
             }
-        }
+
+            configInfo.path = tempPath;
+            packageConfigs.push_back( configInfo );
+        }  
     }
-
-    return packages;
-}
-
-void PackageDiscovery::PadBuildNumber( std::string& versionString )
-{
-    while ( std::count( versionString.begin(), versionString.end(), '.' ) < 3 ) {
-        versionString += ".0";
-    }
-}
-
-void ProgramFilesToKnownFolderId( std::string& programFilesString )
-{
-    std::regex programFilesRegex( R"(^[A-Za-z]+:\\Program Files\\)" );
-    programFilesString = std::regex_replace( programFilesString, programFilesRegex, "<FOLDERID_ProgramFiles>\\" );
-}
-
-PmInstalledPackage PackageDiscovery::BuildUcPackage()
-{
-    PmInstalledPackage ucPackage;
-    PackageConfigInfo ucConfig;
-    std::wstring filepath;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
-    ucPackage.packageName = "uc";
-    ucPackage.packageVersion = converter.to_bytes( STRFORMATPRODVER );
-    PadBuildNumber( ucPackage.packageVersion );
-
-    ucConfig.deleteConfig = false;
-
-    // In the package catalog, the config files use known folder IDs intead of an absolute path.
-    // We need to send back the matching values so we convert 'C:\Program Files\' to '<FOLDERID_ProgramFiles>\'
-    filepath.clear();
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"UCID", filepath ) ) {
-        throw( std::exception( "Failed to read UCID reg key" ) );
-    }
-    ucConfig.path = converter.to_bytes( filepath );
-    ProgramFilesToKnownFolderId( ucConfig.path );
-    ucPackage.configs.push_back( ucConfig );
-
-    filepath.clear();
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"UCPM", filepath ) ) {
-        throw( std::exception( "Failed to read UCPM reg key" ) );
-    }
-    ucConfig.path = converter.to_bytes( filepath );
-    ProgramFilesToKnownFolderId( ucConfig.path );
-    ucPackage.configs.push_back( ucConfig );
-
-    filepath.clear();
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UC_CONFIG_REG_KEY, L"Service", filepath ) ) {
-        throw( std::exception( "Failed to read Service reg key" ) );
-    }
-    ucConfig.path = converter.to_bytes( filepath );
-    ProgramFilesToKnownFolderId( ucConfig.path );
-    ucPackage.configs.push_back( ucConfig );
-
-    return ucPackage;
-}
-
-PmInstalledPackage PackageDiscovery::HackBuildAmpPackage()
-{
-    //TODO: This should be redone in Enterprise. The Discovery component should provide information on how
-    // Discover AMP
-    PmInstalledPackage ampPackage;
-    PackageConfigInfo ucConfig;
-    std::wstring displayName;
-    std::wstring displayVersion;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, IMMUNET_REG_KEY, L"DisplayName", displayName ) ) {
-        throw( std::exception( "Failed to read AMP display name" ) );
-    }
-    else if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, IMMUNET_REG_KEY, L"DisplayVersion", displayVersion ) ) {
-        throw( std::exception( "Failed to read AMP display version" ) );
-    }
-    else {
-        if ( ( displayName == L"Immunet" ) || ( displayName == L"Cisco AMP for Endpoints Connector" ) ) {
-            ampPackage.packageName = "Immunet";
-        }
-        else {
-            std::string error = "Unexpected display name: ";
-            error += converter.to_bytes( displayName );;
-            throw( std::exception( error.c_str() ) );
-        }
-
-        ampPackage.packageVersion = converter.to_bytes( displayVersion );
-        PadBuildNumber( ampPackage.packageVersion );
-
-    }
-    return ampPackage;
 }

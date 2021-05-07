@@ -12,7 +12,7 @@ public:
     CheckinManifestRetriever( IPmCloud& cloud, IUcidAdapter& ucidAdapter, ICertsAdapter& certsAdapter );
     virtual ~CheckinManifestRetriever();
 
-    virtual std::string GetCheckinManifestFrom( std::string uri, std::string payload ) override;
+    std::string GetCheckinManifestFrom( std::string uri, std::string payload ) override;
 private:
     IPmCloud& m_cloud;
     IUcidAdapter& m_ucidAdapter;
@@ -20,5 +20,5 @@ private:
     std::mutex m_mutex;
 
     int32_t InternalGetCheckinManifestFrom( std::string& uri, std::string& payload, std::string& response );
-    void HandleHttpError( int32_t respStatus );
+    void ThrowHttpError( int32_t respStatus );
 };

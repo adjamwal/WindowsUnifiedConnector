@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+#include <chrono>
 
 struct FileUtilHandle
 {
@@ -82,6 +83,9 @@ FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
         WLOG_ERROR( L"filename is empty" );
     }
     else {
+        ::std::filesystem::path target( filename );
+        ::std::filesystem::create_directories( target.parent_path() );
+
         handle = ( FileUtilHandle* )malloc( sizeof( FileUtilHandle ) );
         errno_t rtn = fopen_s( &handle->file, filename.c_str(), "wb" );
         if( rtn != 0 ) {
@@ -143,7 +147,19 @@ std::string FileUtil::GetTempDir()
 
 int32_t FileUtil::DeleteFile( const std::string& filename )
 {
-    return ( FileExists( filename ) && ::std::filesystem::remove( ::std::filesystem::path( filename ) ) ) ? 0 : -1;
+    int32_t rtn = -1;
+ 
+    try {
+        if ( FileExists( filename ) ) {
+            ::std::filesystem::remove( ::std::filesystem::path( filename ) );
+            rtn = 0;
+        }
+    }
+    catch ( std::filesystem::filesystem_error& ex ) {
+        LOG_ERROR( "%s", ex.what() );
+    }
+
+    return rtn;
 }
 
 int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& newName )
@@ -173,12 +189,31 @@ size_t FileUtil::FileSize( const std::string& filename )
     size_t rtn = 0;
 
     try {
-        rtn = ::std::filesystem::file_size( filename );
+        if( !filename.empty() && FileExists( filename ) )
+        {
+            rtn = ::std::filesystem::file_size( filename );
+        }
     }
     catch( std::filesystem::filesystem_error ex ) {
         LOG_ERROR( "%s", ex.what() );
     }
 
+    return rtn;
+}
+
+std::filesystem::file_time_type FileUtil::FileTime( const std::string& filename )
+{
+    std::filesystem::file_time_type rtn; //=0
+    try
+    {
+        if( !filename.empty() && FileExists( filename ) )
+        {
+            rtn = std::filesystem::last_write_time( filename );
+        }
+    }
+    catch( std::filesystem::filesystem_error ex ) {
+        LOG_ERROR( "%s", ex.what() );
+    }
     return rtn;
 }
 
@@ -201,4 +236,19 @@ std::string FileUtil::AppendPath( const std::string& basePath, const std::string
     LOG_DEBUG( "Path resolved to %s", path.string().c_str() );
 
     return path.string();
+}
+
+time_t FileUtil::LastWriteTime( const std::string& filename )
+{
+    time_t rtn = -1;
+
+    struct _stat64 fileInfo;
+    if ( _stati64( filename.c_str(), &fileInfo ) != 0 ) {
+        LOG_ERROR( "_stati64 failed on file %s", filename.c_str() );
+    }
+    else {
+        rtn = fileInfo.st_mtime;
+    }
+
+    return rtn;
 }

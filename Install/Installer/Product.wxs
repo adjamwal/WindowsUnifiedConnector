@@ -18,11 +18,13 @@
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
+        <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <InstallExecuteSequence>
           <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
             WIX_UPGRADE_DETECTED
           </Custom>
           <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
+          <Custom Action="SetCacheDirectory" After="FindRelatedProducts" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
@@ -73,7 +75,15 @@
             <RegistrySearch Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
         </Property>
 
-        <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+        <?if $(var.UC_CONSUMER) = 1 ?>
+            <!-- ARPSYSTEMCOMPONENT=1 prevents the application from being displayed in the Add or Remove Programs list of Control Panel -->
+            <!-- Note that you must remove this property completely to show in the list again. setting 0 is not enough -->
+            <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+        <?endif ?>
+      
+        <!-- These properties disable Repair and Modify options -->
+        <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />
+        <Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
     </Product>
 
     <Fragment>
@@ -135,6 +145,7 @@
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_PROGRAMDATA_DIR" />
+                <util:RemoveFolderEx On="uninstall" Property="UC_INSTALLCACHE_DIR" />
             </Component>
         </ComponentGroup>
     </Fragment>
@@ -221,19 +232,26 @@
                 </RegistryKey>
             </Component>
 
+            <Component Id="UCID_DATA_DIR" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
+                    <RegistryValue Type="string" Name="DataDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
             <Component Id="ucid.exe" Guid="*">
-                <File Id="ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\$(var.Platform)\bin\ucid.exe" />
+                <File Id="ucid.exe" Name="ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucid_$(var.Platform).exe" />
             </Component>
 
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
             <Component Id="ucidapi.dll.x86" Guid="*">
-                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x86\bin\ucidapi.dll" />
+                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidapi_x86.dll" />
             </Component>
             <?if $(var.Platform) != "x64" ?>
               <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
-                  <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll" />
+                  <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidcontrolplugin_x86.dll" />
               </Component>
             <?endif?>
         </ComponentGroup>
@@ -241,10 +259,10 @@
         <?if $(var.Platform) = "x64" ?>
           <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
               <Component Id="ucidapi.dll.x64" Guid="*">
-                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidapi.dll" />
+                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidapi_x64.dll" />
               </Component>
               <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
-                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll" />
+                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidcontrolplugin_x64.dll" />
               </Component>
           </ComponentGroup>
         <?endif?>

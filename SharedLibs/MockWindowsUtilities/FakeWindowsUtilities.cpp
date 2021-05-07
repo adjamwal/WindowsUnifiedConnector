@@ -38,6 +38,11 @@ bool WindowsUtilities::ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstri
     return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryString( hKey, subKey, valueName, data );
 }
 
+bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _In_ DWORD flags, _Out_ std::string& data )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryStringA( hKey, subKey, valueName, flags, data );
+}
+
 bool WindowsUtilities::Is64BitWindows()
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->Is64BitWindows();
@@ -61,4 +66,22 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
 std::wstring WindowsUtilities::GetLogDir()
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
+}
+
+std::string WindowsUtilities::ResolvePath( const std::string& basePath )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolvePath( basePath );
+}
+
+int32_t WindowsUtilities::FileSearchWithWildCard( const std::filesystem::path& path, std::vector<std::filesystem::path>& results )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->FileSearchWithWildCard( path, results );
+}
+
+int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
+    std::vector<std::filesystem::path>::iterator begin,
+    std::vector<std::filesystem::path>::iterator end,
+    std::vector<std::filesystem::path>& results )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->SearchFiles( searchPath, begin, end, results );
 }

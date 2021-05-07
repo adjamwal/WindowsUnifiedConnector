@@ -48,6 +48,7 @@
   <PropertyGroup>
     <PostBuildEvent>set WLHBASE=$(WLHBASE)
 set IMN_COMMON=$(IMN_COMMON)
+set VC_VARS_PATH=$(VC_VARS_PATH)
 $(SolutionDir)..\..\sign.bat $(TargetDir)$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <!--

@@ -1,5 +1,6 @@
 #include "ManifestProcessor.h"
 #include "PmTypes.h"
+#include "PmLogger.h"
 #include <iostream>
 #include <sstream>
 
@@ -23,9 +24,10 @@ void ManifestProcessor::Initialize( IPmPlatformDependencies* dep )
     m_componentProcessor.Initialize( dep );
 }
 
-bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
+bool ManifestProcessor::ProcessManifest( std::string checkinManifest, bool& isRebootRequired )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
+    isRebootRequired = false;
 
     if( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
@@ -33,18 +35,52 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
 
+    auto packages = m_manifest.GetPackageList();
+
+    PreDownloadAllFromManifest( packages );
+    ProcessDownloadedPackagesAndConfigs( packages, isRebootRequired );
+
+    return true;
+}
+
+void ManifestProcessor::PreDownloadAllFromManifest( std::vector<PmComponent>& packages )
+{
+    for( auto& package : packages )
+    {
+        try
+        {
+            m_componentProcessor.DownloadPackageBinary( package );
+            LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", package.downloadedInstallerPath.c_str() );
+        }
+        catch( ... )
+        {
+            LOG_ERROR( __FUNCTION__ ": Failed to download binary for package: %s", package.productAndVersion.c_str() );
+        }
+    }
+}
+
+void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmComponent>& packages, bool& isRebootRequired )
+{
     int failedPackages = 0;
-    for( auto package : m_manifest.GetPackageList() )
+    isRebootRequired = false;
+
+    for( auto& package : packages )
     {
         bool processed = false;
 
         try
         {
             processed =
-                ( !m_componentProcessor.IsActionable( package ) || m_componentProcessor.ProcessPackageBinaries( package ) ) &&
+                ( !m_componentProcessor.HasDownloadedBinary( package ) || m_componentProcessor.ProcessPackageBinary( package ) ) &&
                 ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+
+            isRebootRequired |= package.postInstallRebootRequired;
+
+            LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s", processed, package.productAndVersion.c_str() );
         }
-        catch( ... ) { }
+        catch( ... ) {
+            LOG_ERROR( __FUNCTION__ ": Failed to process package: %s", package.productAndVersion.c_str() );
+        }
 
         failedPackages += processed ? 0 : 1;
     }
@@ -55,8 +91,4 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
         ss << __FUNCTION__ << ": Failed to process " << failedPackages << " component package(s)";
         throw std::exception( ss.str().c_str() );
     }
-
-    //PmSendEvent() success
-
-    return true;
 }

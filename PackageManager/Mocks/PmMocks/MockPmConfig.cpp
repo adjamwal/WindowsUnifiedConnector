@@ -9,8 +9,10 @@ MockPmConfig::MockPmConfig()
     MakeGetCloudIdentifyUriReturn( "" );
     MakeGetCloudCheckinUriReturn( "" );
     MakeGetCloudEventUriReturn( "" );
-    MakeGetCloudIntervalReturn( uint32_t() );
+    MakeGetCloudCatalogUriReturn( "" );
+    MakeGetCloudCheckinIntervalMsReturn( uint32_t() );
     MakeGetSupportedComponentListReturn( {} );
+    MakeAllowPostInstallRebootsReturn( false );
 }
 
 MockPmConfig::~MockPmConfig()
@@ -35,6 +37,16 @@ void MockPmConfig::ExpectLoadBsConfigIsNotCalled()
 void MockPmConfig::ExpectLoadPmConfigIsNotCalled()
 {
     EXPECT_CALL( *this, LoadPmConfig( _ ) ).Times( 0 );
+}
+
+void MockPmConfig::MakePmConfigFileChangedReturn( bool value )
+{
+    ON_CALL( *this, PmConfigFileChanged( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectPmConfigFileChangedIsNotCalled()
+{
+    EXPECT_CALL( *this, PmConfigFileChanged( _ ) ).Times( 0 );
 }
 
 void MockPmConfig::MakeVerifyBsFileIntegrityReturn( int32_t value )
@@ -90,14 +102,25 @@ void MockPmConfig::ExpectGetCloudEventUriIsNotCalled()
     EXPECT_CALL( *this, GetCloudEventUri() ).Times( 0 );
 }
 
-void MockPmConfig::MakeGetCloudIntervalReturn( uint32_t value )
+void MockPmConfig::MakeGetCloudCatalogUriReturn( const std::string& value )
 {
-    ON_CALL( *this, GetCloudCheckinInterval() ).WillByDefault( Return( value ) );
+    m_catalogUri = value;
+    ON_CALL( *this, GetCloudCatalogUri() ).WillByDefault( ReturnRef( m_catalogUri ) );
 }
 
-void MockPmConfig::ExpectGetCloudIntervalIsNotCalled()
+void MockPmConfig::ExpectGetCloudCatalogUriIsNotCalled()
 {
-    EXPECT_CALL( *this, GetCloudCheckinInterval() ).Times( 0 );
+    EXPECT_CALL( *this, GetCloudCatalogUri() ).Times( 0 );
+}
+
+void MockPmConfig::MakeGetCloudCheckinIntervalMsReturn( uint32_t value )
+{
+    ON_CALL( *this, GetCloudCheckinIntervalMs() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetCloudCheckinIntervalMsIsNotCalled()
+{
+    EXPECT_CALL( *this, GetCloudCheckinIntervalMs() ).Times( 0 );
 }
 
 void MockPmConfig::MakeGetSupportedComponentListReturn( const std::vector<PmComponent>& value )
@@ -110,3 +133,27 @@ void MockPmConfig::ExpectGetSupportedComponentListIsNotCalled()
     EXPECT_CALL( *this, GetSupportedComponentList() ).Times( 0 );
 }
 
+void MockPmConfig::MakeGetLogLevelReturn( uint32_t value )
+{
+    ON_CALL( *this, GetLogLevel() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetLogLevelIsNotCalled()
+{
+    EXPECT_CALL( *this, GetLogLevel() ).Times( 0 );
+}
+
+void MockPmConfig::MakeGetMaxFileCacheAgeReturn( uint32_t value )
+{
+    ON_CALL( *this, GetMaxFileCacheAge() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetMaxFileCacheAgeIsNotCalled()
+{
+    EXPECT_CALL( *this, GetMaxFileCacheAge() ).Times( 0 );
+}
+
+void MockPmConfig::MakeAllowPostInstallRebootsReturn( bool value )
+{
+    ON_CALL( *this, AllowPostInstallReboots() ).WillByDefault( Return( value ) );
+}

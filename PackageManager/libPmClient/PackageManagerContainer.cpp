@@ -11,6 +11,7 @@
 #include "CheckinFormatter.h"
 #include "UcidAdapter.h"
 #include "CertsAdapter.h"
+#include "CatalogListRetriever.h"
 #include "CheckinManifestRetriever.h"
 #include "ComponentPackageProcessor.h"
 #include "ManifestProcessor.h"
@@ -19,11 +20,13 @@
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
 #include "UcUpgradeEventHandler.h"
+#include "CatalogJsonParser.h"
 
 #include "FileUtil.h"
 #include "SslUtil.h"
 #include "PmLogger.h"
 #include "PmConstants.h"
+#include "InstallerCacheManager.h"
 
 #include <mutex>
 #include <exception>
@@ -37,11 +40,11 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_sslUtil( new SslUtil() )
     , m_http( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )
+    , m_installeracheMgr( new InstallerCacheManager( *m_cloud, *m_fileUtil, *m_sslUtil ) )
     , m_config( new PmConfig( *m_fileUtil ) )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
     , m_packageInventoryProvider( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) )
-    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_packageInventoryProvider ) )
     , m_checkinFormatter( new CheckinFormatter() )
     , m_ucidAdapter( new UcidAdapter() )
     , m_certsAdapter( new CertsAdapter() )
@@ -52,9 +55,12 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILENAME, *m_fileUtil ) )
     , m_ucUpgradeEventHandler( new UcUpgradeEventHandler( *m_eventPublisher, *m_ucUpgradeEventStorage, *m_ucUpgradeEventBuilder ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter ) )
+    , m_catalogJsonParser( new CatalogJsonParser() )
+    , m_catalogListRetriever( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) )
+    , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
     , m_componentPackageProcessor( 
-        new ComponentPackageProcessor( *m_cloud, 
+        new ComponentPackageProcessor( *m_installeracheMgr,
             *m_fileUtil, 
             *m_sslUtil, 
             *m_packageConfigProcessor, 
@@ -66,6 +72,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_pacMan(
         new PackageManager( *m_config,
             *m_cloud,
+            *m_installeracheMgr,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
             *m_ucidAdapter,

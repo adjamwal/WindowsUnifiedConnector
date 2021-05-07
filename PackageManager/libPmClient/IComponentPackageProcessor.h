@@ -14,9 +14,11 @@ public:
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
 
-    virtual bool IsActionable( PmComponent& componentPackage ) = 0;
+    virtual bool HasDownloadedBinary( PmComponent& componentPackage ) = 0;
     virtual bool HasConfigs( PmComponent& componentPackage ) = 0;
 
-    virtual bool ProcessPackageBinaries( PmComponent& componentPackage ) = 0;
+    virtual bool DownloadPackageBinary( PmComponent& componentPackage ) = 0;
+
+    virtual bool ProcessPackageBinary( PmComponent& componentPackage ) = 0;
     virtual bool ProcessConfigsForPackage( PmComponent& componentPackage ) = 0;
 };

@@ -1,18 +1,31 @@
 #pragma once
 
 #include "IPackageDiscovery.h"
+#include "PmTypes.h"
+#include "Windows.h"
 #include <string>
+#include "IPmPlatformComponentManager.h"
+
+class IPackageDiscoveryMethods;
 
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery();
+    PackageDiscovery( IPackageDiscoveryMethods& methods );
     ~PackageDiscovery();
 
-    PackageInventory GetInstalledPackages( const std::vector<PmDiscoveryComponent>& discoveryList ) override;
+    PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
+    PackageInventory CachedInventory() override;
 
 private:
-    PmInstalledPackage BuildUcPackage();
-    PmInstalledPackage HackBuildAmpPackage();
-    void PadBuildNumber( std::string& versionString );
+    void ApplyDiscoveryMethods(
+        const PmProductDiscoveryRules& lookupProduct,
+        std::vector<PmInstalledPackage>& detectedInstallations );
+
+    void DiscoverPackageConfigurables( 
+        const std::vector<PmProductDiscoveryConfigurable>& configurables, 
+        std::vector<PackageConfigInfo>& packageConfigs );
+
+    IPackageDiscoveryMethods& m_methods;
+    PackageInventory m_lastDetectedPackages;
 };

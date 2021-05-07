@@ -1,16 +1,23 @@
 #include "PackageDiscoveryManager.h"
+#include "PmCloud.h"
 #include "IPackageInventoryProvider.h"
+#include "CatalogJsonParser.h"
+#include "IUcLogger.h"
+#include <mutex>
 #include <sstream>
 
-PackageDiscoveryManager::PackageDiscoveryManager( IPackageInventoryProvider& packageInventoryProvider ) :
-    m_packageInventoryProvider( packageInventoryProvider )
+PackageDiscoveryManager::PackageDiscoveryManager( 
+    ICatalogListRetriever& catalogListRetriever,
+    IPackageInventoryProvider& packageInventoryProvider,
+    ICatalogJsonParser& catalogJsonParser )
+    : m_catalogListRetriever( catalogListRetriever )
+    , m_packageInventoryProvider( packageInventoryProvider )
+    , m_catalogJsonParser( catalogJsonParser )
 {
-
 }
 
 PackageDiscoveryManager::~PackageDiscoveryManager()
 {
-
 }
 
 void PackageDiscoveryManager::Initialize( IPmPlatformDependencies* dep )
@@ -20,31 +27,17 @@ void PackageDiscoveryManager::Initialize( IPmPlatformDependencies* dep )
 
 bool PackageDiscoveryManager::DiscoverPackages( PackageInventory& inventory )
 {
-    SetupDiscoveryPackages();
+    PrepareCatalogDataset();
     return m_packageInventoryProvider.GetInventory( inventory );
 }
 
-// TODO: This will need to be re-written in enterprise to fetch this from somewhere
-void PackageDiscoveryManager::SetupDiscoveryPackages()
+void PackageDiscoveryManager::PrepareCatalogDataset()
 {
-    m_discoveryList.clear();
+    std::string catalogList = m_catalogListRetriever.GetCloudCatalog();
+    LOG_DEBUG( "Retrieved Catalog: %s", catalogList.c_str() );
 
-    PmDiscoveryComponent discoveryItem;
-    discoveryItem.packageId = "uc";
-    discoveryItem.packageName = "Cisco Unified Connector";
-    m_discoveryList.push_back( discoveryItem );
-
-    discoveryItem.packageId = "Immunet";
-    discoveryItem.packageName = "Immunet";
-    m_discoveryList.push_back( discoveryItem );
-
-    for ( uint32_t i = 0; i < 10; i++ ) {
-        std::stringstream ss;
-        ss << "test-package-" << i + 1;
-        discoveryItem.packageId = ss.str();
-        discoveryItem.packageName = "TestPackage";
-        m_discoveryList.push_back( discoveryItem );
-    }
-
-    m_packageInventoryProvider.SetDiscoveryList( m_discoveryList );
+    std::vector<PmProductDiscoveryRules> catalogProductRules;
+    m_catalogJsonParser.Parse( catalogList, catalogProductRules );
+    
+    m_packageInventoryProvider.SetCatalogDataset( catalogProductRules );
 }

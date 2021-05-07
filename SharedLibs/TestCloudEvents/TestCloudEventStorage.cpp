@@ -66,7 +66,7 @@ TEST_F( TestCloudEventStorage, TestOneEventSavedToFile )
 
     m_eventStorage->SaveEvent( m_eventBuilder1 );
 
-    events = m_eventStorage->ReadEvents();
+    events = m_eventStorage->ReadAndRemoveEvents();
 
     EXPECT_EQ( events.size(), 1 );
 }
@@ -82,7 +82,7 @@ TEST_F( TestCloudEventStorage, TestMultipleEventsSaveToFile )
     m_eventStorage->SaveEvent( event2 );
     m_eventStorage->SaveEvent( event1 );
 
-    events = m_eventStorage->ReadEvents();
+    events = m_eventStorage->ReadAndRemoveEvents();
 
     EXPECT_EQ( events.size(), 3 );
 

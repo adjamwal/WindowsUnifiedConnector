@@ -16,11 +16,11 @@ void MockManifestProcessor::ExpectInitializeIsNotCalled()
 
 void MockManifestProcessor::MakeProcessManifestReturn( bool value )
 {
-    ON_CALL( *this, ProcessManifest( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ProcessManifest( _, _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockManifestProcessor::ExpectProcessManifestIsNotCalled()
 {
-    EXPECT_CALL( *this, ProcessManifest( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ProcessManifest( _, _ ) ).Times( 0 );
 }
 

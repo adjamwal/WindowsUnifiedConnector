@@ -11,7 +11,9 @@ class IPMLogger;
 class ICodesignVerifier;
 class IWinCertLoader;
 class IWinApiWrapper;
+class IMsiApi;
 class IPackageDiscovery;
+class IPackageDiscoveryMethods;
 
 class PmAgentContainer
 {
@@ -23,8 +25,10 @@ public:
 
 private:
     std::unique_ptr<IWinApiWrapper> m_winApiWrapper;
+    std::unique_ptr<IMsiApi> m_msiApi;
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
     std::unique_ptr<IWinCertLoader> m_certLoader;
+    std::unique_ptr<IPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<IPackageDiscovery> m_packageDiscovery;
     std::unique_ptr<WindowsConfiguration> m_configuration;
     std::unique_ptr<WindowsComponentManager> m_componentMgr;

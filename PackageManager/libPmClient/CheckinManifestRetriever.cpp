@@ -17,20 +17,20 @@ std::string CheckinManifestRetriever::GetCheckinManifestFrom( std::string uri, s
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     std::string response;
-    int32_t respStatus;
+    int32_t httpStatusResponse;
 
-    respStatus = InternalGetCheckinManifestFrom( uri, payload, response );
+    httpStatusResponse = InternalGetCheckinManifestFrom( uri, payload, response );
     
-    if ( respStatus != 200 ) {
-        if ( respStatus != 401 ) {
-            HandleHttpError( respStatus );
+    if ( httpStatusResponse != 200 ) {
+        if ( httpStatusResponse != 401 ) {
+            ThrowHttpError( httpStatusResponse );
         }
         else {
             m_ucidAdapter.Refresh();
-            respStatus = InternalGetCheckinManifestFrom( uri, payload, response );
+            httpStatusResponse = InternalGetCheckinManifestFrom( uri, payload, response );
 
-            if ( respStatus != 200 ) {
-                HandleHttpError( respStatus );
+            if ( httpStatusResponse != 200 ) {
+                ThrowHttpError( httpStatusResponse );
             }
         }
     }
@@ -54,9 +54,8 @@ int32_t CheckinManifestRetriever::InternalGetCheckinManifestFrom( std::string& u
     return m_cloud.Checkin( payload, response );
 }
 
-void CheckinManifestRetriever::HandleHttpError( int32_t respStatus )
+void CheckinManifestRetriever::ThrowHttpError( int32_t httpStatusResponse )
 {
-    std::string s = __FUNCTION__ ": Http Post status ";
-    s += std::to_string( respStatus );
+    std::string s = __FUNCTION__ ": Http Post status " + std::to_string( httpStatusResponse );
     throw std::exception( s.c_str() );
 }

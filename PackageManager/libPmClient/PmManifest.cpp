@@ -96,7 +96,7 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     PmComponent package;
 
     // Required Data
-    package.packageNameAndVersion = GetJsonStringField( packageJson, MANIFEST_FIELD_PACKAGE, true );
+    package.productAndVersion = GetJsonStringField( packageJson, MANIFEST_FIELD_PACKAGE, true );
 
     // Optional Data
     package.installerUrl = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_URI, false );
@@ -120,7 +120,7 @@ void PmManifest::AddPackage( Json::Value& packageJson )
         }
     }
     else {
-        LOG_DEBUG( "config array not found" );
+        LOG_DEBUG( __FUNCTION__ ": config array not found" );
     }
     m_ComponentList.push_back( package );
 }

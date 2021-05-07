@@ -14,7 +14,9 @@
 #include "IUcLogger.h"
 #include "JsonUtil.h"
 #include "TimeUtil.h"
+#include "StringUtil.h"
 #include <iomanip>
+#include <sstream>
 
 CloudEventBuilder::CloudEventBuilder()
 {
@@ -57,13 +59,7 @@ ICloudEventBuilder& CloudEventBuilder::WithPackage( const std::string& name, con
 
 ICloudEventBuilder& CloudEventBuilder::WithPackageID( const std::string& idAsNameAndVersion )
 {
-    std::istringstream original( idAsNameAndVersion );
-    std::vector<std::string> parts;
-    std::string s;
-
-    while( std::getline( original, s, '/' ) ) {
-        parts.push_back( s );
-    }
+    auto parts = StringUtil::Split( idAsNameAndVersion, '/' );
 
     if( parts.size() > 0 ) m_packageName = parts[ 0 ];
     if( parts.size() > 1 ) m_packageVersion = parts[ 1 ];
@@ -117,8 +113,6 @@ std::string CloudEventBuilder::Build()
 
 void CloudEventBuilder::Reset()
 {
-    LOG_DEBUG( __FUNCTION__ ": Enter" );
-
     m_ucid = "";
     m_evtype = CloudEventType( 0 );
     m_packageName = "";
@@ -132,8 +126,6 @@ void CloudEventBuilder::Reset()
     m_newHash = "";
     m_newSize = 0;
     UpdateEventTime();
-
-    LOG_DEBUG( __FUNCTION__ ": Exit" );
 }
 
 bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std::string& eventJson )
@@ -234,18 +226,40 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
 
 bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
 {
-    return m_ucid._Equal( other.m_ucid ) &&
+    bool result = m_ucid._Equal( other.m_ucid ) &&
         m_evtype == other.m_evtype &&
         m_packageName._Equal( other.m_packageName ) &&
         m_packageVersion._Equal( other.m_packageVersion ) &&
         m_errCode == other.m_errCode &&
         m_errMessage._Equal( other.m_errMessage ) &&
-        m_oldPath._Equal( other.m_oldPath ) &&
+        m_oldPath == other.m_oldPath &&
         m_oldHash._Equal( other.m_oldHash ) &&
         m_oldSize == other.m_oldSize &&
-        m_newPath._Equal( other.m_newPath ) &&
+        m_newPath == other.m_newPath &&
         m_newHash._Equal( other.m_newHash ) &&
         m_newSize == other.m_newSize;
+
+    if( !result )
+    {
+        std::stringstream ss;
+        ss <<
+            "'" << m_ucid << "' ?= '" << other.m_ucid << "', " <<
+            "'" << m_evtype << "' ?= '" << other.m_evtype << "', " <<
+            "'" << m_packageName << "' ?= '" << other.m_packageName << "', " <<
+            "'" << m_packageVersion << "' ?= '" << other.m_packageVersion << "', " <<
+            "'" << m_errCode << "' ?= '" << other.m_errCode << "', " <<
+            "'" << m_errMessage << "' ?= '" << other.m_errMessage << "', " <<
+            "'" << m_oldPath << "' ?= '" << other.m_oldPath << "', " <<
+            "'" << m_oldHash << "' ?= '" << other.m_oldHash << "', " <<
+            "'" << m_oldSize << "' ?= '" << other.m_oldSize << "', " <<
+            "'" << m_newPath << "' ?= '" << other.m_newPath << "', " <<
+            "'" << m_newHash << "' ?= '" << other.m_newHash << "', " <<
+            "'" << m_newSize << "' ?= '" << other.m_newSize << "'";
+
+        LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
+    }
+
+    return result;
 }
 
 #pragma region PRIVATE
@@ -263,22 +277,22 @@ std::string CloudEventBuilder::Serialize()
 
     if( m_evtype == pkgreconfig )
     {
-        if( m_oldPath.length() > 0 )
+        if( !m_oldPath.empty() )
         {
             Json::Value oldfilearr;
             Json::Value oldfile;
-            oldfile[ "path" ] = m_oldPath;
+            oldfile[ "path" ] = m_oldPath.generic_string();
             oldfile[ "sha256" ] = m_oldHash;
             oldfile[ "size" ] = m_oldSize;
             oldfilearr[ 0 ] = oldfile;
             event[ "old" ] = oldfilearr;
         }
 
-        if( m_newPath.length() > 0 )
+        if( !m_newPath.empty() )
         {
             Json::Value newfilearr;
             Json::Value newfile;
-            newfile[ "path" ] = m_newPath;
+            newfile[ "path" ] = m_newPath.generic_string();
             newfile[ "sha256" ] = m_newHash;
             newfile[ "size" ] = m_newSize;
             newfilearr[ 0 ] = newfile;

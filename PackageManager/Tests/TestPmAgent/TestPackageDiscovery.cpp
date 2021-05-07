@@ -1,8 +1,12 @@
 #include "MocksCommon.h"
 #include "PackageDiscovery.h"
 #include "MockWindowsUtilities.h"
+#include "MockPackageDiscoveryMethods.h"
 #include "PmTypes.h"
+#include "MockWinApiWrapper.h"
 #include <memory>
+#include <MockMsiApi.h>
+#include <PmMocks/MockPmPlatformComponentManager.h>
 
 class TestPackageDiscovery : public ::testing::Test
 {
@@ -10,177 +14,435 @@ protected:
     void SetUp()
     {
         MockWindowsUtilities::Init();
-        m_patient = std::make_unique<PackageDiscovery>();
+        m_catalogRules.clear();
+        m_detectedInstallations.clear();
+        m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
     }
 
     void TearDown()
     {
         m_patient.reset();
+        m_discoveryMethods.reset();
+        m_detectedInstallations.clear();
+        m_catalogRules.clear();
         MockWindowsUtilities::Deinit();
     }
 
+    void SetupMsiUpgradeDiscovery( PmProductDiscoveryRules& testProduct )
+    {
+        PmProductDiscoveryMsiUpgradeCodeMethod upgMethod;
+        testProduct.msiUpgradeCode_discovery.push_back( upgMethod );
+
+        PmInstalledPackage detection;
+        detection.version = "msiupg";
+        m_detectedInstallations.push_back( detection );
+
+        ON_CALL( *m_discoveryMethods, DiscoverByMsiUpgradeCode( _, _, _ ) )
+            .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+    }
+
+    void SetupMsiDiscovery( PmProductDiscoveryRules& testProduct )
+    {
+        PmProductDiscoveryMsiMethod msiMethod;
+        testProduct.msi_discovery.push_back( msiMethod );
+
+        PmInstalledPackage detection;
+        detection.version = "msi";
+        m_detectedInstallations.push_back( detection );
+
+        ON_CALL( *m_discoveryMethods, DiscoverByMsi( _, _, _ ) )
+            .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+    }
+
+    void SetupRegistryDiscovery( PmProductDiscoveryRules& testProduct )
+    {
+        PmProductDiscoveryRegistryMethod regMethod;
+        testProduct.reg_discovery.push_back( regMethod );
+
+        PmInstalledPackage detection;
+        detection.version = "reg";
+        m_detectedInstallations.push_back( detection );
+
+        ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+            .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+    }
+
+    std::vector<PmProductDiscoveryRules> m_catalogRules;
+    std::vector<PmInstalledPackage> m_detectedInstallations;
+    std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
 };
 
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillSetOS )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-
     MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
     EXPECT_EQ( installedPackages.architecture, "x64" );
     EXPECT_EQ( installedPackages.platform, "win" );
 }
 
-
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetUC )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDetectByMsiUpgradeCode )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "uc";
-    interestedPrograms.packageName = "Unified Connector";
-    discoveryList.push_back( interestedPrograms );
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiUpgradeDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( true );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
-
-    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.packageId );
-    EXPECT_EQ( installedPackages.packages.front().configs.size(), 3 );
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msiupg", installedPackages.packages[ 0 ].version );
 }
 
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetImmuent )
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDetectByMsi )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "Immunet";
-    interestedPrograms.packageName = "Immunet";
-    discoveryList.push_back( interestedPrograms );
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msi", installedPackages.packages[ 0 ].version );
+}
+
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDetectByRegistry )
+{
+    PmProductDiscoveryRules productInCatalog;
+    SetupRegistryDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "reg", installedPackages.packages[ 0 ].version );
+}
+
+TEST_F( TestPackageDiscovery, DiscoveryWillCompleteAfterMsiUpgradeCodeMethod )
+{
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiUpgradeDiscovery( productInCatalog );
+    SetupMsiDiscovery( productInCatalog );
+    SetupRegistryDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
+
+    m_discoveryMethods->ExpectDiscoverByMsiIsNotCalled();
+    m_discoveryMethods->ExpectDiscoverByRegistryIsNotCalled();
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msiupg", installedPackages.packages[ 0 ].version );
+}
+
+TEST_F( TestPackageDiscovery, DiscoveryWillCompleteAfterMsiMethod )
+{
+    PmProductDiscoveryRules productInCatalog;
+    SetupMsiDiscovery( productInCatalog );
+    SetupRegistryDiscovery( productInCatalog );
+    m_catalogRules.push_back( productInCatalog );
+
+    m_discoveryMethods->ExpectDiscoverByMsiUpgradeCodeIsNotCalled();
+    m_discoveryMethods->ExpectDiscoverByRegistryIsNotCalled();
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( 1, installedPackages.packages.size() );
+    ASSERT_EQ( "msi", installedPackages.packages[ 0 ].version );
+}
+
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillDiscoverManyPrograms )
+{
+    PmProductDiscoveryRules productLookup;
+    PmProductDiscoveryRegistryMethod regMethod;
+    productLookup.reg_discovery.push_back( regMethod );
+    for( int i = 0; i < 10; i++ ) {
+        m_catalogRules.push_back( productLookup );
+    }
+
+    PmInstalledPackage detection;
+    m_detectedInstallations.push_back( detection );
+    ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+        .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( 10, installedPackages.packages.size() );
+}
+
+TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillResetTheCacheToLatestDiscoveryValues )
+{
+    PmProductDiscoveryRules productLookup;
+    PmProductDiscoveryRegistryMethod regMethod;
+    productLookup.reg_discovery.push_back( regMethod );
+    for( int i = 0; i < 10; i++ ) {
+        m_catalogRules.push_back( productLookup );
+    }
+
+    PmInstalledPackage detection;
+    m_detectedInstallations.push_back( detection );
+    ON_CALL( *m_discoveryMethods, DiscoverByRegistry( _, _, _ ) )
+        .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
+
+    m_patient->DiscoverInstalledPackages( m_catalogRules );
+    PackageInventory cache = m_patient->CachedInventory();
+
+    ASSERT_EQ( m_catalogRules.size(), cache.packages.size() );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableIsFound )
+{
+    std::string path1 = "c:/test/one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
     
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
-        .WillByDefault( DoAll( SetArgReferee<3>( L"Immunet" ), Return( true ) ) );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayVersion" ), _ ) )
-        .WillByDefault( Return( true ) );
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    m_catalogRules.push_back( productDiscoveryRules );
 
-    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.packageId );
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+    
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
 }
 
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillGetAmp )
+TEST_F( TestPackageDiscovery, MultipleConfigurablesAreFound )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "Immunet";
-    interestedPrograms.packageName = "Cisco AMP for Endpoints Connector";
-    discoveryList.push_back( interestedPrograms );
+    std::string path1 = "c:/test/one.xml";
+    std::string path2 = "c:/test/two.xml";
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayName" ), _ ) )
-        .WillByDefault( DoAll( SetArgReferee<3>( L"Cisco AMP for Endpoints Connector" ), Return( true ) ) );
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, std::wstring( L"DisplayVersion" ), _ ) )
-        .WillByDefault( Return( true ) );
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
 
-    EXPECT_EQ( installedPackages.packages.front().packageName, interestedPrograms.packageId );
+    PmProductDiscoveryConfigurable configurable2 = {};
+    configurable2.path = path2;
+    configurable2.max_instances = 1;
+    configurable2.required = false;
+    productDiscoveryRules.configurables.push_back( configurable2 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    std::vector<std::filesystem::path> configs2;
+    configs2.push_back( std::filesystem::path( path2 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) )
+        .WillOnce( Return( path1 ) )
+        .WillOnce( Return( path2 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs2 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 2 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[1].path ),
+        std::filesystem::path( path2 ) );
 }
 
-TEST_F( TestPackageDiscovery, BuildAmpWillFailOnRegistryFailure )
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedOne )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "Immunet";
-    interestedPrograms.packageName = "Cisco AMP for Endpoints Connector";
-    discoveryList.push_back( interestedPrograms );
+    std::string path1 = "c:/test/one.xml";
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( false );
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
 
-    EXPECT_EQ( installedPackages.packages.size(), 0 );
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( "c:/test/one.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/three.xml" ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
 }
 
-
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillDiscoverPrograms )
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundMaxInstancesReachedTwo )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
+    std::string path1 = path1;
 
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "p1";
-    interestedPrograms.packageName = "Package1";
-    discoveryList.push_back( interestedPrograms );
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
 
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.packageName;
-    installedProgram.version = "1.0.0.0";
-    installedList.push_back( installedProgram );
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    configurable1.max_instances = 2;
+    productDiscoveryRules.configurables.push_back( configurable1 );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
+    m_catalogRules.push_back( productDiscoveryRules );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( "c:/test/one.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/two.xml" ) );
+    configs1.push_back( std::filesystem::path( "c:/test/three.xml" ) );
 
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageName, interestedPrograms.packageId );
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, installedProgram.version );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 2 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( "c:/test/one.xml" ) );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[1].path ),
+        std::filesystem::path( "c:/test/two.xml" ) );
 }
 
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillDiscoverManyPrograms )
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstances )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
+    std::string path1 = "c:/test/one.xml";
 
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "p1";
-    interestedPrograms.packageName = "Package";
-    discoveryList.push_back( interestedPrograms );
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
 
-    interestedPrograms.packageId = "p2";
-    interestedPrograms.packageName = "Package";
-    discoveryList.push_back( interestedPrograms );
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
 
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.packageName;
-    installedProgram.version = "1.0.0.0";
-    installedList.push_back( installedProgram );
+    m_catalogRules.push_back( productDiscoveryRules );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
 
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageName, "p1" );
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, installedProgram.version );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
 
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageName, "p2" );
-    EXPECT_EQ( installedPackages.packages[ 1 ].packageVersion, installedProgram.version );
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
 }
 
-TEST_F( TestPackageDiscovery, GetInstalledPackagesWillPadVersionNumbers )
+TEST_F( TestPackageDiscovery, OneConfigurableIsFoundDefaultMaxInstancesReached )
 {
-    std::vector<PmDiscoveryComponent> discoveryList;
-    std::vector<WindowsUtilities::WindowsInstallProgram> installedList;
+    std::string path1 = "c:/test/one.xml";
 
-    PmDiscoveryComponent interestedPrograms;
-    interestedPrograms.packageId = "p1";
-    interestedPrograms.packageName = "Package1";
-    discoveryList.push_back( interestedPrograms );
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
 
-    WindowsUtilities::WindowsInstallProgram installedProgram;
-    installedProgram.name = interestedPrograms.packageName;
-    installedProgram.version = "1";
-    installedList.push_back( installedProgram );
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
 
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetInstalledProgramsReturn( installedList );
+    m_catalogRules.push_back( productDiscoveryRules );
 
-    PackageInventory installedPackages = m_patient->GetInstalledPackages( discoveryList );
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+    configs1.push_back( std::filesystem::path( "c:/test/two.xml" ) );
 
-    EXPECT_EQ( installedPackages.packages[ 0 ].packageVersion, "1.0.0.0" );
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( path1 ) );
+}
+
+TEST_F( TestPackageDiscovery, OneConfigurableNoneAreFound )
+{
+    std::string path1 = "c:/test/one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = path1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 0 );
+}
+
+TEST_F( TestPackageDiscovery, ConfigurablePathWillBeUnresolved )
+{
+    std::string path1 = "C:/ProgramData/test/one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.path = "<FOLDERID_ProgramData>/test/one.xml";
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ResolvePath( _ ) ).WillOnce( Return( path1 ) );
+
+    EXPECT_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillOnce( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    EXPECT_EQ( installedPackages.packages.size(), 1 );
+    EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+        std::filesystem::path( "<FOLDERID_ProgramData>/test/one.xml" ) );
 }

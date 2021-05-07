@@ -2,6 +2,9 @@
 #include "WindowsUtilities.h"
 #include <memory>
 #include <ShlObj.h>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
 
 typedef std::pair<std::string, std::string> KNOWNFOLDERPAIR;
 class ComponentTestWindowsUtilites : public ::testing::TestWithParam<KNOWNFOLDERPAIR>
@@ -14,9 +17,43 @@ protected:
 
     void TearDown()
     {
-
+        std::filesystem::remove_all( m_baseTestPath );
     }
 
+    void CreateFiles( std::vector<std::filesystem::path>& files )
+    {
+        for ( const auto& file : files )
+        {
+            auto p = file.parent_path();
+            std::filesystem::create_directories( p );
+
+            std::ofstream ofs( file.string() );
+            ofs << "This is a test file.\n";
+            ofs.close();
+        }
+    }
+
+    void ExecuteTestSearch(
+        std::filesystem::path path,
+        std::vector<std::filesystem::path>& files,
+        std::vector<std::filesystem::path>& expected )
+    {
+        std::vector<std::filesystem::path> discoveredFiles;
+
+        CreateFiles( files );
+
+        int32_t rtn = WindowsUtilities::FileSearchWithWildCard( path, discoveredFiles );
+
+        EXPECT_EQ( rtn, 0 );
+        EXPECT_EQ( expected.size(), discoveredFiles.size() );
+
+        for ( auto& discoveredFile : discoveredFiles )
+        {
+            EXPECT_TRUE( std::find( expected.begin(), expected.end(), discoveredFile ) != expected.end() );
+        }
+    }
+
+    std::filesystem::path m_baseTestPath = "C:/ProgramData/Test/";
 };
 
 TEST_P( ComponentTestWindowsUtilites, VerifyKnownFolderId )
@@ -287,3 +324,175 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 #endif
+
+TEST_F( ComponentTestWindowsUtilites, NoFilesToFind )
+{
+    std::filesystem::path path( m_baseTestPath / "test.xml" );
+
+    std::vector<std::filesystem::path> files;
+
+    std::vector<std::filesystem::path> expected;
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, NoFilesToFindWildcard )
+{
+    std::filesystem::path path( m_baseTestPath / "*.xml" );
+
+    std::vector<std::filesystem::path> files;
+
+    std::vector<std::filesystem::path> expected;
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, OneFileToFind )
+{
+    std::filesystem::path path( m_baseTestPath / "test.xml" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "test.xml" );
+
+    std::vector<std::filesystem::path> expected;
+    expected.push_back( m_baseTestPath / "test.xml" );
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, OneFileToFindWildcard )
+{
+    std::filesystem::path path( m_baseTestPath / "*.xml" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "test.xml" );
+
+    std::vector<std::filesystem::path> expected;
+    expected.push_back( m_baseTestPath / "test.xml" );
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, NoFilesFindWildcardMultipleExistsingFiles )
+{
+    std::filesystem::path path( m_baseTestPath / "*.xml" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "test.txt" );
+    files.push_back( m_baseTestPath / "test.json" );
+
+    std::vector<std::filesystem::path> expected;
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, OneFileToFindWildcardMultipleExistingFiles )
+{
+    std::filesystem::path path( m_baseTestPath / "*.xml" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "test.xml" );
+    files.push_back( m_baseTestPath / "test.txt" );
+    files.push_back( m_baseTestPath / "test.json" );
+
+    std::vector<std::filesystem::path> expected;
+    expected.push_back( m_baseTestPath / "test.xml" );
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, SingleCharacterWildcardSearch )
+{
+    std::filesystem::path path( m_baseTestPath / "policy.???" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "policy.xml" );
+    files.push_back( m_baseTestPath / "policy.txt" );
+    files.push_back( m_baseTestPath / "policy.json" );
+
+    std::vector<std::filesystem::path> expected;
+    expected.push_back( m_baseTestPath / "policy.xml" );
+    expected.push_back( m_baseTestPath / "policy.txt" );
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, SearchWithDirectoryWildcard )
+{
+    std::filesystem::path path( m_baseTestPath / "Temp*Path/test.xml" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "TempPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempPath/other.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/other.xml" );
+
+    std::vector<std::filesystem::path> expected;
+    expected.push_back( m_baseTestPath / "TempPath/test.xml" );
+    expected.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, SearchWithDirectoryWildcardAndFileWildcard )
+{
+    std::filesystem::path path( m_baseTestPath / "Temp*Path/*.xml" );
+
+    std::vector<std::filesystem::path> files;
+    files.push_back( m_baseTestPath / "TempPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempPath/test2.xml" );
+    files.push_back( m_baseTestPath / "TempPath/test.txt" );
+    files.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/test2.xml" );
+    files.push_back( m_baseTestPath / "TempNewPath/test.txt" );
+
+    std::vector<std::filesystem::path> expected;
+    expected.push_back( m_baseTestPath / "TempPath/test.xml" );
+    expected.push_back( m_baseTestPath / "TempPath/test2.xml" );
+    expected.push_back( m_baseTestPath / "TempNewPath/test.xml" );
+    expected.push_back( m_baseTestPath / "TempNewPath/test2.xml" );
+
+    ExecuteTestSearch( path, files, expected );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillResolveKnownFolderID )
+{
+    std::string knownFolderString = "C:\\ProgramData";
+    auto rtn = WindowsUtilities::ResolvePath( "<FOLDERID_ProgramData>" );
+
+    EXPECT_EQ( rtn, knownFolderString );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillResolveKnownFolderIDWithPrefix )
+{
+    std::string prefix = "prefix";
+    std::string knownFolderString = "C:\\ProgramData";
+    std::string suffix = "suffix";
+
+    auto rtn = WindowsUtilities::ResolvePath( prefix + "<FOLDERID_ProgramData>" + suffix );
+
+    EXPECT_EQ( rtn, prefix + knownFolderString + suffix );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillNotModifyPathWhenKnownFolderIsEmpty )
+{
+    std::string folder = "prefix<FOLDERID_SomeKnownFolder>suffix";
+
+    auto rtn = WindowsUtilities::ResolvePath( folder );
+
+    EXPECT_EQ( rtn, folder );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillNotResolveKnownFolderWhenTagNotFound )
+{
+    auto rtn = WindowsUtilities::ResolvePath( "C:/Windows/Somthing" );
+
+    EXPECT_EQ( rtn, "C:/Windows/Somthing" );
+}
+
+TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArguments )
+{
+    std::string arg = "/arg2 <FOLDERID_ProgramData>/Cisco/policy.xml";
+
+    EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\ProgramData/Cisco/policy.xml" );
+}

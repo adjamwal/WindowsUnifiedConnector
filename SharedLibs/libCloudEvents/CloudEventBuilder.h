@@ -2,6 +2,7 @@
 
 #include "ICloudEventBuilder.h"
 #include "json\json.h"
+#include <filesystem>
 
 static std::string CloudEventString( CloudEventType eventType )
 {
@@ -57,10 +58,10 @@ private:
     std::string m_packageVersion;
     int m_errCode;
     std::string m_errMessage;
-    std::string m_oldPath;
+    std::filesystem::path m_oldPath;
     std::string m_oldHash;
     int m_oldSize;
-    std::string m_newPath;
+    std::filesystem::path m_newPath;
     std::string m_newHash;
     int m_newSize;
     std::string m_tse;

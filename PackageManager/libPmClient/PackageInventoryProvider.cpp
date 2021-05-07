@@ -28,7 +28,7 @@ void PackageInventoryProvider::Initialize( IPmPlatformDependencies* dep )
 bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
 {
     bool rtn = false;
-    PackageInventory detectedPackages;
+    PackageInventory packagesDiscovered;
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -36,31 +36,34 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         return false;
     }
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( m_discoveryList, detectedPackages ) == 0 ) {
-        for( auto &package : detectedPackages.packages ) {
-            for( auto it = package.configs.begin(); it != package.configs.end();) {
-                std::string resolvedPath = m_dependencies->ComponentManager().ResolvePath( it->path );
-                if( m_fileUtil.FileExists( resolvedPath ) ) {
-                    auto sha256 = m_sslUtil.CalculateSHA256( resolvedPath );
-                    it->sha256 = sha256.value();
-                    it++;
-                }
-                else {
-                    LOG_DEBUG( "Drop missing config %s", it->path.c_str() );
-                    it = package.configs.erase( it );
+    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogRules, packagesDiscovered ) == 0 ) 
+    {
+        for( auto &package : packagesDiscovered.packages ) 
+        {
+            for ( auto &configFile : package.configs )
+            {
+                auto configFileResolvedPath = m_dependencies->ComponentManager().ResolvePath( configFile.path );
+
+                auto sha256 = m_sslUtil.CalculateSHA256( configFileResolvedPath );
+
+                if ( sha256.has_value() )
+                {
+                    configFile.sha256 = sha256.value();
                 }
             }
         }
-        inventory = detectedPackages;
+
+        inventory = packagesDiscovered;
         rtn = true;
     }
 
     return rtn;
 }
 
-void PackageInventoryProvider::SetDiscoveryList( const std::vector<PmDiscoveryComponent>& discoveryList )
+void PackageInventoryProvider::SetCatalogDataset( 
+    const std::vector<PmProductDiscoveryRules>& discoveryRules )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_discoveryList = discoveryList;
+    m_catalogRules = discoveryRules;
 }

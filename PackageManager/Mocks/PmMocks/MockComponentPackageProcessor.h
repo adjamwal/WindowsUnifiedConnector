@@ -14,17 +14,21 @@ public:
     MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
     void ExpectInitializeIsNotCalled();
 
-    MOCK_METHOD1( IsActionable, bool( PmComponent& ) );
-    void MakeIsActionableReturn( bool value );
-    void ExpectIsActionableIsNotCalled();
+    MOCK_METHOD1( HasDownloadedBinary, bool( PmComponent& ) );
+    void MakeHasDownloadedBinaryReturn( bool value );
+    void ExpectHasDownloadedBinaryIsNotCalled();
 
     MOCK_METHOD1( HasConfigs, bool( PmComponent& ) );
     void MakeHasConfigsReturn( bool value );
     void ExpectHasConfigsIsNotCalled();
 
-    MOCK_METHOD1( ProcessPackageBinaries, bool( PmComponent& ) );
-    void MakeProcessPackageBinariesReturn( bool value );
-    void ExpectProcessPackageBinariesIsNotCalled();
+    MOCK_METHOD1( DownloadPackageBinary, bool( PmComponent& ) );
+    void MakeDownloadPackageBinaryReturn( bool value );
+    void ExpectDownloadPackageBinaryIsNotCalled();
+
+    MOCK_METHOD1( ProcessPackageBinary, bool( PmComponent& ) );
+    void MakeProcessPackageBinaryReturn( bool value );
+    void ExpectProcessPackageBinaryIsNotCalled();
 
     MOCK_METHOD1( ProcessConfigsForPackage, bool( PmComponent& ) );
     void MakeProcessConfigsForPackageReturn( bool value );

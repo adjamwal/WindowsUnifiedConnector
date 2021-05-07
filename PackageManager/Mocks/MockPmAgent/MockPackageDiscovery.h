@@ -10,10 +10,15 @@ public:
     MockPackageDiscovery();
     ~MockPackageDiscovery();
 
-    MOCK_METHOD1( GetInstalledPackages, PackageInventory( const std::vector<PmDiscoveryComponent>& ) );
-    void MakeGetInstalledPackagesReturn( PackageInventory packages );
-    void ExpectGetInstalledPackagesIsNotCalled();
+    MOCK_METHOD1( DiscoverInstalledPackages, PackageInventory( const std::vector<PmProductDiscoveryRules>& ) );
+    void MakeDiscoverInstalledPackagesReturn( PackageInventory value );
+    void ExpectDiscoverInstalledPackagesIsNotCalled();
+
+    MOCK_METHOD0( CachedInventory, PackageInventory() );
+    void MakeCachedInventoryReturn( PackageInventory value );
+    void ExpectCachedInventoryIsNotCalled();
 
 private:
-    PackageInventory m_inventory;
+    PackageInventory m_detectedPackages;
+    PackageInventory m_cachedInventory;
 };

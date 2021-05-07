@@ -18,6 +18,7 @@ class IWorkerThread;
 class ICloudEventPublisher;
 class ICloudEventStorage;
 class IUcUpgradeEventHandler;
+class IInstallerCacheManager;
 
 struct PmComponent;
 struct PmEvent;
@@ -29,6 +30,7 @@ class PackageManager : public IPackageManager
 public:
     PackageManager( IPmConfig& config,
         IPmCloud& cloud,
+        IInstallerCacheManager& installerCacheMgr,
         IPackageDiscoveryManager& packageDiscoveryManager,
         ICheckinFormatter& checkinFormatter,
         IUcidAdapter& ucidAdapter, 
@@ -51,6 +53,7 @@ public:
 private:
     IPmConfig& m_config;
     IPmCloud& m_cloud;
+    IInstallerCacheManager& m_installerCacheMgr;
     IPackageDiscoveryManager& m_packageDiscoveryManager;
     ICheckinFormatter& m_checkinFormatter;
     IUcidAdapter& m_ucidAdapter;

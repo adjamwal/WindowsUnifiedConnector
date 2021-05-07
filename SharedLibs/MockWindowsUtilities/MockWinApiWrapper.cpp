@@ -33,3 +33,43 @@ void MockWinApiWrapper::MakeSHGetKnownFolderPathReturn( HRESULT value )
 {
     ON_CALL( *this, SHGetKnownFolderPath( _, _, _, _ ) ).WillByDefault( Return( value ) );
 }
+
+void MockWinApiWrapper::MakeMsiEnumProductsExWReturn( UINT value )
+{
+    ON_CALL( *this, MsiEnumProductsExW( _, _, _, _, _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeMsiQueryProductStateWReturn( INSTALLSTATE value )
+{
+    ON_CALL( *this, MsiQueryProductStateW( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeMsiGetProductInfoExWReturn( UINT value )
+{
+    ON_CALL( *this, MsiGetProductInfoExW( _, _, _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeMsiGetProductPropertyWReturn( UINT value )
+{
+    ON_CALL( *this, MsiGetProductPropertyW( _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeMsiEnumRelatedProductsWReturn( UINT value )
+{
+    ON_CALL( *this, MsiEnumRelatedProductsW( _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeFindFirstFileExWReturn( HANDLE value )
+{
+    ON_CALL( *this, FindFirstFileExW( _, _, _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeFindNextFileWReturn( BOOL value )
+{
+    ON_CALL( *this, FindNextFileW( _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWinApiWrapper::MakeFindCloseReturn( BOOL value )
+{
+    ON_CALL( *this, FindClose( _ ) ).WillByDefault( Return( value ) );
+}

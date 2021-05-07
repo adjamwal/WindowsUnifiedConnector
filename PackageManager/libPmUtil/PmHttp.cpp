@@ -158,6 +158,13 @@ int32_t PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::strin
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_FOLLOWLOCATION, 1L ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_FOLLOWLOCATION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     } 
+    /* abort if transfer is slower than 30 bytes/sec during 120 seconds */
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_LOW_SPEED_TIME, 120L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_LOW_SPEED_TIME failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_LOW_SPEED_LIMIT, 30L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_LOW_SPEED_LIMIT failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    }
 #if 0
 #if defined ( WIN32 )
     // CURLSSLOPT_NATIVE_CA is new in Curl 7.71. This tells curl to use the windows cert store. This is a beta feature
@@ -285,13 +292,14 @@ int32_t PmHttp::HttpGet( const std::string& url, std::string& response, int32_t 
         return -1;
     }
 
+    response.clear();
     if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &response ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 0 ) ) != CURLE_OK ) {
+    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_HTTPGET, 1L ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }
     else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
@@ -333,6 +341,7 @@ int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, s
         return -1;
     }
 
+    response.clear();
     if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
     }

@@ -13,7 +13,7 @@ public:
     MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
     void ExpectInitializeIsNotCalled();
 
-    MOCK_METHOD1( ProcessManifest, bool( std::string ) );
+    MOCK_METHOD2( ProcessManifest, bool( std::string, bool& ) );
     void MakeProcessManifestReturn( bool value );
     void ExpectProcessManifestIsNotCalled();
 

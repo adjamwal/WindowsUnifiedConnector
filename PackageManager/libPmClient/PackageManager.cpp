@@ -19,6 +19,7 @@
 #include "ICloudEventPublisher.h"
 #include "ICloudEventStorage.h"
 #include "IUcUpgradeEventHandler.h"
+#include "IInstallerCacheManager.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -26,6 +27,7 @@ using namespace std;
 
 PackageManager::PackageManager( IPmConfig& config,
     IPmCloud& cloud,
+    IInstallerCacheManager& installerCacheMgr,
     IPackageDiscoveryManager& packageDiscoveryManager,
     ICheckinFormatter& checkinFormatter,
     IUcidAdapter& ucidAdapter,
@@ -38,6 +40,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
+    , m_installerCacheMgr( installerCacheMgr )
     , m_packageDiscoveryManager( packageDiscoveryManager )
     , m_checkinFormatter( checkinFormatter )
     , m_ucidAdapter( ucidAdapter )
@@ -71,7 +74,7 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         LOG_ERROR( "Platform dependencies not provided. Cannot start Package Manager" );
     }
     else {
-        if ( !LoadPmConfig() ) {
+        if( !LoadPmConfig() ) {
             LOG_DEBUG( "Failed to load Pm configuration" );
         }
 
@@ -80,7 +83,7 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
         }
         else {
             std::string token = m_ucidAdapter.GetAccessToken();
-            if ( !token.empty() ) {
+            if( !token.empty() ) {
                 m_cloud.SetToken( token );
                 m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
                 m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
@@ -146,40 +149,80 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
 
 std::chrono::milliseconds PackageManager::PmThreadWait()
 {
-    return std::chrono::milliseconds( m_config.GetCloudCheckinInterval() );
+    if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
+        LOG_DEBUG( "Failed to load modified Pm configuration" );
+    }
+
+    return std::chrono::milliseconds( m_config.GetCloudCheckinIntervalMs() );
 }
 
 void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    if ( !LoadPmConfig() ) {
+    if( !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
         //Send event? might fail without a config/cloudURL
     }
 
-    try
-    {
-        PackageInventory inventory;
-        m_packageDiscoveryManager.DiscoverPackages( inventory );
+    PackageInventory inventory;
+    bool isRebootRequired = false;
 
+    try {
+        m_packageDiscoveryManager.DiscoverPackages( inventory );
+    }
+    catch( std::exception& ex ) {
+        LOG_ERROR( "PackageDiscovery failed: %s", ex.what() );
+        return;
+    }
+    catch ( ... ) {
+        LOG_ERROR( "PackageDiscovery failed: Unkown expcetion" );
+        return;
+    }
+
+    try {
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
             m_config.GetCloudCheckinUri(),
             m_checkinFormatter.GetJson( inventory )
         );
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
-        
-        if ( m_manifestProcessor.ProcessManifest( manifest ) )
+
+        if( !m_manifestProcessor.ProcessManifest( manifest, isRebootRequired ) )
         {
-            m_cloudEventPublisher.PublishFailedEvents();
+            LOG_ERROR( "ProcessManifest failed" );
         }
     }
-    catch( std::exception& ex )
-    {
+    catch( std::exception& ex ) {
         LOG_ERROR( "Checkin failed: %s", ex.what() );
     }
+    catch ( ... ) {
+        LOG_ERROR( "Checkin failed: Unknown exception" );
+    }
 
+    try {
+        LOG_DEBUG( "Post Checkin Steps" );
+        m_cloudEventPublisher.PublishFailedEvents();
+        m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAge() );
+
+        if( isRebootRequired )
+        {
+            if( m_config.AllowPostInstallReboots() ) 
+            {
+                m_dependencies->ComponentManager().InitiateSystemRestart();
+            }
+            else
+            { 
+                LOG_ERROR( "Post-install reboots disabled by PM configuration" );
+            }
+        }
+    }
+    catch ( std::exception& ex ) {
+        LOG_ERROR( "Post Checkin failed: %s", ex.what() );
+    }
+    catch ( ... ) {
+        LOG_ERROR( "Post Checkin failed: Unknown exception" );
+    }
 }
 
 bool PackageManager::LoadBsConfig()

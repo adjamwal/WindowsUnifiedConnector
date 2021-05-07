@@ -42,7 +42,7 @@ bool UcUpgradeEventHandler::StoreUcUpgradeEvent( const std::string& event )
     m_eventBuilder.FromJson( event );
     if ( m_eventBuilder.GetPackageName() == UC_PACKAGE_NAME ) {
         //Clear Events
-        auto previousEvents = m_ucUpgradeEventStorage.ReadEvents();
+        auto previousEvents = m_ucUpgradeEventStorage.ReadAndRemoveEvents();
         rtn = m_ucUpgradeEventStorage.SaveEvent( event );
     }
 
@@ -58,7 +58,7 @@ bool UcUpgradeEventHandler::PublishUcUpgradeEvent()
         return rtn;
     }
 
-    std::vector<std::string> events = m_ucUpgradeEventStorage.ReadEvents();
+    std::vector<std::string> events = m_ucUpgradeEventStorage.ReadAndRemoveEvents();
     for ( auto&& e : events ) {
         m_eventBuilder.FromJson( e );
 
@@ -66,7 +66,8 @@ bool UcUpgradeEventHandler::PublishUcUpgradeEvent()
             m_eventBuilder.WithError( UCPM_EVENT_ERROR_COMPONENT_UC_UPDATE, "Unified Connector failed to upgrade" );
         }
 
-        rtn = m_cloudEventPublisher.Publish( m_eventBuilder );
+        int publishResultCode = m_cloudEventPublisher.Publish( m_eventBuilder );
+        rtn |= publishResultCode == 200;
     }
 
     return rtn;

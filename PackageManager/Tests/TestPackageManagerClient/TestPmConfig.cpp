@@ -10,14 +10,13 @@ protected:
     void SetUp()
     {
         m_fileUtil.reset( new NiceMock<MockFileUtil>() );
-
+        m_aTimeStamp = std::filesystem::file_time_type::clock::now();
         m_patient.reset( new PmConfig( *m_fileUtil ) );
     }
 
     void TearDown()
     {
         m_patient.reset();
-
         m_fileUtil.reset();
     }
 
@@ -28,21 +27,27 @@ protected:
     },
     "pm": {
         "url": "https://packagemanager.cisco.com/checkin",
-        "event_url": "https://packagemanager.cisco.com/event/1"
+        "event_url": "https://packagemanager.cisco.com/event/1",
+        "catalog_url": "https://packagemanager.cisco.com/catalog"
     }
 }
 )";
 
+    //test with a custom CheckinInterval value different than PM_CONFIG_INTERVAL_DEFAULT
     const std::string pmConfigData = R"(
 {
     "pm": {
         "loglevel": 7,
-        "CheckinInterval": 300000
+        "CheckinInterval": 150000,
+        "MaxStartupDelay": 200000,
+        "maxFileCacheAge_s": 1000,
+        "AllowPostInstallReboots": true
     }
 }
 )";
 
     std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::filesystem::file_time_type m_aTimeStamp;
     std::unique_ptr<PmConfig> m_patient;
 };
 
@@ -68,7 +73,7 @@ TEST_F( TestPmConfig, LoadWillReadPmFile )
     m_patient->LoadPmConfig( pmfilename );
 }
 
-TEST_F( TestPmConfig, LoadWillSaveCloudUri )
+TEST_F( TestPmConfig, LoadWillSaveCloudCheckinUri )
 {
     m_fileUtil->MakeReadFileReturn( bsConfigData );
 
@@ -77,13 +82,32 @@ TEST_F( TestPmConfig, LoadWillSaveCloudUri )
     EXPECT_EQ( m_patient->GetCloudCheckinUri(), "https://packagemanager.cisco.com/checkin" );
 }
 
-TEST_F( TestPmConfig, LoadWillSaveInterval )
+TEST_F( TestPmConfig, LoadWillSaveCloudCatalogUri )
+{
+    m_fileUtil->MakeReadFileReturn( bsConfigData );
+
+    m_patient->LoadBsConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetCloudCatalogUri(), "https://packagemanager.cisco.com/catalog" );
+}
+
+TEST_F( TestPmConfig, LoadWillSaveCustomCheckinInterval )
+{
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
+
+    m_patient->LoadPmConfig( "filename" );
+    m_patient->GetCloudCheckinIntervalMs(); //discard 1st returned value since it is random
+
+    EXPECT_EQ( m_patient->GetCloudCheckinIntervalMs(), 150000 );
+}
+
+TEST_F( TestPmConfig, FirstCheckinIntervalIsRandomizedWithinCustomRange )
 {
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_EQ( m_patient->GetCloudCheckinInterval(), 300000 );
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), 200000 );
 }
 
 TEST_F( TestPmConfig, LoadBsConfigWillSucceed )
@@ -98,6 +122,25 @@ TEST_F( TestPmConfig, LoadPmConfigWillSucceed )
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 
     EXPECT_EQ( m_patient->LoadPmConfig( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, PmConfigFileChangedIsTrueBeforeLoading )
+{
+    m_fileUtil->MakeFileExistsReturn( true );
+    m_fileUtil->MakeFileTimeReturn( m_aTimeStamp );
+
+    EXPECT_EQ( true, m_patient->PmConfigFileChanged( "filename" ) );
+}
+
+TEST_F( TestPmConfig, PmConfigFileChangedIsFalseAfterLoading )
+{
+    m_fileUtil->MakeFileExistsReturn( true );
+    m_fileUtil->MakeFileTimeReturn( m_aTimeStamp );
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( false, m_patient->PmConfigFileChanged( "filename" ) );
 }
 
 TEST_F( TestPmConfig, LoadWillTryBackupFile )
@@ -126,21 +169,54 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceed )
     EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceedWillFailOnEmptyContents )
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillFailOnEmptyContents )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWillFailOnEmptyContents )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailOnEmptyContents )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
     EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidJson )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProvided )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "pm": {
+        "loglevel": 7,
+        "CheckinInterval": 150000,
+        "MaxStartupDelay": 200000,
+        "AllowPostInstallReboots": true
+    }
+}
+)" );
+
+    EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailIfMaxFileCacheAgeIsInvalid )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "pm": {
+        "loglevel": 7,
+        "CheckinInterval": 150000,
+        "MaxStartupDelay": 200000,
+        "maxFileCacheAge_s": "Invalid",
+        "AllowPostInstallReboots": true
+    }
+}
+)" );
+
+    EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+}
+
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillNotAcceptInvalidJson )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
@@ -150,12 +226,12 @@ TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidJson )
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
+TEST_F( TestPmConfig, VerifyBsFileIntegrityWillNotAcceptInvalidURL )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
 	"pm": {
-		"url": 1
+        "url": 1
 	}
 }
 )" );
@@ -163,16 +239,17 @@ TEST_F( TestPmConfig, VerifyFileIntegrityWillSucceedWillNotAcceptInvalidURL )
     EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, LoadSetDefaultInterval )
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultInterval )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
     m_patient->LoadPmConfig( "filename" );
+    m_patient->GetCloudCheckinIntervalMs(); //discard 1st returned value since it is random
 
-    EXPECT_EQ( m_patient->GetCloudCheckinInterval(), PM_CONFIG_INTERVAL_DEFAULT );
+    EXPECT_EQ( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
 }
 
-TEST_F( TestPmConfig, LoadSetDefaultLogLevel )
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
 {
     m_fileUtil->MakeReadFileReturn( "" );
 
@@ -180,3 +257,4 @@ TEST_F( TestPmConfig, LoadSetDefaultLogLevel )
 
     EXPECT_EQ( m_patient->GetLogLevel(), PM_CONFIG_LOGLEVEL_DEFAULT );
 }
+

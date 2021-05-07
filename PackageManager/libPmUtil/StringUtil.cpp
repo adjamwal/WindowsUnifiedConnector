@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 const std::string WHITESPACE = " \n\r\t\f\v\0";
 
@@ -20,4 +21,41 @@ std::string StringUtil::RTrim( const std::string& s )
 std::string StringUtil::Trim( const std::string& s )
 {
     return RTrim( LTrim( s ) );
+}
+
+void StringUtil::ReplaceStringInPlace( std::string& subject, const std::string& search, const std::string& replace )
+{
+    size_t pos = 0;
+    while( ( pos = subject.find( search, pos ) ) != std::string::npos ) {
+        subject.replace( pos, search.length(), replace );
+        pos += replace.length();
+    }
+}
+
+std::vector<std::string> StringUtil::Split( const std::string source, const char separator )
+{
+    std::vector<std::string> parts;
+    std::istringstream stream( source );
+    std::string s;
+    while( getline( stream, s, separator ) ) {
+        parts.push_back( s );
+    }
+
+    return parts;
+}
+
+std::wstring StringUtil::Str2WStr( const std::string& str )
+{
+    auto ws = std::make_unique<wchar_t[]>( str.size() + 1 );
+    mbstowcs_s( nullptr, ws.get(), str.size() + 1, str.c_str(), str.size() );
+    return ws.get();
+}
+
+bool StringUtil::NoCaseEquals( const std::string& a, const std::string& b )
+{
+    return std::equal( a.begin(), a.end(),
+        b.begin(), b.end(),
+        []( char a, char b ) {
+            return tolower( a ) == tolower( b );
+        } );
 }

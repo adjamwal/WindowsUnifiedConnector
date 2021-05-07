@@ -45,14 +45,19 @@ void MockPmCloud::ExpectCheckinIsNotCalled()
     EXPECT_CALL( *this, Checkin( _, _ ) ).Times( 0 );
 }
 
-void MockPmCloud::MakePostReturn( int32_t value )
+void MockPmCloud::MakeGetReturn( int32_t value )
 {
-    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( 200 ), Return( value ) ) );
+    ON_CALL( *this, Get( _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<2>( value ), Return( value ) ) );
 }
 
-void MockPmCloud::MakePostReturn( int32_t value, int32_t httpResponse )
+void MockPmCloud::ExpectGetIsNotCalled()
 {
-    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( httpResponse ), Return( value ) ) );
+    EXPECT_CALL( *this, Get( _, _, _ ) ).Times( 0 );
+}
+
+void MockPmCloud::MakePostReturn( int32_t value )
+{
+    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( value ), Return( value ) ) );
 }
 
 void MockPmCloud::ExpectPostIsNotCalled()

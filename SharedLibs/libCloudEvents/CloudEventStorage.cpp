@@ -56,7 +56,7 @@ bool CloudEventStorage::SaveEvent( const std::string& event )
     return m_fileUtil.WriteLine( m_fullPath, event );
 }
 
-std::vector<std::string> CloudEventStorage::ReadEvents()
+std::vector<std::string> CloudEventStorage::ReadAndRemoveEvents()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 

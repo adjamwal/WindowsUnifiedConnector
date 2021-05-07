@@ -114,12 +114,42 @@ void MockFileUtil::ExpectFileExistsNotCalled()
     EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
 }
 
+void MockFileUtil::MakeFileSizeReturn( size_t value )
+{
+    ON_CALL( *this, FileSize( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectFileSizeNotCalled()
+{
+    EXPECT_CALL( *this, FileSize( _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeFileTimeReturn( std::filesystem::file_time_type value )
+{
+    ON_CALL( *this, FileTime( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectFileTimeNotCalled()
+{
+    EXPECT_CALL( *this, FileTime( _ ) ).Times( 0 );
+}
+
 void MockFileUtil::MakeAppendPathReturn( std::string value )
 {
     ON_CALL( *this, AppendPath( _, _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectAppendPathCalled()
+void MockFileUtil::ExpectAppendPathIsNotCalled()
 {
     EXPECT_CALL( *this, AppendPath( _, _ ) ).Times( 0 );
+}
+
+void MockFileUtil::MakeLastWriteTimeReturn( time_t value )
+{
+    ON_CALL( *this, LastWriteTime( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockFileUtil::ExpectLastWriteTimeIsNotCalled()
+{
+    EXPECT_CALL( *this, LastWriteTime( _ ) ).Times( 0 );
 }

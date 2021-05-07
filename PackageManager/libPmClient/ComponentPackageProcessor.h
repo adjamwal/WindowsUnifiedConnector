@@ -4,7 +4,6 @@
 #include "PmTypes.h"
 #include <mutex>
 
-class IPmCloud;
 class IFileUtil;
 class ISslUtil;
 class IPackageConfigProcessor;
@@ -12,12 +11,13 @@ class IUcidAdapter;
 class ICloudEventBuilder;
 class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
+class IInstallerCacheManager;
 
 class ComponentPackageProcessor : public IComponentPackageProcessor
 {
 public:
     ComponentPackageProcessor(
-        IPmCloud& pmCloud,
+        IInstallerCacheManager& installerManager,
         IFileUtil& fileutil,
         ISslUtil& sslUtil,
         IPackageConfigProcessor& configProcessor,
@@ -30,15 +30,17 @@ public:
 
     void Initialize( IPmPlatformDependencies* dep ) override;
 
-    bool IsActionable( PmComponent& componentPackage ) override;
+    bool HasDownloadedBinary( PmComponent& componentPackage ) override;
     bool HasConfigs( PmComponent& componentPackage ) override;
 
-    bool ProcessPackageBinaries( PmComponent& componentPackage ) override;
+    bool DownloadPackageBinary( PmComponent& componentPackage ) override;
+
+    bool ProcessPackageBinary( PmComponent& componentPackage ) override;
     bool ProcessConfigsForPackage( PmComponent& componentPackage ) override;
 
 private:
     std::mutex m_mutex;
-    IPmCloud& m_pmCloud;
+    IInstallerCacheManager& m_installerManager;
     IFileUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     IPackageConfigProcessor& m_configProcessor;
@@ -50,6 +52,4 @@ private:
     uint32_t m_fileCount;
 
     bool IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly );
-    void DownloadAsTempFile( const PmComponent& componentPackage, std::string& downloadedFilePath );
-    void CleanupTempDownload( std::string tempFilePath );
 };

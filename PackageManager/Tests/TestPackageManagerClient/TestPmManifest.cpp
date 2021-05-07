@@ -149,7 +149,7 @@ TEST_F( TestPmManifest, WillGetPackageName )
 
     auto packages = m_patient->GetPackageList();
 
-    EXPECT_EQ( packages[0].packageNameAndVersion, "package name" );
+    EXPECT_EQ( packages[0].productAndVersion, "package name" );
 }
 
 TEST_F( TestPmManifest, WillGetPackageUrl )
