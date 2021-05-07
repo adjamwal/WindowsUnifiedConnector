@@ -21,5 +21,5 @@ private:
     IPmConfig& m_config;
 
     int32_t InternalGetCloudCatalogFrom( std::string& uri, std::string& response );
-    void HandleHttpError( int32_t respStatus );
+    void ThrowHttpError( int32_t respStatus );
 };

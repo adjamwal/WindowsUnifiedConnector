@@ -23,14 +23,14 @@ std::string CheckinManifestRetriever::GetCheckinManifestFrom( std::string uri, s
     
     if ( httpStatusResponse != 200 ) {
         if ( httpStatusResponse != 401 ) {
-            HandleHttpError( httpStatusResponse );
+            ThrowHttpError( httpStatusResponse );
         }
         else {
             m_ucidAdapter.Refresh();
             httpStatusResponse = InternalGetCheckinManifestFrom( uri, payload, response );
 
             if ( httpStatusResponse != 200 ) {
-                HandleHttpError( httpStatusResponse );
+                ThrowHttpError( httpStatusResponse );
             }
         }
     }
@@ -54,9 +54,8 @@ int32_t CheckinManifestRetriever::InternalGetCheckinManifestFrom( std::string& u
     return m_cloud.Checkin( payload, response );
 }
 
-void CheckinManifestRetriever::HandleHttpError( int32_t httpStatusResponse )
+void CheckinManifestRetriever::ThrowHttpError( int32_t httpStatusResponse )
 {
-    std::string s = __FUNCTION__ ": Http Post status ";
-    s += std::to_string( httpStatusResponse );
+    std::string s = __FUNCTION__ ": Http Post status " + std::to_string( httpStatusResponse );
     throw std::exception( s.c_str() );
 }
