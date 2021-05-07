@@ -13,7 +13,8 @@ def CheckoutDependencies() {
 def SetupVersion( int ucMajor, int ucMinor, int ucPatch, int ucRev ) {
   dir('WindowsUnifiedConnector') {
     contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackageBootstrapper\\Bundle.wxs') ])
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackage\\Product.wxs') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackageA\\Product.wxs') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackageB\\Product.wxs') ])
   }
 }
 
