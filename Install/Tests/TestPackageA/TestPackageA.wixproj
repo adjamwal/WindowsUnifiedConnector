@@ -47,11 +47,10 @@
     <PreBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir)en-us\$(TargetFileName) $(TargetDir)en-us\Cisco-UC-Installer-$(Platform).msi
-set WLHBASE=$(WLHBASE)
+    <PostBuildEvent>set WLHBASE=$(WLHBASE)
 set IMN_COMMON=$(IMN_COMMON)
 set VC_VARS_PATH=$(VC_VARS_PATH)
-$(SolutionDir)sign.bat $(TargetDir)en-us\Cisco-UC-Installer-$(Platform).msi</PostBuildEvent>
+$(SolutionDir)..\..\sign.bat $(TargetDir)$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
