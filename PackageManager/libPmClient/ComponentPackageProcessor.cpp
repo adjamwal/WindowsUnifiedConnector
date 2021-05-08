@@ -167,11 +167,13 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
                 componentPackage.downloadedInstallerPath.c_str() );
             componentPackage.postInstallRebootRequired = true;
+            m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_REQ, "Reboot required event" );
         }
         else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
         {
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, reboot initiated by msi",
                 componentPackage.downloadedInstallerPath.c_str() );
+            m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_INIT, "Reboot initiated event" );
         }
         else if( updErrCode != 0 )
         {

@@ -7,7 +7,7 @@ class WinApiWrapper : public IWinApiWrapper
 public:
     WinApiWrapper();
 
-    virtual BOOL CreateProcessW(
+    BOOL CreateProcessW(
         LPCWSTR lpApplicationName,
         LPWSTR lpCommandLine,
         LPSECURITY_ATTRIBUTES lpProcessAttributes,
@@ -17,17 +17,17 @@ public:
         LPVOID lpEnvironment,
         LPCWSTR lpCurrentDirectory,
         LPSTARTUPINFOW lpStartupInfo,
-        LPPROCESS_INFORMATION lpProcessInformation );
+        LPPROCESS_INFORMATION lpProcessInformation ) override;
 
-    virtual DWORD WaitForSingleObject( HANDLE hHandle, DWORD dwMilliseconds );
+    DWORD WaitForSingleObject( HANDLE hHandle, DWORD dwMilliseconds ) override;
 
-    virtual BOOL GetExitCodeProcess( HANDLE hProcess, LPDWORD lpExitCode );
+    BOOL GetExitCodeProcess( HANDLE hProcess, LPDWORD lpExitCode ) override;
 
-    virtual DWORD GetLastError();
+    DWORD GetLastError() override;
 
-    virtual HRESULT SHGetKnownFolderPath( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath );
+    HRESULT SHGetKnownFolderPath( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath ) override;
 
-    virtual UINT MsiEnumProductsExW(
+    UINT MsiEnumProductsExW(
         LPCWSTR szProductCode,
         LPCWSTR szUserSid,
         DWORD dwContext,
@@ -35,44 +35,53 @@ public:
         WCHAR* szInstalledProductCode,
         MSIINSTALLCONTEXT* pdwInstalledContext,
         LPWSTR szSid,
-        LPDWORD pcchSid );
+        LPDWORD pcchSid ) override;
 
-    virtual INSTALLSTATE MsiQueryProductStateW(
-        LPCWSTR szProduct );
+    INSTALLSTATE MsiQueryProductStateW(
+        LPCWSTR szProduct ) override;
 
-    virtual UINT MsiGetProductInfoExW(
+    UINT MsiGetProductInfoExW(
         LPCWSTR szProductCode,
         LPCWSTR szUserSid,
         MSIINSTALLCONTEXT dwContext,
         LPCWSTR szProperty,
         LPWSTR szValue,
-        LPDWORD pcchValue );
+        LPDWORD pcchValue ) override;
 
-    virtual UINT MsiGetProductPropertyW(
+    UINT MsiGetProductPropertyW(
         MSIHANDLE hProduct,
         LPCWSTR szProperty,
         LPWSTR lpValueBuf,
-        LPDWORD pcchValueBuf );
+        LPDWORD pcchValueBuf ) override;
 
-    virtual UINT MsiEnumRelatedProductsW(
+    UINT MsiEnumRelatedProductsW(
         LPCWSTR lpUpgradeCode,
         DWORD dwReserved,
         DWORD iProductIndex,
-        LPWSTR lpProductBuf );
+        LPWSTR lpProductBuf ) override;
 
-    virtual HANDLE FindFirstFileExW(
+    HANDLE FindFirstFileExW(
         LPCWSTR lpFileName,
         FINDEX_INFO_LEVELS fInfoLevelId,
         LPVOID lpFindFileData,
         FINDEX_SEARCH_OPS fSearchOp,
         LPVOID lpSearchFilter,
-        DWORD dwAdditionalFlags );
+        DWORD dwAdditionalFlags ) override;
 
-    virtual BOOL FindNextFileW(
+    BOOL FindNextFileW(
         HANDLE hFindFile,
-        LPWIN32_FIND_DATAW lpFindFileData );
+        LPWIN32_FIND_DATAW lpFindFileData ) override;
 
-    virtual BOOL FindClose(
-        HANDLE hFindFile );
+    BOOL FindClose(
+        HANDLE hFindFile ) override;
+
+    BOOL InitiateSystemShutdownExA(
+        LPSTR lpMachineName,
+        LPSTR lpMessage,
+        DWORD dwTimeout,
+        BOOL  bForceAppsClosed,
+        BOOL  bRebootAfterShutdown,
+        DWORD dwReason
+    ) override;
 };
 

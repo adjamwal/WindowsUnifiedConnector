@@ -133,3 +133,38 @@ BOOL WinApiWrapper::FindClose(
     return ::FindClose(
         hFindFile );
 }
+
+BOOL WinApiWrapper::InitiateSystemShutdownExA(
+    LPSTR lpMachineName,
+    LPSTR lpMessage,
+    DWORD dwTimeout,
+    BOOL  bForceAppsClosed,
+    BOOL  bRebootAfterShutdown,
+    DWORD dwReason
+)
+{
+    HANDLE           hToken;
+    TOKEN_PRIVILEGES tkp;
+
+    BOOL result = ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
+    if( result != ERROR_SUCCESS ) return result;
+
+    result = ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
+    if( result != ERROR_SUCCESS ) return result;
+
+    tkp.PrivilegeCount = 1; // set 1 privilege
+    tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
+
+    // get the shutdown privilege for this process
+    result = ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
+    if( result != ERROR_SUCCESS ) return result;
+
+    return ::InitiateSystemShutdownExA(
+        lpMachineName,
+        lpMessage,
+        dwTimeout,
+        bForceAppsClosed,
+        bRebootAfterShutdown,
+        dwReason
+    );
+}

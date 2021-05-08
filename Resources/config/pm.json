@@ -3,6 +3,7 @@
 		"loglevel": 7,
 		"CheckinInterval": 300000,
 		"MaxStartupDelay": 300000,
-		"maxFileCacheAge_s": 604800
+		"maxFileCacheAge_s": 604800,
+		"AllowPostInstallReboots": true
 	}
 }

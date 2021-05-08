@@ -24,9 +24,10 @@ void ManifestProcessor::Initialize( IPmPlatformDependencies* dep )
     m_componentProcessor.Initialize( dep );
 }
 
-bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
+bool ManifestProcessor::ProcessManifest( std::string checkinManifest, bool& isRebootRequired )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
+    isRebootRequired = false;
 
     if( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
@@ -37,9 +38,7 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest )
     auto packages = m_manifest.GetPackageList();
 
     PreDownloadAllFromManifest( packages );
-    ProcessDownloadedPackagesAndConfigs( packages );
-
-    //PmSendEvent() success
+    ProcessDownloadedPackagesAndConfigs( packages, isRebootRequired );
 
     return true;
 }
@@ -60,9 +59,11 @@ void ManifestProcessor::PreDownloadAllFromManifest( std::vector<PmComponent>& pa
     }
 }
 
-void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmComponent>& packages )
+void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmComponent>& packages, bool& isRebootRequired )
 {
     int failedPackages = 0;
+    isRebootRequired = false;
+
     for( auto& package : packages )
     {
         bool processed = false;
@@ -72,6 +73,8 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmCompo
             processed =
                 ( !m_componentProcessor.HasDownloadedBinary( package ) || m_componentProcessor.ProcessPackageBinary( package ) ) &&
                 ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+
+            isRebootRequired |= package.postInstallRebootRequired;
 
             LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s", processed, package.productAndVersion.c_str() );
         }

@@ -11,5 +11,5 @@ public:
     virtual ~IManifestProcessor() {}
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
-    virtual bool ProcessManifest( std::string checkinManifest ) = 0;
+    virtual bool ProcessManifest( std::string checkinManifest, bool& isRebootRequired ) = 0;
 };

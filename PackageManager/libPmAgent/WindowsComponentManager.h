@@ -95,7 +95,13 @@ public:
     * question mark is exactly one
     *
     */
-    int32_t FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results );
+    int32_t FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results ) override;
+
+    /**
+    * Initiates a system restart
+    * 
+    */
+    void InitiateSystemRestart() override;
 
 private:
     IWinApiWrapper& m_winApiWrapper;

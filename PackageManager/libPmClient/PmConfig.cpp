@@ -67,6 +67,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
             m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT;
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
             m_configData.maxFileCacheAge = PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS;
+            m_configData.allowPostInstallReboots = false;
         }
     }
 
@@ -199,6 +200,7 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
         m_configData.log_level = pm[ "loglevel" ].asUInt();
         m_configData.intervalMs = pm[ "CheckinInterval" ].asUInt();
         m_configData.maxDelayMs = pm[ "MaxStartupDelay" ].asUInt();
+        m_configData.allowPostInstallReboots = pm[ "AllowPostInstallReboots" ].asBool();
 
         //optional fields
         if ( pm.isMember( "maxFileCacheAge_s" ) ) {
@@ -302,8 +304,14 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
             LOG_ERROR( "MaxStartupDelay cannot be less than 2000 ms" );
             rtn = -1;
         }
-        else if ( pm.isMember( "maxFileCacheAge_s" ) && !pm[ "maxFileCacheAge_s" ].isUInt() ) {
+        
+        if ( pm.isMember( "maxFileCacheAge_s" ) && !pm[ "maxFileCacheAge_s" ].isUInt() ) {
             LOG_ERROR( "Invalid maxFileCacheAge_s" );
+            rtn = -1;
+        }
+
+        if( !pm[ "AllowPostInstallReboots" ].isBool() ) {
+            LOG_ERROR( "Invalid AllowPostInstallReboots" );
             rtn = -1;
         }
 
@@ -328,4 +336,9 @@ int32_t PmConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
     std::string pmData = m_fileUtil.ReadFile( pmConfig );
 
     return VerifyPmContents( pmData );
+}
+
+bool PmConfig::AllowPostInstallReboots()
+{
+    return m_configData.allowPostInstallReboots;
 }

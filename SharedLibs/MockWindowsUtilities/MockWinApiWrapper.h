@@ -90,4 +90,7 @@ public:
     MOCK_METHOD1( FindClose, BOOL(
         HANDLE hFindFile  ) );
     void MakeFindCloseReturn( BOOL value );
+
+    MOCK_METHOD6( InitiateSystemShutdownExA, 
+        BOOL( LPSTR, LPSTR, DWORD, BOOL, BOOL, DWORD ) );
 };

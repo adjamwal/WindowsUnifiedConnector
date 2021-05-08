@@ -12,6 +12,7 @@ MockPmConfig::MockPmConfig()
     MakeGetCloudCatalogUriReturn( "" );
     MakeGetCloudCheckinIntervalMsReturn( uint32_t() );
     MakeGetSupportedComponentListReturn( {} );
+    MakeAllowPostInstallRebootsReturn( false );
 }
 
 MockPmConfig::~MockPmConfig()
@@ -150,4 +151,9 @@ void MockPmConfig::MakeGetMaxFileCacheAgeReturn( uint32_t value )
 void MockPmConfig::ExpectGetMaxFileCacheAgeIsNotCalled()
 {
     EXPECT_CALL( *this, GetMaxFileCacheAge() ).Times( 0 );
+}
+
+void MockPmConfig::MakeAllowPostInstallRebootsReturn( bool value )
+{
+    ON_CALL( *this, AllowPostInstallReboots() ).WillByDefault( Return( value ) );
 }

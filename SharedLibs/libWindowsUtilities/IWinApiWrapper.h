@@ -74,4 +74,13 @@ public:
 
     virtual BOOL FindClose(
         HANDLE hFindFile ) = 0;
+
+    virtual BOOL InitiateSystemShutdownExA(
+        LPSTR lpMachineName,
+        LPSTR lpMessage,
+        DWORD dwTimeout,
+        BOOL  bForceAppsClosed,
+        BOOL  bRebootAfterShutdown,
+        DWORD dwReason
+    ) = 0;
 };

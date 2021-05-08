@@ -103,4 +103,10 @@ public:
     *
     */
     virtual int32_t FileSearchWithWildCard( const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results ) = 0;
+
+    /**
+    * Initiates a system restart
+    * 
+    */
+    virtual void InitiateSystemRestart() = 0;
 };

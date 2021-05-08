@@ -16,6 +16,7 @@
 #include "TimeUtil.h"
 #include "StringUtil.h"
 #include <iomanip>
+#include <sstream>
 
 CloudEventBuilder::CloudEventBuilder()
 {
@@ -225,7 +226,7 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
 
 bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
 {
-    return m_ucid._Equal( other.m_ucid ) &&
+    bool result = m_ucid._Equal( other.m_ucid ) &&
         m_evtype == other.m_evtype &&
         m_packageName._Equal( other.m_packageName ) &&
         m_packageVersion._Equal( other.m_packageVersion ) &&
@@ -237,6 +238,28 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
         m_newPath == other.m_newPath &&
         m_newHash._Equal( other.m_newHash ) &&
         m_newSize == other.m_newSize;
+
+    if( !result )
+    {
+        std::stringstream ss;
+        ss <<
+            "'" << m_ucid << "' ?= '" << other.m_ucid << "', " <<
+            "'" << m_evtype << "' ?= '" << other.m_evtype << "', " <<
+            "'" << m_packageName << "' ?= '" << other.m_packageName << "', " <<
+            "'" << m_packageVersion << "' ?= '" << other.m_packageVersion << "', " <<
+            "'" << m_errCode << "' ?= '" << other.m_errCode << "', " <<
+            "'" << m_errMessage << "' ?= '" << other.m_errMessage << "', " <<
+            "'" << m_oldPath << "' ?= '" << other.m_oldPath << "', " <<
+            "'" << m_oldHash << "' ?= '" << other.m_oldHash << "', " <<
+            "'" << m_oldSize << "' ?= '" << other.m_oldSize << "', " <<
+            "'" << m_newPath << "' ?= '" << other.m_newPath << "', " <<
+            "'" << m_newHash << "' ?= '" << other.m_newHash << "', " <<
+            "'" << m_newSize << "' ?= '" << other.m_newSize << "'";
+
+        LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
+    }
+
+    return result;
 }
 
 #pragma region PRIVATE
