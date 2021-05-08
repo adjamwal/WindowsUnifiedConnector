@@ -200,10 +200,11 @@ int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::
 
 void WindowsComponentManager::InitiateSystemRestart()
 {
-    const char* lpMessage = "A Cisco Unified Connector package update has requested a reboot";
-    m_winApiWrapper.InitiateSystemShutdownExA(
+    LOG_DEBUG( __FUNCTION__ ": Enter" );
+
+    BOOL success = m_winApiWrapper.InitiateSystemShutdownExA(
         /*lpMachineName*/           NULL, 
-        /*lpMessage*/               (LPSTR)lpMessage, //message to log in Event Viewer
+        /*lpMessage*/               NULL,
         /*dwTimeout*/               0, //prevent aborting the reboot
         /*bForceAppsClosed*/        false, //user prompted to save any pending work
         /*bRebootAfterShutdown*/    true,
@@ -211,4 +212,12 @@ void WindowsComponentManager::InitiateSystemRestart()
                                     SHTDN_REASON_MINOR_INSTALLATION | 
                                     SHTDN_REASON_FLAG_PLANNED
     );
+
+    if( !success )
+    {
+        DWORD errCode = GetLastError();
+        LOG_DEBUG( __FUNCTION__ ": Failed, GetLastError=%ld", errCode );
+    }
+
+    LOG_DEBUG( __FUNCTION__ ": Exit" );
 }
