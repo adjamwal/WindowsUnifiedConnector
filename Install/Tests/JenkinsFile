@@ -26,18 +26,15 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'10'))
   }
   environment {
-    BUILD_LOG_LINES         = '500'
-
     MASTER_BRANCH_NAME      = 'master'
     LOCAL_CERT_LOCATION = 'C:\\machineCerts'
     CERT_FILENAME = 'MyCA.cer'
-
+	SIGNING_API_PASSWORD = credentials('VSPHERE_GENERIC_ACCOUNT')
     JENKINS_USERNAME = 'Jenkins'
     JENKINS_USER_PASSWORD = credentials('JENKINS_USER_PASSWORD')
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
     WIN_DEV_GITHUB_TOKEN = credentials('fireamp-win-dev-git-token')
     CLG5_LAB_PASSWORD = credentials('CLG5_LAB_GENERIC_USER_PW')
-    CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
   }
   stages {
     stage ('Init') {
