@@ -13,11 +13,11 @@ struct MsiApiProductProperties
     std::wstring InstalledProductName;
     std::wstring Publisher;
     std::wstring VersionString;
-    std::wstring InstallDate;
-    std::wstring InstallLocation;
-    std::wstring InstallSource;
-    std::wstring LocalPackage;
-    std::wstring AssignmentType;
+    //std::wstring InstallDate;
+    //std::wstring InstallLocation;
+    //std::wstring InstallSource;
+    //std::wstring LocalPackage;
+    //std::wstring AssignmentType;
 };
 
 struct MsiApiProductInfo

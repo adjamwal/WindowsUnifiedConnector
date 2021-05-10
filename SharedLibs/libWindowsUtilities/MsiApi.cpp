@@ -121,17 +121,21 @@ MsiApiProductInfo MsiApi::GetProductInformation(
 
     product.InstalledProductCode = std::wstring( szInstalledProductCode );
     product.MsiInstallContext = pdwInstalledContext;
-    product.InstallState = m_winApiWrapper.MsiQueryProductStateW( szInstalledProductCode );
+
+    //Commented out to improve performance. Might still be valid information in the future.
+    //product.InstallState = m_winApiWrapper.MsiQueryProductStateW( szInstalledProductCode );
 
     MsiApiProductProperties properties;
     properties.InstalledProductName = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLEDPRODUCTNAME );
     properties.Publisher = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_PUBLISHER );
     properties.VersionString = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_VERSIONSTRING );
-    properties.InstallDate = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLDATE );
-    properties.InstallLocation = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLLOCATION );
-    properties.InstallSource = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLSOURCE );
-    properties.LocalPackage = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_LOCALPACKAGE );
-    properties.AssignmentType = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_ASSIGNMENTTYPE );
+
+    //Commented out to improve performance. Might still be valid information in the future.
+    //properties.InstallDate = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLDATE );
+    //properties.InstallLocation = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLLOCATION );
+    //properties.InstallSource = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLSOURCE );
+    //properties.LocalPackage = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_LOCALPACKAGE );
+    //properties.AssignmentType = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_ASSIGNMENTTYPE );
     
     product.Properties = properties;
 
