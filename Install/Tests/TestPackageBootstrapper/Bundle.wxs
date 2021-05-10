@@ -6,10 +6,10 @@
         <Variable Name="FAIL" bal:Overridable="yes"/>
 
         <Chain>
-            <MsiPackage Id="Installer32" InstallCondition='NOT VersionNT64' SourceFile="..\TestPackage\bin\x86\$(var.Configuration)\TestPackage.msi">
+            <MsiPackage Id="Installer32" InstallCondition='NOT VersionNT64' SourceFile="..\TestPackageA\bin\x86\$(var.Configuration)\TestPackageA.msi">
                 <MsiProperty Name="FAIL" Value="[FAIL]" />
             </MsiPackage>
-            <MsiPackage Id="Installer64" InstallCondition='VersionNT64' SourceFile="..\TestPackage\bin\x64\$(var.Configuration)\TestPackage.msi">
+            <MsiPackage Id="Installer64" InstallCondition='VersionNT64' SourceFile="..\TestPackageA\bin\x64\$(var.Configuration)\TestPackageA.msi">
                 <MsiProperty Name="FAIL" Value="[FAIL]" />
             </MsiPackage>
 		</Chain>

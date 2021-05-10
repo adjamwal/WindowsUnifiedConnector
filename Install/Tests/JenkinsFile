@@ -2,7 +2,7 @@
 
 @Library('JenkinsShared')_
 
-agentLabel = "VS2019"
+agentLabel = "windowsci2019"
 
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
@@ -13,7 +13,8 @@ def CheckoutDependencies() {
 def SetupVersion( int ucMajor, int ucMinor, int ucPatch, int ucRev ) {
   dir('WindowsUnifiedConnector') {
     contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackageBootstrapper\\Bundle.wxs') ])
-    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackage\\Product.wxs') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackageA\\Product.wxs') ])
+    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: 'Version=\\"(\\d+.\\d+.\\d+.\\d+)', replace: 'Version="' + ucMajor + '.' + ucMinor + '.' + ucPatch + '.' + ucRev, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Install\\Tests\\TestPackageB\\Product.wxs') ])
   }
 }
 
@@ -25,18 +26,16 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'10'))
   }
   environment {
-    BUILD_LOG_LINES         = '500'
-
     MASTER_BRANCH_NAME      = 'master'
     LOCAL_CERT_LOCATION = 'C:\\machineCerts'
     CERT_FILENAME = 'MyCA.cer'
-
+	SIGNING_API_PASSWORD = credentials('VSPHERE_GENERIC_ACCOUNT')
     JENKINS_USERNAME = 'Jenkins'
     JENKINS_USER_PASSWORD = credentials('JENKINS_USER_PASSWORD')
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
     WIN_DEV_GITHUB_TOKEN = credentials('fireamp-win-dev-git-token')
     CLG5_LAB_PASSWORD = credentials('CLG5_LAB_GENERIC_USER_PW')
-    CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
+	WIN_AMP_OFFICIAL_BUILD = "${env.CHANGE_ID != null ? 0 : 1}"
   }
   stages {
     stage ('Init') {
@@ -75,17 +74,23 @@ pipeline {
           steps {
             script {
               dir('WindowsUnifiedConnector\\Install\\Tests') {
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackage"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackage"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageA"
+				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageA"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageB"
+				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
 				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
 				
-				bat "RENAME TestPackage\\bin\\x86\\Release\\TestPackage.msi TestPackage-x86-1.0.0.0.msi"
-				bat "RENAME TestPackage\\bin\\x64\\Release\\TestPackage.msi TestPackage-x64-1.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-1.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-1.0.0.0.msi"
+                bat "RENAME TestPackageB\\bin\\x86\\Release\\TestPackageB.msi TestPackageB-x86-1.0.0.0.msi"
+				bat "RENAME TestPackageB\\bin\\x64\\Release\\TestPackageB.msi TestPackageB-x64-1.0.0.0.msi"
 				bat "RENAME TestPackageBootstrapper\\bin\\Release\\TestPackageBootstrapper.exe TestPackageBootstrapper-1.0.0.0.exe"
               }
               
-              archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackage\\bin\\x86\\Release\\TestPackage-x86-1.0.0.0.msi', fingerprint: true
-			  archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackage\\bin\\x64\\Release\\TestPackage-x64-1.0.0.0.msi', fingerprint: true
+              archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageA\\bin\\x86\\Release\\TestPackageA-x86-1.0.0.0.msi', fingerprint: true
+			  archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageA\\bin\\x64\\Release\\TestPackageA-x64-1.0.0.0.msi', fingerprint: true
+              archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageB\\bin\\x86\\Release\\TestPackageB-x86-1.0.0.0.msi', fingerprint: true
+			  archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageB\\bin\\x64\\Release\\TestPackageB-x64-1.0.0.0.msi', fingerprint: true
               archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageBootstrapper\\bin\\Release\\TestPackageBootstrapper-1.0.0.0.exe', fingerprint: true
             }
           }
@@ -95,17 +100,23 @@ pipeline {
             script {
               SetupVersion(2,0,0,0)
               dir('WindowsUnifiedConnector\\Install\\Tests') {
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackage"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackage"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageA"
+				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageA"
+                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageB"
+				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
 				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
                 
-				bat "RENAME TestPackage\\bin\\x64\\Release\\TestPackage.msi TestPackage-x64-2.0.0.0.msi"
-				bat "RENAME TestPackage\\bin\\x86\\Release\\TestPackage.msi TestPackage-x86-2.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-2.0.0.0.msi"
+				bat "RENAME TestPackageA\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-2.0.0.0.msi"
+                bat "RENAME TestPackageB\\bin\\x64\\Release\\TestPackageB.msi TestPackageB-x64-2.0.0.0.msi"
+				bat "RENAME TestPackageB\\bin\\x86\\Release\\TestPackageB.msi TestPackageB-x86-2.0.0.0.msi"
 				bat "RENAME TestPackageBootstrapper\\bin\\Release\\TestPackageBootstrapper.exe TestPackageBootstrapper-2.0.0.0.exe"
               }
               
-              archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackage\\bin\\x86\\Release\\TestPackage-x86-2.0.0.0.msi', fingerprint: true
-			  archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackage\\bin\\x64\\Release\\TestPackage-x64-2.0.0.0.msi', fingerprint: true
+              archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageA\\bin\\x86\\Release\\TestPackageA-x86-2.0.0.0.msi', fingerprint: true
+			  archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageA\\bin\\x64\\Release\\TestPackageA-x64-2.0.0.0.msi', fingerprint: true
+              archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageB\\bin\\x86\\Release\\TestPackageB-x86-2.0.0.0.msi', fingerprint: true
+			  archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageB\\bin\\x64\\Release\\TestPackageB-x64-2.0.0.0.msi', fingerprint: true
               archiveArtifacts artifacts: 'WindowsUnifiedConnector\\Install\\Tests\\TestPackageBootstrapper\\bin\\Release\\TestPackageBootstrapper-2.0.0.0.exe', fingerprint: true
             }
           }

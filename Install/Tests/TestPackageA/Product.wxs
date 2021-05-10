@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="TestPackage" Language="1033" Version="1.0.0.0" Manufacturer="TestPackage" UpgradeCode="8c028f5d-d916-40b5-a678-f66b9789ec2b">
+	<Product Id="*" Name="TestPackageA" Language="1033" Version="1.0.0.0" Manufacturer="TestPackageA" UpgradeCode="8c028f5d-d916-40b5-a678-f66b9789ec2b">
         <?if $(var.Platform) = x64 ?>
             <?define Win64 = "yes" ?>
             <?define ProjectsPlatform = "x64" ?>
@@ -21,7 +21,7 @@
         
         <MediaTemplate EmbedCab="yes" />
 
-		<Feature Id="ProductFeature" Title="TestPackage" Level="1">
+		<Feature Id="ProductFeature" Title="TestPackageA" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
 
@@ -45,7 +45,7 @@
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component Id="ProductRegistry">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\SecureXYZ\TestPackage">
+							 Key="Software\Cisco\SecureXYZ\TestPackageA">
                     <RegistryValue Type="string" Name="ProductCode" Value="[ProductCode]" KeyPath="yes"/>
                     <RegistryValue Type="string" Name="Config" Value="[INSTALLFOLDER]config.json"/>
                     <RegistryValue Type="string" Name="Version" Value="[ProductVersion]"/>
