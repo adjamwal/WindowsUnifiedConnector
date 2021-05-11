@@ -146,6 +146,7 @@ BOOL WinApiWrapper::InitiateSystemShutdownExA(
     HANDLE           hToken;
     TOKEN_PRIVILEGES tkp;
 
+    //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
     BOOL result = ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
     if( result != ERROR_SUCCESS ) return result;
 
@@ -167,4 +168,26 @@ BOOL WinApiWrapper::InitiateSystemShutdownExA(
         bRebootAfterShutdown,
         dwReason
     );
+}
+
+BOOL WinApiWrapper::ExitWindowsEx( UINT  uFlags, DWORD dwReason )
+{
+    HANDLE           hToken;
+    TOKEN_PRIVILEGES tkp;
+
+    //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
+    BOOL result = ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
+    if( result != ERROR_SUCCESS ) return result;
+
+    result = ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
+    if( result != ERROR_SUCCESS ) return result;
+
+    tkp.PrivilegeCount = 1; // set 1 privilege
+    tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
+
+    // get the shutdown privilege for this process
+    result = ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
+    if( result != ERROR_SUCCESS ) return result;
+
+    return ::ExitWindowsEx( uFlags, dwReason );
 }
