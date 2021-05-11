@@ -83,5 +83,6 @@ public:
         BOOL  bRebootAfterShutdown,
         DWORD dwReason
     ) override;
-};
 
+    BOOL ExitWindowsEx( UINT uFlags, DWORD dwReason ) override;
+};

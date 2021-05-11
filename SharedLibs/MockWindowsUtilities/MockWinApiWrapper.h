@@ -93,4 +93,6 @@ public:
 
     MOCK_METHOD6( InitiateSystemShutdownExA, 
         BOOL( LPSTR, LPSTR, DWORD, BOOL, BOOL, DWORD ) );
+
+    MOCK_METHOD2( ExitWindowsEx, BOOL( UINT, DWORD ) );
 };

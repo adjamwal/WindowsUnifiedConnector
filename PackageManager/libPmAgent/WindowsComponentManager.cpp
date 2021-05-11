@@ -202,18 +202,13 @@ void WindowsComponentManager::InitiateSystemRestart()
 {
     LOG_DEBUG( __FUNCTION__ ": Enter" );
 
-    BOOL success = m_winApiWrapper.InitiateSystemShutdownExA(
-        /*lpMachineName*/           NULL, 
-        /*lpMessage*/               NULL,
-        /*dwTimeout*/               0, //prevent aborting the reboot
-        /*bForceAppsClosed*/        false, //user prompted to save any pending work
-        /*bRebootAfterShutdown*/    true,
-        /*dwReason*/                SHTDN_REASON_MAJOR_SOFTWARE | 
-                                    SHTDN_REASON_MINOR_INSTALLATION | 
-                                    SHTDN_REASON_FLAG_PLANNED
-    );
+    BOOL result = m_winApiWrapper.ExitWindowsEx(
+        EWX_REBOOT | EWX_FORCEIFHUNG,
+        SHTDN_REASON_MAJOR_SOFTWARE |
+        SHTDN_REASON_MINOR_INSTALLATION |
+        SHTDN_REASON_FLAG_PLANNED );
 
-    if( !success )
+    if( result != ERROR_SUCCESS )
     {
         DWORD errCode = GetLastError();
         LOG_DEBUG( __FUNCTION__ ": Failed, GetLastError=%ld", errCode );

@@ -83,4 +83,6 @@ public:
         BOOL  bRebootAfterShutdown,
         DWORD dwReason
     ) = 0;
+
+    virtual BOOL ExitWindowsEx( UINT uFlags, DWORD dwReason ) = 0;
 };
