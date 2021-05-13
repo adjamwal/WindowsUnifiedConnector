@@ -147,18 +147,15 @@ BOOL WinApiWrapper::InitiateSystemShutdownExA(
     TOKEN_PRIVILEGES tkp;
 
     //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
-    BOOL result = ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
-    if( result != ERROR_SUCCESS ) return result;
+    ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
 
-    result = ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
-    if( result != ERROR_SUCCESS ) return result;
+    ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
 
     tkp.PrivilegeCount = 1; // set 1 privilege
     tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
 
     // get the shutdown privilege for this process
-    result = ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
-    if( result != ERROR_SUCCESS ) return result;
+    ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
 
     return ::InitiateSystemShutdownExA(
         lpMachineName,
@@ -176,18 +173,15 @@ BOOL WinApiWrapper::ExitWindowsEx( UINT  uFlags, DWORD dwReason )
     TOKEN_PRIVILEGES tkp;
 
     //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
-    BOOL result = ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
-    if( result != ERROR_SUCCESS ) return result;
+    ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
 
-    result = ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
-    if( result != ERROR_SUCCESS ) return result;
+    ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
 
     tkp.PrivilegeCount = 1; // set 1 privilege
     tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
 
     // get the shutdown privilege for this process
-    result = ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
-    if( result != ERROR_SUCCESS ) return result;
+    ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
 
     return ::ExitWindowsEx( uFlags, dwReason );
 }
