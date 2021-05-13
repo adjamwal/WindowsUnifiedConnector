@@ -29,11 +29,6 @@ struct MsiApiProductInfo
     MsiApiProductProperties Properties;
 };
 
-struct MsiProductCache
-{
-    std::vector<MsiApiProductInfo> Cache;
-};
-
 class IMsiApi
 {
 public:
