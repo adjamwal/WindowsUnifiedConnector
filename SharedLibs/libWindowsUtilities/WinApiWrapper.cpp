@@ -169,7 +169,7 @@ BOOL WinApiWrapper::InitiateSystemShutdownExA(
 
 BOOL WinApiWrapper::ExitWindowsEx( UINT  uFlags, DWORD dwReason )
 {
-    HANDLE           hToken;
+    HANDLE           hToken = NULL;
     TOKEN_PRIVILEGES tkp;
 
     //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
