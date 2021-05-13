@@ -181,7 +181,9 @@ BOOL WinApiWrapper::ExitWindowsEx( UINT  uFlags, DWORD dwReason )
     tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
 
     // get the shutdown privilege for this process
-    ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
+    if( hToken != NULL && hToken != INVALID_HANDLE_VALUE ) {
+        ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
+    }
 
     return ::ExitWindowsEx( uFlags, dwReason );
 }
