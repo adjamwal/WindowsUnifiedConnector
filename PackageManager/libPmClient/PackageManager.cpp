@@ -160,9 +160,8 @@ void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    if( !LoadPmConfig() ) {
+    if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
-        //Send event? might fail without a config/cloudURL
     }
 
     PackageInventory inventory;
@@ -191,6 +190,11 @@ void PackageManager::PmWorkflowThread()
         if( !m_manifestProcessor.ProcessManifest( manifest, isRebootRequired ) )
         {
             LOG_ERROR( "ProcessManifest failed" );
+        }
+
+        //new config might've been deployed
+        if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
+            LOG_DEBUG( "Failed to load PM configuration" );
         }
     }
     catch( std::exception& ex ) {

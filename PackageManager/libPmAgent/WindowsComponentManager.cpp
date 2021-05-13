@@ -210,8 +210,7 @@ void WindowsComponentManager::InitiateSystemRestart()
 
     if( result != ERROR_SUCCESS )
     {
-        DWORD errCode = GetLastError();
-        LOG_DEBUG( __FUNCTION__ ": Failed, GetLastError=%ld", errCode );
+        LOG_DEBUG( __FUNCTION__ ": ExitWindowsEx() failed, GetLastError=%ld", GetLastError() );
     }
 
     LOG_DEBUG( __FUNCTION__ ": Exit" );
