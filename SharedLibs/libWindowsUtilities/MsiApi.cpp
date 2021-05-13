@@ -11,6 +11,47 @@ MsiApi::~MsiApi()
 {
 }
 
+int32_t MsiApi::QueryProducts( std::vector<MsiApiProductInfo>& products )
+{
+    int32_t retValue = 0;
+    DWORD dwIndex = 0;
+    TCHAR szInstalledProductCode[39] = { 0 };
+    TCHAR szSid[128] = { 0 };
+    DWORD pcchSid = 128;
+    MSIINSTALLCONTEXT pdwInstalledContext = {};
+
+    do {
+        pcchSid = 128;
+
+        retValue = m_winApiWrapper.MsiEnumProductsExW(
+            NULL,
+            L"s-1-1-0",
+            MSIINSTALLCONTEXT_ALL,
+            dwIndex,
+            szInstalledProductCode,
+            &pdwInstalledContext,
+            szSid,
+            &pcchSid );
+
+        if ( retValue == ERROR_SUCCESS )
+        {
+            MsiApiProductInfo currentProduct;
+
+            currentProduct = GetProductInformation(
+                szInstalledProductCode,
+                pdwInstalledContext,
+                szSid,
+                pcchSid );
+
+            products.emplace_back( currentProduct );
+
+            dwIndex++;
+        }
+    } while ( retValue == ERROR_SUCCESS );
+
+    return (ERROR_NO_MORE_ITEMS == retValue) ? ERROR_SUCCESS : retValue;
+}
+
 std::tuple<int32_t, std::vector<MsiApiProductInfo>> MsiApi::FindProductsByName( std::wstring productName )
 {
     return QueryProducts( NULL, productName, L"" );

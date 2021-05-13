@@ -164,6 +164,57 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
     }
 }
 
+void PackageDiscoveryMethods::DiscoverByMsiRules( 
+    const PmProductDiscoveryRules& lookupProduct, 
+    const std::vector<PmProductDiscoveryMsiMethod>& msiRules, 
+    std::vector<PmInstalledPackage>& detectedInstallations )
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::vector<MsiApiProductInfo> productCache;
+
+    auto ret = m_msiApi.QueryProducts( productCache );
+
+    if ( ret == ERROR_SUCCESS && !productCache.empty() )
+    {
+        for ( auto msiRule : lookupProduct.msi_discovery )
+        {
+            bool found = false;
+            std::wstring name = converter.from_bytes( msiRule.name );
+            std::wstring publisher = converter.from_bytes( msiRule.vendor );
+
+            for ( auto product : productCache )
+            {
+                if ( !name.empty() &&
+                    !publisher.empty() &&
+                    name.compare( product.Properties.InstalledProductName ) == 0 &&
+                    publisher.compare( product.Properties.Publisher ) == 0 )
+                {
+                    PmInstalledPackage detected = {};
+                    detected.version = converter.to_bytes( product.Properties.VersionString );
+                    detected.product = lookupProduct.product;
+
+                    LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
+                        msiRule.name.c_str(),
+                        msiRule.vendor.c_str(),
+                        converter.to_bytes( product.InstalledProductCode ).c_str() );
+
+                    detectedInstallations.push_back( detected );
+                    found = true;
+                }
+            }
+
+            if ( !found )
+            {
+                LOG_ERROR( "Could not find %s, %s", msiRule.name.c_str(), msiRule.vendor.c_str() );
+            }
+        }
+    }
+    else
+    {
+        LOG_ERROR( "Error getting products list form system  %d", ret );
+    }
+}
+
 bool PackageDiscoveryMethods::DecodeRegistryPath( const PmProductDiscoveryRegKeyDef& keyDef,
     HKEY& root, std::string& subKey, std::string& valueName, std::string& error )
 {

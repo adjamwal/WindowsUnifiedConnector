@@ -18,4 +18,7 @@ public:
 
     MOCK_METHOD3( DiscoverByMsiUpgradeCode, void( const PmProductDiscoveryRules&, const PmProductDiscoveryMsiUpgradeCodeMethod&, std::vector<PmInstalledPackage>& ) );
     void ExpectDiscoverByMsiUpgradeCodeIsNotCalled();
+
+    MOCK_METHOD3( DiscoverByMsiRules, void( const PmProductDiscoveryRules&, const std::vector<PmProductDiscoveryMsiMethod>&, std::vector<PmInstalledPackage>& ) );
+    void ExpectDiscoverByMsiRulesIsNotCalled();
 };

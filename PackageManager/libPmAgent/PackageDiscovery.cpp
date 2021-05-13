@@ -58,13 +58,7 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
         }
     }
 
-    for( auto msiRule : lookupProduct.msi_discovery )
-    {
-        m_methods.DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
-        if ( !detectedInstallations.empty() ) {
-            return;
-        }
-    }
+    m_methods.DiscoverByMsiRules( lookupProduct, lookupProduct.msi_discovery, detectedInstallations );
 
     for( auto regRule : lookupProduct.reg_discovery )
     {

@@ -51,7 +51,7 @@ protected:
         detection.version = "msi";
         m_detectedInstallations.push_back( detection );
 
-        ON_CALL( *m_discoveryMethods, DiscoverByMsi( _, _, _ ) )
+        ON_CALL( *m_discoveryMethods, DiscoverByMsiRules( _, _, _ ) )
             .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
     }
 
@@ -141,11 +141,7 @@ TEST_F( TestPackageDiscovery, DiscoveryWillCompleteAfterMsiMethod )
 {
     PmProductDiscoveryRules productInCatalog;
     SetupMsiDiscovery( productInCatalog );
-    SetupRegistryDiscovery( productInCatalog );
     m_catalogRules.push_back( productInCatalog );
-
-    m_discoveryMethods->ExpectDiscoverByMsiUpgradeCodeIsNotCalled();
-    m_discoveryMethods->ExpectDiscoverByRegistryIsNotCalled();
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 

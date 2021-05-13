@@ -29,11 +29,18 @@ struct MsiApiProductInfo
     MsiApiProductProperties Properties;
 };
 
+struct MsiProductCache
+{
+    std::vector<MsiApiProductInfo> Cache;
+};
+
 class IMsiApi
 {
 public:
     IMsiApi() {}
     virtual ~IMsiApi() {}
+
+    virtual int32_t QueryProducts( std::vector<MsiApiProductInfo>& products ) = 0;
 
     virtual std::tuple<int32_t, std::vector<MsiApiProductInfo>> FindProductsByName( 
         std::wstring displayName ) = 0;

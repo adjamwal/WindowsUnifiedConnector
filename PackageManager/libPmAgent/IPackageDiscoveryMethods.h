@@ -28,4 +28,9 @@ public:
         const PmProductDiscoveryRules& lookupProduct,
         const PmProductDiscoveryMsiUpgradeCodeMethod& upgradeCodeRule,
         std::vector<PmInstalledPackage>& detectedInstallations ) = 0;
+
+    virtual void DiscoverByMsiRules(
+        const PmProductDiscoveryRules& lookupProduct,
+        const std::vector<PmProductDiscoveryMsiMethod>& msiRules,
+        std::vector<PmInstalledPackage>& detectedInstallations ) = 0;
 };

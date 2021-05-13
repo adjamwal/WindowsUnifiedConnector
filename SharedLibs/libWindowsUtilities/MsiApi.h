@@ -6,7 +6,10 @@ class MsiApi : public IMsiApi
 {
 public:
     MsiApi( IWinApiWrapper& winApiWrapper );
+
     virtual ~MsiApi();
+
+    int32_t QueryProducts( std::vector<MsiApiProductInfo>& products ) override;
 
     std::tuple<int32_t, std::vector<MsiApiProductInfo>> FindProductsByName(
         std::wstring productName ) override;
