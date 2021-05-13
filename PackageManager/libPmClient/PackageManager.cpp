@@ -160,7 +160,7 @@ void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    if( !LoadPmConfig() ) {
+    if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
     }
 
@@ -193,7 +193,7 @@ void PackageManager::PmWorkflowThread()
         }
 
         //new config might've been deployed
-        if( !LoadPmConfig() ) {
+        if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
             LOG_DEBUG( "Failed to load PM configuration" );
         }
     }
