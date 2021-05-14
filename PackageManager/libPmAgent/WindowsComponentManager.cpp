@@ -208,7 +208,7 @@ void WindowsComponentManager::InitiateSystemRestart()
         SHTDN_REASON_MINOR_INSTALLATION |
         SHTDN_REASON_FLAG_PLANNED );
 
-    if( result != ERROR_SUCCESS )
+    if( !result )
     {
         LOG_DEBUG( __FUNCTION__ ": ExitWindowsEx() failed, GetLastError=%ld", GetLastError() );
     }

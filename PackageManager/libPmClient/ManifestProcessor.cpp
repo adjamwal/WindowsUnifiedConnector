@@ -31,7 +31,6 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest, bool& isRe
 
     if( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
-        //PmSendEvent() bad manifest
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
 
@@ -76,7 +75,8 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmCompo
 
             isRebootRequired |= package.postInstallRebootRequired;
 
-            LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s", processed, package.productAndVersion.c_str() );
+            LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s, postInstallRebootRequired=%d", 
+                processed, package.productAndVersion.c_str(), package.postInstallRebootRequired );
         }
         catch( ... ) {
             LOG_ERROR( __FUNCTION__ ": Failed to process package: %s", package.productAndVersion.c_str() );
