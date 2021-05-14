@@ -113,6 +113,7 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     package.installLocation = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_LOCATION, false ) );
     package.signerName = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_SIGNER, false );
     package.installerHash = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_SHA, false );
+    package.postInstallRebootRequired = false;
 
     if( packageJson[ MANIFEST_FIELD_FILES ].isArray() ) {
         for( Json::Value::ArrayIndex i = 0; i != packageJson[ MANIFEST_FIELD_FILES ].size(); i++ ) {
