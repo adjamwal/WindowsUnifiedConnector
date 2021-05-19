@@ -40,5 +40,5 @@ public:
         std::vector<std::filesystem::path>& results );
 
 private:
-    static std::string ResolveKnownFolderId( const std::string& knownFolderId, DWORD user );
+    static std::string ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle );
 };

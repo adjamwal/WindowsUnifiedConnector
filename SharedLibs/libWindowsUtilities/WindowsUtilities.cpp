@@ -347,13 +347,13 @@ std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstal
 }
 
 //Only supportting System and current user. NULL = current user, -1 = system user
-std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId, DWORD user )
+std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle )
 {
     std::string knownFolder;
 
     if ( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
         PWSTR wpath = NULL;
-        if ( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, ( HANDLE )user, &wpath ) ) ) {
+        if ( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, userHandle, &wpath ) ) ) {
             knownFolder = _g_converter.to_bytes( wpath );
             CoTaskMemFree( wpath );
         }
@@ -364,7 +364,7 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
 
 std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
 {
-    return ResolveKnownFolderId( knownFolderId, -1 );
+    return ResolveKnownFolderId( knownFolderId, ( HANDLE )-1 );
 }
 
 std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId )
