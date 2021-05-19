@@ -21,7 +21,6 @@ DiagTool::~DiagTool()
 
 std::filesystem::path DiagTool::GetPackagePath()
 {
-    //TODO: Resolve for current user
     std::filesystem::path packagePath = WindowsUtilities::ResolveKnownFolderIdForCurrentUser( "FOLDERID_Desktop" );
     packagePath /= "UC_Diagnostic_";
     packagePath += std::to_string( time( NULL ) );

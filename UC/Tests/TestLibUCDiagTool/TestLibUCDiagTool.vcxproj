@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b9278c6d-eae7-4526-916d-42189dabe0a0}</ProjectGuid>
-    <RootNamespace>UCDiagTool</RootNamespace>
+    <ProjectGuid>{02d691b7-c77d-43f5-87b8-c548643fc5cc}</ProjectGuid>
+    <RootNamespace>TestLibUCDiagTool</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -74,21 +74,17 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>csc_ucdt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>csc_ucdt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>csc_ucdt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>csc_ucdt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,20 +94,15 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcDiagTool;$(UC_PATH)UC\Mocks\MockLibUcDiagTool;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalDependencies>zlibstat.lib;gtest.lib;gtest_main.lib;gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -123,22 +114,17 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcDiagTool;$(UC_PATH)UC\Mocks\MockLibUcDiagTool;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalDependencies>zlibstat.lib;gtest.lib;gtest_main.lib;gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -148,20 +134,15 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcDiagTool;$(UC_PATH)UC\Mocks\MockLibUcDiagTool;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalDependencies>zlibstat.lib;gtest.lib;gtest_main.lib;gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -173,22 +154,17 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcDiagTool;$(UC_PATH)UC\Mocks\MockLibUcDiagTool;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalDependencies>zlibstat.lib;gtest.lib;gtest_main.lib;gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -197,25 +173,25 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="UCDiagTool.cpp" />
+    <ClCompile Include="TestDiagFileListBuilder.cpp" />
+    <ClCompile Include="TestDiagPackager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
+    <ProjectReference Include="..\..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
-      <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
+    <ProjectReference Include="..\..\..\SharedLibs\MockWindowsUtilities\MockWindowsUtilities.vcxproj">
+      <Project>{9cb9ba83-2fbd-4904-a5ed-66dd0dc780b3}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libUcDiagTool\libUcDiagTool.vcxproj">
+    <ProjectReference Include="..\..\libUcDiagTool\libUcDiagTool.vcxproj">
       <Project>{58eb5a11-9117-4d01-9f08-e611ef639289}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="UCDiagTool.rc" />
+    <ProjectReference Include="..\..\Mocks\MockLibUCDiagTool\MockLibUCDiagTool.vcxproj">
+      <Project>{35e8d274-5993-4ab9-9691-0db233f4eeab}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

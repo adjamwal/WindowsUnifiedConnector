@@ -75,7 +75,7 @@ std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::str
 
 std::wstring WindowsUtilities::GetLogDir()
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
+    return MockWindowsUtilities::GetMockWindowUtilities()->GetLogDir();
 }
 
 std::string WindowsUtilities::ResolvePath( const std::string& basePath )

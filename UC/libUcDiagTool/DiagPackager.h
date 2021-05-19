@@ -3,11 +3,11 @@
 
 class IZlibWrapper;
 
-class DiagPackage : public IDiagPackager
+class DiagPackager : public IDiagPackager
 {
 public:
-    DiagPackage( IZlibWrapper& zlibWrapper );
-    ~DiagPackage();
+    DiagPackager( IZlibWrapper& zlibWrapper );
+    ~DiagPackager();
 
     void CreatePackage( const std::vector<std::filesystem::path>& fileList, const std::filesystem::path& packagePath ) override;
 
