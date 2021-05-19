@@ -53,13 +53,13 @@
     <ClCompile Include="TestUcConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
+    <ProjectReference Include="..\..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\SharedLibs\MockWindowsUtilities\MockWindowsUtilities.vcxproj">
+    <ProjectReference Include="..\..\..\SharedLibs\MockWindowsUtilities\MockWindowsUtilities.vcxproj">
       <Project>{9cb9ba83-2fbd-4904-a5ed-66dd0dc780b3}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libUcConfig\libUcConfig.vcxproj">
+    <ProjectReference Include="..\..\libUcConfig\libUcConfig.vcxproj">
       <Project>{1a45e256-8923-49ba-95db-f778ddcefa31}</Project>
     </ProjectReference>
   </ItemGroup>
