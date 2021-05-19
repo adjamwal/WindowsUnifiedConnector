@@ -17,7 +17,8 @@ protected:
         m_catalogRules.clear();
         m_detectedInstallations.clear();
         m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
-        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods );
+        m_msiApi.reset( new NiceMock<MockMsiApi>() );
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods, *m_msiApi );
     }
 
     void TearDown()
@@ -51,7 +52,7 @@ protected:
         detection.version = "msi";
         m_detectedInstallations.push_back( detection );
 
-        ON_CALL( *m_discoveryMethods, DiscoverByMsiRules( _, _, _ ) )
+        ON_CALL( *m_discoveryMethods, DiscoverByMsiRules( _, _, _, _ ) )
             .WillByDefault( SetArgReferee<2>( m_detectedInstallations ) );
     }
 
@@ -72,6 +73,7 @@ protected:
     std::vector<PmInstalledPackage> m_detectedInstallations;
     std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<PackageDiscovery> m_patient;
+    std::unique_ptr<MockMsiApi> m_msiApi;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )

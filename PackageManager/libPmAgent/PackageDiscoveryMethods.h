@@ -30,8 +30,9 @@ public:
 
     void DiscoverByMsiRules(
         const PmProductDiscoveryRules& lookupProduct,
-        const std::vector<PmProductDiscoveryMsiMethod>& msiRules,
-        std::vector<PmInstalledPackage>& detectedInstallations );
+        const PmProductDiscoveryMsiMethod& msiRules,
+        std::vector<PmInstalledPackage>& detectedInstallations,
+        std::vector<MsiApiProductInfo>& productCache );
 
 private:
     bool DecodeRegistryPath( const PmProductDiscoveryRegKeyDef& keyDef,

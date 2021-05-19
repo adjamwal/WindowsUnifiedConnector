@@ -10,7 +10,9 @@
 #include "..\..\GlobalVersion.h"
 #include <StringUtil.h>
 
-PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods ) : m_methods( methods )
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi ) : 
+    m_methods( methods ),
+    m_msiApi( msiApi )
 {
 }
 
@@ -25,10 +27,18 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
     inventory.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
     inventory.platform = "win";
 
+    std::vector<MsiApiProductInfo> productCache;
+    auto ret = m_msiApi.QueryProducts( productCache );
+
+    if ( ret != ERROR_SUCCESS || productCache.empty() )
+    {
+        LOG_ERROR( "Error getting products list from system  %d", ret );
+    }
+
     for( auto& lookupProduct : catalogRules )
     {
         std::vector<PmInstalledPackage> detectedInstallations;
-        ApplyDiscoveryMethods( lookupProduct, detectedInstallations );
+        ApplyDiscoveryMethods( lookupProduct, detectedInstallations, productCache );
         
         for( auto& detectedItem : detectedInstallations )
         {
@@ -49,7 +59,8 @@ PackageInventory PackageDiscovery::CachedInventory()
 }
 
 void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& lookupProduct,
-    std::vector<PmInstalledPackage>& detectedInstallations )
+    std::vector<PmInstalledPackage>& detectedInstallations,
+    std::vector<MsiApiProductInfo>& productCache )
 {
     for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery ) {
         m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
@@ -58,7 +69,13 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
         }
     }
 
-    m_methods.DiscoverByMsiRules( lookupProduct, lookupProduct.msi_discovery, detectedInstallations );
+    for ( auto regRule : lookupProduct.msi_discovery )
+    {
+        m_methods.DiscoverByMsiRules( lookupProduct, regRule, detectedInstallations, productCache );
+        if ( !detectedInstallations.empty() ) {
+            return;
+        }
+    }
 
     for( auto regRule : lookupProduct.reg_discovery )
     {

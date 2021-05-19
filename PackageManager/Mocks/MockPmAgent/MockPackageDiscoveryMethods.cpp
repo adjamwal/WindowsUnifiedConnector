@@ -27,5 +27,5 @@ void MockPackageDiscoveryMethods::ExpectDiscoverByMsiUpgradeCodeIsNotCalled()
 
 void MockPackageDiscoveryMethods::ExpectDiscoverByMsiRulesIsNotCalled()
 {
-    EXPECT_CALL( *this, DiscoverByMsiRules( _, _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, DiscoverByMsiRules( _, _, _, _ ) ).Times( 0 );
 }
