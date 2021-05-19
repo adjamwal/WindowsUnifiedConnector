@@ -11,6 +11,47 @@ MsiApi::~MsiApi()
 {
 }
 
+int32_t MsiApi::QueryProducts( std::vector<MsiApiProductInfo>& products )
+{
+    int32_t retValue = 0;
+    DWORD dwIndex = 0;
+    TCHAR szInstalledProductCode[39] = { 0 };
+    TCHAR szSid[128] = { 0 };
+    DWORD pcchSid = 128;
+    MSIINSTALLCONTEXT pdwInstalledContext = {};
+
+    do {
+        pcchSid = 128;
+
+        retValue = m_winApiWrapper.MsiEnumProductsExW(
+            NULL,
+            L"s-1-1-0",
+            MSIINSTALLCONTEXT_ALL,
+            dwIndex,
+            szInstalledProductCode,
+            &pdwInstalledContext,
+            szSid,
+            &pcchSid );
+
+        if ( retValue == ERROR_SUCCESS )
+        {
+            MsiApiProductInfo currentProduct;
+
+            currentProduct = GetProductInformation(
+                szInstalledProductCode,
+                pdwInstalledContext,
+                szSid,
+                pcchSid );
+
+            products.emplace_back( currentProduct );
+
+            dwIndex++;
+        }
+    } while ( retValue == ERROR_SUCCESS );
+
+    return (ERROR_NO_MORE_ITEMS == retValue) ? ERROR_SUCCESS : retValue;
+}
+
 std::tuple<int32_t, std::vector<MsiApiProductInfo>> MsiApi::FindProductsByName( std::wstring productName )
 {
     return QueryProducts( NULL, productName, L"" );
@@ -121,17 +162,21 @@ MsiApiProductInfo MsiApi::GetProductInformation(
 
     product.InstalledProductCode = std::wstring( szInstalledProductCode );
     product.MsiInstallContext = pdwInstalledContext;
-    product.InstallState = m_winApiWrapper.MsiQueryProductStateW( szInstalledProductCode );
+
+    //Commented out to improve performance. Might still be valid information in the future.
+    //product.InstallState = m_winApiWrapper.MsiQueryProductStateW( szInstalledProductCode );
 
     MsiApiProductProperties properties;
     properties.InstalledProductName = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLEDPRODUCTNAME );
     properties.Publisher = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_PUBLISHER );
     properties.VersionString = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_VERSIONSTRING );
-    properties.InstallDate = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLDATE );
-    properties.InstallLocation = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLLOCATION );
-    properties.InstallSource = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLSOURCE );
-    properties.LocalPackage = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_LOCALPACKAGE );
-    properties.AssignmentType = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_ASSIGNMENTTYPE );
+
+    //Commented out to improve performance. Might still be valid information in the future.
+    //properties.InstallDate = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLDATE );
+    //properties.InstallLocation = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLLOCATION );
+    //properties.InstallSource = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLSOURCE );
+    //properties.LocalPackage = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_LOCALPACKAGE );
+    //properties.AssignmentType = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_ASSIGNMENTTYPE );
     
     product.Properties = properties;
 

@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 #include "PmTypes.h"
 #include "IPackageDiscoveryMethods.h"
+#include "MsiApi.h"
 
 class MockPackageDiscoveryMethods : public IPackageDiscoveryMethods
 {
@@ -18,4 +19,7 @@ public:
 
     MOCK_METHOD3( DiscoverByMsiUpgradeCode, void( const PmProductDiscoveryRules&, const PmProductDiscoveryMsiUpgradeCodeMethod&, std::vector<PmInstalledPackage>& ) );
     void ExpectDiscoverByMsiUpgradeCodeIsNotCalled();
+
+    MOCK_METHOD4( DiscoverByMsiRules, void( const PmProductDiscoveryRules&, const PmProductDiscoveryMsiMethod&, std::vector<PmInstalledPackage>&, std::vector<MsiApiProductInfo>& ) );
+    void ExpectDiscoverByMsiRulesIsNotCalled();
 };
