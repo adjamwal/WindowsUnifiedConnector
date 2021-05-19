@@ -166,43 +166,40 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
 void PackageDiscoveryMethods::DiscoverByMsiRules( 
     const PmProductDiscoveryRules& lookupProduct, 
-    const PmProductDiscoveryMsiMethod& msiRules, 
+    const PmProductDiscoveryMsiMethod& msiRule, 
     std::vector<PmInstalledPackage>& detectedInstallations,
     std::vector<MsiApiProductInfo>& productCache )
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    for ( auto msiRule : lookupProduct.msi_discovery )
+    bool found = false;
+    std::wstring name = converter.from_bytes( msiRule.name );
+    std::wstring publisher = converter.from_bytes( msiRule.vendor );
+
+    for ( auto product : productCache )
     {
-        bool found = false;
-        std::wstring name = converter.from_bytes( msiRule.name );
-        std::wstring publisher = converter.from_bytes( msiRule.vendor );
-
-        for ( auto product : productCache )
+        if ( !name.empty() &&
+            !publisher.empty() &&
+            name.compare( product.Properties.InstalledProductName ) == 0 &&
+            publisher.compare( product.Properties.Publisher ) == 0 )
         {
-            if ( !name.empty() &&
-                !publisher.empty() &&
-                name.compare( product.Properties.InstalledProductName ) == 0 &&
-                publisher.compare( product.Properties.Publisher ) == 0 )
-            {
-                PmInstalledPackage detected = {};
-                detected.version = converter.to_bytes( product.Properties.VersionString );
-                detected.product = lookupProduct.product;
+            PmInstalledPackage detected = {};
+            detected.version = converter.to_bytes( product.Properties.VersionString );
+            detected.product = lookupProduct.product;
 
-                LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
-                    msiRule.name.c_str(),
-                    msiRule.vendor.c_str(),
-                    converter.to_bytes( product.InstalledProductCode ).c_str() );
+            LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
+                msiRule.name.c_str(),
+                msiRule.vendor.c_str(),
+                converter.to_bytes( product.InstalledProductCode ).c_str() );
 
-                detectedInstallations.push_back( detected );
-                found = true;
-            }
+            detectedInstallations.push_back( detected );
+            found = true;
         }
+    }
 
-        if ( !found )
-        {
-            LOG_ERROR( "Could not find %s, %s", msiRule.name.c_str(), msiRule.vendor.c_str() );
-        }
+    if ( !found )
+    {
+        LOG_ERROR( "Could not find %s, %s", msiRule.name.c_str(), msiRule.vendor.c_str() );
     }
 }
 
