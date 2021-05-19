@@ -25,6 +25,10 @@ public:
     void MakeGetFileModifyTimeReturn( uint32_t value );
     void ExpectGetFileModifyTimeIsNotCalled();
 
+    MOCK_METHOD3( WriteFileContents, bool( const WCHAR*, const uint8_t*, const size_t) );
+    void MakeWriteFileContentsReturn( bool  value );
+    void ExpectWriteFileContentsIsNotCalled();
+
     MOCK_METHOD1( DirectoryExists, bool( const WCHAR* ) );
     void MakeDirectoryExistsReturn( bool value );
     void ExpectDirectoryExistsIsNotCalled();
@@ -57,9 +61,13 @@ public:
     void MakeGetInstalledProgramsReturn( std::vector<WindowsUtilities::WindowsInstallProgram>& value );
     void ExpectGetInstalledProgramsIsNotCalled();
 
-    MOCK_METHOD1( ResolveKnownFolderId, std::string( const std::string& ) );
+    MOCK_METHOD1( ResolveKnownFolderIdForDefaultUser, std::string( const std::string& ) );
     void MakeResolveKnownFolderIdReturn( std::string value );
     void ExpectResolveKnownFolderIdIsNotCalled();
+
+    MOCK_METHOD1( ResolveKnownFolderIdForCurrentUser, std::string( const std::string& ) );
+    void MakeResolveKnownFolderIdForCurrentUserReturn( std::string value );
+    void ExpectResolveKnownFolderIdForCurrentUserIsNotCalled();
 
     MOCK_METHOD0( GetDataDir, std::wstring() );
     void MakeGetDataDirReturn( std::wstring value );

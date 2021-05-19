@@ -74,6 +74,16 @@ void MockWindowsUtilities::ExpectGetFileModifyTimeIsNotCalled()
     EXPECT_CALL( *this, GetFileModifyTime( _ ) ).Times( 0 );
 }
 
+void MockWindowsUtilities::MakeWriteFileContentsReturn( bool  value )
+{
+    ON_CALL( *this, WriteFileContents( _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectWriteFileContentsIsNotCalled()
+{
+    EXPECT_CALL( *this, WriteFileContents( _, _, _ ) ).Times( 0 );
+}
+
 void MockWindowsUtilities::MakeDirectoryExistsReturn( bool value )
 {
     ON_CALL( *this, DirectoryExists( _ ) ).WillByDefault( Return( value ) );
@@ -156,12 +166,22 @@ void MockWindowsUtilities::ExpectGetInstalledProgramsIsNotCalled()
 
 void MockWindowsUtilities::MakeResolveKnownFolderIdReturn( std::string value )
 {
-    ON_CALL( *this, ResolveKnownFolderId( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ResolveKnownFolderIdForDefaultUser( _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockWindowsUtilities::ExpectResolveKnownFolderIdIsNotCalled()
 {
-    EXPECT_CALL( *this, ResolveKnownFolderId( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ResolveKnownFolderIdForDefaultUser( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeResolveKnownFolderIdForCurrentUserReturn( std::string value )
+{
+    ON_CALL( *this, ResolveKnownFolderIdForCurrentUser( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectResolveKnownFolderIdForCurrentUserIsNotCalled()
+{
+    EXPECT_CALL( *this, ResolveKnownFolderIdForCurrentUser( _ ) ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeGetDataDirReturn( std::wstring value )

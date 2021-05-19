@@ -167,6 +167,10 @@
                 </ServiceInstall>
             </Component>
 
+          <Component Id="csc_ucdt.exe" Guid="*">
+            <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" />
+          </Component>
+          
             <?if $(var.Configuration) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
                     <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
