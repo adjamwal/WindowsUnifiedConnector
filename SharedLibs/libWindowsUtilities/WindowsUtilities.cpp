@@ -174,7 +174,7 @@ bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* 
 {
     bool rtn = false;
     if ( !filename || !content || contentLen == 0 ) {
-        return -1;
+        return false;
     }
 
     try {
@@ -362,7 +362,7 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
     return knownFolder;
 }
 
-std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+std::string WindowsUtilities::ResolveKnownFolderIdForDefaultUser( const std::string& knownFolderId )
 {
     return ResolveKnownFolderId( knownFolderId, ( HANDLE )-1 );
 }
@@ -390,7 +390,7 @@ std::string WindowsUtilities::ResolvePath( const std::string& basePath )
         if ( end != std::string::npos ) {
             begin;
 
-            std::string knownFolder = WindowsUtilities::ResolveKnownFolderId( basePath.substr( begin + 1, end - (begin + 1) ) );
+            std::string knownFolder = WindowsUtilities::ResolveKnownFolderIdForDefaultUser( basePath.substr( begin + 1, end - (begin + 1) ) );
             if ( !knownFolder.empty() ) {
                 knownFolder = basePath.substr( 0, begin ) + knownFolder + basePath.substr( end + 1 );
                 return knownFolder;

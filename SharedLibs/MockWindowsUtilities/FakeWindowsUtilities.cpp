@@ -63,9 +63,9 @@ std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstal
     return MockWindowsUtilities::GetMockWindowUtilities()->GetInstalledPrograms();
 }
 
-std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+std::string WindowsUtilities::ResolveKnownFolderIdForDefaultUser( const std::string& knownFolderId )
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderId( knownFolderId );
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderIdForDefaultUser( knownFolderId );
 }
 
 std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId )

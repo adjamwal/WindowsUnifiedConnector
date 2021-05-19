@@ -61,7 +61,7 @@ public:
     void MakeGetInstalledProgramsReturn( std::vector<WindowsUtilities::WindowsInstallProgram>& value );
     void ExpectGetInstalledProgramsIsNotCalled();
 
-    MOCK_METHOD1( ResolveKnownFolderId, std::string( const std::string& ) );
+    MOCK_METHOD1( ResolveKnownFolderIdForDefaultUser, std::string( const std::string& ) );
     void MakeResolveKnownFolderIdReturn( std::string value );
     void ExpectResolveKnownFolderIdIsNotCalled();
 
