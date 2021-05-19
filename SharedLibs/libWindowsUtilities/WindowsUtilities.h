@@ -16,6 +16,7 @@ public:
     static bool FileExists(const WCHAR* filename);
     static std::string ReadFileContents( const WCHAR* filename );
     static uint32_t GetFileModifyTime( const WCHAR* filename );
+    static bool WriteFileContents( const WCHAR* filename, const uint8_t* content, const size_t contentLen );
     static bool DirectoryExists(const WCHAR* dirname);
     static std::wstring GetExePath();
     static std::wstring GetDirPath(const std::wstring& path);
@@ -25,6 +26,7 @@ public:
     static bool GetSysDirectory( std::string& path );
     static std::vector<WindowsInstallProgram> GetInstalledPrograms();
     static std::string ResolveKnownFolderId( const std::string& knownFolderId );
+    static std::string ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId );
     static std::wstring GetLogDir();
     static std::string ResolvePath( const std::string& basePath );
 
@@ -36,4 +38,7 @@ public:
         std::vector<std::filesystem::path>::iterator begin,
         std::vector<std::filesystem::path>::iterator end,
         std::vector<std::filesystem::path>& results );
+
+private:
+    static std::string ResolveKnownFolderId( const std::string& knownFolderId, DWORD user );
 };

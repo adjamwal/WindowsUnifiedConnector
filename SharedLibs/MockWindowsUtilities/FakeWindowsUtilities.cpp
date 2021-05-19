@@ -18,6 +18,11 @@ uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
     return MockWindowsUtilities::GetMockWindowUtilities()->GetFileModifyTime( filename );
 }
 
+bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* content, const size_t contentLen )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->WriteFileContents( filename, content, contentLen );
+}
+
 bool WindowsUtilities::DirectoryExists( const WCHAR* dirname )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->DirectoryExists( dirname );
@@ -61,6 +66,11 @@ std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstal
 std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderId( knownFolderId );
+}
+
+std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderIdForCurrentUser( knownFolderId );
 }
 
 std::wstring WindowsUtilities::GetLogDir()

@@ -170,6 +170,31 @@ uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
     return ( uint32_t )stFileInfo.st_mtime;
 }
 
+bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* content, const size_t contentLen )
+{
+    bool rtn = false;
+    if ( !filename || !content || contentLen == 0 ) {
+        return -1;
+    }
+
+    try {
+        std::ofstream file( filename, std::ofstream::out | std::ofstream::trunc );
+
+        if ( file.is_open() ) {
+            file.write( ( const char* )content, contentLen );
+
+            file.close();
+
+            rtn = true;
+        }
+    }
+    catch ( ... ) {
+
+    }
+
+    return rtn;
+}
+
 bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)
 {
     DWORD ftyp = GetFileAttributes(dirname);
@@ -321,19 +346,30 @@ std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstal
     return list;
 }
 
-std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+//Only supportting System and current user. NULL = current user, -1 = system user
+std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId, DWORD user )
 {
     std::string knownFolder;
 
-    if( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
+    if ( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
         PWSTR wpath = NULL;
-        if( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, ( HANDLE )-1, &wpath ) ) ) {
+        if ( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, ( HANDLE )user, &wpath ) ) ) {
             knownFolder = _g_converter.to_bytes( wpath );
             CoTaskMemFree( wpath );
         }
     }
 
     return knownFolder;
+}
+
+std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+{
+    return ResolveKnownFolderId( knownFolderId, -1 );
+}
+
+std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId )
+{
+    return ResolveKnownFolderId( knownFolderId, NULL );
 }
 
 std::wstring WindowsUtilities::GetLogDir()
