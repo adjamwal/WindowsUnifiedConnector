@@ -37,7 +37,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
     if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_ERROR( "DiscoverByMsi could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
+        LOG_DEBUG( "DiscoverByMsi could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -147,7 +147,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
     if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_ERROR( "DiscoverByMsiUpgradeCode could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
+        LOG_DEBUG( "DiscoverByMsiUpgradeCode could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -199,7 +199,7 @@ void PackageDiscoveryMethods::DiscoverByMsiRules(
 
     if ( !found )
     {
-        LOG_ERROR( "Could not find %s, %s", msiRule.name.c_str(), msiRule.vendor.c_str() );
+        LOG_DEBUG( "Could not find %s, %s", msiRule.name.c_str(), msiRule.vendor.c_str() );
     }
 }
 
