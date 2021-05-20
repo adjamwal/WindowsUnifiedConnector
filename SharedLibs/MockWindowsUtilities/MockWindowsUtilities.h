@@ -69,9 +69,9 @@ public:
     void MakeResolveKnownFolderIdForCurrentUserReturn( std::string value );
     void ExpectResolveKnownFolderIdForCurrentUserIsNotCalled();
 
-    MOCK_METHOD0( GetDataDir, std::wstring() );
-    void MakeGetDataDirReturn( std::wstring value );
-    void ExpectGetDataDirIsNotCalled();
+    MOCK_METHOD0( GetLogDir, std::wstring() );
+    void MakeGetLogDirReturn( std::wstring value );
+    void ExpectGetLogDirIsNotCalled();
 
     MOCK_METHOD1( ResolvePath, std::string( const std::string& ) );
     void MakeResolvePathReturn( std::string value );

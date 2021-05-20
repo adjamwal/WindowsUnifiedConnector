@@ -4,18 +4,18 @@
 #include "IUcLogger.h"
 #include <exception>
 
-DiagPackage::DiagPackage( IZlibWrapper& zlibWrapper ) :
+DiagPackager::DiagPackager( IZlibWrapper& zlibWrapper ) :
     m_zlibWrapper( zlibWrapper )
 {
 
 }
 
-DiagPackage::~DiagPackage()
+DiagPackager::~DiagPackager()
 {
 
 }
 
-void DiagPackage::CreatePackage( const std::vector<std::filesystem::path>& fileList, const std::filesystem::path& packagePath )
+void DiagPackager::CreatePackage( const std::vector<std::filesystem::path>& fileList, const std::filesystem::path& packagePath )
 {
     if ( fileList.empty() || packagePath.empty() ) {
         throw std::runtime_error( __FUNCTION__ ": Invalid Parameters" );
