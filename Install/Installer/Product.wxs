@@ -15,16 +15,26 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
+        <Property Id="UC_EVENT_UCID" Value="-" />
+
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
+        <CustomAction Id="StoreUCIDToProperty" BinaryKey="CustomActionsDll" DllEntry="StoreUCIDToProperty" />
+        <CustomAction Id="SendUninstallEvent" BinaryKey="CustomActionsDll" DllEntry="SendUninstallEvent" />
         <InstallExecuteSequence>
           <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
             WIX_UPGRADE_DETECTED
           </Custom>
           <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
           <Custom Action="SetCacheDirectory" After="FindRelatedProducts" />
+          <Custom Action="StoreUCIDToProperty" Before="StopServices">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="SendUninstallEvent" After="InstallFinalize">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>

@@ -140,3 +140,8 @@ bool IsWindows10OrGreater( const std::string fileVersion )
 
     return rtn;
 }
+
+std::string GetNewUCID()
+{
+    return "default";
+}

@@ -59,7 +59,7 @@ LExit:
     return WcaFinalize( er );
 }
 
-UINT __stdcall RefreshUCID( MSIHANDLE hInstall )
+UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
@@ -67,9 +67,30 @@ UINT __stdcall RefreshUCID( MSIHANDLE hInstall )
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, "Failed to initialize" );
 
-    wchar_t* kPropertyName = L"MYPROPERTY";
-    wchar_t* value = nullptr;
-    auto result = MsiSetPropertyW( hInstall, kPropertyName, value );
+    std::string evUcidPropVal = GetNewUCID();
+    auto result = MsiSetPropertyA( hInstall, "UC_EVENT_UCID", evUcidPropVal.c_str() );
+    WcaLog( LOGMSG_STANDARD, "Stored UCID: %s", evUcidPropVal.c_str() );
+
+LExit:
+    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize( er );
+}
+
+UINT __stdcall SendUninstallEvent( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, "Failed to initialize" );
+
+    char evUcidPropVal[ MAX_PATH ] = { 0 };
+    DWORD evUcidPropValLength = 0;
+    if( MsiGetPropertyA( hInstall, "UC_EVENT_UCID", evUcidPropVal, &evUcidPropValLength ) == 0 )
+    {
+        WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", evUcidPropVal );
+        //send event
+    }
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
