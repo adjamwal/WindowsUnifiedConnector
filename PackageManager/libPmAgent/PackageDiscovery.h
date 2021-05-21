@@ -5,13 +5,14 @@
 #include "Windows.h"
 #include <string>
 #include "IPmPlatformComponentManager.h"
+#include "MsiApi.h"
 
 class IPackageDiscoveryMethods;
 
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery( IPackageDiscoveryMethods& methods );
+    PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi );
     ~PackageDiscovery();
 
     PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
@@ -20,7 +21,8 @@ public:
 private:
     void ApplyDiscoveryMethods(
         const PmProductDiscoveryRules& lookupProduct,
-        std::vector<PmInstalledPackage>& detectedInstallations );
+        std::vector<PmInstalledPackage>& detectedInstallations,
+        std::vector<MsiApiProductInfo>& productCache );
 
     void DiscoverPackageConfigurables( 
         const std::vector<PmProductDiscoveryConfigurable>& configurables, 
@@ -28,4 +30,5 @@ private:
 
     IPackageDiscoveryMethods& m_methods;
     PackageInventory m_lastDetectedPackages;
+    IMsiApi& m_msiApi;
 };

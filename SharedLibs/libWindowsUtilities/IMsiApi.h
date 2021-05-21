@@ -13,11 +13,11 @@ struct MsiApiProductProperties
     std::wstring InstalledProductName;
     std::wstring Publisher;
     std::wstring VersionString;
-    std::wstring InstallDate;
-    std::wstring InstallLocation;
-    std::wstring InstallSource;
-    std::wstring LocalPackage;
-    std::wstring AssignmentType;
+    //std::wstring InstallDate;
+    //std::wstring InstallLocation;
+    //std::wstring InstallSource;
+    //std::wstring LocalPackage;
+    //std::wstring AssignmentType;
 };
 
 struct MsiApiProductInfo
@@ -34,6 +34,8 @@ class IMsiApi
 public:
     IMsiApi() {}
     virtual ~IMsiApi() {}
+
+    virtual int32_t QueryProducts( std::vector<MsiApiProductInfo>& products ) = 0;
 
     virtual std::tuple<int32_t, std::vector<MsiApiProductInfo>> FindProductsByName( 
         std::wstring displayName ) = 0;

@@ -7,6 +7,7 @@ struct PmProductDiscoveryMsiMethod;
 struct PmProductDiscoveryRegistryMethod;
 struct PmProductDiscoveryMsiUpgradeCodeMethod;
 struct PmInstalledPackage;
+struct MsiApiProductInfo;
 
 class IPackageDiscoveryMethods
 {
@@ -28,4 +29,10 @@ public:
         const PmProductDiscoveryRules& lookupProduct,
         const PmProductDiscoveryMsiUpgradeCodeMethod& upgradeCodeRule,
         std::vector<PmInstalledPackage>& detectedInstallations ) = 0;
+
+    virtual void DiscoverByMsiRules(
+        const PmProductDiscoveryRules& lookupProduct,
+        const PmProductDiscoveryMsiMethod& msiRules,
+        std::vector<PmInstalledPackage>& detectedInstallations,
+        std::vector<MsiApiProductInfo>& productCache ) = 0;
 };

@@ -21,7 +21,7 @@ PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const 
     , m_codeSignVerifer( new CodesignVerifier() )
     , m_discoveryMethods( new PackageDiscoveryMethods( *m_msiApi ) )
     , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
-    , m_packageDiscovery( new PackageDiscovery( *m_discoveryMethods ) )
+    , m_packageDiscovery( new PackageDiscovery( *m_discoveryMethods, *m_msiApi ) )
     , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery ) )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
     , m_pmLogger( new PmLogAdapter() )
