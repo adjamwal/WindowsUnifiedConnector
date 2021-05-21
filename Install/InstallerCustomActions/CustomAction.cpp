@@ -76,7 +76,7 @@ LExit:
     return WcaFinalize( er );
 }
 
-UINT __stdcall SendUninstallEvent( MSIHANDLE hInstall )
+UINT __stdcall SendUninstallEventBegin( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
@@ -89,7 +89,28 @@ UINT __stdcall SendUninstallEvent( MSIHANDLE hInstall )
     if( MsiGetPropertyA( hInstall, "UC_EVENT_UCID", evUcidPropVal, &evUcidPropValLength ) == 0 )
     {
         WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", evUcidPropVal );
-        //send event
+        //send begin event
+    }
+
+LExit:
+    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize( er );
+}
+
+UINT __stdcall SendUninstallEventEnd( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, "Failed to initialize" );
+
+    char evUcidPropVal[ MAX_PATH ] = { 0 };
+    DWORD evUcidPropValLength = 0;
+    if( MsiGetPropertyA( hInstall, "UC_EVENT_UCID", evUcidPropVal, &evUcidPropValLength ) == 0 )
+    {
+        WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", evUcidPropVal );
+        //send end event
     }
 
 LExit:
