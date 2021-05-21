@@ -3,3 +3,4 @@ LIBRARY "InstallerCustomActions"
 EXPORTS
 	DetectOlderBuildVersion
 	DetectWindows10OrGreater
+	RefreshUCID
