@@ -3,4 +3,8 @@ LIBRARY "InstallerCustomActions"
 EXPORTS
 	DetectOlderBuildVersion
 	DetectWindows10OrGreater
-	RefreshUCID
+	StoreUCIDToProperty
+	SendEventOnUninstallBegin
+	NoopDeferredUninstallAction
+	SendEventOnUninstallRollback
+	SendEventOnUninstallComplete

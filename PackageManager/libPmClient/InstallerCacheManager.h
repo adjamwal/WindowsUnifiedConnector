@@ -5,14 +5,14 @@
 #include <filesystem>
 
 class IPmCloud;
-class IFileUtil;
+class IFileSysUtil;
 class ISslUtil;
 class IPmPlatformComponentManager;
 
 class InstallerCacheManager : public IInstallerCacheManager
 {
 public:
-    InstallerCacheManager( IPmCloud& pmCloud, IFileUtil& fileUtil, ISslUtil& sslUtil );
+    InstallerCacheManager( IPmCloud& pmCloud, IFileSysUtil& fileUtil, ISslUtil& sslUtil );
     ~InstallerCacheManager();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
@@ -25,7 +25,7 @@ private:
     std::string SanitizeComponentProductAndVersion( const std::string& productAndVersion );
 
     IPmCloud& m_pmCloud;
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     std::mutex m_mutex;
     IPmPlatformComponentManager* m_componentMgr;

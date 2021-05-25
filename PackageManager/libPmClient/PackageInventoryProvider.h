@@ -4,13 +4,13 @@
 #include "PmTypes.h"
 #include <mutex>
 
-class IFileUtil;
+class IFileSysUtil;
 class ISslUtil;
 
 class PackageInventoryProvider : public IPackageInventoryProvider
 {
 public:
-    PackageInventoryProvider( IFileUtil& fileUtil, ISslUtil& sslUtil );
+    PackageInventoryProvider( IFileSysUtil& fileUtil, ISslUtil& sslUtil );
     virtual ~PackageInventoryProvider();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
@@ -18,7 +18,7 @@ public:
     void SetCatalogDataset( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
 
 private:
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     std::mutex m_mutex;
     std::vector<PmProductDiscoveryRules> m_catalogRules;

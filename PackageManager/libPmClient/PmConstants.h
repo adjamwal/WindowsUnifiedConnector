@@ -15,6 +15,10 @@
 #define UCPM_EVENT_ERROR_CONFIG_REMOVE                  0x00000014
 #define UCPM_EVENT_ERROR_CONFIG_RESOLVE                 0x00000015
 
+#define UCPM_EVENT_UC_UNINSTALL_START                   0x00000030
+#define UCPM_EVENT_UC_UNINSTALL_ROLLBACK                0x00000031
+#define UCPM_EVENT_UC_UNINSTALL_END                     0x00000032
+
 #define UCPM_EVENT_SUCCESS_REBOOT_REQ                   0x00000050
 #define UCPM_EVENT_SUCCESS_REBOOT_INIT                  0x00000051
 

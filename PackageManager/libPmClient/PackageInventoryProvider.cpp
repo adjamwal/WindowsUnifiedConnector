@@ -1,11 +1,11 @@
 #include "PackageInventoryProvider.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include "ISslUtil.h"
 #include "PmLogger.h"
 
-PackageInventoryProvider::PackageInventoryProvider( IFileUtil& fileUtil, ISslUtil& sslUtil ) :
+PackageInventoryProvider::PackageInventoryProvider( IFileSysUtil& fileUtil, ISslUtil& sslUtil ) :
     m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_dependencies( nullptr )

@@ -15,15 +15,20 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
-        <Property Id="UC_EVENT_UCID" Value="-" />
+        <Property Id="UC_EVENT_UCID" Value="0" />
+        <Property Id="UC_ROLLBACK_DETECTED" Value="0" />
 
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+      
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="StoreUCIDToProperty" BinaryKey="CustomActionsDll" DllEntry="StoreUCIDToProperty" />
-        <CustomAction Id="SendUninstallEventBegin" BinaryKey="CustomActionsDll" DllEntry="SendUninstallEventBegin" />
-        <CustomAction Id="SendUninstallEventEnd" BinaryKey="CustomActionsDll" DllEntry="SendUninstallEventEnd" />
+        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" Impersonate="no" />
+        <CustomAction Id="NoopDeferredUninstallAction" Execute="deferred" BinaryKey="CustomActionsDll" DllEntry="NoopDeferredUninstallAction" Impersonate="no" />
+        <CustomAction Id="SendEventOnUninstallRollback" Execute="rollback" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallRollback" Impersonate="no" />
+        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" Impersonate="no" />
+      
         <InstallExecuteSequence>
           <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
             WIX_UPGRADE_DETECTED
@@ -33,10 +38,16 @@
           <Custom Action="StoreUCIDToProperty" Before="InstallInitialize">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
-          <Custom Action="SendUninstallEventBegin" After="StoreUCIDToProperty">
+          <Custom Action="SendEventOnUninstallBegin" After="StoreUCIDToProperty">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
-          <Custom Action="SendUninstallEventEnd" After="InstallFinalize">
+          <Custom Action="SendEventOnUninstallRollback" After="NoopDeferredUninstallAction">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="NoopDeferredUninstallAction" Before="InstallFinalize">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
         </InstallExecuteSequence>

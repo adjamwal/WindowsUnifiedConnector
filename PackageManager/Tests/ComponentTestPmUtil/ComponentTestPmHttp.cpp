@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "PmHttp.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 
 #include <memory>
 #include "WindowsCertStore.h"
@@ -27,7 +27,7 @@ protected:
 
     void SetUp()
     {
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
 
         m_patient.reset( new PmHttp( *m_fileUtil ) );
     }
@@ -40,7 +40,7 @@ protected:
     }
 
     PmHttpCertList m_certList;
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<PmHttp> m_patient;
 };
 

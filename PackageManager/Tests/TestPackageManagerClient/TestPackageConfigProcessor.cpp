@@ -1,6 +1,6 @@
 #include "MocksCommon.h"
 #include "PackageConfigProcessor.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
 #include "MockSslUtil.h"
@@ -15,7 +15,7 @@ class TestPackageConfigProcessor : public ::testing::Test
 protected:
     void SetUp()
     {
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
@@ -60,7 +60,7 @@ protected:
 
     PackageConfigInfo m_configInfo;
 
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;

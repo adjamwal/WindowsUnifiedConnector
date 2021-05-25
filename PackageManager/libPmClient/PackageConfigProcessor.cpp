@@ -1,5 +1,5 @@
 #include "PackageConfigProcessor.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include "ISslUtil.h"
 #include "IUcidAdapter.h"
 #include "CloudEventBuilder.h"
@@ -14,7 +14,7 @@
 #include "PackageException.h"
 
 PackageConfigProcessor::PackageConfigProcessor(
-    IFileUtil& fileUtil,
+    IFileSysUtil& fileUtil,
     ISslUtil& sslUtil,
     IUcidAdapter& ucidAdapter,
     ICloudEventBuilder& eventBuilder,

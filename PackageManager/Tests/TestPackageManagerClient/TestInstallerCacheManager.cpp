@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "InstallerCacheManager.h"
 #include "MockPmCloud.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "MockSslUtil.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
@@ -18,7 +18,7 @@ protected:
         SetupComponentPackage();
 
         m_cloud.reset( new NiceMock<MockPmCloud>() );
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
 
         m_componentMgr.reset( new NiceMock<MockPmPlatformComponentManager>() );
@@ -60,7 +60,7 @@ protected:
     PmComponent m_component;
 
     std::unique_ptr<MockPmCloud> m_cloud;
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<MockSslUtil> m_sslUtil;
     std::unique_ptr<MockPmPlatformComponentManager> m_componentMgr;
     std::unique_ptr<MockPmPlatformDependencies> m_deps;

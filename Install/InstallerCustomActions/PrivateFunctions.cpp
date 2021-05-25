@@ -1,5 +1,33 @@
 #include "stdafx.h"
 #include "PrivateFunctions.h"
+#include "CloudEventBuilder.h"
+#include "CloudEventPublisher.h"
+#include "CloudEventStorage.h"
+#include "PmHttp.h"
+#include "PmCloud.h"
+#include "PmConfig.h"
+#include "PmConstants.h"
+#include "FileSysUtil.h"
+#include "StringUtil.h"
+
+bool PrepareAndSendEvent( std::string ucidToken, std::wstring productVersion, int errorCode, std::string errorMessage )
+{
+    CloudEventBuilder ev;
+    FileSysUtil fileUtil;
+    PmHttp pmHttp(fileUtil);
+    PmCloud pmCloud( pmHttp );
+    CloudEventStorage eventStorage( CLOUD_EVENT_STORAGE_FILENAME, fileUtil);
+    PmConfig pmConfig(fileUtil);
+    CloudEventPublisher epub(pmCloud, eventStorage, pmConfig);
+
+    ev.WithUCID( ucidToken );
+    ev.WithPackageID( "uc/" + StringUtil::WStr2Str(productVersion) );
+    ev.WithType( CloudEventType::pkguninstall );
+    ev.WithError( errorCode, errorMessage );
+
+    epub.SetToken( ucidToken );
+    return epub.Publish( ev ) == 200;
+}
 
 bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo )
 {
@@ -141,7 +169,28 @@ bool IsWindows10OrGreater( const std::string fileVersion )
     return rtn;
 }
 
-std::string GetNewUCID()
+std::string GetNewUCIDToken()
 {
-    return "default";
+    return "test-ucid";
+}
+
+bool NotifyUninstallBeginEvent( std::string ucidToken, std::wstring productVersion )
+{
+    return PrepareAndSendEvent( 
+        ucidToken, productVersion, 
+        UCPM_EVENT_UC_UNINSTALL_START, "UC uninstall started" );
+}
+
+bool NotifyUninstallFailureEvent( std::string ucidToken, std::wstring productVersion )
+{
+    return PrepareAndSendEvent( 
+        ucidToken, productVersion, 
+        UCPM_EVENT_UC_UNINSTALL_ROLLBACK, "UC uninstall has encountered an error and is being rolled back" );
+}
+
+bool NotifyUninstallEndEvent( std::string ucidToken, std::wstring productVersion )
+{
+    return PrepareAndSendEvent( 
+        ucidToken, productVersion, 
+        UCPM_EVENT_UC_UNINSTALL_END, "UC uninstall ended" );
 }
