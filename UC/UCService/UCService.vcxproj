@@ -204,6 +204,9 @@
     <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Install\InstallerCustomActions\InstallerCustomActions.vcxproj">
+      <Project>{d72eb94c-bdc3-45ba-8f73-f4eb0c73b334}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libCrashHandlerClient\libCrashHandlerClient.vcxproj">
       <Project>{58783f4f-d8a3-4409-a4d0-618441c95c8e}</Project>
     </ProjectReference>
