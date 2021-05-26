@@ -24,10 +24,9 @@
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="StoreUCIDToProperty" BinaryKey="CustomActionsDll" DllEntry="StoreUCIDToProperty" />
-        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" Impersonate="no" />
-        <CustomAction Id="NoopDeferredUninstallAction" Execute="deferred" BinaryKey="CustomActionsDll" DllEntry="NoopDeferredUninstallAction" Impersonate="no" />
-        <CustomAction Id="SendEventOnUninstallRollback" Execute="rollback" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallRollback" Impersonate="no" />
-        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" Impersonate="no" />
+        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
+        <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
+        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
       
         <InstallExecuteSequence>
           <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
@@ -41,10 +40,7 @@
           <Custom Action="SendEventOnUninstallBegin" After="StoreUCIDToProperty">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
-          <Custom Action="SendEventOnUninstallRollback" After="NoopDeferredUninstallAction">
-            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
-          </Custom>
-          <Custom Action="NoopDeferredUninstallAction" Before="InstallFinalize">
+          <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">

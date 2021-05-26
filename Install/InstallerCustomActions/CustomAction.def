@@ -5,6 +5,5 @@ EXPORTS
 	DetectWindows10OrGreater
 	StoreUCIDToProperty
 	SendEventOnUninstallBegin
-	NoopDeferredUninstallAction
-	SendEventOnUninstallRollback
+	SendEventOnUninstallError
 	SendEventOnUninstallComplete
