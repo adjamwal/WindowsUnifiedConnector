@@ -1,16 +1,17 @@
 #include "stdafx.h"
 #include "PrivateFunctions.h"
+#include "MsiLogger.h"
 
 UINT __stdcall DetectOlderBuildVersion( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
     BuildInfo prevBuildInfo;
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, "Failed to initialize" );
-
-    WcaLog( LOGMSG_STANDARD, "Initialized." );
 
     LPWSTR productName = NULL;
     hr = WcaGetProperty( L"ProductName", &productName );
@@ -37,6 +38,7 @@ UINT __stdcall DetectOlderBuildVersion( MSIHANDLE hInstall )
     }
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 
@@ -46,6 +48,8 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
     UINT er = ERROR_SUCCESS;
     BuildInfo prevBuildInfo;
     const char* filename = "C:\\Windows\\System32\\ntdll.dll";
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, "Failed to initialize" );
@@ -56,6 +60,7 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 
@@ -64,6 +69,8 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
     std::string ucidStr;
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
 
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
@@ -82,6 +89,7 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 
@@ -91,6 +99,8 @@ UINT __stdcall SendEventOnUninstallBegin( MSIHANDLE hInstall )
     UINT er = ERROR_SUCCESS;
     char ucidToken[ MAX_PATH ] = { 0 };
     DWORD ucidTokenLength = 0;
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
 
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
@@ -122,6 +132,7 @@ UINT __stdcall SendEventOnUninstallBegin( MSIHANDLE hInstall )
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 
@@ -171,6 +182,9 @@ UINT __stdcall SendEventOnUninstallRollback( MSIHANDLE hInstall )
     char ucidToken[ MAX_PATH ] = { 0 };
     DWORD ucidTokenLength = 0;
 
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
+
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
@@ -206,6 +220,7 @@ UINT __stdcall SendEventOnUninstallRollback( MSIHANDLE hInstall )
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 
@@ -222,6 +237,9 @@ UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
     char rollback[ MAX_PATH ] = { 0 };
     DWORD rollbackLength = 0;
     bool hasRollbackBeenDetected = false;
+
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
 
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
@@ -253,6 +271,7 @@ UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 

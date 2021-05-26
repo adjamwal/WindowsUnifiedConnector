@@ -1,25 +1,23 @@
-#include "pch.h"
-#include "UcLogger.h"
-#include "IUcLogFile.h"
+#include "stdafx.h"
+#include "MsiLogger.h"
 #include <time.h>
 #include <mutex>
 #include <Windows.h>
+#include <Msi.h>
 
-
-UcLogger::UcLogger( IUcLogFile& logFile ) :
-    m_logLevel( LOG_ERROR )
-    , m_logFile( logFile )
+MsiLogger::MsiLogger() :
+    m_logLevel( LOG_DEBUG )
 {
 }
 
-UcLogger::~UcLogger()
+MsiLogger::~MsiLogger()
 {
 }
 
-void UcLogger::SetLogLevel( Severity logLevel )
+void MsiLogger::SetLogLevel( Severity logLevel )
 {
-    if( ( logLevel >= LOG_EMERGENCY ) && ( logLevel <= LOG_DEBUG ) ) {
-        if( m_logLevel != logLevel ) {
+    if ( ( logLevel >= LOG_EMERGENCY ) && ( logLevel <= LOG_DEBUG ) ) {
+        if ( m_logLevel != logLevel ) {
             m_logLevel = logLevel;
             Log( m_logLevel, "Set Debug Level to %d", m_logLevel );
         }
@@ -29,7 +27,7 @@ void UcLogger::SetLogLevel( Severity logLevel )
     }
 }
 
-void UcLogger::Log( Severity serverity, const char* msgFormatter, ... )
+void MsiLogger::Log( Severity serverity, const char* msgFormatter, ... )
 {
     va_list  args;
     va_start( args, msgFormatter );
@@ -39,7 +37,7 @@ void UcLogger::Log( Severity serverity, const char* msgFormatter, ... )
     va_end( args );
 }
 
-void UcLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
+void MsiLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
 {
     va_list  args;
     va_start( args, msgFormatter );
@@ -49,51 +47,62 @@ void UcLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
     va_end( args );
 }
 
-void UcLogger::Log( Severity serverity, const char* msgFormatter, va_list args )
+void MsiLogger::Log( Severity serverity, const char* msgFormatter, va_list args )
 {
-    if( serverity <= LOG_ERROR ) {
+    if ( serverity <= LOG_ERROR ) {
         LogWithError( serverity, msgFormatter, args );
     }
-    else if( serverity <= m_logLevel ) {
+    else if ( serverity <= m_logLevel ) {
         size_t length = _vscprintf( msgFormatter, args ) + 1;   // vsnprintf returns 1 character less???
         char* logLine = ( char* )calloc( 1, length + 1 );
 
-        if( logLine ) {
-            vsnprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
+        if ( logLine ) {
+            char tstr[ 32 ] = {};
+            time_t now = time( NULL );
+            struct tm tm;
+            localtime_s( &tm, &now );
+            strftime( tstr, sizeof( tstr ), "%b %d %H:%M:%S", &tm );
 
-            m_logFile.WriteLogLine( LogLevelStr( serverity ), logLine );
+            vsnprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
+            WcaLog( LOGMSG_STANDARD, "%s: %s", tstr, logLine );
 
             free( logLine );
         }
         else {
-            m_logFile.WriteLogLine( LogLevelStr( serverity ), __FUNCTION__ ": calloc failed" );
+            WcaLogError( LOGMSG_STANDARD, __FUNCTION__ "calloc failed" );
         }
     }
 }
 
-void UcLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
+void MsiLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
 {
-    if( serverity <= LOG_ERROR ) {
+    if ( serverity <= LOG_ERROR ) {
         LogWithError( serverity, msgFormatter, args );
     }
-    else if( serverity <= m_logLevel ) {
+    else if ( serverity <= m_logLevel ) {
         size_t length = _vscwprintf( msgFormatter, args ) + 1;   // vsnprintf returns 1 character less???
         wchar_t* logLine = ( wchar_t* )calloc( 1, ( sizeof( wchar_t ) * ( length + 1 ) ) );
 
-        if( logLine ) {
+        if ( logLine ) {
+            char tstr[ 32 ] = {};
+            time_t now = time( NULL );
+            struct tm tm;
+            localtime_s( &tm, &now );
+            strftime( tstr, sizeof( tstr ), "%b %d %H:%M:%S", &tm );
+
             _vsnwprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
 
-            m_logFile.WriteLogLine( LogLevelStrW( serverity ), logLine );
+            WcaLog( LOGMSG_STANDARD, "%s: %S", tstr, logLine );
 
             free( logLine );
         }
         else {
-            m_logFile.WriteLogLine( LogLevelStr( serverity ), __FUNCTION__ ": calloc failed" );
+            WcaLogError( LOGMSG_STANDARD, __FUNCTION__ "calloc failed" );
         }
     }
 }
 
-void UcLogger::LogWithError( Severity level, const char* msgFormatter, va_list args )
+void MsiLogger::LogWithError( Severity level, const char* msgFormatter, va_list args )
 {
     DWORD lastError = GetLastError();
     char ebuffer[ 256 ] = { 0 };
@@ -101,7 +110,7 @@ void UcLogger::LogWithError( Severity level, const char* msgFormatter, va_list a
     /*
     * Retrieve Windows error code and format it, convert to char *
     */
-    if( lastError ) {
+    if ( lastError ) {
         FormatMessageA( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
             lastError,
@@ -118,25 +127,31 @@ void UcLogger::LogWithError( Severity level, const char* msgFormatter, va_list a
     length += sizeof( ebuffer );                                    // Add space for GetLastError
     char* logLine = ( char* )calloc( 1, length + 1 );
 
-    if( logLine ) {
+    if ( logLine ) {
+        char tstr[ 32 ] = {};
+        time_t now = time( NULL );
+        struct tm tm;
+        localtime_s( &tm, &now );
+        strftime( tstr, sizeof( tstr ), "%b %d %H:%M:%S", &tm );
+
         vsnprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
 
-        if( lastError ) {
+        if ( lastError ) {
             char errstring[ 256 ] = { 0 };
             snprintf( errstring, sizeof( errstring ) - 1, " : %i : %s", lastError, ebuffer );
             strncat_s( logLine, length, errstring, sizeof( errstring ) );
         }
 
-        m_logFile.WriteLogLine( LogLevelStr( level ), logLine );
+        WcaLogError( LOGMSG_STANDARD, "%s %s", tstr, logLine );
 
         free( logLine );
     }
     else {
-        m_logFile.WriteLogLine( LogLevelStr( LOG_ERROR ), __FUNCTION__ ": calloc failed" );
+        WcaLogError( LOGMSG_STANDARD, __FUNCTION__ "calloc failed" );
     }
 }
 
-void UcLogger::LogWithError( Severity level, const wchar_t* msgFormatter, va_list args )
+void MsiLogger::LogWithError( Severity level, const wchar_t* msgFormatter, va_list args )
 {
     DWORD lastError = GetLastError();
     wchar_t ebuffer[ 256 ] = { 0 };
@@ -144,7 +159,7 @@ void UcLogger::LogWithError( Severity level, const wchar_t* msgFormatter, va_lis
     /*
     * Retrieve Windows error code and format it, convert to char *
     */
-    if( lastError ) {
+    if ( lastError ) {
         FormatMessageW( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
             lastError,
@@ -161,86 +176,26 @@ void UcLogger::LogWithError( Severity level, const wchar_t* msgFormatter, va_lis
     length += sizeof( ebuffer );                                    // Add space for GetLastError
     wchar_t* logLine = ( wchar_t* )calloc( 1, ( sizeof( wchar_t ) * ( length + 1 ) ) );
 
-    if( logLine ) {
+    if ( logLine ) {
+        char tstr[ 32 ] = {};
+        time_t now = time( NULL );
+        struct tm tm;
+        localtime_s( &tm, &now );
+        strftime( tstr, sizeof( tstr ), "%b %d %H:%M:%S", &tm );
+
         _vsnwprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
 
-        if( lastError ) {
+        if ( lastError ) {
             wchar_t errstring[ 256 ] = { 0 };
             _snwprintf_s( errstring, sizeof( errstring ) - 1, L" : %i : %s", lastError, ebuffer );
             wcsncat_s( logLine, length, errstring, sizeof( errstring ) / sizeof( wchar_t ) );
         }
 
-        m_logFile.WriteLogLine( LogLevelStrW( level ), logLine );
+        WcaLogError( LOGMSG_STANDARD, "%s: %S", tstr, logLine );
 
         free( logLine );
     }
     else {
-        m_logFile.WriteLogLine( LogLevelStr( level ), __FUNCTION__ ": calloc failed" );
+        WcaLogError( LOGMSG_STANDARD, __FUNCTION__ "calloc failed" );
     }
-}
-
-const char* UcLogger::LogLevelStr( Severity level )
-{
-    const char* levelStr = "";
-
-    switch( level ) {
-    case LOG_EMERGENCY:
-        levelStr = "EMERGENCY";
-        break;
-    case LOG_ALERT:
-        levelStr = "ALERT";
-        break;
-    case LOG_CRITICAL:
-        levelStr = "CRITICAL";
-        break;
-    case LOG_ERROR:
-        levelStr = "ERROR";
-        break;
-    case LOG_WARNING:
-        levelStr = "WARNING";
-        break;
-    case LOG_INFO:
-        levelStr = "INFO";
-        break;
-    case LOG_DEBUG:
-        levelStr = "DEBUG";
-        break;
-    default:
-        break;
-    }
-
-    return levelStr;
-}
-
-const wchar_t* UcLogger::LogLevelStrW( Severity level )
-{
-    const wchar_t* levelStr = L"";
-
-    switch( level ) {
-    case LOG_EMERGENCY:
-        levelStr = L"EMERGENCY";
-        break;
-    case LOG_ALERT:
-        levelStr = L"ALERT";
-        break;
-    case LOG_CRITICAL:
-        levelStr = L"CRITICAL";
-        break;
-    case LOG_ERROR:
-        levelStr = L"ERROR";
-        break;
-    case LOG_WARNING:
-        levelStr = L"WARNING";
-        break;
-    case LOG_INFO:
-        levelStr = L"INFO";
-        break;
-    case LOG_DEBUG:
-        levelStr = L"DEBUG";
-        break;
-    default:
-        break;
-    }
-
-    return levelStr;
 }
