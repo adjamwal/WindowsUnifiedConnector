@@ -27,8 +27,9 @@
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="StoreUCIDToProperty" BinaryKey="CustomActionsDll" DllEntry="StoreUCIDToProperty" />
-        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" Impersonate="no" />
-        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" Impersonate="no" />
+        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
+        <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
+        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
       
         <InstallExecuteSequence>
           <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
@@ -44,10 +45,13 @@
           <Custom Action="SendEventOnUninstallBegin" After="StoreUCIDToProperty">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
-          <Custom Action="RemoveCaResources" After="InstallFinalize" />
-          <Custom Action="SendEventOnUninstallComplete" Before="RemoveCaResources">
+          <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
+          <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="RemoveCaResources" OnExit="success" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>

@@ -215,29 +215,7 @@ MsiGetFeatureValidStatesA ==> INSTALLSTATE_ABSENT https://docs.microsoft.com/en-
 MsiOpenProductA ==> ERROR_UNKNOWN_PRODUCT https://docs.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiopenproducta?redirectedfrom=MSDN
 */
 
-//dummy deferred CA - rollback CA needs pairing with a deferred custom action to rollback on uninstall failure
-//http://www.installsite.org/pages/en/isnews/200108/
-UINT __stdcall NoopDeferredUninstallAction( MSIHANDLE hInstall )
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
-    hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
-
-LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize( ERROR_SUCCESS );
-}
-
-//NOTE this CA cannot modify or store data in msi properties
-//https://stackoverflow.com/questions/48459445/how-to-set-wix-property-from-deferred-customaction-c-dll
-//NOTE: this CA won't run if installer has RollbackDisabled set
-//https://docs.microsoft.com/en-us/windows/win32/msi/commit-custom-actions
-//NOTE: a rollback action must have a corresponding deferred action to rollback (??)
-//http://www.installsite.org/pages/en/isnews/200108/
-UINT __stdcall SendEventOnUninstallRollback( MSIHANDLE hInstall )
+UINT __stdcall SendEventOnUninstallError( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
@@ -252,33 +230,29 @@ UINT __stdcall SendEventOnUninstallRollback( MSIHANDLE hInstall )
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, "Failed to initialize" );
+
 #if 0
-    if( MsiGetMode( hInstall, MSIRUNMODE_ROLLBACK ) == TRUE )
+    LPWSTR productVersion = NULL;
+    hr = WcaGetProperty( L"ProductVersion", &productVersion );
+    ExitOnFailure( hr, "Failed to get ProductVersion" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductVersion %S", productVersion );
+
+    if( hr = MsiGetPropertyA( hInstall, "UC_EVENT_UCID", ucidToken, &ucidTokenLength ) == ERROR_SUCCESS )
     {
-        WcaLog( LOGMSG_STANDARD, "ROLLBACK MODE DETECTED" );
+        WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", ucidToken );
+    }
+    else
+    {
+        WcaLogError( LOGMSG_STANDARD, "Failed to load stored UCID value" );
+    }
 
-        LPWSTR productVersion = NULL;
-        hr = WcaGetProperty( L"ProductVersion", &productVersion );
-        ExitOnFailure( hr, "Failed to get ProductVersion" );
-        WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductVersion %S", productVersion );
-
-        if( hr = MsiGetPropertyA( hInstall, "UC_EVENT_UCID", ucidToken, &ucidTokenLength ) == ERROR_SUCCESS )
-        {
-            WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", ucidToken );
-        }
-        else
-        {
-            WcaLogError( LOGMSG_STANDARD, "Failed to load stored UCID value" );
-        }
-
-        if( ucidTokenLength <= 1 || !NotifyUninstallFailureEvent( ucidToken, productVersion ) )
-        {
-            WcaLogError( LOGMSG_STANDARD, "Error sending uninstall FAILURE event" );
-        }
-        else
-        {
-            WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall FAILURE event" );
-        }
+    if( ucidTokenLength <= 1 || !NotifyUninstallFailureEvent( ucidToken, productVersion ) )
+    {
+        WcaLogError( LOGMSG_STANDARD, "Error sending uninstall FAILURE event" );
+    }
+    else
+    {
+        WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall FAILURE event" );
     }
 #endif
 LExit:
@@ -329,7 +303,7 @@ UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
     }
     else
     {
-        WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall END event");
+        WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall END event" );
     }
 #endif
 LExit:
