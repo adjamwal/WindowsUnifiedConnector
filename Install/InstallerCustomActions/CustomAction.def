@@ -8,3 +8,6 @@ EXPORTS
 	NoopDeferredUninstallAction
 	SendEventOnUninstallRollback
 	SendEventOnUninstallComplete
+	ExtractCaResources
+	RemoveCaResources
+	TestCaSupport

@@ -1,5 +1,14 @@
 #include "stdafx.h"
 #include "PrivateFunctions.h"
+#include <Rpc.h>
+#include "IUcLogger.h"
+#include <filesystem>
+#include <exception>
+#include "resource.h"
+#include <tchar.h>
+
+extern HMODULE globalDllHandle;
+#if 0
 #include "CloudEventBuilder.h"
 #include "CloudEventPublisher.h"
 #include "CloudEventStorage.h"
@@ -28,7 +37,7 @@ bool PrepareAndSendEvent( std::string ucidToken, std::wstring productVersion, in
     epub.SetToken( ucidToken );
     return epub.Publish( ev ) == 200;
 }
-
+#endif
 bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo )
 {
     buildInfo.versionString = version;
@@ -169,6 +178,7 @@ bool IsWindows10OrGreater( const std::string fileVersion )
     return rtn;
 }
 
+#if 0
 std::string GetNewUCIDToken()
 {
     return "test-ucid";
@@ -193,4 +203,181 @@ bool NotifyUninstallEndEvent( std::string ucidToken, std::wstring productVersion
     return PrepareAndSendEvent( 
         ucidToken, productVersion, 
         UCPM_EVENT_UC_UNINSTALL_END, "UC uninstall ended" );
+}
+#endif
+
+bool ExtractResourceToFile( HMODULE dllHandle, LPCTSTR ResourceName, LPCTSTR ResourceType, LPCTSTR OutputFileName )
+{
+    WLOG_DEBUG( L"Extracting Resource %s", OutputFileName );
+
+    HRSRC hResource = ::FindResource( dllHandle, ResourceName, ResourceType );
+    if ( hResource == NULL )
+        return false;
+
+    HGLOBAL hLoadResource = ::LoadResource( dllHandle, hResource );
+    if ( hLoadResource == NULL )
+        return false;
+
+    LPVOID pResource = ::LockResource( hLoadResource );
+    if ( pResource == NULL )
+        return false;
+
+    DWORD dwResSize = ::SizeofResource( dllHandle, hResource );
+    if ( dwResSize == 0 )
+        return false;
+
+    HANDLE hFile = ::CreateFile( OutputFileName, GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+    if ( hFile == INVALID_HANDLE_VALUE )
+        return false;
+
+    DWORD dwBytesWritten = 0;
+    if ( !::WriteFile( hFile, pResource, dwResSize, &dwBytesWritten, NULL ) ) {
+        ::CloseHandle( hFile );
+        ::DeleteFile( OutputFileName );
+
+        return false;
+    }
+
+    ::CloseHandle( hFile );
+
+    return true;
+}
+
+std::string GenerateNewGuid()
+{
+    RPC_CSTR rpcStr = NULL;
+    UUID guid = { 0 };
+    std::string guidRtn;
+
+    if ( UuidCreate( &guid ) != RPC_S_OK ) {
+        LOG_ERROR( "UuidCreate failed" );
+        goto abort;
+    }
+
+    if ( UuidToStringA( &guid, &rpcStr ) != RPC_S_OK ) {
+        LOG_ERROR( "UuidToString failed" );
+        goto abort;
+    }
+
+    guidRtn = ( char* )rpcStr;
+    RpcStringFreeA( &rpcStr );
+    
+abort:
+    return guidRtn;
+}
+
+bool ExtractResources( std::wstring &outputPath )
+{
+    std::filesystem::path tempPath = std::filesystem::temp_directory_path();
+    std::filesystem::path rcPath;
+    bool retErr = true;
+    tempPath /= "UC.Installer-";
+    tempPath += GenerateNewGuid();
+
+    std::filesystem::create_directories( tempPath );
+
+    rcPath = tempPath / MSVCP_DLL_NAME;
+    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
+        retErr = false;
+    }
+
+    rcPath = tempPath / MSVCP1_DLL_NAME;
+    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP1 ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
+        retErr = false;
+    }
+
+    rcPath = tempPath / MSVCP2_DLL_NAME;
+    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP2 ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
+        retErr = false;
+    }
+
+    rcPath = tempPath / VCRUNTIME_DLL_NAME;
+    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_VCRUNTIME ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
+        retErr = false;
+    }
+
+    rcPath = tempPath / UCRT_DLL_NAME;
+    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_UCRT ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
+        retErr = false;
+    }
+
+    rcPath = tempPath / CASUPPORT_DLL_NAME;
+    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_CASUPPORT ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
+        retErr = false;
+    }
+
+    if ( retErr ) {
+        outputPath = tempPath.native();
+    }
+
+    return retErr;
+}
+
+bool DeleteResources( const std::wstring& dllPath )
+{
+    bool rtn = true;
+    if ( !dllPath.empty() ) {
+        try {
+            std::filesystem::path deletePath = dllPath;
+            std::filesystem::remove_all( deletePath );
+        }
+        catch ( std::exception& e ) {
+            WLOG_ERROR( L"Failed to delete %s %hs", dllPath.c_str(), e.what() );
+            rtn = false;
+        }
+    }
+
+    return rtn;
+}
+
+HMODULE LoadCaSupportDll( const std::wstring& dllPath )
+{
+    HMODULE module = NULL;
+    
+    WLOG_DEBUG( L"Loading dll %s\\%hs", dllPath.c_str(), CASUPPORT_DLL_NAME );
+    SetDllDirectory( dllPath.c_str() );
+    module = LoadLibrary( _T( CASUPPORT_DLL_NAME ) );
+
+    if ( module == NULL ) {
+        WLOG_ERROR( L"Failed to load %hs", CASUPPORT_DLL_NAME );
+    }
+
+    return module;
+}
+
+void UnloadModule( HMODULE module)
+{
+    if ( module ) {
+        if ( !FreeLibrary( module ) ) {
+            WLOG_ERROR( L"Failed to unload module" );
+        }
+    }
+        
+    SetDllDirectory( NULL );
+}
+
+typedef void( *TestLoggerFunc )( IUcLogger* logger );
+
+void RunTestFunction( IUcLogger* logger, const std::wstring& dllPath )
+{
+    HMODULE caSupport = NULL;
+    TestLoggerFunc TestLogger = NULL;
+    
+    if ( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
+        LOG_ERROR( "LoadCaSupportDll failed" );
+    }
+    else if ( ( TestLogger = ( TestLoggerFunc )GetProcAddress( caSupport, "TestLogger" ) ) == NULL ) {
+        LOG_ERROR( "GetProcAddress TestLogger failed" );
+    }
+    else {
+        TestLogger( logger );
+    }
+
+    UnloadModule( caSupport );
 }

@@ -4,6 +4,8 @@
 #include <string>
 #include <versionhelpers.h>
 
+class IUcLogger;
+
 #define GUID_SIZE 39
 
 struct BuildInfo
@@ -20,3 +22,6 @@ std::string GetNewUCIDToken();
 bool NotifyUninstallBeginEvent( std::string ucidToken, std::wstring productVersion );
 bool NotifyUninstallFailureEvent( std::string ucidToken, std::wstring productVersion );
 bool NotifyUninstallEndEvent( std::string ucidToken, std::wstring productVersion );
+bool ExtractResources( std::wstring& outputPath );
+bool DeleteResources( const std::wstring& dllPath );
+void RunTestFunction( IUcLogger* logger, const std::wstring& dllPath );
