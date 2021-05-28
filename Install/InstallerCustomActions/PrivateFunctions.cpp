@@ -312,6 +312,26 @@ bool ExtractResources( std::wstring &outputPath )
         retErr = false;
     }
 
+    rcPath = tempPath / CRYPTO_DLL_NAME;
+    if (!ExtractResourceToFile(globalDllHandle, MAKEINTRESOURCE(IDR_RRDLL_CRYPTO), RT_RCDATA, rcPath.native().c_str())) {
+        WLOG_ERROR(L"Failed to extract %s", rcPath.native().c_str());
+        retErr = false;
+    }
+
+    rcPath = tempPath / SSL_DLL_NAME;
+    if (!ExtractResourceToFile(globalDllHandle, MAKEINTRESOURCE(IDR_RRDLL_SSL), RT_RCDATA, rcPath.native().c_str())) {
+        WLOG_ERROR(L"Failed to extract %s", rcPath.native().c_str());
+        retErr = false;
+    }
+
+#ifdef _DEBUG
+    rcPath = tempPath / ZLIB_DLL_NAME;
+    if (!ExtractResourceToFile(globalDllHandle, MAKEINTRESOURCE(IDR_RRDLL_ZLIB), RT_RCDATA, rcPath.native().c_str())) {
+        WLOG_ERROR(L"Failed to extract %s", rcPath.native().c_str());
+        retErr = false;
+    }
+#endif
+
     if ( retErr ) {
         outputPath = tempPath.native();
     }

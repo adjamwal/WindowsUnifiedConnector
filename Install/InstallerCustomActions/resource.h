@@ -19,6 +19,14 @@
 #define IDR_RRDLL_VCRUNTIME             803
 #define IDR_RRDLL_UCRT                  804
 #define IDR_RRDLL_CASUPPORT             805
+#define IDR_RRDLL_CRYPTO                806
+#define IDR_RRDLL_SSL                   807
+
+#ifdef _DEBUG
+
+#define IDR_RRDLL_ZLIB                  808
+
+#endif
 
 #ifdef _DEBUG
 
@@ -27,6 +35,7 @@
 #define MSVCP2_DLL_NAME                "msvcp140_2d.dll"
 #define VCRUNTIME_DLL_NAME             "vcruntime140d.dll"
 #define UCRT_DLL_NAME                  "ucrtbased.dll"
+#define ZLIB_DLL_NAME                  "zlibd.dll"
 
 #else
 	
@@ -39,3 +48,5 @@
 #endif
 
 #define CASUPPORT_DLL_NAME             "dllCaSupport.dll"
+#define CRYPTO_DLL_NAME                "libcrypto-1_1.dll"
+#define SSL_DLL_NAME                   "libssl-1_1.dll"
