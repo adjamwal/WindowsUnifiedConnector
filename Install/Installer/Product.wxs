@@ -15,6 +15,9 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
+       <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
+       <Property Id="ARPPRODUCTICON" Value="UC.ico" />
+      
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />

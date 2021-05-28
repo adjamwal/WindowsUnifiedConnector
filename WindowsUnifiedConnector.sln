@@ -119,6 +119,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MockLibUCDiagTool", "UC\Moc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestUcConfig", "UC\Tests\TestUcConfig\TestUcConfig.vcxproj", "{5EE37648-C251-49DF-A95B-9237929C1195}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{85A305D6-4179-4455-A42A-B554ECA65FE6}"
+	ProjectSection(SolutionItems) = preProject
+		Resources\images\small.ico = Resources\images\small.ico
+		Resources\images\UC.ico = Resources\images\UC.ico
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -475,6 +481,7 @@ Global
 		{BAA800DD-9C49-4129-8249-4EC064686854} = {D99E33CC-A481-41A0-A01C-C5F04722912D}
 		{35E8D274-5993-4AB9-9691-0DB233F4EEAB} = {BAA800DD-9C49-4129-8249-4EC064686854}
 		{5EE37648-C251-49DF-A95B-9237929C1195} = {BC4968FB-5FCC-4BAB-9647-74B9FB741E81}
+		{85A305D6-4179-4455-A42A-B554ECA65FE6} = {C8505725-0B3E-4425-9EB7-55785D1CCC9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

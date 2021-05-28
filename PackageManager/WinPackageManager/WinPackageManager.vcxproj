@@ -204,10 +204,6 @@
     <ResourceCompile Include="WinPackageManager.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="WinPackageManager.ico" />
-    <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\SharedLibs\libCloudEvents\libCloudEvents.vcxproj">
       <Project>{5004d35a-f8c0-4f1e-ae8e-5d7fe5cd89a9}</Project>
     </ProjectReference>
