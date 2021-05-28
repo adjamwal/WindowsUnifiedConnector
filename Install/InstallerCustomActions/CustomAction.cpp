@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PrivateFunctions.h"
 #include "MsiLogger.h"
+#include "UcidFacade.h"
 
 UINT __stdcall DetectOlderBuildVersion( MSIHANDLE hInstall )
 {
@@ -68,23 +69,33 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-    std::string ucidStr;
+    std::string ucid, ucidToken;
     MsiLogger msiLogger;
-    SetUcLogger( &msiLogger );
 
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
+
+    SetUcLogger( &msiLogger );
+    UcidFacade ucidFacade;
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, "Failed to initialize" );
 
-    ucidStr = GetNewUCIDToken();
-    if( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID", ucidStr.c_str() ) == ERROR_SUCCESS )
+    if( !ucidFacade.FetchCredentials( ucid, ucidToken ) )
     {
-        WcaLog( LOGMSG_STANDARD, "Stored UCID: %s", ucidStr.c_str() );
+        hr = -1;
+        WcaLogError( LOGMSG_STANDARD, "Failed to fetch UCID/Token values" );
+    }
+    else if ( 
+        ( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID", ucid.c_str() ) == ERROR_SUCCESS ) &&
+        ( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID_TOKEN", ucidToken.c_str() ) == ERROR_SUCCESS ) 
+    )
+    {
+        WcaLog( LOGMSG_STANDARD, "Stored UCID/Token: %s/%s", ucid.c_str(), ucidToken.c_str() );
     }
     else
     {
-        WcaLogError( LOGMSG_STANDARD, "Failed to store UCID value: %s", ucidStr.c_str() );
+        hr = -1;
+        WcaLogError( LOGMSG_STANDARD, "Failed to store UCID/Token values" );
     }
 
 LExit:

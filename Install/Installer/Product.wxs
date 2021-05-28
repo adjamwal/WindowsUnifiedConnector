@@ -16,7 +16,7 @@
                  InstallPrivileges="elevated"/>
 
         <Property Id="UC_EVENT_UCID" Value="0" />
-        <Property Id="UC_ROLLBACK_DETECTED" Value="0" />
+        <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
 
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
       

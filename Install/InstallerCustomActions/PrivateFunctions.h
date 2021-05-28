@@ -16,7 +16,6 @@ bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo );
 bool GetPreviousBuildVersion( BuildInfo& buildInfo, LPWSTR& productName );
 std::string GetFileVersion( const std::string filename );
 bool IsWindows10OrGreater( const std::string fileVersion );
-std::string GetNewUCIDToken();
 bool NotifyUninstallBeginEvent( std::string ucidToken, std::wstring productVersion );
 bool NotifyUninstallFailureEvent( std::string ucidToken, std::wstring productVersion );
 bool NotifyUninstallEndEvent( std::string ucidToken, std::wstring productVersion );

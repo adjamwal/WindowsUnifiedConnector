@@ -169,11 +169,6 @@ bool IsWindows10OrGreater( const std::string fileVersion )
     return rtn;
 }
 
-std::string GetNewUCIDToken()
-{
-    return "test-ucid";
-}
-
 bool NotifyUninstallBeginEvent( std::string ucidToken, std::wstring productVersion )
 {
     return PrepareAndSendEvent( 
