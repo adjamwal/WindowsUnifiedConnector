@@ -15,7 +15,7 @@
 #include <Windows.h>
 #include "PmTypes.h"
 
-#define PM_AGENT_BINARY "ucpm.exe"
+#define PM_AGENT_BINARY "csc_pm.exe"
 #define BS_CONFIG_FILE "bs.json"
 #define PM_CONFIG_FILE "pm.json"
 
