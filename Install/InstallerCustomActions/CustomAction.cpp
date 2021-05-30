@@ -131,7 +131,7 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
-
+#if 0
     WcaLog( LOGMSG_STANDARD, __FUNCTION__" Initialized." );
 
     WCHAR dllPath[ 1024 ] = { 0 };
@@ -159,7 +159,7 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
     {
         WLOG_ERROR( L"MsiGetProperty failed for UC_RESOURCE_DIR" );
     }
-
+#endif
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
