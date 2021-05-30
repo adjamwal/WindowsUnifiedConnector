@@ -7,3 +7,6 @@ EXPORTS
 	SendEventOnUninstallBegin
 	SendEventOnUninstallError
 	SendEventOnUninstallComplete
+	ExtractCaResources
+	RemoveCaResources
+	TestCaSupport

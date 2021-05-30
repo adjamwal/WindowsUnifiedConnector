@@ -16,10 +16,16 @@
                  InstallPrivileges="elevated"/>
 
         <Property Id="UC_EVENT_UCID" Value="0" />
-        <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
+        <Property Id="UC_ROLLBACK_DETECTED" Value="0" />
+        <Property Id="UC_RESOURCE_DIR" Value="0" />
 
-        <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+        <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
+        <Property Id="ARPPRODUCTICON" Value="UC.ico" />
       
+        <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+        <CustomAction Id="ExtractCaResources" BinaryKey="CustomActionsDll" DllEntry="ExtractCaResources" />
+        <CustomAction Id="RemoveCaResources" BinaryKey="CustomActionsDll" DllEntry="RemoveCaResources" />
+        <CustomAction Id="TestCaSupport" BinaryKey="CustomActionsDll" DllEntry="TestCaSupport" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
@@ -29,11 +35,13 @@
         <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
       
         <InstallExecuteSequence>
-          <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
+          <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
+          <Custom Action="TestCaSupport" After="ExtractCaResources" />
+          <Custom Action="DetectInvalidSideGrade" After="ExtractCaResources">
             WIX_UPGRADE_DETECTED
           </Custom>
-          <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
-          <Custom Action="SetCacheDirectory" After="FindRelatedProducts" />
+          <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
+          <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
           <Custom Action="StoreUCIDToProperty" Before="InstallInitialize">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
@@ -46,6 +54,7 @@
           <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
+          <Custom Action="RemoveCaResources" OnExit="success" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
@@ -114,6 +123,7 @@
                     <Directory Id="PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
                         <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
                             <Directory Id="UC_CONFIG_DIRECTORY" Name="$(var.UCConfigDirectory)" />
+                            <Directory Id="UC_DATA_DIRECTORY" Name="$(var.UCDataDirectory)" />
                             <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
                                 <Directory Id="UCSERVICE_BASE_DIRECTORY" Name="$(var.ServiceDictory)">
                                     <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.ServiceVersion)" />
@@ -128,14 +138,6 @@
                                     <Directory Id="UCPM_DIRECTORY" Name="$(var.UCPMVersion)" />
                                 </Directory>
                             </Directory>
-                        </Directory>
-                    </Directory>
-                </Directory>
-            </Directory>
-            <Directory Id="CommonAppDataFolder">
-                <Directory Id="PROGRAMDATA_CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
-                    <Directory Id="PROGRAMDATA_PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
-                        <Directory Id="UC_LOG_DIRECTORY" Name="$(var.UCLogDirectory)">
                         </Directory>
                     </Directory>
                 </Directory>
@@ -156,7 +158,7 @@
             <Component Id="UC_LOG_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector">
-                    <RegistryValue Type="string" Name="LogDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="LogDir" Value="[UC_DATA_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
           
@@ -180,8 +182,8 @@
                 </RegistryKey>
             </Component>
         
-            <Component Id="ucs.exe" Guid="*">
-                <File Id="ucs.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\ucs.exe" />
+            <Component Id="csc_uc.exe" Guid="*">
+                <File Id="csc_uc.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_uc.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />
                 <ServiceInstall Id="ServiceInstaller" Name="$(var.ServiceName)" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
                     <util:ServiceConfig RestartServiceDelayInSeconds="60" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
@@ -260,7 +262,7 @@
             <Component Id="UCID_DATA_DIR" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
-                    <RegistryValue Type="string" Name="DataDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="DataDir" Value="[UC_DATA_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
@@ -312,8 +314,8 @@
             <Component Id="PM_MCP.dll" Guid="*">
                 <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
             </Component>
-            <Component Id="ucpm.exe" Guid="*">
-                <File Id="ucpm.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucpm.exe" />
+            <Component Id="csc_pm.exe" Guid="*">
+                <File Id="csc_pm.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_pm.exe" />
             </Component>
             <Component Id="PM_Verify.exe" Guid="*">
               <File Id="PM_Verify.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_Verify.exe" />

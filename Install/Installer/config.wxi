@@ -22,7 +22,7 @@
     <?if $(var.UC_CONSUMER) = 1 ?>
         <?define ProductDirectory = "Immunet" ?>
     <?else ?>
-        <?define ProductDirectory = "SecureClient" ?>
+        <?define ProductDirectory = "Cisco Secure Client" ?>
     <?endif ?>
   
     <?define UnifiedConnectorDirectory = "UC" ?>
@@ -30,7 +30,7 @@
     <?define UCIDDirectory = "UCID" ?>
     <?define UCPMDirectory = "UCPM" ?>
     <?define UCConfigDirectory = "Configuration" ?>
-    <?define UCLogDirectory = "UC" ?>
+    <?define UCDataDirectory = "Data" ?>
     <?define PmInstallCacheDirectory = "Cisco-UC" ?>
 
     <!-- Config File Information -->
@@ -48,10 +48,10 @@
     <!-- Version info -->
     <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
     <!-- Version and Service Version will be the same for now, in the future they might be different to support individual module updates -->
-    <?define Version = "!(bind.fileVersion.ucs.exe)" ?>
-    <?define ServiceVersion = "!(bind.fileVersion.ucs.exe)" ?>
+    <?define Version = "!(bind.fileVersion.csc_uc.exe)" ?>
+    <?define ServiceVersion = "!(bind.fileVersion.csc_uc.exe)" ?>
     <?define UCIDVersion = "!(bind.fileVersion.ucid.exe)" ?>
-    <?define UCPMVersion = "!(bind.fileVersion.ucpm.exe)" ?>
+    <?define UCPMVersion = "!(bind.fileVersion.csc_pm.exe)" ?>
 
     <!-- Minimum version supported if product already installed and this is an upgrade -->
     <!-- Note that 4th version (Revision) is ignored by Windows Installer -->
