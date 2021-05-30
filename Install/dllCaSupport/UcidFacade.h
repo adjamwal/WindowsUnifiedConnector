@@ -1,11 +1,13 @@
 #pragma once
 
 #include "IUcidFacade.h"
-#include "WinCertLoader.h"
-#include "CodesignVerifier.h"
-#include "WindowsConfiguration.h"
+#include "IUcLogger.h"
 #include <string>
 #include <memory>
+
+class ICodesignVerifier;
+class IWinCertLoader;
+class IPmPlatformConfiguration;
 
 class UcidFacade : public IUcidFacade
 {
@@ -19,5 +21,5 @@ private:
     IUcLogger* m_oldLogger;
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
     std::unique_ptr<IWinCertLoader> m_certLoader;
-    std::unique_ptr<WindowsConfiguration> m_winConf;
+    std::unique_ptr<IPmPlatformConfiguration> m_winConf;
 };

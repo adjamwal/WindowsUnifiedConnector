@@ -179,11 +179,6 @@ bool IsWindows10OrGreater( const std::string fileVersion )
 }
 
 #if 0
-std::string GetNewUCIDToken()
-{
-    return "test-ucid";
-}
-
 bool NotifyUninstallBeginEvent( std::string ucidToken, std::wstring productVersion )
 {
     return PrepareAndSendEvent( 
@@ -400,4 +395,28 @@ void RunTestFunction( IUcLogger* logger, const std::wstring& dllPath )
     }
 
     UnloadModule( caSupport );
+}
+
+typedef bool( *GetUcidAndTokenFunc )( IUcLogger* logger, std::string& ucid, std::string& ucidToken );
+bool RunGetUcidAndToken( IUcLogger* logger, const std::wstring& dllPath, std::string& ucid, std::string& ucidToken )
+{
+    bool result = false;
+    ucid = "";
+    ucidToken = "";
+
+    HMODULE caSupport = NULL;
+    GetUcidAndTokenFunc GetUcidAndToken = NULL;
+
+    if( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
+        LOG_ERROR( "LoadCaSupportDll failed" );
+    }
+    else if( ( GetUcidAndToken = ( GetUcidAndTokenFunc )GetProcAddress( caSupport, "GetUcidAndToken" ) ) == NULL ) {
+        LOG_ERROR( "GetProcAddress GetUcidAndToken failed" );
+    }
+    else {
+        result = GetUcidAndToken( logger, ucid, ucidToken );
+    }
+
+    UnloadModule( caSupport );
+    return result;
 }

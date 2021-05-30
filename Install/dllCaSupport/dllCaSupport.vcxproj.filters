@@ -27,6 +27,12 @@
     <ClInclude Include="CaSupport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IUcidFacade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UcidFacade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -36,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CaSupport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UcidFacade.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

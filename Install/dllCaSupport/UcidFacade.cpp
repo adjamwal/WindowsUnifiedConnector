@@ -1,5 +1,8 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "UcidFacade.h"
+#include "WinCertLoader.h"
+#include "CodesignVerifier.h"
+#include "WindowsConfiguration.h"
 
 UcidFacade::UcidFacade()
     : m_oldLogger( GetUcLogger() )

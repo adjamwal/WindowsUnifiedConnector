@@ -16,7 +16,7 @@
                  InstallPrivileges="elevated"/>
 
         <Property Id="UC_EVENT_UCID" Value="0" />
-        <Property Id="UC_ROLLBACK_DETECTED" Value="0" />
+        <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
         <Property Id="UC_RESOURCE_DIR" Value="0" />
 
         <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>

@@ -13,7 +13,7 @@ UINT __stdcall ExtractCaResources( MSIHANDLE hInstall )
     SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
     if ( ExtractResources( dllPath ) ) {
         if ( (hr = MsiSetProperty( hInstall, L"UC_RESOURCE_DIR", dllPath.c_str() ) ) == ERROR_SUCCESS ) {
@@ -41,7 +41,7 @@ UINT __stdcall RemoveCaResources( MSIHANDLE hInstall )
     SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
     if ( MsiGetProperty( hInstall, L"UC_RESOURCE_DIR", dllPath, &size ) == ERROR_SUCCESS ) {
         WLOG_DEBUG( L"Remove resource folder %s", dllPath );
@@ -66,7 +66,7 @@ UINT __stdcall DetectOlderBuildVersion( MSIHANDLE hInstall )
     SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
     LPWSTR productName = NULL;
     hr = WcaGetProperty( L"ProductName", &productName );
@@ -107,7 +107,7 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
     SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
     WcaLog( LOGMSG_STANDARD, "Initialized." );
 
@@ -123,25 +123,43 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-    std::string ucidStr;
+    std::string ucid, ucidToken;
     MsiLogger msiLogger;
-    SetUcLogger( &msiLogger );
 
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
+    SetUcLogger( &msiLogger );
+
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
-#if 0
-    ucidStr = GetNewUCIDToken();
-    if( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID", ucidStr.c_str() ) == ERROR_SUCCESS )
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
+
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__" Initialized." );
+
+    WCHAR dllPath[ 1024 ] = { 0 };
+    DWORD dllPathSize = sizeof( dllPath ) / sizeof( WCHAR );
+    if( hr = MsiGetProperty( hInstall, L"UC_RESOURCE_DIR", dllPath, &dllPathSize ) == ERROR_SUCCESS )
     {
-        WcaLog( LOGMSG_STANDARD, "Stored UCID: %s", ucidStr.c_str() );
+        WLOG_DEBUG( L"Call RunGetUcidAndToken function %s", dllPath );
+        if( !RunGetUcidAndToken( &msiLogger, dllPath, ucid, ucidToken ) )
+        {
+            hr = -1;
+            WcaLogError( LOGMSG_STANDARD, "Failed to fetch UCID/Token values" );
+        }
+        else if(
+            ( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID", ucid.c_str() ) == ERROR_SUCCESS ) &&
+            ( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID_TOKEN", ucidToken.c_str() ) == ERROR_SUCCESS ) )
+        {
+            WcaLog( LOGMSG_STANDARD, "Stored UCID/Token: %s/%s", ucid.c_str(), ucidToken.c_str() );
+        }
+        else
+        {
+            WcaLogError( LOGMSG_STANDARD, "Failed to store UCID/Token values" );
+        }
     }
     else
     {
-        WcaLogError( LOGMSG_STANDARD, "Failed to store UCID value: %s", ucidStr.c_str() );
+        WLOG_ERROR( L"MsiGetProperty failed for UC_RESOURCE_DIR" );
     }
 
-#endif
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
@@ -160,7 +178,7 @@ UINT __stdcall SendEventOnUninstallBegin( MSIHANDLE hInstall )
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 #if 0
     LPWSTR productVersion = NULL;
     hr = WcaGetProperty( L"ProductVersion", &productVersion );
@@ -229,7 +247,7 @@ UINT __stdcall SendEventOnUninstallError( MSIHANDLE hInstall )
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
 #if 0
     LPWSTR productVersion = NULL;
@@ -281,7 +299,7 @@ UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 #if 0
     LPWSTR productVersion = NULL;
     hr = WcaGetProperty( L"ProductVersion", &productVersion );
@@ -321,9 +339,9 @@ UINT __stdcall TestCaSupport( MSIHANDLE hInstall )
     SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, "Failed to initialize" );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
-    WcaLog( LOGMSG_STANDARD, "Initialized." );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__" Initialized." );
 
     WCHAR dllPath[ 1024 ] = { 0 };
     DWORD size = 1024;

@@ -24,3 +24,4 @@ bool NotifyUninstallEndEvent( std::string ucidToken, std::wstring productVersion
 bool ExtractResources( std::wstring& outputPath );
 bool DeleteResources( const std::wstring& dllPath );
 void RunTestFunction( IUcLogger* logger, const std::wstring& dllPath );
+bool RunGetUcidAndToken( IUcLogger* logger, const std::wstring& dllPath, std::string& ucid, std::string& ucidToken );
