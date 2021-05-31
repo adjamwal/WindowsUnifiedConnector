@@ -37,14 +37,14 @@
         <InstallExecuteSequence>
           <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
           <Custom Action="TestCaSupport" After="ExtractCaResources" />
+          <Custom Action="StoreUCIDToProperty" After="ExtractCaResources">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
           <Custom Action="DetectInvalidSideGrade" After="ExtractCaResources">
             WIX_UPGRADE_DETECTED
           </Custom>
           <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
           <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
-          <Custom Action="StoreUCIDToProperty" Before="InstallInitialize">
-            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
-          </Custom>
           <Custom Action="SendEventOnUninstallBegin" After="StoreUCIDToProperty">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>

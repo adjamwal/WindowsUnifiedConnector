@@ -182,21 +182,24 @@ bool UCIDApiDll::LoadApi()
 
     std::wstring ucidDllDir;
     std::wstring dllFullPath;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
+
+    if( !WindowsUtilities::ReadRegistryString( 
+        HKEY_LOCAL_MACHINE, 
+        L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID", 
+        L"Path", 
+        ucidDllDir ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnectorID Api data from registry" );
         return false;
     }
 
     dllFullPath = ucidDllDir;
-    if( WindowsUtilities::Is64BitWindows() )
-    {
-        dllFullPath.append( L"x64\\" );
-    }
-    else
-    {
-        dllFullPath.append( L"x86\\" );
-    }
+    //running process can only load a dll of the same bitness as itself
+#if defined(_WIN64)
+    dllFullPath.append( L"x64\\" );
+#else
+    dllFullPath.append( L"x86\\" );
+#endif
     dllFullPath.append( L"ucidapi.dll" );
 
     try
