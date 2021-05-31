@@ -200,11 +200,9 @@
                   <ShortcutProperty Key="System.AppUserModel.ToastActivatorCLSID" Value="{2A6D455C-4742-4000-A128-9BC84DBAD18F}"/>
                 </Shortcut>
               </File>
-
             </Component>
-
           
-            <?if $(var.Platform) = "Release" ?>
+            <?if $(var.Configuration) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
                     <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
                 </Component>
