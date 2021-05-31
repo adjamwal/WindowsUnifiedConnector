@@ -183,7 +183,7 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailOnEmptyContents )
     EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProvided )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailWhenMaxFileCacheAgeNotProvided )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
@@ -196,7 +196,7 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProv
 }
 )" );
 
-    EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+    EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailIfMaxFileCacheAgeIsInvalid )
@@ -249,6 +249,15 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultInterval )
     EXPECT_EQ( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
 }
 
+//Not a great test... but not worthwihle to mock out RandomUtil
+TEST_F(TestPmConfig, LoadingEmptyConfigSetsDefaultMaxStartupDelay)
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
+}
 TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
 {
     m_fileUtil->MakeReadFileReturn( "" );
@@ -256,5 +265,23 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
     m_patient->LoadPmConfig( "filename" );
 
     EXPECT_EQ( m_patient->GetLogLevel(), PM_CONFIG_LOGLEVEL_DEFAULT );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsMaxFileCacheAge )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetMaxFileCacheAge(), PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsAllowPostInstallReboots )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->AllowPostInstallReboots(), false );
 }
 

@@ -8,6 +8,11 @@
 #define PM_CONFIG_INTERVAL_DEFAULT 300000
 #define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
 
+namespace Json
+{
+    class Value;
+};
+
 class IFileUtil;
 
 struct PmConfigData
@@ -58,4 +63,10 @@ private:
 
     int32_t VerifyBsContents( const std::string& bsConfig );
     int32_t VerifyPmContents( const std::string& pmConfig );
+    bool VerifyPmLogLevel( const Json::Value& pmRoot );
+    bool VerifyPmCheckinInterval( const Json::Value& pmRoot );
+    bool VerifyPmMaxStartupDelay( const Json::Value& pmRoot );
+    bool VerifyPmMaxFileCacheAge(const Json::Value& pmRoot);
+    bool VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot );
+    
 };
