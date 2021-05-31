@@ -17,6 +17,23 @@
 
        <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
        <Property Id="ARPPRODUCTICON" Value="UC.ico" />
+      <!--=
+        Disables Install-on-demand shortcuts
+        What this is: https://docs.microsoft.com/en-us/windows/win32/msi/disableadvtshortcuts
+        
+        Why this matters: 
+        source - https://stackoverflow.com/questions/2058230/wix-create-non-advertised-shortcut-for-all-users-per-machine
+        By default, creating shortcuts for the ALL USERS profile causes a MSI validation errors. There is a validation requirement (ICE43)
+        that specifies that non advertised shortcuts (normal shortcuts) must have a HKCU registry entry. ALL USERS does not have a HKCU profile so this
+        can't be satified. Seems like a windows installer bug. The example in the link above works around this by
+        
+        1. Setting a global property to disable advertised shortcuts
+        2. Set the advertise property in the shortcut
+        
+        The effect is this removes the requirement to have a registry entry for the shortcut under HKCU and windows installer will replace the advertised
+        shortcut with a normal shortcut
+      -->       
+       <Property Id="DISABLEADVTSHORTCUTS" Value="1" />
       
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
@@ -72,6 +89,7 @@
             <?endif?>
             <ComponentGroupRef Id="UCPMComponents" />
             <ComponentGroupRef Id="CG.ConfigFiles" />
+            <ComponentGroupRef Id="CiscoStartMenu" />
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
@@ -114,6 +132,9 @@
                         </Directory>
                     </Directory>
                 </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+              <Directory Id="CiscoProgramMenuFolder" Name="$(var.CiscoDirectory)" />
             </Directory>
         </Directory>
     </Fragment>
@@ -163,11 +184,27 @@
                 </ServiceInstall>
             </Component>
 
-          <Component Id="csc_ucdt.exe" Guid="*">
-            <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" />
-          </Component>
+            <Component Id="csc_ucdt.exe" Guid="*">
+              <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" >
+                <!--= Set explanation above for Advertise="yes" -->
+                <Shortcut Id="csc_ucdt_start_menu_shortcut" 
+                          Name="!(loc.DiagToolName)" 
+                          Description="!(loc.DiagToolDescription)" 
+                          Directory="CiscoProgramMenuFolder" 
+                          Advertise="yes" 
+                          WorkingDirectory="UCSERVICE_DIRECTORY" >
+                  <!--AUMID-->
+                  <ShortcutProperty Key="System.AppUserModel.ID" Value="Cisco.UC"/>
+
+                  <!--COM CLSID-->
+                  <ShortcutProperty Key="System.AppUserModel.ToastActivatorCLSID" Value="{2A6D455C-4742-4000-A128-9BC84DBAD18F}"/>
+                </Shortcut>
+              </File>
+
+            </Component>
+
           
-            <?if $(var.Configuration) = "Release" ?>
+            <?if $(var.Platform) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
                     <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
                 </Component>
@@ -431,4 +468,13 @@
             </Component>
         </ComponentGroup>
     </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="CiscoStartMenu" Directory="CiscoProgramMenuFolder">
+      <Component Id="CiscoProgramMenuFolder" Guid="87C0183A-06EA-4616-ACBA-E34EE127C861">
+        <RemoveFolder Id="CiscoProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Name="InstalledStartMenuShortcuts" Type="integer" Value="1" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
 </Wix>
