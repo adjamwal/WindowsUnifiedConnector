@@ -214,7 +214,7 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
 
         if ( !VerifyPmMaxStartupDelay( pm ) ) {
             LOG_WARNING("Invalid MaxStartupDelay. Using default");
-            m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT;
         }
         else {
             m_configData.maxDelayMs = pm["MaxStartupDelay"].asUInt();
