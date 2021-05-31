@@ -18,5 +18,6 @@ extern "C" CA_SUPPORT_API bool GetUcidAndToken( IUcLogger * logger, std::string 
     bool result = ucidFacade.FetchCredentials( ucid, ucidToken );
 
     LOG_DEBUG( __FUNCTION__": Exit" );
+    SetUcLogger( NULL );
     return result;
 }

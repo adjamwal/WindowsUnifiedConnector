@@ -21,11 +21,9 @@ bool UcidFacade::FetchCredentials( std::string& ucid, std::string& ucidToken )
     bool retval = false;
     try
     {
-        m_winConf->RefreshIdentity();
-        m_winConf->GetUcIdentity( ucid );
-        m_winConf->GetIdentityToken( ucidToken );
-
-        retval = true;
+        retval = m_winConf->RefreshIdentity() &&
+                 m_winConf->GetUcIdentity( ucid ) &&
+                 m_winConf->GetIdentityToken( ucidToken );
     }
     catch( std::exception& ex )
     {
