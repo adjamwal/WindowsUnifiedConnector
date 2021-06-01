@@ -161,9 +161,9 @@ UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
     }
 
 LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    //always ignore UCID errors
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 UINT __stdcall SendEventOnUninstallBegin( MSIHANDLE hInstall )
