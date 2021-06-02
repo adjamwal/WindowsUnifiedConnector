@@ -193,11 +193,6 @@
                           Directory="CiscoProgramMenuFolder" 
                           Advertise="yes" 
                           WorkingDirectory="UCSERVICE_DIRECTORY" >
-                  <!--AUMID-->
-                  <ShortcutProperty Key="System.AppUserModel.ID" Value="Cisco.UC"/>
-
-                  <!--COM CLSID-->
-                  <ShortcutProperty Key="System.AppUserModel.ToastActivatorCLSID" Value="{2A6D455C-4742-4000-A128-9BC84DBAD18F}"/>
                 </Shortcut>
               </File>
             </Component>

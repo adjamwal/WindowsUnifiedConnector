@@ -125,6 +125,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{85A305
 		Resources\images\UC.ico = Resources\images\UC.ico
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libWinToast", "SharedLibs\libWinToast\libWinToast.vcxproj", "{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -431,6 +433,14 @@ Global
 		{5EE37648-C251-49DF-A95B-9237929C1195}.Release|x64.Build.0 = Release|x64
 		{5EE37648-C251-49DF-A95B-9237929C1195}.Release|x86.ActiveCfg = Release|Win32
 		{5EE37648-C251-49DF-A95B-9237929C1195}.Release|x86.Build.0 = Release|Win32
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Debug|x64.ActiveCfg = Debug|x64
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Debug|x64.Build.0 = Debug|x64
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Debug|x86.ActiveCfg = Debug|Win32
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Debug|x86.Build.0 = Debug|Win32
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Release|x64.ActiveCfg = Release|x64
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Release|x64.Build.0 = Release|x64
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Release|x86.ActiveCfg = Release|Win32
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -482,6 +492,7 @@ Global
 		{35E8D274-5993-4AB9-9691-0DB233F4EEAB} = {BAA800DD-9C49-4129-8249-4EC064686854}
 		{5EE37648-C251-49DF-A95B-9237929C1195} = {BC4968FB-5FCC-4BAB-9647-74B9FB741E81}
 		{85A305D6-4179-4455-A42A-B554ECA65FE6} = {C8505725-0B3E-4425-9EB7-55785D1CCC9D}
+		{5D45A429-3A8C-45B9-B66C-2D7B4C91ADB0} = {1A73622D-F811-4A98-A1BA-ED0435F1656A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}
