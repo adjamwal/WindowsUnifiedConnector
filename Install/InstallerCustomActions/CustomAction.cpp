@@ -26,9 +26,8 @@ UINT __stdcall ExtractCaResources( MSIHANDLE hInstall )
     }
 
 LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 UINT __stdcall RemoveCaResources( MSIHANDLE hInstall )
@@ -53,9 +52,8 @@ UINT __stdcall RemoveCaResources( MSIHANDLE hInstall )
     }
 
 LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 UINT __stdcall DetectOlderBuildVersion( MSIHANDLE hInstall )
@@ -117,7 +115,7 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 UINT __stdcall CollectUCData( MSIHANDLE hInstall )
@@ -208,9 +206,8 @@ UINT __stdcall SendEventOnUninstallBegin( MSIHANDLE hInstall )
     }
 
 LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 UINT __stdcall SendEventOnUninstallError( MSIHANDLE hInstall )
@@ -261,9 +258,8 @@ UINT __stdcall SendEventOnUninstallError( MSIHANDLE hInstall )
     }
 
 LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
@@ -314,9 +310,8 @@ UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
     }
 
 LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( er );
+    return WcaFinalize( ERROR_SUCCESS );
 }
 
 // DllMain - Initialize and cleanup WiX custom action utils.
