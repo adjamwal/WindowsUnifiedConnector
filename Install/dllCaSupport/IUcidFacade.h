@@ -6,5 +6,5 @@
 class IUcidFacade
 {
 public:
-    virtual bool FetchCredentials( std::string& ucid, std::string& ucidToken ) = 0;
+    virtual bool CollectUCData( std::string& url, std::string& ucid, std::string& ucidToken ) = 0;
 };

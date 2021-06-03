@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PrivateFunctions.h"
 #include "MsiLogger.h"
+#include <codecvt>
 
 HMODULE globalDllHandle;
 
@@ -119,45 +120,38 @@ LExit:
     return WcaFinalize( er );
 }
 
-UINT __stdcall StoreUCIDToProperty( MSIHANDLE hInstall )
+UINT __stdcall CollectUCData( MSIHANDLE hInstall )
 {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-    std::string ucid, ucidToken;
-    MsiLogger msiLogger;
+    std::string url, ucid, ucidToken;
 
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
+    MsiLogger msiLogger;
     SetUcLogger( &msiLogger );
 
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__" Initialized." );
+    LPWSTR dllPath = NULL;
+    hr = WcaGetProperty( L"UC_RESOURCE_DIR", &dllPath );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_RESOURCE_DIR" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": dllPath %S", dllPath );
 
-    WCHAR dllPath[ 1024 ] = { 0 };
-    DWORD dllPathSize = sizeof( dllPath ) / sizeof( WCHAR );
-    if( hr = MsiGetProperty( hInstall, L"UC_RESOURCE_DIR", dllPath, &dllPathSize ) == ERROR_SUCCESS )
+    if ( RunCollectUCData( &msiLogger, dllPath, url, ucid, ucidToken ) )
     {
-        WLOG_DEBUG( L"Call RunGetUcidAndToken function %s", dllPath );
-        if( !RunGetUcidAndToken( &msiLogger, dllPath, ucid, ucidToken ) )
-        {
-            hr = -1;
-            WcaLogError( LOGMSG_STANDARD, "Failed to fetch UCID/Token values" );
-        }
-        else if(
-            ( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID", ucid.c_str() ) == ERROR_SUCCESS ) &&
-            ( hr = MsiSetPropertyA( hInstall, "UC_EVENT_UCID_TOKEN", ucidToken.c_str() ) == ERROR_SUCCESS ) )
-        {
-            WcaLog( LOGMSG_STANDARD, "Stored UCID/Token: %s/%s", ucid.c_str(), ucidToken.c_str() );
-        }
-        else
-        {
-            WcaLogError( LOGMSG_STANDARD, "Failed to store UCID/Token values" );
-        }
+        hr = WcaSetProperty( L"UC_EVENT_URL", converter.from_bytes( url ).c_str() );
+        ExitOnFailure( hr, __FUNCTION__ "Failed to set UC_EVENT_URL" );
+
+        hr = WcaSetProperty( L"UC_EVENT_UCID", converter.from_bytes( ucid ).c_str() );
+        ExitOnFailure( hr, __FUNCTION__ "Failed to set UC_EVENT_UCID" );
+
+        hr = WcaSetProperty( L"UC_EVENT_UCID_TOKEN", converter.from_bytes( ucidToken ).c_str() );
+        ExitOnFailure( hr, __FUNCTION__ "Failed to set UC_EVENT_UCID_TOKEN" );
     }
     else
     {
-        WLOG_ERROR( L"MsiGetProperty failed for UC_RESOURCE_DIR" );
+        WcaLogError( LOGMSG_STANDARD, "Failed to run RunCollectUCData" );
     }
 
 LExit:
@@ -168,191 +162,157 @@ LExit:
 
 UINT __stdcall SendEventOnUninstallBegin( MSIHANDLE hInstall )
 {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-    char ucidToken[ MAX_PATH ] = { 0 };
-    DWORD ucidTokenLength = 0;
+
     MsiLogger msiLogger;
     SetUcLogger( &msiLogger );
 
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
-
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
-#if 0
+
+    LPWSTR dllPath = NULL;
+    hr = WcaGetProperty( L"UC_RESOURCE_DIR", &dllPath );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_RESOURCE_DIR" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": dllPath %S", dllPath );
+
+    LPWSTR url = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_URL", &url );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_URL" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": url %S", url );
+
     LPWSTR productVersion = NULL;
     hr = WcaGetProperty( L"ProductVersion", &productVersion );
     ExitOnFailure( hr, "Failed to get ProductVersion" );
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductVersion %s", productVersion );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductVersion %S", productVersion );
 
-    if( hr = MsiGetPropertyA( hInstall, "UC_EVENT_UCID", ucidToken, &ucidTokenLength ) == ERROR_SUCCESS )
+    LPWSTR ucid = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_UCID", &ucid );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_UCID" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ucid %S", ucid );
+
+    LPWSTR ucidToken = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_UCID_TOKEN", &ucidToken );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_UCID_TOKEN" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ucidToken %S", ucidToken );
+
+    if ( !RunSendEventOnUninstallBegin( &msiLogger,
+        dllPath,
+        converter.to_bytes( url ),
+        converter.to_bytes( productVersion ),
+        converter.to_bytes( ucid ),
+        converter.to_bytes( ucidToken ) ) )
     {
-        WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", ucidToken );
-    }
-    else
-    {
-        WcaLogError( LOGMSG_STANDARD, "Failed to load stored UCID value" );
+        WcaLogError( LOGMSG_STANDARD, "Failed to run RunSendEventOnUninstallBegin" );
     }
 
-    if( ucidTokenLength <= 1 || !NotifyUninstallBeginEvent( ucidToken, productVersion ) )
-    {
-        WcaLogError( LOGMSG_STANDARD, "Error sending uninstall BEGIN event" );
-    }
-    else
-    {
-        WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall BEGIN event" );
-    }
-#endif
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
     return WcaFinalize( er );
 }
-
-/*
-NOTES on sending event on uninstall error and uninstall finalization:
-https://stackoverflow.com/questions/45918457/wix-customaction-based-on-the-outcome-of-another-customaction
-1. for error, send event from a Rollback Custom Action (Execute="rollback") scheduled before InstallFinalize,
-   with condition (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
-   http://www.installsite.org/pages/en/isnews/200108/
-
-2. on uninstall end, we can send an event from a normal custom action scheduled After="InstallFinalize",
-   with condition (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
-   this CA won't be aware if there were errors prior to this step,
-   as the "rollback"  and deferred CAs get executed by a different set of generated scripts
-   which cannot set msi properties to be consumed by the normal execution CAs
-
-other docs:
-https://stackoverflow.com/questions/11518927/custom-action-after-installation-failed
-https://docs.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetmode
-to find out if we are in rollback mode: MsiGetMode MSIRUNMODE_ROLLBACK ==> true??
-
-to find out if a product is still installed:
-MsiGetFeatureStateA ==> INSTALLSTATE_ABSENT https://docs.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetfeaturestatea
-MsiGetFeatureValidStatesA ==> INSTALLSTATE_ABSENT https://docs.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetfeaturevalidstatesa
-MsiOpenProductA ==> ERROR_UNKNOWN_PRODUCT https://docs.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiopenproducta?redirectedfrom=MSDN
-*/
 
 UINT __stdcall SendEventOnUninstallError( MSIHANDLE hInstall )
 {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-
-    char ucidToken[ MAX_PATH ] = { 0 };
-    DWORD ucidTokenLength = 0;
 
     MsiLogger msiLogger;
     SetUcLogger( &msiLogger );
 
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
-
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
 
-#if 0
+    LPWSTR dllPath = NULL;
+    hr = WcaGetProperty( L"UC_RESOURCE_DIR", &dllPath );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_RESOURCE_DIR" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": dllPath %S", dllPath );
+
+    LPWSTR url = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_URL", &url );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_URL" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": url %S", url );
+
     LPWSTR productVersion = NULL;
     hr = WcaGetProperty( L"ProductVersion", &productVersion );
     ExitOnFailure( hr, "Failed to get ProductVersion" );
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductVersion %S", productVersion );
 
-    if( hr = MsiGetPropertyA( hInstall, "UC_EVENT_UCID", ucidToken, &ucidTokenLength ) == ERROR_SUCCESS )
+    LPWSTR ucid = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_UCID", &ucid );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_UCID" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ucid %S", ucid );
+
+    LPWSTR ucidToken = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_UCID_TOKEN", &ucidToken );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_UCID_TOKEN" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ucidToken %S", ucidToken );
+
+    if ( !RunSendEventOnUninstallError( &msiLogger,
+        dllPath,
+        converter.to_bytes( url ),
+        converter.to_bytes( productVersion ),
+        converter.to_bytes( ucid ),
+        converter.to_bytes( ucidToken ) ) )
     {
-        WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", ucidToken );
-    }
-    else
-    {
-        WcaLogError( LOGMSG_STANDARD, "Failed to load stored UCID value" );
+        WcaLogError( LOGMSG_STANDARD, "Failed to run RunSendEventOnUninstallError" );
     }
 
-    if( ucidTokenLength <= 1 || !NotifyUninstallFailureEvent( ucidToken, productVersion ) )
-    {
-        WcaLogError( LOGMSG_STANDARD, "Error sending uninstall FAILURE event" );
-    }
-    else
-    {
-        WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall FAILURE event" );
-    }
-#endif
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
     return WcaFinalize( er );
 }
 
-//NOTE: this CA cannot know whether a rollback had occurred before completion
-//since custom properties cannot be set during rollbacks
 UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
 {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-
-    char ucidToken[ MAX_PATH ] = { 0 };
-    DWORD ucidTokenLength = 0;
-
-    char rollback[ MAX_PATH ] = { 0 };
-    DWORD rollbackLength = 0;
-    bool hasRollbackBeenDetected = false;
 
     MsiLogger msiLogger;
     SetUcLogger( &msiLogger );
 
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__ );
-
     hr = WcaInitialize( hInstall, __FUNCTION__ );
     ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
-#if 0
+
+    LPWSTR dllPath = NULL;
+    hr = WcaGetProperty( L"UC_RESOURCE_DIR", &dllPath );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_RESOURCE_DIR" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": dllPath %S", dllPath );
+
+    LPWSTR url = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_URL", &url );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_URL" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": url %S", url );
+
     LPWSTR productVersion = NULL;
     hr = WcaGetProperty( L"ProductVersion", &productVersion );
     ExitOnFailure( hr, "Failed to get ProductVersion" );
     WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ProductVersion %S", productVersion );
 
-    if( hr = MsiGetPropertyA( hInstall, "UC_EVENT_UCID", ucidToken, &ucidTokenLength ) == ERROR_SUCCESS )
+    LPWSTR ucid = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_UCID", &ucid );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_UCID" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ucid %S", ucid );
+
+    LPWSTR ucidToken = NULL;
+    hr = WcaGetProperty( L"UC_EVENT_UCID_TOKEN", &ucidToken );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to get UC_EVENT_UCID_TOKEN" );
+    WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": ucidToken %S", ucidToken );
+
+    if ( !RunSendEventOnUninstallComplete( &msiLogger,
+        dllPath,
+        converter.to_bytes( url ),
+        converter.to_bytes( productVersion ),
+        converter.to_bytes( ucid ),
+        converter.to_bytes( ucidToken ) ) )
     {
-        WcaLog( LOGMSG_STANDARD, "Loaded UCID: %s", ucidToken );
-    }
-    else
-    {
-        WcaLogError( LOGMSG_STANDARD, "Failed to load stored UCID value" );
+        WcaLogError( LOGMSG_STANDARD, "Failed to run RunSendEventOnUninstallComplete" );
     }
 
-    if( ucidTokenLength <= 1 || !NotifyUninstallEndEvent( ucidToken, productVersion ) )
-    {
-        WcaLogError( LOGMSG_STANDARD, "Error sending uninstall END event" );
-    }
-    else
-    {
-        WcaLog( LOGMSG_STANDARD, "Successfully sent uninstall END event" );
-    }
-#endif
-LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    SetUcLogger( NULL );
-    return WcaFinalize( er );
-}
-
-UINT __stdcall TestCaSupport( MSIHANDLE hInstall )
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-    BuildInfo prevBuildInfo;
-    MsiLogger msiLogger;
-    SetUcLogger( &msiLogger );
-
-    hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
-
-    WcaLog( LOGMSG_STANDARD, __FUNCTION__" Initialized." );
-
-    WCHAR dllPath[ 1024 ] = { 0 };
-    DWORD size = 1024;
-    if ( MsiGetProperty( hInstall, L"UC_RESOURCE_DIR", dllPath, &size ) == ERROR_SUCCESS ) {
-        WLOG_DEBUG( L"Run Test function %s", dllPath );
-        RunTestFunction( &msiLogger, dllPath );
-    }
-    else {
-        WLOG_ERROR( L"MsiGetProperty failed for UC_RESOURCE_DIR" );
-    }
-    
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );

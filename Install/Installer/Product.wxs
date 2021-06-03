@@ -25,19 +25,17 @@
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="ExtractCaResources" BinaryKey="CustomActionsDll" DllEntry="ExtractCaResources" />
         <CustomAction Id="RemoveCaResources" BinaryKey="CustomActionsDll" DllEntry="RemoveCaResources" />
-        <CustomAction Id="TestCaSupport" BinaryKey="CustomActionsDll" DllEntry="TestCaSupport" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
-        <CustomAction Id="StoreUCIDToProperty" BinaryKey="CustomActionsDll" DllEntry="StoreUCIDToProperty" />
+        <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
         <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
         <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
         <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
       
         <InstallExecuteSequence>
           <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
-          <Custom Action="TestCaSupport" After="ExtractCaResources" />
-          <Custom Action="StoreUCIDToProperty" After="ExtractCaResources">
+          <Custom Action="CollectUCData" After="ExtractCaResources">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           <Custom Action="DetectInvalidSideGrade" After="ExtractCaResources">
@@ -45,13 +43,13 @@
           </Custom>
           <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
           <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
-          <Custom Action="SendEventOnUninstallBegin" After="StoreUCIDToProperty">
+          <Custom Action="SendEventOnUninstallComplete" After="CollectUCData">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
-          <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">
+          <Custom Action="SendEventOnUninstallBegin" After="InstallFinalize">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           <Custom Action="RemoveCaResources" OnExit="success" />

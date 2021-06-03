@@ -187,11 +187,13 @@
     <ClInclude Include="ICloudEventPublisher.h" />
     <ClInclude Include="ICloudEventBuilder.h" />
     <ClInclude Include="ICloudEventStorage.h" />
+    <ClInclude Include="MsiCloudEventStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CloudEventBuilder.cpp" />
     <ClCompile Include="CloudEventPublisher.cpp" />
     <ClCompile Include="CloudEventStorage.cpp" />
+    <ClCompile Include="MsiCloudEventStorage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

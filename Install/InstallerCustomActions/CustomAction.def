@@ -3,10 +3,9 @@ LIBRARY "InstallerCustomActions"
 EXPORTS
 	DetectOlderBuildVersion
 	DetectWindows10OrGreater
-	StoreUCIDToProperty
+	CollectUCData
 	SendEventOnUninstallBegin
 	SendEventOnUninstallError
 	SendEventOnUninstallComplete
 	ExtractCaResources
 	RemoveCaResources
-	TestCaSupport

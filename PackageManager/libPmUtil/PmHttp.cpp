@@ -373,6 +373,8 @@ int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, s
         LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
     }
 
+    LOG_ERROR( "Curl request to %s. Http response code %d", url.c_str(), httpReturn );
+
     return rtn;
 }
 

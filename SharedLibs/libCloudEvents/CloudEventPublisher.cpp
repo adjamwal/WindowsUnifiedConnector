@@ -68,7 +68,7 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
     int32_t httpReturn;
 
     std::lock_guard<std::mutex> lock( m_mutex );
-    
+
     m_pmCloud.Post(
         m_pmConfig.GetCloudEventUri(),
         ( void* )eventJson.c_str(),

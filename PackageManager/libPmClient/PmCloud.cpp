@@ -1,4 +1,5 @@
 #include "PmCloud.h"
+#include "IUcLogger.h"
 
 PmCloud::PmCloud( IPmHttp& http )
     : m_http( http )
@@ -72,14 +73,15 @@ int32_t PmCloud::Get( const std::string& url, std::string& response, int32_t& ht
 
 int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize, std::string& response, int32_t& httpStatusResponse )
 {
+    int32_t ret = 0;
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_http.Init( _ProgressCallback, this, m_userAgent );
-    m_http.SetCerts( m_certs );
-    m_http.SetToken( m_token );
-
-    m_http.HttpPost( url, payload, payloadSize, response, httpStatusResponse );
-    m_http.Deinit();
+    ret = m_http.Init( _ProgressCallback, this, m_userAgent );
+    ret = m_http.SetCerts( m_certs );
+    ret = m_http.SetToken( m_token );
+    
+    ret = m_http.HttpPost( url, payload, payloadSize, response, httpStatusResponse );
+    ret = m_http.Deinit();
 
     return httpStatusResponse;
 }
@@ -87,8 +89,9 @@ int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize
 int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filename )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-
+    
     m_http.Init( _ProgressCallback, this, m_userAgent );
+
     m_http.SetCerts( m_certs );
     m_http.SetToken( m_token );
 

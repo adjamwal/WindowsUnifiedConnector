@@ -6,38 +6,10 @@
 #include <exception>
 #include "resource.h"
 #include <tchar.h>
+#include <codecvt>
 
 extern HMODULE globalDllHandle;
-#if 0
-#include "CloudEventBuilder.h"
-#include "CloudEventPublisher.h"
-#include "CloudEventStorage.h"
-#include "PmHttp.h"
-#include "PmCloud.h"
-#include "PmConfig.h"
-#include "PmConstants.h"
-#include "FileSysUtil.h"
-#include "StringUtil.h"
 
-bool PrepareAndSendEvent( std::string ucidToken, std::wstring productVersion, int errorCode, std::string errorMessage )
-{
-    CloudEventBuilder ev;
-    FileSysUtil fileUtil;
-    PmHttp pmHttp(fileUtil);
-    PmCloud pmCloud( pmHttp );
-    CloudEventStorage eventStorage( CLOUD_EVENT_STORAGE_FILENAME, fileUtil);
-    PmConfig pmConfig(fileUtil);
-    CloudEventPublisher epub(pmCloud, eventStorage, pmConfig);
-
-    ev.WithUCID( ucidToken );
-    ev.WithPackageID( "uc/" + StringUtil::WStr2Str(productVersion) );
-    ev.WithType( CloudEventType::pkguninstall );
-    ev.WithError( errorCode, errorMessage );
-
-    epub.SetToken( ucidToken );
-    return epub.Publish( ev ) == 200;
-}
-#endif
 bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo )
 {
     buildInfo.versionString = version;
@@ -177,29 +149,6 @@ bool IsWindows10OrGreater( const std::string fileVersion )
 
     return rtn;
 }
-
-#if 0
-bool NotifyUninstallBeginEvent( std::string ucidToken, std::wstring productVersion )
-{
-    return PrepareAndSendEvent( 
-        ucidToken, productVersion, 
-        UCPM_EVENT_UC_UNINSTALL_START, "UC uninstall started" );
-}
-
-bool NotifyUninstallFailureEvent( std::string ucidToken, std::wstring productVersion )
-{
-    return PrepareAndSendEvent( 
-        ucidToken, productVersion, 
-        UCPM_EVENT_UC_UNINSTALL_ROLLBACK, "UC uninstall has encountered an error and is being rolled back" );
-}
-
-bool NotifyUninstallEndEvent( std::string ucidToken, std::wstring productVersion )
-{
-    return PrepareAndSendEvent( 
-        ucidToken, productVersion, 
-        UCPM_EVENT_UC_UNINSTALL_END, "UC uninstall ended" );
-}
-#endif
 
 bool ExtractResourceToFile( HMODULE dllHandle, LPCTSTR ResourceName, LPCTSTR ResourceType, LPCTSTR OutputFileName )
 {
@@ -377,46 +326,96 @@ void UnloadModule( HMODULE module)
     SetDllDirectory( NULL );
 }
 
-typedef void( *TestLoggerFunc )( IUcLogger* logger );
-
-void RunTestFunction( IUcLogger* logger, const std::wstring& dllPath )
-{
-    HMODULE caSupport = NULL;
-    TestLoggerFunc TestLogger = NULL;
-    
-    if ( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
-        LOG_ERROR( "LoadCaSupportDll failed" );
-    }
-    else if ( ( TestLogger = ( TestLoggerFunc )GetProcAddress( caSupport, "TestLogger" ) ) == NULL ) {
-        LOG_ERROR( "GetProcAddress TestLogger failed" );
-    }
-    else {
-        TestLogger( logger );
-    }
-
-    UnloadModule( caSupport );
-}
-
-typedef bool( *GetUcidAndTokenFunc )( IUcLogger* logger, std::string& ucid, std::string& ucidToken );
-bool RunGetUcidAndToken( IUcLogger* logger, const std::wstring& dllPath, std::string& ucid, std::string& ucidToken )
+typedef bool( *CollectUCDataFunc )( IUcLogger* logger, std::string& url, std::string& ucid, std::string& ucidToken );
+bool RunCollectUCData( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& ucid, std::string& ucidToken )
 {
     bool result = false;
+    url = "";
     ucid = "";
     ucidToken = "";
 
     HMODULE caSupport = NULL;
-    GetUcidAndTokenFunc GetUcidAndToken = NULL;
+    CollectUCDataFunc func = NULL;
 
     if( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
         LOG_ERROR( "LoadCaSupportDll failed" );
     }
-    else if( ( GetUcidAndToken = ( GetUcidAndTokenFunc )GetProcAddress( caSupport, "GetUcidAndToken" ) ) == NULL ) {
-        LOG_ERROR( "GetProcAddress GetUcidAndToken failed" );
+    else if( (func = (CollectUCDataFunc )GetProcAddress( caSupport, "CollectUCData" ) ) == NULL ) {
+        LOG_ERROR( "GetProcAddress CollectUCData failed" );
     }
     else {
-        result = GetUcidAndToken( logger, ucid, ucidToken );
+        result = func( logger, url, ucid, ucidToken );
     }
 
     UnloadModule( caSupport );
+    return result;
+}
+
+typedef bool(*SendEventOnUninstallBeginFunc)(IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken);
+bool RunSendEventOnUninstallBegin( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
+{
+    bool result = false;
+
+    HMODULE caSupport = NULL;
+    SendEventOnUninstallBeginFunc func = NULL;
+
+    if ( (caSupport = LoadCaSupportDll( dllPath )) == NULL ) {
+        LOG_ERROR( "LoadCaSupportDll failed" );
+    }
+    else if ( (func = (SendEventOnUninstallBeginFunc)GetProcAddress( caSupport, "SendEventOnUninstallBegin" )) == NULL ) {
+        LOG_ERROR( "GetProcAddress SendEventOnUninstallBegin failed" );
+    }
+    else {
+        result = func( logger, url, productVersion, ucid, ucidToken );
+    }
+
+    UnloadModule( caSupport );
+
+    return result;
+}
+
+typedef bool(*SendEventOnUninstallErrorFunc)(IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken);
+bool RunSendEventOnUninstallError( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
+{
+    bool result = false;
+
+    HMODULE caSupport = NULL;
+    SendEventOnUninstallErrorFunc func = NULL;
+
+    if ( (caSupport = LoadCaSupportDll( dllPath )) == NULL ) {
+        LOG_ERROR( "LoadCaSupportDll failed" );
+    }
+    else if ( (func = (SendEventOnUninstallErrorFunc)GetProcAddress( caSupport, "SendEventOnUninstallError" )) == NULL ) {
+        LOG_ERROR( "GetProcAddress SendEventOnUninstallError failed" );
+    }
+    else {
+        result = func( logger, url, productVersion, ucid, ucidToken );
+    }
+
+    UnloadModule( caSupport );
+
+    return result;
+}
+
+typedef bool(*SendEventOnUninstallCompleteFunc)(IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken);
+bool RunSendEventOnUninstallComplete( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
+{
+    bool result = false;
+
+    HMODULE caSupport = NULL;
+    SendEventOnUninstallCompleteFunc func = NULL;
+
+    if ( (caSupport = LoadCaSupportDll( dllPath )) == NULL ) {
+        LOG_ERROR( "LoadCaSupportDll failed" );
+    }
+    else if ( (func = (SendEventOnUninstallCompleteFunc)GetProcAddress( caSupport, "SendEventOnUninstallComplete" )) == NULL ) {
+        LOG_ERROR( "GetProcAddress SendEventOnUninstallComplete failed" );
+    }
+    else {
+        result = func( logger, url, productVersion, ucid, ucidToken );
+    }
+
+    UnloadModule( caSupport );
+
     return result;
 }
