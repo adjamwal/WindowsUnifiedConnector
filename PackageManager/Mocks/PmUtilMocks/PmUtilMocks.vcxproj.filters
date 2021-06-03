@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MockFileUtil.h">
+    <ClInclude Include="MockFileSysUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MockPmHttp.h">
@@ -26,7 +26,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MockFileUtil.cpp">
+    <ClCompile Include="MockFileSysUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockPmHttp.cpp">

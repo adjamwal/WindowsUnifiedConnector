@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma once
 #include "IUcLogger.h"
 
 class IUcLogFile;

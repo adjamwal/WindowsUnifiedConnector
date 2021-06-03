@@ -1,12 +1,15 @@
 #pragma once
 
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 
-class FileUtil : public IFileUtil
+//original FileUtil.h name was overlapping with 
+//C:\Program Files (x86)\WiX Toolset v3.11\SDK\VS2015\inc\fileutil.h 
+//and couldn't be used from installer project
+class FileSysUtil : public IFileSysUtil
 {
 public:
-    FileUtil();
-    ~FileUtil();
+    FileSysUtil();
+    ~FileSysUtil();
 
     std::string ReadFile( const std::string& filename ) override;
     bool WriteLine( const std::string& filename, const std::string& data ) override;

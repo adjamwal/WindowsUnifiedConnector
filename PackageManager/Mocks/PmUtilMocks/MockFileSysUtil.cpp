@@ -1,6 +1,6 @@
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 
-MockFileUtil::MockFileUtil() :
+MockFileSysUtil::MockFileSysUtil() :
     m_defaultString( "" )
 {
     MakeReadFileReturn( m_defaultString );
@@ -8,148 +8,148 @@ MockFileUtil::MockFileUtil() :
     MakeAppendPathReturn( m_defaultString );
 }
 
-MockFileUtil::~MockFileUtil()
+MockFileSysUtil::~MockFileSysUtil()
 {
 
 }
 
-void MockFileUtil::MakeReadFileReturn( std::string value )
+void MockFileSysUtil::MakeReadFileReturn( std::string value )
 {
     ON_CALL( *this, ReadFile( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectReadFileNotCalled()
+void MockFileSysUtil::ExpectReadFileNotCalled()
 {
     EXPECT_CALL( *this, ReadFile( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeWriteLineReturn( bool value )
+void MockFileSysUtil::MakeWriteLineReturn( bool value )
 {
     ON_CALL( *this, WriteLine( _, _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectWriteLineNotCalled()
+void MockFileSysUtil::ExpectWriteLineNotCalled()
 {
     EXPECT_CALL( *this, WriteLine( _, _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeReadFileLinesReturn( std::vector<std::string> value )
+void MockFileSysUtil::MakeReadFileLinesReturn( std::vector<std::string> value )
 {
     ON_CALL( *this, ReadFileLines( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectReadFileLinesNotCalled()
+void MockFileSysUtil::ExpectReadFileLinesNotCalled()
 {
     EXPECT_CALL( *this, ReadFileLines( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakePmCreateFileReturn( FileUtilHandle* value )
+void MockFileSysUtil::MakePmCreateFileReturn( FileUtilHandle* value )
 {
     ON_CALL( *this, PmCreateFile( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectPmCreateFileNotCalled()
+void MockFileSysUtil::ExpectPmCreateFileNotCalled()
 {
     EXPECT_CALL( *this, PmCreateFile( _ ) ).Times( 0 );
 }
 
 
-void MockFileUtil::MakeCloseFileReturn( int32_t value )
+void MockFileSysUtil::MakeCloseFileReturn( int32_t value )
 {
     ON_CALL( *this, CloseFile( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectCloseFileNotCalled()
+void MockFileSysUtil::ExpectCloseFileNotCalled()
 {
     EXPECT_CALL( *this, CloseFile( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeAppendFileReturn( int32_t value )
+void MockFileSysUtil::MakeAppendFileReturn( int32_t value )
 {
     ON_CALL( *this, AppendFile( _, _, _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectAppendFileNotCalled()
+void MockFileSysUtil::ExpectAppendFileNotCalled()
 {
     EXPECT_CALL( *this, AppendFile( _, _, _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeGetTempDirReturn( std::string value )
+void MockFileSysUtil::MakeGetTempDirReturn( std::string value )
 {
     ON_CALL( *this, GetTempDir() ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectGetTempDirNotCalled()
+void MockFileSysUtil::ExpectGetTempDirNotCalled()
 {
     EXPECT_CALL( *this, GetTempDir() ).Times( 0 );
 }
 
-void MockFileUtil::MakeDeleteFileReturn( int32_t value )
+void MockFileSysUtil::MakeDeleteFileReturn( int32_t value )
 {
     ON_CALL( *this, DeleteFile( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectDeleteFileNotCalled()
+void MockFileSysUtil::ExpectDeleteFileNotCalled()
 {
     EXPECT_CALL( *this, DeleteFile( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeRenameReturn( int32_t value )
+void MockFileSysUtil::MakeRenameReturn( int32_t value )
 {
     ON_CALL( *this, Rename( _, _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectRenameNotCalled()
+void MockFileSysUtil::ExpectRenameNotCalled()
 {
     EXPECT_CALL( *this, Rename( _, _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeFileExistsReturn( bool value )
+void MockFileSysUtil::MakeFileExistsReturn( bool value )
 {
     ON_CALL( *this, FileExists ( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectFileExistsNotCalled()
+void MockFileSysUtil::ExpectFileExistsNotCalled()
 {
     EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeFileSizeReturn( size_t value )
+void MockFileSysUtil::MakeFileSizeReturn( size_t value )
 {
     ON_CALL( *this, FileSize( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectFileSizeNotCalled()
+void MockFileSysUtil::ExpectFileSizeNotCalled()
 {
     EXPECT_CALL( *this, FileSize( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeFileTimeReturn( std::filesystem::file_time_type value )
+void MockFileSysUtil::MakeFileTimeReturn( std::filesystem::file_time_type value )
 {
     ON_CALL( *this, FileTime( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectFileTimeNotCalled()
+void MockFileSysUtil::ExpectFileTimeNotCalled()
 {
     EXPECT_CALL( *this, FileTime( _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeAppendPathReturn( std::string value )
+void MockFileSysUtil::MakeAppendPathReturn( std::string value )
 {
     ON_CALL( *this, AppendPath( _, _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectAppendPathIsNotCalled()
+void MockFileSysUtil::ExpectAppendPathIsNotCalled()
 {
     EXPECT_CALL( *this, AppendPath( _, _ ) ).Times( 0 );
 }
 
-void MockFileUtil::MakeLastWriteTimeReturn( time_t value )
+void MockFileSysUtil::MakeLastWriteTimeReturn( time_t value )
 {
     ON_CALL( *this, LastWriteTime( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileUtil::ExpectLastWriteTimeIsNotCalled()
+void MockFileSysUtil::ExpectLastWriteTimeIsNotCalled()
 {
     EXPECT_CALL( *this, LastWriteTime( _ ) ).Times( 0 );
 }

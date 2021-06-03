@@ -1,6 +1,6 @@
 #include "PmHttp.h"
 #include "PmLogger.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -111,7 +111,7 @@ CURLcode PmHttp::SslCallback( CURL* curl, void* sslctx, void* param )
     return cb_ret;
 }
 
-PmHttp::PmHttp( IFileUtil& fileUtil ) :
+PmHttp::PmHttp( IFileSysUtil& fileUtil ) :
     m_fileUtil( fileUtil )
     , m_curlHandle( nullptr )
     , m_userAgent( "DefaultPackageManager" )

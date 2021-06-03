@@ -6,11 +6,14 @@
 
 struct FileUtilHandle;
 
-class IFileUtil
+//original FileUtil.h name was overlapping with 
+//C:\Program Files (x86)\WiX Toolset v3.11\SDK\VS2015\inc\fileutil.h 
+//and couldn't be used from installer project
+class IFileSysUtil
 {
 public:
-    IFileUtil() {}
-    virtual ~IFileUtil() {}
+    IFileSysUtil() {}
+    virtual ~IFileSysUtil() {}
 
     virtual std::string ReadFile( const std::string& filename ) = 0;
     virtual bool WriteLine( const std::string& filename, const std::string& data ) = 0;

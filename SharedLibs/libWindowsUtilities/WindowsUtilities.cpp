@@ -231,7 +231,10 @@ std::wstring WindowsUtilities::GetDirPath(const std::wstring& path)
 bool WindowsUtilities::ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data)
 {
     DWORD dataSize{};
-    LONG retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize);
+
+    //NOTE: RRF_SUBKEY_WOW6464KEY flag only works with Windows 10 or greater, and is ignored on 32 bit Windows
+    //if we ever need to support Windows 7/8.1 we'll have to switch to RegOpenKeyEx() and RegQueryValueEx()
+    LONG retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, nullptr, &dataSize);
 
     if (retCode != ERROR_SUCCESS)
     {
@@ -240,7 +243,7 @@ bool WindowsUtilities::ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstrin
 
     data.resize(dataSize / sizeof(wchar_t));
 
-    retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, &data[0], &dataSize);
+    retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, &data[0], &dataSize);
     if (retCode != ERROR_SUCCESS)
     {
         return false;

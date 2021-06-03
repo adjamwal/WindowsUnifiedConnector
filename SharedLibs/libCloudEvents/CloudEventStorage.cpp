@@ -7,7 +7,7 @@
 #include <fstream>
 #include <filesystem>
 
-CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileUtil& fileUtil ) :
+CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileSysUtil& fileUtil ) :
     m_fileName( fileName ),
     m_fileUtil( fileUtil ),
     m_dependencies( nullptr )

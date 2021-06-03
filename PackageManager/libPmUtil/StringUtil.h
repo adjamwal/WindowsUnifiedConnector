@@ -12,5 +12,6 @@ public:
     static void ReplaceStringInPlace( std::string& subject, const std::string& search, const std::string& replace );
     static std::vector<std::string> Split( const std::string source, const char separator );
     static std::wstring Str2WStr( const std::string& str );
+    static std::string WStr2Str( const std::wstring& wstr );
     static bool NoCaseEquals( const std::string& a, const std::string& b );
 };

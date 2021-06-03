@@ -1,4 +1,4 @@
-#include "FileUtil.h"
+#include "FileSysUtil.h"
 #include "PMLogger.h"
 #include <sstream>
 #include <fstream>
@@ -10,17 +10,17 @@ struct FileUtilHandle
     FILE* file;
 };
 
-FileUtil::FileUtil()
+FileSysUtil::FileSysUtil()
 {
 
 }
 
-FileUtil::~FileUtil()
+FileSysUtil::~FileSysUtil()
 {
 
 }
 
-std::string FileUtil::ReadFile( const std::string& filename )
+std::string FileSysUtil::ReadFile( const std::string& filename )
 {
     std::stringstream stream;
 
@@ -40,7 +40,7 @@ std::string FileUtil::ReadFile( const std::string& filename )
     return stream.str();
 }
 
-bool FileUtil::WriteLine( const std::string& filename, const std::string& data )
+bool FileSysUtil::WriteLine( const std::string& filename, const std::string& data )
 {
     bool ret = false;
     std::ofstream file( filename, std::ios_base::app );
@@ -55,7 +55,7 @@ bool FileUtil::WriteLine( const std::string& filename, const std::string& data )
     return ret;
 }
 
-std::vector<std::string> FileUtil::ReadFileLines( const std::string& filename )
+std::vector<std::string> FileSysUtil::ReadFileLines( const std::string& filename )
 {
     std::vector<std::string> lines;
     std::ifstream file( filename );
@@ -75,7 +75,7 @@ std::vector<std::string> FileUtil::ReadFileLines( const std::string& filename )
     return lines;
 }
 
-FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
+FileUtilHandle* FileSysUtil::PmCreateFile( const std::string& filename )
 {
     FileUtilHandle* handle = NULL;
 
@@ -99,7 +99,7 @@ FileUtilHandle* FileUtil::PmCreateFile( const std::string& filename )
     return handle;
 }
 
-int32_t FileUtil::CloseFile( FileUtilHandle* handle )
+int32_t FileSysUtil::CloseFile( FileUtilHandle* handle )
 {
     int32_t rtn = -1;
 
@@ -116,7 +116,7 @@ int32_t FileUtil::CloseFile( FileUtilHandle* handle )
     return rtn;
 }
 
-int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen )
+int32_t FileSysUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen )
 {
     int32_t bytesWritten = 0;
 
@@ -133,7 +133,7 @@ int32_t FileUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen
     return bytesWritten;
 }
 
-std::string FileUtil::GetTempDir()
+std::string FileSysUtil::GetTempDir()
 {
     auto path = std::filesystem::temp_directory_path();
 
@@ -145,7 +145,7 @@ std::string FileUtil::GetTempDir()
     return path.string();
 }
 
-int32_t FileUtil::DeleteFile( const std::string& filename )
+int32_t FileSysUtil::DeleteFile( const std::string& filename )
 {
     int32_t rtn = -1;
  
@@ -162,7 +162,7 @@ int32_t FileUtil::DeleteFile( const std::string& filename )
     return rtn;
 }
 
-int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& newName )
+int32_t FileSysUtil::Rename( const std::string& oldFilename, const std::string& newName )
 {
     int32_t rtn = -1;
 
@@ -179,12 +179,12 @@ int32_t FileUtil::Rename( const std::string& oldFilename, const std::string& new
     return rtn;
 }
 
-bool FileUtil::FileExists( const std::string& filename )
+bool FileSysUtil::FileExists( const std::string& filename )
 {
     return ::std::filesystem::exists( filename );
 }
 
-size_t FileUtil::FileSize( const std::string& filename )
+size_t FileSysUtil::FileSize( const std::string& filename )
 {
     size_t rtn = 0;
 
@@ -201,7 +201,7 @@ size_t FileUtil::FileSize( const std::string& filename )
     return rtn;
 }
 
-std::filesystem::file_time_type FileUtil::FileTime( const std::string& filename )
+std::filesystem::file_time_type FileSysUtil::FileTime( const std::string& filename )
 {
     std::filesystem::file_time_type rtn; //=0
     try
@@ -217,7 +217,7 @@ std::filesystem::file_time_type FileUtil::FileTime( const std::string& filename 
     return rtn;
 }
 
-std::string FileUtil::AppendPath( const std::string& basePath, const std::string& configPath )
+std::string FileSysUtil::AppendPath( const std::string& basePath, const std::string& configPath )
 {
     std::filesystem::path path;
 
@@ -238,7 +238,7 @@ std::string FileUtil::AppendPath( const std::string& basePath, const std::string
     return path.string();
 }
 
-time_t FileUtil::LastWriteTime( const std::string& filename )
+time_t FileSysUtil::LastWriteTime( const std::string& filename )
 {
     time_t rtn = -1;
 

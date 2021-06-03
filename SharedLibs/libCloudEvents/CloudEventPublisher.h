@@ -10,14 +10,14 @@
 class CloudEventPublisher final : public ICloudEventPublisher
 {
 public:
-    CloudEventPublisher( IPmCloud& httpAdapter, ICloudEventStorage& eventStorage, IPmConfig& pmConfig );
+    CloudEventPublisher( IPmCloud& pmCloud, ICloudEventStorage& eventStorage, IPmConfig& pmConfig );
     ~CloudEventPublisher();
 
     void SetToken( const std::string& token ) override;
     int32_t Publish( ICloudEventBuilder& event ) override;
     int32_t PublishFailedEvents() override;
 private:
-    IPmCloud& m_httpAdapter;
+    IPmCloud& m_pmCloud;
     ICloudEventStorage& m_eventStorage;
     IPmConfig& m_pmConfig;
     std::string m_eventEndpointUrl;

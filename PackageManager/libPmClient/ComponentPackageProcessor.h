@@ -4,7 +4,7 @@
 #include "PmTypes.h"
 #include <mutex>
 
-class IFileUtil;
+class IFileSysUtil;
 class ISslUtil;
 class IPackageConfigProcessor;
 class IUcidAdapter;
@@ -18,7 +18,7 @@ class ComponentPackageProcessor : public IComponentPackageProcessor
 public:
     ComponentPackageProcessor(
         IInstallerCacheManager& installerManager,
-        IFileUtil& fileutil,
+        IFileSysUtil& fileutil,
         ISslUtil& sslUtil,
         IPackageConfigProcessor& configProcessor,
         IUcidAdapter& ucidAdapter,
@@ -41,7 +41,7 @@ public:
 private:
     std::mutex m_mutex;
     IInstallerCacheManager& m_installerManager;
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     IPackageConfigProcessor& m_configProcessor;
     IUcidAdapter& m_ucidAdapter;

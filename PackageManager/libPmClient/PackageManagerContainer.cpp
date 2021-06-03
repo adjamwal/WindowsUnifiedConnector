@@ -22,7 +22,7 @@
 #include "UcUpgradeEventHandler.h"
 #include "CatalogJsonParser.h"
 
-#include "FileUtil.h"
+#include "FileSysUtil.h"
 #include "SslUtil.h"
 #include "PmLogger.h"
 #include "PmConstants.h"
@@ -36,7 +36,7 @@ static std::mutex gContainerMutex;
 static PackageManagerContainer* gContainer = NULL;
 
 PackageManagerContainer::PackageManagerContainer() :
-    m_fileUtil( new FileUtil() )
+    m_fileUtil( new FileSysUtil() )
     , m_sslUtil( new SslUtil() )
     , m_http( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )

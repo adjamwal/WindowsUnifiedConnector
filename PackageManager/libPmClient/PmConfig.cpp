@@ -1,11 +1,11 @@
 #include "PmConfig.h"
 #include "PmTypes.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include <json/json.h>
 #include "PmLogger.h"
 #include "RandomUtil.h"
 
-PmConfig::PmConfig( IFileUtil& fileUtil )
+PmConfig::PmConfig( IFileSysUtil& fileUtil )
     : m_fileUtil( fileUtil )
     , m_isFirstCheckin( true )
 {

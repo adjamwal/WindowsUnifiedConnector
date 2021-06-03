@@ -15,19 +15,53 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
-       <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
-       <Property Id="ARPPRODUCTICON" Value="UC.ico" />
+        <Property Id="UC_EVENT_URL" Value="0" />
+        <Property Id="UC_EVENT_UCID" Value="0" />
+        <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
+        <Property Id="UC_RESOURCE_DIR" Value="0" />
+
+        <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
+        <Property Id="ARPPRODUCTICON" Value="UC.ico" />
       
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+        <CustomAction Id="ExtractCaResources" BinaryKey="CustomActionsDll" DllEntry="ExtractCaResources" />
+        <CustomAction Id="RemoveCaResources" BinaryKey="CustomActionsDll" DllEntry="RemoveCaResources" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
+        <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
+        <!--=
+        Commenting out this event till we figure out what we want to do with it
+        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
+        -->
+        <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
+        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
+      
         <InstallExecuteSequence>
-          <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
+          <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
+          <Custom Action="CollectUCData" After="ExtractCaResources">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="DetectInvalidSideGrade" After="ExtractCaResources">
             WIX_UPGRADE_DETECTED
           </Custom>
-          <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
-          <Custom Action="SetCacheDirectory" After="FindRelatedProducts" />
+          <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
+          <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
+          
+          <!--=
+          Commenting out this event till we figure out what we want to do with it
+          <Custom Action="SendEventOnUninstallBegin" After="CollectUCData">
+              (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          -->
+          
+          <Custom Action="SendEventOnUninstallError" OnExit="error">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="RemoveCaResources" OnExit="success" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
