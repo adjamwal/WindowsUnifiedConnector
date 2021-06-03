@@ -115,7 +115,7 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     SetUcLogger( NULL );
-    return WcaFinalize( ERROR_SUCCESS );
+    return WcaFinalize( er );
 }
 
 UINT __stdcall CollectUCData( MSIHANDLE hInstall )
