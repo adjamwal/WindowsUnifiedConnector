@@ -7,10 +7,7 @@ enum CloudEventType
     pkgunknown,
     pkginstall,
     pkgreconfig,
-    pkguninstall,
-    pkguninstallbegin,
-    pkguninstallerror,
-    pkguninstallcomplete
+    pkguninstall
 };
 
 class ICloudEventBuilder

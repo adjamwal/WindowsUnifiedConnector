@@ -30,7 +30,10 @@
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
+        <!--=
+        Commenting out this event till we figure out what we want to do with it
         <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
+        -->
         <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
         <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
       
@@ -44,9 +47,14 @@
           </Custom>
           <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
           <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
+          
+          <!--=
+          Commenting out this event till we figure out what we want to do with it
           <Custom Action="SendEventOnUninstallBegin" After="CollectUCData">
               (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
+          -->
+          
           <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
