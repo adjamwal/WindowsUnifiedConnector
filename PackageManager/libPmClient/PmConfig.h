@@ -10,6 +10,11 @@
 
 class IFileSysUtil;
 
+namespace Json
+{
+    class Value;
+};
+
 struct PmConfigData
 {
     std::string identifyUri;
@@ -58,4 +63,10 @@ private:
 
     int32_t VerifyBsContents( const std::string& bsConfig );
     int32_t VerifyPmContents( const std::string& pmConfig );
+    bool VerifyPmLogLevel( const Json::Value& pmRoot );
+    bool VerifyPmCheckinInterval( const Json::Value& pmRoot );
+    bool VerifyPmMaxStartupDelay( const Json::Value& pmRoot );
+    bool VerifyPmMaxFileCacheAge(const Json::Value& pmRoot);
+    bool VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot );
+    
 };
