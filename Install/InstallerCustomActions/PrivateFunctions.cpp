@@ -155,27 +155,27 @@ bool ExtractResourceToFile( HMODULE dllHandle, LPCTSTR ResourceName, LPCTSTR Res
     WLOG_DEBUG( L"Extracting Resource %s", OutputFileName );
 
     HRSRC hResource = ::FindResource( dllHandle, ResourceName, ResourceType );
-    if ( hResource == NULL )
+    if( hResource == NULL )
         return false;
 
     HGLOBAL hLoadResource = ::LoadResource( dllHandle, hResource );
-    if ( hLoadResource == NULL )
+    if( hLoadResource == NULL )
         return false;
 
     LPVOID pResource = ::LockResource( hLoadResource );
-    if ( pResource == NULL )
+    if( pResource == NULL )
         return false;
 
     DWORD dwResSize = ::SizeofResource( dllHandle, hResource );
-    if ( dwResSize == 0 )
+    if( dwResSize == 0 )
         return false;
 
     HANDLE hFile = ::CreateFile( OutputFileName, GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
-    if ( hFile == INVALID_HANDLE_VALUE )
+    if( hFile == INVALID_HANDLE_VALUE )
         return false;
 
     DWORD dwBytesWritten = 0;
-    if ( !::WriteFile( hFile, pResource, dwResSize, &dwBytesWritten, NULL ) ) {
+    if( !::WriteFile( hFile, pResource, dwResSize, &dwBytesWritten, NULL ) ) {
         ::CloseHandle( hFile );
         ::DeleteFile( OutputFileName );
 
@@ -193,24 +193,24 @@ std::string GenerateNewGuid()
     UUID guid = { 0 };
     std::string guidRtn;
 
-    if ( UuidCreate( &guid ) != RPC_S_OK ) {
+    if( UuidCreate( &guid ) != RPC_S_OK ) {
         LOG_ERROR( "UuidCreate failed" );
         goto abort;
     }
 
-    if ( UuidToStringA( &guid, &rpcStr ) != RPC_S_OK ) {
+    if( UuidToStringA( &guid, &rpcStr ) != RPC_S_OK ) {
         LOG_ERROR( "UuidToString failed" );
         goto abort;
     }
 
     guidRtn = ( char* )rpcStr;
     RpcStringFreeA( &rpcStr );
-    
+
 abort:
     return guidRtn;
 }
 
-bool ExtractResources( std::wstring &outputPath )
+bool ExtractResources( std::wstring& outputPath )
 {
     std::filesystem::path tempPath = std::filesystem::temp_directory_path();
     std::filesystem::path rcPath;
@@ -221,62 +221,62 @@ bool ExtractResources( std::wstring &outputPath )
     std::filesystem::create_directories( tempPath );
 
     rcPath = tempPath / MSVCP_DLL_NAME;
-    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP ), RT_RCDATA, rcPath.native().c_str() ) ) {
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP ), RT_RCDATA, rcPath.native().c_str() ) ) {
         WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / MSVCP1_DLL_NAME;
-    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP1 ), RT_RCDATA, rcPath.native().c_str() ) ) {
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP1 ), RT_RCDATA, rcPath.native().c_str() ) ) {
         WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / MSVCP2_DLL_NAME;
-    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP2 ), RT_RCDATA, rcPath.native().c_str() ) ) {
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_MSVCP2 ), RT_RCDATA, rcPath.native().c_str() ) ) {
         WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / VCRUNTIME_DLL_NAME;
-    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_VCRUNTIME ), RT_RCDATA, rcPath.native().c_str() ) ) {
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_VCRUNTIME ), RT_RCDATA, rcPath.native().c_str() ) ) {
         WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / UCRT_DLL_NAME;
-    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_UCRT ), RT_RCDATA, rcPath.native().c_str() ) ) {
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_UCRT ), RT_RCDATA, rcPath.native().c_str() ) ) {
         WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / CASUPPORT_DLL_NAME;
-    if ( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_CASUPPORT ), RT_RCDATA, rcPath.native().c_str() ) ) {
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_CASUPPORT ), RT_RCDATA, rcPath.native().c_str() ) ) {
         WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / CRYPTO_DLL_NAME;
-    if (!ExtractResourceToFile(globalDllHandle, MAKEINTRESOURCE(IDR_RRDLL_CRYPTO), RT_RCDATA, rcPath.native().c_str())) {
-        WLOG_ERROR(L"Failed to extract %s", rcPath.native().c_str());
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_CRYPTO ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
     rcPath = tempPath / SSL_DLL_NAME;
-    if (!ExtractResourceToFile(globalDllHandle, MAKEINTRESOURCE(IDR_RRDLL_SSL), RT_RCDATA, rcPath.native().c_str())) {
-        WLOG_ERROR(L"Failed to extract %s", rcPath.native().c_str());
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_SSL ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 
 #ifdef _DEBUG
     rcPath = tempPath / ZLIB_DLL_NAME;
-    if (!ExtractResourceToFile(globalDllHandle, MAKEINTRESOURCE(IDR_RRDLL_ZLIB), RT_RCDATA, rcPath.native().c_str())) {
-        WLOG_ERROR(L"Failed to extract %s", rcPath.native().c_str());
+    if( !ExtractResourceToFile( globalDllHandle, MAKEINTRESOURCE( IDR_RRDLL_ZLIB ), RT_RCDATA, rcPath.native().c_str() ) ) {
+        WLOG_ERROR( L"Failed to extract %s", rcPath.native().c_str() );
         retErr = false;
     }
 #endif
 
-    if ( retErr ) {
+    if( retErr ) {
         outputPath = tempPath.native();
     }
 
@@ -286,15 +286,32 @@ bool ExtractResources( std::wstring &outputPath )
 bool DeleteResources( const std::wstring& dllPath )
 {
     bool rtn = true;
-    if ( !dllPath.empty() ) {
-        try {
-            std::filesystem::path deletePath = dllPath;
-            std::filesystem::remove_all( deletePath );
+
+    if( dllPath.empty() || !std::filesystem::exists( dllPath ) ) return rtn;
+
+    try {
+        std::filesystem::remove_all( dllPath );
+    }
+    catch( ... ) { }
+
+    if( !std::filesystem::exists( dllPath ) ) return rtn;
+
+    try {
+        for( auto& entry : std::filesystem::directory_iterator( dllPath ) )
+        {
+            if( entry.is_regular_file() )
+            {
+                ::MoveFileEx( entry.path().c_str(), nullptr, MOVEFILE_DELAY_UNTIL_REBOOT );
+            }
         }
-        catch ( std::exception& e ) {
-            WLOG_ERROR( L"Failed to delete %s %hs", dllPath.c_str(), e.what() );
-            rtn = false;
-        }
+        //https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw
+        ::MoveFileEx( dllPath.c_str(), nullptr, MOVEFILE_DELAY_UNTIL_REBOOT );
+
+        WLOG_DEBUG( L"Deferred removal of %s", dllPath.c_str() );
+    }
+    catch( std::exception& e ) {
+        WLOG_ERROR( L"Failed to defer removal of %s: %hs", dllPath.c_str(), e.what() );
+        rtn = false;
     }
 
     return rtn;
@@ -303,26 +320,26 @@ bool DeleteResources( const std::wstring& dllPath )
 HMODULE LoadCaSupportDll( const std::wstring& dllPath )
 {
     HMODULE module = NULL;
-    
+
     WLOG_DEBUG( L"Loading dll %s\\%hs", dllPath.c_str(), CASUPPORT_DLL_NAME );
     SetDllDirectory( dllPath.c_str() );
     module = LoadLibrary( _T( CASUPPORT_DLL_NAME ) );
 
-    if ( module == NULL ) {
+    if( module == NULL ) {
         WLOG_ERROR( L"Failed to load %hs", CASUPPORT_DLL_NAME );
     }
 
     return module;
 }
 
-void UnloadModule( HMODULE module)
+void UnloadModule( HMODULE module )
 {
-    if ( module ) {
-        if ( !FreeLibrary( module ) ) {
+    if( module ) {
+        if( !FreeLibrary( module ) ) {
             WLOG_ERROR( L"Failed to unload module" );
         }
     }
-        
+
     SetDllDirectory( NULL );
 }
 
@@ -340,7 +357,7 @@ bool RunCollectUCData( IUcLogger* logger, const std::wstring& dllPath, std::stri
     if( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
         LOG_ERROR( "LoadCaSupportDll failed" );
     }
-    else if( (func = (CollectUCDataFunc )GetProcAddress( caSupport, "CollectUCData" ) ) == NULL ) {
+    else if( ( func = ( CollectUCDataFunc )GetProcAddress( caSupport, "CollectUCData" ) ) == NULL ) {
         LOG_ERROR( "GetProcAddress CollectUCData failed" );
     }
     else {
@@ -351,7 +368,7 @@ bool RunCollectUCData( IUcLogger* logger, const std::wstring& dllPath, std::stri
     return result;
 }
 
-typedef bool(*SendEventOnUninstallBeginFunc)(IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken);
+typedef bool( *SendEventOnUninstallBeginFunc )( IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken );
 bool RunSendEventOnUninstallBegin( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
 {
     bool result = false;
@@ -359,10 +376,10 @@ bool RunSendEventOnUninstallBegin( IUcLogger* logger, const std::wstring& dllPat
     HMODULE caSupport = NULL;
     SendEventOnUninstallBeginFunc func = NULL;
 
-    if ( (caSupport = LoadCaSupportDll( dllPath )) == NULL ) {
+    if( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
         LOG_ERROR( "LoadCaSupportDll failed" );
     }
-    else if ( (func = (SendEventOnUninstallBeginFunc)GetProcAddress( caSupport, "SendEventOnUninstallBegin" )) == NULL ) {
+    else if( ( func = ( SendEventOnUninstallBeginFunc )GetProcAddress( caSupport, "SendEventOnUninstallBegin" ) ) == NULL ) {
         LOG_ERROR( "GetProcAddress SendEventOnUninstallBegin failed" );
     }
     else {
@@ -374,7 +391,7 @@ bool RunSendEventOnUninstallBegin( IUcLogger* logger, const std::wstring& dllPat
     return result;
 }
 
-typedef bool(*SendEventOnUninstallErrorFunc)(IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken);
+typedef bool( *SendEventOnUninstallErrorFunc )( IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken );
 bool RunSendEventOnUninstallError( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
 {
     bool result = false;
@@ -382,10 +399,10 @@ bool RunSendEventOnUninstallError( IUcLogger* logger, const std::wstring& dllPat
     HMODULE caSupport = NULL;
     SendEventOnUninstallErrorFunc func = NULL;
 
-    if ( (caSupport = LoadCaSupportDll( dllPath )) == NULL ) {
+    if( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
         LOG_ERROR( "LoadCaSupportDll failed" );
     }
-    else if ( (func = (SendEventOnUninstallErrorFunc)GetProcAddress( caSupport, "SendEventOnUninstallError" )) == NULL ) {
+    else if( ( func = ( SendEventOnUninstallErrorFunc )GetProcAddress( caSupport, "SendEventOnUninstallError" ) ) == NULL ) {
         LOG_ERROR( "GetProcAddress SendEventOnUninstallError failed" );
     }
     else {
@@ -397,7 +414,7 @@ bool RunSendEventOnUninstallError( IUcLogger* logger, const std::wstring& dllPat
     return result;
 }
 
-typedef bool(*SendEventOnUninstallCompleteFunc)(IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken);
+typedef bool( *SendEventOnUninstallCompleteFunc )( IUcLogger* logger, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken );
 bool RunSendEventOnUninstallComplete( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
 {
     bool result = false;
@@ -405,10 +422,10 @@ bool RunSendEventOnUninstallComplete( IUcLogger* logger, const std::wstring& dll
     HMODULE caSupport = NULL;
     SendEventOnUninstallCompleteFunc func = NULL;
 
-    if ( (caSupport = LoadCaSupportDll( dllPath )) == NULL ) {
+    if( ( caSupport = LoadCaSupportDll( dllPath ) ) == NULL ) {
         LOG_ERROR( "LoadCaSupportDll failed" );
     }
-    else if ( (func = (SendEventOnUninstallCompleteFunc)GetProcAddress( caSupport, "SendEventOnUninstallComplete" )) == NULL ) {
+    else if( ( func = ( SendEventOnUninstallCompleteFunc )GetProcAddress( caSupport, "SendEventOnUninstallComplete" ) ) == NULL ) {
         LOG_ERROR( "GetProcAddress SendEventOnUninstallComplete failed" );
     }
     else {
