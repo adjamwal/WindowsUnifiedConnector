@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileUtil.h" />
-    <ClInclude Include="IFileUtil.h" />
+    <ClInclude Include="FileSysUtil.h" />
+    <ClInclude Include="IFileSysUtil.h" />
     <ClInclude Include="IPmHttp.h" />
     <ClInclude Include="IPmLogger.h" />
     <ClInclude Include="ISslUtil.h" />
@@ -35,7 +35,7 @@
     <ClInclude Include="WorkerThread.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="FileSysUtil.cpp" />
     <ClCompile Include="JsonUtil.cpp" />
     <ClCompile Include="PmHttp.cpp" />
     <ClCompile Include="PmLogger.cpp" />

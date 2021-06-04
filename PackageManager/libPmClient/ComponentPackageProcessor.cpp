@@ -2,7 +2,7 @@
 #include "IInstallerCacheManager.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include "ISslUtil.h"
 #include "IPackageConfigProcessor.h"
 #include "IUcidAdapter.h"
@@ -20,7 +20,7 @@
 
 ComponentPackageProcessor::ComponentPackageProcessor(
     IInstallerCacheManager& installerManager,
-    IFileUtil& fileUtil,
+    IFileSysUtil& fileUtil,
     ISslUtil& sslUtil,
     IPackageConfigProcessor& configProcessor,
     IUcidAdapter& ucidAdapter,

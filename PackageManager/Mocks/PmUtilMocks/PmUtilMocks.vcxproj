@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MockFileUtil.h" />
+    <ClInclude Include="MockFileSysUtil.h" />
     <ClInclude Include="MockPmHttp.h" />
     <ClInclude Include="MockSslUtil.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MockFileUtil.cpp" />
+    <ClCompile Include="MockFileSysUtil.cpp" />
     <ClCompile Include="MockPmHttp.cpp" />
     <ClCompile Include="MockSslUtil.cpp" />
   </ItemGroup>

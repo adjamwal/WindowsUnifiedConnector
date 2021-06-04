@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "ComponentPackageProcessor.h"
 #include "MockInstallerCacheManager.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
 #include "MockSslUtil.h"
@@ -20,7 +20,7 @@ protected:
     void SetUp()
     {
         m_installerCacheMgr.reset( new NiceMock<MockInstallerCacheManager>() );
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
@@ -101,7 +101,7 @@ protected:
 
     PmComponent m_expectedComponentPackage;
     std::unique_ptr<MockInstallerCacheManager> m_installerCacheMgr;
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;

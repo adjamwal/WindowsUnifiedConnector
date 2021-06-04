@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "PmConfig.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 
 #include <memory>
 
@@ -9,7 +9,7 @@ class TestPmConfig : public ::testing::Test
 protected:
     void SetUp()
     {
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_aTimeStamp = std::filesystem::file_time_type::clock::now();
         m_patient.reset( new PmConfig( *m_fileUtil ) );
     }
@@ -46,7 +46,7 @@ protected:
 }
 )";
 
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::filesystem::file_time_type m_aTimeStamp;
     std::unique_ptr<PmConfig> m_patient;
 };

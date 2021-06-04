@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "PmManifest.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "PmTypes.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"

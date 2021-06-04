@@ -8,12 +8,12 @@
 #define PM_CONFIG_INTERVAL_DEFAULT 300000
 #define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
 
+class IFileSysUtil;
+
 namespace Json
 {
     class Value;
 };
-
-class IFileUtil;
 
 struct PmConfigData
 {
@@ -31,7 +31,7 @@ struct PmConfigData
 class PmConfig : public IPmConfig
 {
 public:
-    PmConfig( IFileUtil& fileUtil );
+    PmConfig( IFileSysUtil& fileUtil );
     ~PmConfig();
 
     int32_t LoadBsConfig( const std::string& bsConfig ) override;
@@ -50,7 +50,7 @@ public:
     bool AllowPostInstallReboots() override;
 
 private:
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
 
     std::atomic<bool> m_isFirstCheckin;
     PmConfigData m_configData;

@@ -8,7 +8,7 @@ class IPmCloud;
 class IPmConfig;
 class IPmManifest;
 class IWorkerThread;
-class IFileUtil;
+class IFileSysUtil;
 class IPackageInventoryProvider;
 class IPackageDiscoveryManager;
 class ICheckinFormatter;
@@ -36,7 +36,7 @@ public:
     IPackageManager& packageManager();
 
 private:
-    std::unique_ptr<IFileUtil> m_fileUtil;
+    std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;

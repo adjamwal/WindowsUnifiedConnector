@@ -1,0 +1,85 @@
+// Microsoft Visual C++ generated resource script.
+//
+
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE  
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE  
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
+#ifdef _DEBUG
+
+IDR_RRDLL_MSVCP          RCDATA                "..\\..\\Win32\\Debug\\msvcp140d.dll"
+IDR_RRDLL_MSVCP1         RCDATA                "..\\..\\Win32\\Debug\\msvcp140_1d.dll"
+IDR_RRDLL_MSVCP2         RCDATA                "..\\..\\Win32\\Debug\\msvcp140_2d.dll"
+IDR_RRDLL_VCRUNTIME      RCDATA                "..\\..\\Win32\\Debug\\vcruntime140d.dll"
+IDR_RRDLL_UCRT           RCDATA                "..\\..\\Win32\\Debug\\ucrtbased.dll"
+IDR_RRDLL_CASUPPORT      RCDATA                "..\\..\\Win32\\Debug\\dllCaSupport.dll"
+IDR_RRDLL_CRYPTO         RCDATA                "..\\..\\Win32\\Debug\\libcrypto-1_1.dll"
+IDR_RRDLL_SSL            RCDATA                "..\\..\\Win32\\Debug\\libssl-1_1.dll"
+IDR_RRDLL_ZLIB           RCDATA                "..\\..\\Win32\\Debug\\zlibd.dll"
+
+#else
+
+IDR_RRDLL_MSVCP          RCDATA                "..\\..\\Win32\\Release\\msvcp140.dll"
+IDR_RRDLL_MSVCP1         RCDATA                "..\\..\\Win32\\Release\\msvcp140_1.dll"
+IDR_RRDLL_MSVCP2         RCDATA                "..\\..\\Win32\\Release\\msvcp140_2.dll"
+IDR_RRDLL_VCRUNTIME      RCDATA                "..\\..\\Win32\\Release\\vcruntime140.dll"
+IDR_RRDLL_UCRT           RCDATA                "..\\..\\Win32\\Release\\ucrtbase.dll"
+IDR_RRDLL_CASUPPORT      RCDATA                "..\\..\\Win32\\Release\\dllCaSupport.dll"
+IDR_RRDLL_CRYPTO         RCDATA                "..\\..\\Win32\\Release\\libcrypto-1_1.dll"
+IDR_RRDLL_SSL            RCDATA                "..\\..\\Win32\\Release\\libssl-1_1.dll"
+
+#endif

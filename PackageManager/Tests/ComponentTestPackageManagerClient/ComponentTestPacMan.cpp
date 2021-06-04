@@ -18,7 +18,7 @@
 #include "PmConstants.h"
 #include "SslUtil.h"
 
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "MockPmConfig.h"
 #include "MockPmCloud.h"
 #include "MockPmPlatformConfiguration.h"
@@ -44,7 +44,7 @@ protected:
         m_configUrl = "https://test.com";
         m_configIntervalCalledOnce = false;
 
-        m_mockFileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_mockFileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_mockConfig.reset( new NiceMock<MockPmConfig>() );
         m_mockCloud.reset( new NiceMock<MockPmCloud>() );
         m_mockPlatformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
@@ -198,7 +198,7 @@ protected:
     std::mutex m_configMutex;
     std::condition_variable m_cv;
 
-    std::unique_ptr<MockFileUtil> m_mockFileUtil;
+    std::unique_ptr<MockFileSysUtil> m_mockFileUtil;
     std::unique_ptr<MockPmConfig> m_mockConfig;
     std::unique_ptr<MockPmCloud> m_mockCloud;
     std::unique_ptr<MockPmPlatformConfiguration> m_mockPlatformConfiguration;

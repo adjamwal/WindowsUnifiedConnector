@@ -51,6 +51,12 @@ std::wstring StringUtil::Str2WStr( const std::string& str )
     return ws.get();
 }
 
+std::string StringUtil::WStr2Str( const std::wstring& wstr )
+{
+    std::string str( ( const char* )&wstr[ 0 ], sizeof( wchar_t ) / sizeof( char ) * wstr.size() );
+    return str;
+}
+
 bool StringUtil::NoCaseEquals( const std::string& a, const std::string& b )
 {
     return std::equal( a.begin(), a.end(),

@@ -1,12 +1,12 @@
 #pragma once
 #include "MocksCommon.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 
-class MockFileUtil : public IFileUtil
+class MockFileSysUtil : public IFileSysUtil
 {
 public:
-    MockFileUtil();
-    ~MockFileUtil();
+    MockFileSysUtil();
+    ~MockFileSysUtil();
 
     MOCK_METHOD1( ReadFile, std::string( const std::string& ) );
     void MakeReadFileReturn( std::string value );

@@ -1,6 +1,6 @@
 #include "InstallerCacheManager.h"
 #include "PmTypes.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include "ISslUtil.h"
 #include "IPmCloud.h"
 #include "PmLogger.h"
@@ -10,7 +10,7 @@
 #include "IPmPlatformComponentManager.h"
 #include <sstream>
 
-InstallerCacheManager::InstallerCacheManager( IPmCloud& pmCloud, IFileUtil& fileUtil,  ISslUtil& sslUtil ) :
+InstallerCacheManager::InstallerCacheManager( IPmCloud& pmCloud, IFileSysUtil& fileUtil,  ISslUtil& sslUtil ) :
     m_pmCloud( pmCloud )
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
