@@ -6,6 +6,7 @@
 #include "WindowsUtilities.h"
 #include "wintoastlib.h"
 #include "WinApiWrapper.h"
+#include <tchar.h>
 
 #define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnositcs"
 #define TOAST_AUMI L"Cisco.UC"
@@ -94,7 +95,81 @@ void SendRebootToast()
     }
 }
 
-int main( int argc, char** argv )
+BOOL IsProcessElevated()
+{
+    BOOL fIsElevated = FALSE;
+    DWORD dwError = ERROR_SUCCESS;
+    HANDLE hToken = NULL;
+
+    // Open the primary access token of the process with TOKEN_QUERY. 
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+    {
+        dwError = GetLastError();
+        goto Cleanup;
+    }
+
+    // Retrieve token elevation information. 
+    TOKEN_ELEVATION elevation;
+    DWORD dwSize;
+    if (!GetTokenInformation(hToken, TokenElevation, &elevation,
+        sizeof(elevation), &dwSize))
+    {
+        // When the process is run on operating systems prior to Windows  
+        // Vista, GetTokenInformation returns FALSE with the  
+        // ERROR_INVALID_PARAMETER error code because TokenElevation is  
+        // not supported on those operating systems. 
+        dwError = GetLastError();
+        goto Cleanup;
+    }
+
+    fIsElevated = elevation.TokenIsElevated;
+
+Cleanup:
+    // Centralized cleanup for all allocated resources. 
+    if (hToken)
+    {
+        CloseHandle(hToken);
+        hToken = NULL;
+    }
+
+    // Throw the error if something failed in the function. 
+    if (ERROR_SUCCESS != dwError)
+    {
+        throw dwError;
+    }
+
+    return fIsElevated;
+}
+
+void RunElevated( int argc, wchar_t** argv )
+{
+    SHELLEXECUTEINFO shExInfo = { 0 };
+    WCHAR swPath[MAX_PATH + 5] = { 0 };
+    GetModuleFileName(NULL, swPath, MAX_PATH);
+    std::wstring arglist;
+    for (int i = 1; i < argc; i++) {
+        arglist += argv[i];
+        arglist += L" ";
+    }
+
+    shExInfo.cbSize = sizeof(shExInfo);
+    shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+    shExInfo.hwnd = 0;
+    shExInfo.lpVerb = _T("runas");                // Operation to perform
+    shExInfo.lpFile = swPath;
+    shExInfo.lpParameters = arglist.c_str();
+    shExInfo.lpDirectory = 0;
+    shExInfo.nShow = SW_SHOW;
+    shExInfo.hInstApp = 0;
+
+    if (ShellExecuteEx(&shExInfo))
+    {
+        WaitForSingleObject(shExInfo.hProcess, INFINITE);
+        CloseHandle(shExInfo.hProcess);
+    }
+}
+
+int wmain(int argc, wchar_t** argv, wchar_t** envp)
 {
     std::wstring dataDir = WindowsUtilities::GetLogDir();
 
@@ -107,8 +182,13 @@ int main( int argc, char** argv )
 
     WLOG_DEBUG( L"Enter" );
 
-    if ((argc > 0) && (std::string( "--notifyreboot" ) == argv[1])) {
+    if ((argc > 1) && (std::wstring( L"--notifyreboot" ) == argv[1])) {
         SendRebootToast();
+        return 0;
+    }
+
+    if( !IsProcessElevated() ) {
+        RunElevated( argc, argv );
         return 0;
     }
 
