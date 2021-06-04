@@ -7,6 +7,8 @@
 #include "resource.h"
 #include <tchar.h>
 #include <codecvt>
+#include <AclAPI.h>
+#include <Sddl.h>
 
 extern HMODULE globalDllHandle;
 
@@ -435,4 +437,54 @@ bool RunSendEventOnUninstallComplete( IUcLogger* logger, const std::wstring& dll
     UnloadModule( caSupport );
 
     return result;
+}
+
+bool AllowEveryoneAccessToFile( const std::wstring &path )
+{
+    bool rtn = false;
+    PACL pDacl = NULL;
+    PACL pNewDACL = NULL;
+    EXPLICIT_ACCESS ExplicitAccess = { 0 };
+    PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
+    PSID psid = NULL;
+
+    LPTSTR lpStr;
+    lpStr = ( LPTSTR )path.c_str();
+
+    WLOG_DEBUG( "Updating Permissions for %s", lpStr );
+
+    if( path.empty() ) {
+        LOG_ERROR( "path is empty" );
+    } 
+    else if( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pDacl, NULL, &ppSecurityDescriptor ) != ERROR_SUCCESS ) {
+        LOG_ERROR( "GetNamedSecurityInfo failed" );
+    } 
+    else if( !ConvertStringSidToSid( L"S-1-1-0", &psid ) ) {
+        LOG_ERROR( "GetNamedSecurityInfo failed" );
+    }
+    else {
+        ExplicitAccess.grfAccessMode = SET_ACCESS;
+        ExplicitAccess.grfAccessPermissions = GENERIC_ALL;
+        ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+        ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+        ExplicitAccess.Trustee.pMultipleTrustee = NULL;
+        ExplicitAccess.Trustee.ptstrName = ( LPTSTR )psid;
+        ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
+
+        if( SetEntriesInAcl( 1, &ExplicitAccess, pDacl, &pNewDACL ) != ERROR_SUCCESS ) {
+            LOG_ERROR( "SetEntriesInAcl failed" );
+        }
+        else if( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) != ERROR_SUCCESS ) {
+            LOG_ERROR( "SetNamedSecurityInfo failed" );
+        }
+        else {
+            rtn = true;
+        }
+    }
+
+    if( pNewDACL ) LocalFree( pNewDACL );
+    if( psid ) LocalFree( psid );
+
+    return rtn;
 }

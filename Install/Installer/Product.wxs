@@ -37,7 +37,7 @@
         <Property Id="UC_EVENT_UCID" Value="0" />
         <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
         <Property Id="UC_RESOURCE_DIR" Value="0" />
-
+        <Property Id="UCDT_SHORTCUT_NAME" Value="!(loc.DiagToolName).lnk" />
         <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
         <Property Id="ARPPRODUCTICON" Value="UC.ico" />
       
@@ -48,6 +48,7 @@
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
+        <CustomAction Id="SetShortCutPermissions" BinaryKey="CustomActionsDll" DllEntry="SetShortCutPermissions" />
         <!--=
         Commenting out this event till we figure out what we want to do with it
         <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
@@ -72,7 +73,8 @@
               (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           -->
-          
+
+          <Custom Action="SetShortCutPermissions" Before="InstallFinalize" />
           <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>

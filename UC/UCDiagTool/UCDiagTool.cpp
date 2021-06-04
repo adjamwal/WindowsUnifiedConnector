@@ -73,6 +73,10 @@ void SendRebootToast()
             LOG_ERROR("Toast Initialization Failed");
         }
         else {
+            //Setup the shortcut first (Set AppUserModelId). Sometimes the first toast doesn't appear if this isn't already set
+            //This is a no-op if the shortcut is already configured
+            toast->createShortcut();
+
             WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::Text02);
             templ.setTextField(L"A software update requires a reboot to complete. Would you like to restart Windows now?", WinToastLib::WinToastTemplate::FirstLine);
             templ.setAudioOption(audioOption);
@@ -130,12 +134,6 @@ Cleanup:
     {
         CloseHandle(hToken);
         hToken = NULL;
-    }
-
-    // Throw the error if something failed in the function. 
-    if (ERROR_SUCCESS != dwError)
-    {
-        throw dwError;
     }
 
     return fIsElevated;
