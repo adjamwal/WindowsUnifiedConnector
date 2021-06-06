@@ -9,6 +9,7 @@
 #include "MockCodesignVerifier.h"
 #include "MockPackageDiscovery.h"
 #include "MockWindowsUtilities.h"
+#include "MockUserImpersonator.h"
 #include <memory>
 #include <codecvt>
 
@@ -21,8 +22,9 @@ protected:
         m_winApiWrapper.reset( new NiceMock<MockWinApiWrapper>() );
         m_codeSignVerifier.reset( new NiceMock<MockCodesignVerifier>() );
         m_packageDiscovery.reset( new NiceMock<MockPackageDiscovery>() );
+        m_userImpersonator.reset( new NiceMock<MockUserImpersonator>() );
 
-        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery ) );
+        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery, *m_userImpersonator ) );
     }
 
     void TearDown()
@@ -32,6 +34,7 @@ protected:
         m_winApiWrapper.reset();
         m_codeSignVerifier.reset();
         m_packageDiscovery.reset();
+        m_userImpersonator.reset();
 
         MockWindowsUtilities::Deinit();
         m_expectedComponentPackage = {};
@@ -68,6 +71,7 @@ protected:
     std::unique_ptr<MockWinApiWrapper> m_winApiWrapper;
     std::unique_ptr<MockCodesignVerifier> m_codeSignVerifier;
     std::unique_ptr<MockPackageDiscovery> m_packageDiscovery;
+    std::unique_ptr<MockUserImpersonator> m_userImpersonator;
 
     std::unique_ptr<WindowsComponentManager> m_patient;
 };

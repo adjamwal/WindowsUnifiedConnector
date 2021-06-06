@@ -33,6 +33,7 @@
     <ClInclude Include="MockPmPlatformComponentManager.h" />
     <ClInclude Include="MockPmPlatformConfiguration.h" />
     <ClInclude Include="MockPmPlatformDependencies.h" />
+    <ClInclude Include="MockRebootHandler.h" />
     <ClInclude Include="MockUcidAdapter.h" />
     <ClInclude Include="MockUcUpgradeEventHandler.h" />
   </ItemGroup>
@@ -51,6 +52,7 @@
     <ClCompile Include="MockPmPlatformComponentManager.cpp" />
     <ClCompile Include="MockPmPlatformConfiguration.cpp" />
     <ClCompile Include="MockPmPlatformDependencies.cpp" />
+    <ClCompile Include="MockRebootHandler.cpp" />
     <ClCompile Include="MockUcidAdapter.cpp" />
     <ClCompile Include="MockUcUpgradeEventHandler.cpp" />
   </ItemGroup>
