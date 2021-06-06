@@ -81,7 +81,13 @@ bool InstallerConfig::AllowPostInstallReboots()
     return false;
 }
 
+uint32_t InstallerConfig::GetRebootThrottleS()
+{
+    return uint32_t();
+}
+
 void InstallerConfig::SetCloudEventUri( std::string& uri )
 {
     m_configData.eventUri = uri;
 }
+

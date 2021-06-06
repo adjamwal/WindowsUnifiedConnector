@@ -28,6 +28,7 @@ public:
     const std::vector<PmComponent>& GetSupportedComponentList() override;
     uint32_t GetMaxFileCacheAge() override;
     bool AllowPostInstallReboots() override;
+    uint32_t GetRebootThrottleS() override;
 
     void SetCloudEventUri( std::string& uri );
 private:
