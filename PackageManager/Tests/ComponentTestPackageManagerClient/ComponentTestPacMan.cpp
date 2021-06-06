@@ -318,7 +318,7 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
             return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
 
-    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockPlatformComponentManager, NotifySystemRestart() ).WillOnce( Invoke(
         [this, &pass]()
         {
             pass = true;
@@ -351,7 +351,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
             return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
 
-    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
+    EXPECT_CALL( *m_mockPlatformComponentManager, NotifySystemRestart() ).WillOnce( Invoke(
         [this, &pass]()
         {
             pass = true;

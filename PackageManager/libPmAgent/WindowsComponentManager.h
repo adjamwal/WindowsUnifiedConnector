@@ -105,7 +105,7 @@ public:
     * Initiates a system restart
     * 
     */
-    void InitiateSystemRestart() override;
+    void NotifySystemRestart() override;
 
 private:
     IWinApiWrapper& m_winApiWrapper;

@@ -209,7 +209,7 @@ int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::
     return WindowsUtilities::FileSearchWithWildCard( searchPath, results );
 }
 
-void WindowsComponentManager::InitiateSystemRestart()
+void WindowsComponentManager::NotifySystemRestart()
 {
     LOG_DEBUG( "Enter" );
 

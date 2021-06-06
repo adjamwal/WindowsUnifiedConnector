@@ -213,7 +213,7 @@ void PackageManager::PmWorkflowThread()
         {
             if( m_config.AllowPostInstallReboots() ) 
             {
-                m_dependencies->ComponentManager().InitiateSystemRestart();
+                m_dependencies->ComponentManager().NotifySystemRestart();
             }
             else
             { 
