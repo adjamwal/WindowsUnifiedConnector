@@ -48,6 +48,9 @@
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
+        <!--=
+        WIX Allows you set permission on a file but not a shortcut created for a file. A custom action was required
+        -->
         <CustomAction Id="SetShortCutPermissions" BinaryKey="CustomActionsDll" DllEntry="SetShortCutPermissions" />
         <!--=
         Commenting out this event till we figure out what we want to do with it
@@ -212,7 +215,14 @@
                     <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
-        
+
+            <Component Id="UCSERVICE_PATH_REGISTRY" Guid="*">
+              <RegistryKey Root="HKLM"
+             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+                <RegistryValue Type="string" Name="Path" Value="[UCSERVICE_DIRECTORY]" KeyPath="yes"/>
+              </RegistryKey>
+            </Component>
+          
             <Component Id="ucs.exe" Guid="*">
                 <File Id="ucs.exe" Name="csc_uc.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_uc.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />

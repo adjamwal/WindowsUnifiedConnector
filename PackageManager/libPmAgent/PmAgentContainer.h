@@ -14,6 +14,7 @@ class IWinApiWrapper;
 class IMsiApi;
 class IPackageDiscovery;
 class IPackageDiscoveryMethods;
+class IUserImpersonator;
 
 class PmAgentContainer
 {
@@ -30,6 +31,7 @@ private:
     std::unique_ptr<IWinCertLoader> m_certLoader;
     std::unique_ptr<IPackageDiscoveryMethods> m_discoveryMethods;
     std::unique_ptr<IPackageDiscovery> m_packageDiscovery;
+    std::unique_ptr<IUserImpersonator> m_userImpersonator;
     std::unique_ptr<WindowsConfiguration> m_configuration;
     std::unique_ptr<WindowsComponentManager> m_componentMgr;
     std::unique_ptr<WindowsPmDependencies> m_pmDependencies;

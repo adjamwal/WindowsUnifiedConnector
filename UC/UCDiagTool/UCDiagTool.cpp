@@ -75,7 +75,12 @@ void SendRebootToast()
         else {
             //Setup the shortcut first (Set AppUserModelId). Sometimes the first toast doesn't appear if this isn't already set
             //This is a no-op if the shortcut is already configured
-            toast->createShortcut();
+            enum WinToastLib::WinToast::ShortcutResult result = toast->createShortcut();
+            if( ( result == WinToastLib::WinToast::SHORTCUT_WAS_CHANGED ) ||
+                ( result == WinToastLib::WinToast::SHORTCUT_WAS_CREATED ) ) {
+                LOG_DEBUG( "Shortcut modified/created. Sleeping 2 seconds to let changes take effect" );
+                Sleep( 2000 );
+            }
 
             WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::Text02);
             templ.setTextField(L"A software update requires a reboot to complete. Would you like to restart Windows now?", WinToastLib::WinToastTemplate::FirstLine);

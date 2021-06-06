@@ -1,19 +1,23 @@
 #pragma once
 
 #include "IPmPlatformComponentManager.h"
-#include "IUcLogger.h"
-#include "IWinApiWrapper.h"
-#include "ICodesignVerifier.h"
-#include "IPackageDiscovery.h"
 #include <string>
 #include <Windows.h>
 #include <PmTypes.h>
 #include <filesystem>
 
+class IWinApiWrapper;
+class ICodesignVerifier;
+class IPackageDiscovery;
+class IUserImpersonator;
+
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
 public:
-    WindowsComponentManager( IWinApiWrapper& winApiWrapper, ICodesignVerifier& codeSignVerifier, IPackageDiscovery& packageDiscovery );
+    WindowsComponentManager( IWinApiWrapper& winApiWrapper, 
+        ICodesignVerifier& codeSignVerifier, 
+        IPackageDiscovery& packageDiscovery,
+        IUserImpersonator& userImpersonator );
     virtual ~WindowsComponentManager();
 
     /**
@@ -107,6 +111,7 @@ private:
     IWinApiWrapper& m_winApiWrapper;
     ICodesignVerifier& m_codeSignVerifier;
     IPackageDiscovery& m_packageDiscovery;
+    IUserImpersonator& m_userImpersonator;
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
 };

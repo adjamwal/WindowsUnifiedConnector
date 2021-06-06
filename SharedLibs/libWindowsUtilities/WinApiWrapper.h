@@ -85,4 +85,36 @@ public:
     ) override;
 
     BOOL ExitWindowsEx( UINT uFlags, DWORD dwReason ) override;
+
+    BOOL WTSEnumerateSessionsW(
+        HANDLE hServer,
+        DWORD Reserved,
+        DWORD Version,
+        PWTS_SESSION_INFOW* ppSessionInfo,
+        DWORD* pCount
+    ) override;
+
+    void WTSFreeMemory( PVOID pMemory ) override;
+
+    BOOL WTSQueryUserToken( ULONG SessionId, PHANDLE phToken ) override;
+
+    BOOL CloseHandle( HANDLE hObject ) override;
+
+    BOOL CreateEnvironmentBlock( LPVOID* lpEnvironment, HANDLE hToken, BOOL bInherit ) override;
+
+    BOOL DestroyEnvironmentBlock( LPVOID  lpEnvironment ) override;
+
+    BOOL CreateProcessAsUserW(
+        HANDLE hToken,
+        LPCWSTR lpApplicationName,
+        LPWSTR lpCommandLine,
+        //LPSECURITY_ATTRIBUTES lpProcessAttributes, USE null
+        //LPSECURITY_ATTRIBUTES lpThreadAttributes, use null
+        //BOOL bInheritHandles, use FALSE
+        DWORD dwCreationFlags,
+        LPVOID lpEnvironment,
+        LPCWSTR lpCurrentDirectory,
+        LPSTARTUPINFOW lpStartupInfo,
+        LPPROCESS_INFORMATION lpProcessInformation
+    ) override;
 };

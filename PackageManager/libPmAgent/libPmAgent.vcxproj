@@ -167,6 +167,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="IPackageDiscovery.h" />
     <ClInclude Include="IPackageDiscoveryMethods.h" />
+    <ClInclude Include="IUserImpersonator.h" />
     <ClInclude Include="IWinCertLoader.h" />
     <ClInclude Include="PackageDiscovery.h" />
     <ClInclude Include="PackageDiscoveryMethods.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="PmAgentContainer.h" />
     <ClInclude Include="PmLogAdapter.h" />
     <ClInclude Include="UCIDApiDll.h" />
+    <ClInclude Include="UserImpersonator.h" />
     <ClInclude Include="WinCertLoader.h" />
     <ClInclude Include="WindowsComponentManager.h" />
     <ClInclude Include="WindowsConfiguration.h" />
@@ -193,6 +195,7 @@
     <ClCompile Include="PmAgentContainer.cpp" />
     <ClCompile Include="PmLogAdapter.cpp" />
     <ClCompile Include="UCIDApiDll.cpp" />
+    <ClCompile Include="UserImpersonator.cpp" />
     <ClCompile Include="WinCertLoader.cpp" />
     <ClCompile Include="WindowsComponentManager.cpp" />
     <ClCompile Include="WindowsConfiguration.cpp" />

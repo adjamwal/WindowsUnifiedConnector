@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <Shlobj.h>
 #include <Msi.h>
+#include <wtsapi32.h>
+#include <userenv.h>
 
 class IWinApiWrapper
 {
@@ -85,4 +87,37 @@ public:
     ) = 0;
 
     virtual BOOL ExitWindowsEx( UINT uFlags, DWORD dwReason ) = 0;
+
+    virtual BOOL WTSEnumerateSessionsW(
+        HANDLE hServer,
+        DWORD Reserved,
+        DWORD Version,
+        PWTS_SESSION_INFOW* ppSessionInfo,
+        DWORD* pCount
+    ) = 0;
+
+    virtual void WTSFreeMemory( PVOID pMemory ) = 0;
+
+    virtual BOOL WTSQueryUserToken( ULONG SessionId, PHANDLE phToken ) = 0;
+
+    virtual BOOL CloseHandle( HANDLE hObject ) = 0;
+
+    virtual BOOL CreateEnvironmentBlock( LPVOID* lpEnvironment, HANDLE hToken, BOOL bInherit ) = 0;
+
+    virtual BOOL DestroyEnvironmentBlock( LPVOID  lpEnvironment ) = 0;
+
+    virtual BOOL CreateProcessAsUserW(
+        HANDLE hToken,
+        LPCWSTR lpApplicationName,
+        LPWSTR lpCommandLine,
+        //LPSECURITY_ATTRIBUTES lpProcessAttributes, USE null
+        //LPSECURITY_ATTRIBUTES lpThreadAttributes, use null
+        //BOOL bInheritHandles, use FALSE
+        DWORD dwCreationFlags,
+        LPVOID lpEnvironment,
+        LPCWSTR lpCurrentDirectory,
+        LPSTARTUPINFOW lpStartupInfo,
+        LPPROCESS_INFORMATION lpProcessInformation
+    ) = 0;
+
 };

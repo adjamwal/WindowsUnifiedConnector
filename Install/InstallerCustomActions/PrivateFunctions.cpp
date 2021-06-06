@@ -451,7 +451,7 @@ bool AllowEveryoneAccessToFile( const std::wstring &path )
     LPTSTR lpStr;
     lpStr = ( LPTSTR )path.c_str();
 
-    WLOG_DEBUG( "Updating Permissions for %s", lpStr );
+    WLOG_DEBUG( L"Updating Permissions for %s", lpStr );
 
     if( path.empty() ) {
         LOG_ERROR( "path is empty" );
