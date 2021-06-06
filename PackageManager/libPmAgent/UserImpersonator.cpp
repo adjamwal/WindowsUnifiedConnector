@@ -55,7 +55,10 @@ bool UserImpersonator::RunProcessInSession( const std::wstring& processName,
     bool rtn = false;
     HANDLE userToken = NULL;
     
-    if( !m_winApi.WTSQueryUserToken( sessionId, &userToken ) ) {
+    if( processName.empty() || workingDir.empty() ) { 
+        LOG_ERROR( "invalid parameters");
+    }
+    else if( !m_winApi.WTSQueryUserToken( sessionId, &userToken ) ) {
         LOG_ERROR( "WTSQueryUserToken failed for session %d", sessionId );
     }
     else if( userToken == NULL ) {

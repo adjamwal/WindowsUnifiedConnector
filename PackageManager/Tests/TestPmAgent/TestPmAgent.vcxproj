@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="TestPackageDiscovery.cpp" />
     <ClCompile Include="TestPackageDiscoveryMethods.cpp" />
+    <ClCompile Include="TestUserImpersonator.cpp" />
     <ClCompile Include="TestWindowsComponentManager.cpp" />
   </ItemGroup>
   <ItemGroup>
