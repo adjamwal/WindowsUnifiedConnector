@@ -141,6 +141,12 @@
     <ClInclude Include="InstallerCacheManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IRebootHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RebootHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CertsAdapter.cpp">
@@ -195,6 +201,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InstallerCacheManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RebootHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

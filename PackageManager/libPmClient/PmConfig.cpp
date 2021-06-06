@@ -68,6 +68,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
             m_configData.maxFileCacheAge = PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS;
             m_configData.allowPostInstallReboots = false;
+            m_configData.rebootThrottleS = PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS;
         }
     }
 
@@ -144,6 +145,13 @@ uint32_t PmConfig::GetMaxFileCacheAge()
     std::lock_guard<std::mutex> lock( m_mutex );
 
     return m_configData.maxFileCacheAge;
+}
+
+uint32_t PmConfig::GetRebootThrottleS()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.rebootThrottleS;
 }
 
 int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
@@ -236,6 +244,13 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
             m_configData.maxFileCacheAge = pm["maxFileCacheAge_s"].asUInt();
         }
 
+        if( !VerifyPmRebootThrottle( pm ) ) {
+            LOG_WARNING( "Invalid RebootThrottleS. Using default" );
+            m_configData.rebootThrottleS = PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS;
+        }
+        else {
+            m_configData.rebootThrottleS = pm[ "RebootThrottleS" ].asUInt();
+        }
         rtn = 0;
     }
 
@@ -334,6 +349,11 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
             rtn = -1;
         }
 
+        if( !VerifyPmRebootThrottle( pm ) ) {
+            LOG_ERROR( "Invalid RebootThrottle" );
+            rtn = -1;
+        }
+
         if( rtn != 0 ) {
             LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
         }
@@ -385,4 +405,9 @@ bool PmConfig::VerifyPmMaxFileCacheAge( const Json::Value& pmRoot )
 bool PmConfig::VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot )
 {
     return pmRoot.isMember( "AllowPostInstallReboots" ) && pmRoot[ "AllowPostInstallReboots" ].isBool();
+}
+
+bool PmConfig::VerifyPmRebootThrottle( const Json::Value& pmRoot )
+{
+    return pmRoot.isMember( "RebootThrottleS" ) && pmRoot[ "RebootThrottleS" ].isUInt() && ( pmRoot[ "RebootThrottleS" ].asUInt() >= 60 );
 }
