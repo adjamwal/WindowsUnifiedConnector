@@ -10,6 +10,7 @@
 #include "CodesignVerifier.h"
 #include "WindowsConfiguration.h"
 #include "CloudEventBuilder.h"
+#include "PmConstants.h"
 
 EventFacade::EventFacade()
     : m_oldLogger( GetUcLogger() )
@@ -37,7 +38,7 @@ bool EventFacade::SendEventOnUninstallBegin( std::string& url, std::string& prod
     {
         CloudEventBuilder ev;
         ev.WithUCID( ucid );
-        ev.WithPackageID( "uc/" + productVersion );
+        ev.WithPackageID( UC_PACKAGE_NAME + std::string("/") + productVersion );
         ev.WithType( CloudEventType::pkguninstall );
 
         retval = SendEvent( ev, url, ucid, ucidToken );
