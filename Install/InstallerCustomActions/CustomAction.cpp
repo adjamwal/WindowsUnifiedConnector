@@ -118,43 +118,6 @@ LExit:
     return WcaFinalize( er );
 }
 
-UINT __stdcall SetShortCutPermissions( MSIHANDLE hInstall )
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-    MsiLogger msiLogger;
-    WCHAR path[ 1024 ] = { 0 };
-    DWORD pathSize = 1024;
-    WCHAR filename[ 1024 ] = { 0 };
-    DWORD filenameSize = 1024;
-
-    SetUcLogger( &msiLogger );
-
-    hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
-
-    LOG_DEBUG( "Initialized." );
-
-    if( MsiGetPropertyW( hInstall, L"CiscoProgramMenuFolder", path, &pathSize ) == 0 ) {
-        WLOG_DEBUG( L"CiscoProgramMenuFolder %s", path );
-
-        if( MsiGetPropertyW( hInstall, L"UCDT_SHORTCUT_NAME", filename, &filenameSize ) == 0 ) {
-            WLOG_DEBUG( L"UCDT_SHORTCUT_NAME %s", filename );
-
-            std::wstring shortCutPath = path;
-            shortCutPath += filename;
-            
-            er = AllowEveryoneAccessToFile( shortCutPath ) ? S_OK : E_FAIL;
-        }
-    }
-
-LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    SetUcLogger( NULL );
-    return WcaFinalize( er );
-}
-
-
 UINT __stdcall CollectUCData( MSIHANDLE hInstall )
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;

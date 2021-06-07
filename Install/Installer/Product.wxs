@@ -49,10 +49,6 @@
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
         <!--=
-        WIX Allows you set permission on a file but not a shortcut created for a file. A custom action was required
-        -->
-        <CustomAction Id="SetShortCutPermissions" BinaryKey="CustomActionsDll" DllEntry="SetShortCutPermissions" />
-        <!--=
         Commenting out this event till we figure out what we want to do with it
         <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
         -->
@@ -77,7 +73,6 @@
           </Custom>
           -->
 
-          <Custom Action="SetShortCutPermissions" Before="InstallFinalize" />
           <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
@@ -220,6 +215,13 @@
               <RegistryKey Root="HKLM"
              Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
                 <RegistryValue Type="string" Name="Path" Value="[UCSERVICE_DIRECTORY]" KeyPath="yes"/>
+              </RegistryKey>
+            </Component>
+
+            <Component Id="UCDT_SHORTCUT_PATH_REGISTRY" Guid="*">
+              <RegistryKey Root="HKLM"
+             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+                <RegistryValue Type="string" Name="ucdt Shortcut" Value="[CiscoProgramMenuFolder]\!(loc.DiagToolName).lnk" KeyPath="yes"/>
               </RegistryKey>
             </Component>
           

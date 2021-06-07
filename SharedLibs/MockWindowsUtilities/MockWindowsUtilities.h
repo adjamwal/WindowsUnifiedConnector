@@ -88,6 +88,9 @@ public:
     void MakeSearchFilesReturn( int32_t value );
     void ExpectSearchFilesIsNotCalled();
 
+    MOCK_METHOD1( AllowEveryoneAccessToFile, bool( const std::wstring& ) );
+    void MakeAllowEveryoneAccessToFileReturn( bool value );
+    void ExpectAllowEveryoneAccessToFileNotCalled();
 
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();

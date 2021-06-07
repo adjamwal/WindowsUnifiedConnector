@@ -6,6 +6,8 @@
 #include <ShlObj.h>
 #include <Msi.h>
 #include <unordered_map>
+#include <AclAPI.h>
+#include <Sddl.h>
 
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
@@ -488,4 +490,41 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
     }
 
     return dwError;
+}
+
+bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
+{
+    bool rtn = false;
+    PACL pDacl = NULL;
+    PACL pNewDACL = NULL;
+    EXPLICIT_ACCESS ExplicitAccess = { 0 };
+    PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
+    PSID psid = NULL;
+
+    LPTSTR lpStr;
+    lpStr = ( LPTSTR )path.c_str();
+
+    if( !path.empty() &&
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pDacl, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
+        ConvertStringSidToSid( L"S-1-1-0", &psid ) 
+      ) {
+        ExplicitAccess.grfAccessMode = SET_ACCESS;
+        ExplicitAccess.grfAccessPermissions = GENERIC_ALL;
+        ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+        ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+        ExplicitAccess.Trustee.pMultipleTrustee = NULL;
+        ExplicitAccess.Trustee.ptstrName = ( LPTSTR )psid;
+        ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
+
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pDacl, &pNewDACL ) == ERROR_SUCCESS ) &&
+            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
+            rtn = true;
+        }
+    }
+
+    if( pNewDACL ) LocalFree( pNewDACL );
+    if( psid ) LocalFree( psid );
+
+    return rtn;
 }

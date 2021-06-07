@@ -65,6 +65,13 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
     {
         WLOG_ERROR( L"Error loading UCMCP Module" );
     }
+
+    try {
+        FixUcdtShortcut();
+    }
+    catch( ... ) {
+        WLOG_ERROR( L"Error Fixing Ucdt Shortcut" );
+    }
 }
 
 void UCService::OnStop()
@@ -90,3 +97,28 @@ void UCService::OnStop()
 }
 
 #pragma endregion
+
+void UCService::FixUcdtShortcut()
+{
+    std::wstring shortcutPath;
+
+    if( WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE,
+        L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCSERVICE",
+        L"ucdt Shortcut",
+        shortcutPath ) ) {
+
+        if( !shortcutPath.empty() ) {
+            WLOG_DEBUG( L"Fixing ucdt shortcut" );
+
+            if( !WindowsUtilities::AllowEveryoneAccessToFile( shortcutPath ) ) {
+                WLOG_ERROR( "Failed on %s", shortcutPath.c_str() );
+            }
+        }
+        else {
+            WLOG_ERROR( "shortcut is empty" );
+        }
+    }
+    else {
+        WLOG_ERROR( "Failed to read ucdt Shortcut from registry" );
+    }
+}

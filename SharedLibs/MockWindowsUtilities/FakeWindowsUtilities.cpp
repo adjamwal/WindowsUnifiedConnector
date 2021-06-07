@@ -95,3 +95,8 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->SearchFiles( searchPath, begin, end, results );
 }
+
+bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->AllowEveryoneAccessToFile( path );
+}

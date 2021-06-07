@@ -27,4 +27,6 @@ private:
     UCIDLoader m_ucidLoader;
     UCMCPLoader m_ucmcpLoader;
     UcConfig m_ucConfig;
+
+    void FixUcdtShortcut();
 };
