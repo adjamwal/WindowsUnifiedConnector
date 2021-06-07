@@ -63,7 +63,7 @@ bool EventFacade::SendEventOnUninstallError( std::string& url, std::string& prod
     {
         CloudEventBuilder ev;
         ev.WithUCID( ucid );
-        ev.WithPackageID( "uc/" + productVersion );
+        ev.WithPackageID( UC_PACKAGE_NAME + std::string( "/" ) + productVersion );
         ev.WithType( CloudEventType::pkguninstall );
         ev.WithError( -1, "Uninstall Error, no error code available" );
 
@@ -89,7 +89,7 @@ bool EventFacade::SendEventOnUninstallComplete( std::string& url, std::string& p
     {
         CloudEventBuilder ev;
         ev.WithUCID( ucid );
-        ev.WithPackageID( "uc/" + productVersion );
+        ev.WithPackageID( UC_PACKAGE_NAME + std::string( "/" ) + productVersion );
         ev.WithType( CloudEventType::pkguninstall );
 
         retval = SendEvent( ev, url, ucid, ucidToken );
