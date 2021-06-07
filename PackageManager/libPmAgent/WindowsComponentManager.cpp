@@ -232,7 +232,7 @@ void WindowsComponentManager::NotifySystemRestart()
                 diagToolDir,
                 session
             ) ) {
-                LOG_ERROR( "RunProcessInSession failed" );
+                WLOG_ERROR( L"RunProcessInSession failed. Sesssion: %d Working directory %s", session, diagToolDir );
             }
         }
     }
