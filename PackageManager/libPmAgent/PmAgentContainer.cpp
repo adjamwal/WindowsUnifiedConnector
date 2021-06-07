@@ -13,6 +13,7 @@
 #include "WinCertLoader.h"
 #include "WinApiWrapper.h"
 #include "MsiApi.h"
+#include "UserImpersonator.h"
 
 PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath ) :
     m_winApiWrapper( new WinApiWrapper() )
@@ -22,7 +23,8 @@ PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const 
     , m_discoveryMethods( new PackageDiscoveryMethods( *m_msiApi ) )
     , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
     , m_packageDiscovery( new PackageDiscovery( *m_discoveryMethods, *m_msiApi ) )
-    , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery ) )
+    , m_userImpersonator( new UserImpersonator( *m_winApiWrapper ) )
+    , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery, *m_userImpersonator ) )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
     , m_pmLogger( new PmLogAdapter() )
     , m_pmAgent( new PmAgent( bsConfigFilePath, pmConfigFilePath, *m_pmDependencies, *m_pmLogger ) )

@@ -20,6 +20,7 @@
 #include "ICloudEventStorage.h"
 #include "IUcUpgradeEventHandler.h"
 #include "IInstallerCacheManager.h"
+#include "IRebootHandler.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -37,6 +38,7 @@ PackageManager::PackageManager( IPmConfig& config,
     ICloudEventPublisher& cloudEventPublisher,
     ICloudEventStorage& cloudEventStorage,
     IUcUpgradeEventHandler& ucUpgradeEventHandler,
+    IRebootHandler& rebootHandler,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
@@ -50,6 +52,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_cloudEventPublisher( cloudEventPublisher )
     , m_cloudEventStorage( cloudEventStorage )
     , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
+    , m_rebootHandler( rebootHandler )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
@@ -140,6 +143,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
         m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
         m_ucUpgradeEventHandler.Initialize( m_dependencies );
+        m_rebootHandler.Initialize( m_dependencies );
     }
     catch( std::exception& ex )
     {
@@ -209,17 +213,7 @@ void PackageManager::PmWorkflowThread()
         m_cloudEventPublisher.PublishFailedEvents();
         m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAge() );
 
-        if( isRebootRequired )
-        {
-            if( m_config.AllowPostInstallReboots() ) 
-            {
-                m_dependencies->ComponentManager().InitiateSystemRestart();
-            }
-            else
-            { 
-                LOG_ERROR( "Post-install reboots disabled by PM configuration" );
-            }
-        }
+        m_rebootHandler.HandleReboot( isRebootRequired );
     }
     catch ( std::exception& ex ) {
         LOG_ERROR( "Post Checkin failed: %s", ex.what() );

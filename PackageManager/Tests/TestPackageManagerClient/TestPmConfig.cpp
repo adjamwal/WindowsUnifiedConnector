@@ -41,7 +41,8 @@ protected:
         "CheckinInterval": 150000,
         "MaxStartupDelay": 200000,
         "maxFileCacheAge_s": 1000,
-        "AllowPostInstallReboots": true
+        "AllowPostInstallReboots": true,
+        "RebootThrottleS": 1000
     }
 }
 )";
@@ -283,5 +284,14 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsAllowPostInstallReboots )
     m_patient->LoadPmConfig( "filename" );
 
     EXPECT_EQ( m_patient->AllowPostInstallReboots(), false );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsRebootThrottle )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetRebootThrottleS(), PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS );
 }
 

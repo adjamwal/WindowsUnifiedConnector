@@ -60,6 +60,12 @@
     <ClInclude Include="IPackageDiscoveryMethods.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IUserImpersonator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserImpersonator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -93,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PackageDiscoveryMethods.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserImpersonator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

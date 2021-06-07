@@ -108,5 +108,5 @@ public:
     * Initiates a system restart
     * 
     */
-    virtual void InitiateSystemRestart() = 0;
+    virtual void NotifySystemRestart() = 0;
 };

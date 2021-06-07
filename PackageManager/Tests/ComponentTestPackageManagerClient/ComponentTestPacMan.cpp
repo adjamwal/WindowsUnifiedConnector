@@ -30,6 +30,7 @@
 #include "MockCloudEventStorage.h"
 #include "MockUcUpgradeEventHandler.h"
 #include "MockInstallerCacheManager.h"
+#include "MockRebootHandler.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -52,6 +53,7 @@ protected:
         m_mockDeps.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_mockSslUtil.reset( new NiceMock<MockSslUtil>() );
         m_mockInstallerCacheMgr.reset( new NiceMock<MockInstallerCacheManager>() );
+        m_mockRebootHandler.reset( new NiceMock<MockRebootHandler>() );
 
         m_manifest.reset( new PmManifest() );
         m_thread.reset( new WorkerThread() );
@@ -107,6 +109,7 @@ protected:
             *m_eventPublisher,
             *m_eventStorage,
             *m_ucUpgradeEventHandler,
+            *m_mockRebootHandler,
             *m_thread ) );
     }
 
@@ -133,6 +136,7 @@ protected:
         m_thread.reset();
         m_manifest.reset();
         m_mockInstallerCacheMgr.reset();
+        m_mockRebootHandler.reset();
         m_mockSslUtil.reset();
 
         m_mockDeps.reset();
@@ -206,6 +210,7 @@ protected:
     std::unique_ptr<MockPmPlatformDependencies> m_mockDeps;
     std::unique_ptr<MockSslUtil> m_mockSslUtil;
     std::unique_ptr<MockInstallerCacheManager> m_mockInstallerCacheMgr;
+    std::unique_ptr<MockRebootHandler> m_mockRebootHandler;
 
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
@@ -318,11 +323,13 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
             return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
 
-    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
-        [this, &pass]()
+    EXPECT_CALL( *m_mockRebootHandler, HandleReboot( _ ) ).WillOnce( Invoke(
+        [this, &pass]( bool rebootRequired )
         {
             pass = true;
             m_cv.notify_one();
+
+            return true;
         } ) );
 
     StartPacMan();
@@ -351,11 +358,13 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
             return ERROR_SUCCESS_REBOOT_REQUIRED;
         } ) );
 
-    EXPECT_CALL( *m_mockPlatformComponentManager, InitiateSystemRestart() ).WillOnce( Invoke(
-        [this, &pass]()
+    EXPECT_CALL( *m_mockRebootHandler, HandleReboot( _ ) ).WillOnce( Invoke(
+        [this, &pass]( bool rebootRequired )
         {
             pass = true;
             m_cv.notify_one();
+
+            return true;
         } ) );
 
     StartPacMan();

@@ -15,11 +15,29 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
+        <!--=
+        Disables Install-on-demand shortcuts
+        What this is: https://docs.microsoft.com/en-us/windows/win32/msi/disableadvtshortcuts
+        
+        Why this matters: 
+        source - https://stackoverflow.com/questions/2058230/wix-create-non-advertised-shortcut-for-all-users-per-machine
+        By default, creating shortcuts for the ALL USERS profile causes a MSI validation errors. There is a validation requirement (ICE43)
+        that specifies that non advertised shortcuts (normal shortcuts) must have a HKCU registry entry. ALL USERS does not have a HKCU profile so this
+        can't be satified. Seems like a windows installer bug. The example in the link above works around this by
+        
+        1. Setting a global property to disable advertised shortcuts
+        2. Set the advertise property in the shortcut
+        
+        The effect is this removes the requirement to have a registry entry for the shortcut under HKCU and windows installer will replace the advertised
+        shortcut with a normal shortcut
+        -->       
+        <Property Id="DISABLEADVTSHORTCUTS" Value="1" />
+
         <Property Id="UC_EVENT_URL" Value="0" />
         <Property Id="UC_EVENT_UCID" Value="0" />
         <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
         <Property Id="UC_RESOURCE_DIR" Value="0" />
-
+        <Property Id="UCDT_SHORTCUT_NAME" Value="!(loc.DiagToolName).lnk" />
         <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
         <Property Id="ARPPRODUCTICON" Value="UC.ico" />
       
@@ -54,7 +72,7 @@
               (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           -->
-          
+
           <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
@@ -106,6 +124,7 @@
             <?endif?>
             <ComponentGroupRef Id="UCPMComponents" />
             <ComponentGroupRef Id="CG.ConfigFiles" />
+            <ComponentGroupRef Id="CiscoStartMenu" />
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
@@ -149,6 +168,9 @@
                     </Directory>
                 </Directory>
             </Directory>
+            <Directory Id="ProgramMenuFolder">
+              <Directory Id="CiscoProgramMenuFolder" Name="$(var.CiscoDirectory)" />
+            </Directory>
         </Directory>
     </Fragment>
 
@@ -188,7 +210,21 @@
                     <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
-        
+
+            <Component Id="UCSERVICE_PATH_REGISTRY" Guid="*">
+              <RegistryKey Root="HKLM"
+             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+                <RegistryValue Type="string" Name="Path" Value="[UCSERVICE_DIRECTORY]" KeyPath="yes"/>
+              </RegistryKey>
+            </Component>
+
+            <Component Id="UCDT_SHORTCUT_PATH_REGISTRY" Guid="*">
+              <RegistryKey Root="HKLM"
+             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+                <RegistryValue Type="string" Name="ucdt Shortcut" Value="[CiscoProgramMenuFolder]\!(loc.DiagToolName).lnk" KeyPath="yes"/>
+              </RegistryKey>
+            </Component>
+          
             <Component Id="ucs.exe" Guid="*">
                 <File Id="ucs.exe" Name="csc_uc.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_uc.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />
@@ -197,9 +233,18 @@
                 </ServiceInstall>
             </Component>
 
-          <Component Id="csc_ucdt.exe" Guid="*">
-            <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" />
-          </Component>
+            <Component Id="csc_ucdt.exe" Guid="*">
+              <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" >
+                <!--= Set explanation above for Advertise="yes" -->
+                <Shortcut Id="csc_ucdt_start_menu_shortcut" 
+                          Name="!(loc.DiagToolName)" 
+                          Description="!(loc.DiagToolDescription)" 
+                          Directory="CiscoProgramMenuFolder" 
+                          Advertise="yes" 
+                          WorkingDirectory="UCSERVICE_DIRECTORY" >
+                </Shortcut>
+              </File>
+            </Component>
           
             <?if $(var.Configuration) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
@@ -465,4 +510,13 @@
             </Component>
         </ComponentGroup>
     </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="CiscoStartMenu" Directory="CiscoProgramMenuFolder">
+      <Component Id="CiscoProgramMenuFolder" Guid="87C0183A-06EA-4616-ACBA-E34EE127C861">
+        <RemoveFolder Id="CiscoProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Name="InstalledStartMenuShortcuts" Type="integer" Value="1" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
 </Wix>

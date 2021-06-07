@@ -1,16 +1,27 @@
 #include "pch.h"
 #include "WindowsComponentManager.h"
 #include "WindowsUtilities.h"
+#include "IWinApiWrapper.h"
+#include "ICodesignVerifier.h"
+#include "IPackageDiscovery.h"
+#include "IUserImpersonator.h"
+#include "IUcLogger.h"
 #include <sstream>
 #include <locale>
 #include <codecvt>
 
+#define UCSERVICE_PATH_REG_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCSERVICE"
+#define DIAG_TOOL_EXE L"csc_ucdt.exe"
+#define DIAG_TOOL_NOTIFY_ARG L"--notifyreboot"
+
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, 
     ICodesignVerifier& codesignVerifier, 
-    IPackageDiscovery& packageDiscovery ) :
+    IPackageDiscovery& packageDiscovery,
+    IUserImpersonator& userImpersonator ) :
     m_winApiWrapper( winApiWrapper )
     , m_codeSignVerifier( codesignVerifier )
     , m_packageDiscovery( packageDiscovery )
+    , m_userImpersonator( userImpersonator )
 {
 }
 
@@ -198,20 +209,33 @@ int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::
     return WindowsUtilities::FileSearchWithWildCard( searchPath, results );
 }
 
-void WindowsComponentManager::InitiateSystemRestart()
+void WindowsComponentManager::NotifySystemRestart()
 {
-    LOG_DEBUG( __FUNCTION__ ": Enter" );
+    LOG_DEBUG( "Enter" );
 
-    BOOL result = m_winApiWrapper.ExitWindowsEx(
-        EWX_REBOOT | EWX_FORCEIFHUNG,
-        SHTDN_REASON_MAJOR_SOFTWARE |
-        SHTDN_REASON_MINOR_INSTALLATION |
-        SHTDN_REASON_FLAG_PLANNED );
+    std::wstring diagToolDir;
+    std::vector<ULONG> sessionList;
 
-    if( !result )
-    {
-        LOG_DEBUG( __FUNCTION__ ": ExitWindowsEx() failed, GetLastError=%ld", GetLastError() );
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UCSERVICE_PATH_REG_KEY, L"Path", diagToolDir ) || diagToolDir.empty() ) {
+        LOG_ERROR( "Failed to get diag tool path" );
+        return;
     }
 
-    LOG_DEBUG( __FUNCTION__ ": Exit" );
+    if( !m_userImpersonator.GetActiveUserSessions( sessionList ) ) {
+        LOG_ERROR( "GetActiveUserSessions failed" );
+    }
+    else {
+        for( auto& session : sessionList ) {
+            if( !m_userImpersonator.RunProcessInSession(
+                DIAG_TOOL_EXE,
+                DIAG_TOOL_NOTIFY_ARG,
+                diagToolDir,
+                session
+            ) ) {
+                WLOG_ERROR( L"RunProcessInSession failed. Sesssion: %d Working directory %s", session, diagToolDir );
+            }
+        }
+    }
+
+    LOG_DEBUG( "Exit" );
 }

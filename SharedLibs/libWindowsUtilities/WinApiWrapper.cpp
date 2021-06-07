@@ -187,3 +187,66 @@ BOOL WinApiWrapper::ExitWindowsEx( UINT  uFlags, DWORD dwReason )
 
     return ::ExitWindowsEx( uFlags, dwReason );
 }
+
+BOOL WinApiWrapper::WTSEnumerateSessionsW(
+    HANDLE hServer,
+    DWORD Reserved,
+    DWORD Version,
+    PWTS_SESSION_INFOW* ppSessionInfo,
+    DWORD* pCount
+)
+{
+    return ::WTSEnumerateSessionsW( hServer, Reserved, Version, ppSessionInfo, pCount );
+}
+
+void WinApiWrapper::WTSFreeMemory( PVOID pMemory )
+{
+    return ::WTSFreeMemory( pMemory );
+}
+
+BOOL WinApiWrapper::WTSQueryUserToken( ULONG SessionId, PHANDLE phToken )
+{
+    return ::WTSQueryUserToken( SessionId, phToken );
+}
+
+BOOL WinApiWrapper::CloseHandle( HANDLE hObject )
+{
+    return ::CloseHandle( hObject );
+}
+
+BOOL WinApiWrapper::CreateEnvironmentBlock( LPVOID* lpEnvironment, HANDLE hToken, BOOL bInherit )
+{
+    return ::CreateEnvironmentBlock( lpEnvironment, hToken, bInherit );
+}
+
+BOOL WinApiWrapper::DestroyEnvironmentBlock( LPVOID  lpEnvironment )
+{
+    return ::DestroyEnvironmentBlock( lpEnvironment );
+}
+
+BOOL WinApiWrapper::CreateProcessAsUserW(
+    HANDLE hToken,
+    LPCWSTR lpApplicationName,
+    LPWSTR lpCommandLine,
+    //LPSECURITY_ATTRIBUTES lpProcessAttributes, USE null
+    //LPSECURITY_ATTRIBUTES lpThreadAttributes, use null
+    //BOOL bInheritHandles, use FALSE
+    DWORD dwCreationFlags,
+    LPVOID lpEnvironment,
+    LPCWSTR lpCurrentDirectory,
+    LPSTARTUPINFOW lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation
+)
+{
+    return ::CreateProcessAsUserW( hToken,
+        lpApplicationName,
+        lpCommandLine,
+        NULL,
+        NULL,
+        FALSE,
+        dwCreationFlags,
+        lpEnvironment,
+        lpCurrentDirectory,
+        lpStartupInfo,
+        lpProcessInformation );
+}

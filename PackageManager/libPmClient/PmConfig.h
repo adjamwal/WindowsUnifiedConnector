@@ -7,6 +7,7 @@
 #define PM_CONFIG_LOGLEVEL_DEFAULT 7
 #define PM_CONFIG_INTERVAL_DEFAULT 300000
 #define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
+#define PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS 3600 // One hour
 
 class IFileSysUtil;
 
@@ -26,6 +27,7 @@ struct PmConfigData
     uint32_t log_level;
     uint32_t maxFileCacheAge;
     bool allowPostInstallReboots;
+    uint32_t rebootThrottleS;
 };
 
 class PmConfig : public IPmConfig
@@ -48,7 +50,7 @@ public:
     const std::vector<PmComponent>& GetSupportedComponentList() override;
     uint32_t GetMaxFileCacheAge() override;
     bool AllowPostInstallReboots() override;
-
+    uint32_t GetRebootThrottleS() override;
 private:
     IFileSysUtil& m_fileUtil;
 
@@ -68,5 +70,6 @@ private:
     bool VerifyPmMaxStartupDelay( const Json::Value& pmRoot );
     bool VerifyPmMaxFileCacheAge(const Json::Value& pmRoot);
     bool VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot );
+    bool VerifyPmRebootThrottle( const Json::Value& pmRoot );
     
 };

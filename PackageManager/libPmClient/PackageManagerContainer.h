@@ -26,6 +26,7 @@ class ICloudEventBuilder;
 class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
+class IRebootHandler;
 
 class PackageManagerContainer
 {
@@ -61,6 +62,7 @@ private:
     std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
+    std::unique_ptr<IRebootHandler> m_rebootHandler;
 
     std::unique_ptr<IPackageManager> m_pacMan;
 };

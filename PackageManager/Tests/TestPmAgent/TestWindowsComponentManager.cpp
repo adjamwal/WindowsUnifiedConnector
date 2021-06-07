@@ -9,6 +9,7 @@
 #include "MockCodesignVerifier.h"
 #include "MockPackageDiscovery.h"
 #include "MockWindowsUtilities.h"
+#include "MockUserImpersonator.h"
 #include <memory>
 #include <codecvt>
 
@@ -21,8 +22,9 @@ protected:
         m_winApiWrapper.reset( new NiceMock<MockWinApiWrapper>() );
         m_codeSignVerifier.reset( new NiceMock<MockCodesignVerifier>() );
         m_packageDiscovery.reset( new NiceMock<MockPackageDiscovery>() );
+        m_userImpersonator.reset( new NiceMock<MockUserImpersonator>() );
 
-        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery ) );
+        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery, *m_userImpersonator ) );
     }
 
     void TearDown()
@@ -32,6 +34,7 @@ protected:
         m_winApiWrapper.reset();
         m_codeSignVerifier.reset();
         m_packageDiscovery.reset();
+        m_userImpersonator.reset();
 
         MockWindowsUtilities::Deinit();
         m_expectedComponentPackage = {};
@@ -68,6 +71,7 @@ protected:
     std::unique_ptr<MockWinApiWrapper> m_winApiWrapper;
     std::unique_ptr<MockCodesignVerifier> m_codeSignVerifier;
     std::unique_ptr<MockPackageDiscovery> m_packageDiscovery;
+    std::unique_ptr<MockUserImpersonator> m_userImpersonator;
 
     std::unique_ptr<WindowsComponentManager> m_patient;
 };
@@ -322,4 +326,46 @@ TEST_F( TestWindowsComponentManager, GetInstalledPackagesWillSearchForPackages )
     EXPECT_CALL( *m_packageDiscovery, DiscoverInstalledPackages( _ ) );
 
     int32_t ret = m_patient->GetInstalledPackages( catalogRules, installedPackages );
+}
+
+TEST_F( TestWindowsComponentManager, NotifySystemRestartWillImpersonateUser )
+{
+    std::wstring diagToolDir = L"SomeDir";
+    std::vector<ULONG> sessionList;
+
+    sessionList.push_back( 0 );
+
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, _, _ ) ).WillByDefault( DoAll(
+        SetArgReferee<3>( diagToolDir ),
+        Return( true )
+    ) );
+
+    ON_CALL( *m_userImpersonator, GetActiveUserSessions( _ ) ).WillByDefault( DoAll(
+        SetArgReferee<0>( sessionList ),
+        Return( true )
+    ) );
+
+    EXPECT_CALL( *m_userImpersonator, RunProcessInSession( _, _, _, _ ) );
+
+    m_patient->NotifySystemRestart();
+}
+
+TEST_F( TestWindowsComponentManager, NotifySystemRestartWillAbortWithoutUCPath )
+{
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( false );
+
+    m_userImpersonator->ExpectGetActiveUserSessionsNotCalled();
+    m_userImpersonator->ExpectRunProcessInSessionNotCalled();
+
+    m_patient->NotifySystemRestart();
+}
+
+TEST_F( TestWindowsComponentManager, NotifySystemRestartWillAbortWithoutSessionList )
+{
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeReadRegistryStringReturn( false );
+    m_userImpersonator->MakeGetActiveUserSessionsReturn( false );
+
+    m_userImpersonator->ExpectRunProcessInSessionNotCalled();
+
+    m_patient->NotifySystemRestart();
 }

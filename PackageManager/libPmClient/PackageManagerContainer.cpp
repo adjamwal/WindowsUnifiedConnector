@@ -27,6 +27,7 @@
 #include "PmLogger.h"
 #include "PmConstants.h"
 #include "InstallerCacheManager.h"
+#include "RebootHandler.h"
 
 #include <mutex>
 #include <exception>
@@ -69,6 +70,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_eventPublisher,
             *m_ucUpgradeEventHandler ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
+    , m_rebootHandler( new RebootHandler( *m_config ) )
     , m_pacMan(
         new PackageManager( *m_config,
             *m_cloud,
@@ -82,6 +84,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_eventPublisher,
             *m_eventStorage,
             *m_ucUpgradeEventHandler,
+            *m_rebootHandler,
             *m_thread ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );

@@ -98,16 +98,16 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -123,7 +123,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -131,10 +131,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -148,16 +148,16 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -173,7 +173,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -181,10 +181,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -209,6 +209,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
       <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SharedLibs\libWinToast\libWinToast.vcxproj">
+      <Project>{5d45a429-3a8c-45b9-b66c-2d7b4c91adb0}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libUcDiagTool\libUcDiagTool.vcxproj">
       <Project>{58eb5a11-9117-4d01-9f08-e611ef639289}</Project>

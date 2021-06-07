@@ -18,11 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="wintoastlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="wintoastlib.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a9adc3fd-3439-4592-af16-a00fcd571bfb}</ProjectGuid>
-    <RootNamespace>MockPmAgent</RootNamespace>
+    <ProjectGuid>{5d45a429-3a8c-45b9-b66c-2d7b4c91adb0}</ProjectGuid>
+    <RootNamespace>libWinToast</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -93,7 +99,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -110,7 +116,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -127,7 +133,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -144,7 +150,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -154,17 +160,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="MockPackageDiscovery.h" />
-    <ClInclude Include="MockPackageDiscoveryMethods.h" />
-    <ClInclude Include="MockUserImpersonator.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="MockPackageDiscovery.cpp" />
-    <ClCompile Include="MockPackageDiscoveryMethods.cpp" />
-    <ClCompile Include="MockUserImpersonator.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

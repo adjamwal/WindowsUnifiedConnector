@@ -65,6 +65,10 @@ public:
     MOCK_METHOD0( AllowPostInstallReboots, bool() );
     void MakeAllowPostInstallRebootsReturn( bool value );
 
+    MOCK_METHOD0( GetRebootThrottleS, uint32_t() );
+    void MakeGetRebootThrottleSReturn( uint32_t value );
+    void ExpectGetRebootThrottleSNotCalled();
+
 private:
     std::string m_identifyUri;
     std::string m_checkinUri;

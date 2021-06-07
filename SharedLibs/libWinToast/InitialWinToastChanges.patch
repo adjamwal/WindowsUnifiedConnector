@@ -1,0 +1,32 @@
+diff --git a/src/wintoastlib.cpp b/src/wintoastlib.cpp
+index 3cf5f21..e181c89 100644
+--- a/src/wintoastlib.cpp
++++ b/src/wintoastlib.cpp
+@@ -24,14 +24,13 @@
+ #include <unordered_map>
+ #include <array>
+ 
++#include <sstream>
++#include "IUcLogger.h"
++
+ #pragma comment(lib,"shlwapi")
+ #pragma comment(lib,"user32")
+ 
+-#ifdef NDEBUG
+-    #define DEBUG_MSG(str) do { } while ( false )
+-#else
+-    #define DEBUG_MSG(str) do { std::wcout << str << std::endl; } while( false )
+-#endif
++#define DEBUG_MSG(msg) do { std::wstringstream wstream;  wstream << msg;  WLOG_DEBUG( L"%s", wstream.str().c_str() ); } while( false )
+ 
+ #define DEFAULT_SHELL_LINKS_PATH	L"\\Microsoft\\Windows\\Start Menu\\Programs\\"
+ #define DEFAULT_LINK_FORMAT			L".lnk"
+@@ -214,7 +213,7 @@ namespace Util {
+ 
+ 
+     inline HRESULT defaultShellLinksDirectory(_In_ WCHAR* path, _In_ DWORD nSize = MAX_PATH) {
+-        DWORD written = GetEnvironmentVariableW(L"APPDATA", path, nSize);
++        DWORD written = GetEnvironmentVariableW(L"ALLUSERSPROFILE", path, nSize);
+         HRESULT hr = written > 0 ? S_OK : E_INVALIDARG;
+         if (SUCCEEDED(hr)) {
+             errno_t result = wcscat_s(path, nSize, DEFAULT_SHELL_LINKS_PATH);

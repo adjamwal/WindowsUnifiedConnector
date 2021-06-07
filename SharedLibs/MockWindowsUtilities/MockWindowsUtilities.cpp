@@ -223,3 +223,13 @@ void MockWindowsUtilities::ExpectSearchFilesIsNotCalled()
 {
     EXPECT_CALL( *this, SearchFiles( _, _, _, _ ) ).Times( 0 );
 }
+
+void MockWindowsUtilities::MakeAllowEveryoneAccessToFileReturn( bool value )
+{
+    ON_CALL( *this, AllowEveryoneAccessToFile( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectAllowEveryoneAccessToFileNotCalled()
+{
+    EXPECT_CALL( *this, AllowEveryoneAccessToFile( _ ) ).Times( 0 );
+}
