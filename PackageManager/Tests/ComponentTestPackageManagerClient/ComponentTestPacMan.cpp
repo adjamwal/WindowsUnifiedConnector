@@ -488,12 +488,10 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
     m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
 
-    EXPECT_CALL( *m_mockFileUtil, AppendPath( "/install/location", "config.json" ) )
-        .WillOnce( Return( "/install/location/config.json" ) );
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
-        [this, &pass]( const std::string& oldFilename, const std::string& newName )
+        [this, &pass]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
         {
-            EXPECT_EQ( "/install/location/config.json", newName );
+            EXPECT_EQ( std::filesystem::path( "/install/location/config.json" ), newName );
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -535,12 +533,11 @@ TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
     m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
     m_mockFileUtil->MakeFileExistsReturn( true );
     m_mockPlatformComponentManager->ExpectDeployConfigurationIsNotCalled();
-    EXPECT_CALL( *m_mockFileUtil, AppendPath( "/install/location", "config.json" ) )
-        .WillOnce( Return( "/install/location/config.json" ) );
+    
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
-        [this, &pass]( const std::string& oldFilename, const std::string& newName )
+        [this, &pass]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
         {
-            EXPECT_EQ( "/install/location/config.json", newName );
+            EXPECT_EQ( std::filesystem::path( "/install/location/config.json" ), newName );
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -591,9 +588,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( _ ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( _ ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( _ ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -602,7 +599,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
             EXPECT_EQ( "/S /Q ", package.installerArgs );
-            EXPECT_EQ( "/install/location", package.installLocation );
+            EXPECT_EQ( std::filesystem::path( "/install/location" ), package.installLocation );
             EXPECT_EQ( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", package.installerHash );
             EXPECT_EQ( "Cisco Systems, Inc.", package.signerName );
             EXPECT_EQ( "msi", package.installerType );
@@ -614,7 +611,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
         } ) );
 
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
-        [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+        [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
         {
             configUpdated = true;
             m_cv.notify_one();
@@ -638,12 +635,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
         "uc/0.0.1",
         0,
         "",
+        "config.json",
         "",
-        "",
-        0,
+        100,
         "config.json",
         "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4",
-        0
+        100
     );
 }
 
@@ -715,16 +712,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( _) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( _ ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( _ ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
-    ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
-        {
-            return oldFilename + '/' + newName;
-        } ) );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) )
         .WillOnce( Invoke(
@@ -757,30 +750,30 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
             } ) );
             EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) )
                 .WillOnce( Invoke(
-                    [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                    [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
                     {
-                        EXPECT_EQ( "/install/location/p1_config1.json", newName );
+                        EXPECT_EQ( std::filesystem::path( "/install/location/p1_config1.json" ), newName );
                         configUpdated++;
                         return 0;
                     } ) )
                 .WillOnce( Invoke(
-                    [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                    [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
                     {
-                        EXPECT_EQ( "/install/location/p1_config2.json", newName );
+                        EXPECT_EQ( std::filesystem::path( "/install/location/p1_config2.json" ), newName );
                         configUpdated++;
                         return 0;
                     } ) )
                         .WillOnce( Invoke(
-                            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                            [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
                             {
-                                EXPECT_EQ( "/install/location/p2_config1.json", newName );
+                                EXPECT_EQ( std::filesystem::path( "/install/location/p2_config1.json" ), newName );
                                 configUpdated++;
                                 return 0;
                             } ) )
                         .WillOnce( Invoke(
-                            [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+                            [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
                             {
-                                EXPECT_EQ( "/install/location/p2_config2.json", newName );
+                                EXPECT_EQ( std::filesystem::path(  "/install/location/p2_config2.json" ), newName );
                                 configUpdated++;
                                 m_cv.notify_one();
 
@@ -831,16 +824,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( _ ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( _ ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( _ ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_mockFileUtil, AppendPath( _, _ ) ).WillByDefault( Invoke( []( const std::string& oldFilename, const std::string& newName )
-        {
-            return newName;
-        } ) );
-
+    
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
@@ -855,9 +844,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
             return 0;
         } ) );
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
-        [this, &configUpdated]( const std::string& oldFilename, const std::string& newName )
+        [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
         {
-            EXPECT_EQ( "C:/Program Files/Cisco/SecureClient/UnifiedConnector/Configuration/uc.json", newName );
+            EXPECT_EQ( std::filesystem::path( "C:/Program Files/Cisco/SecureClient/UnifiedConnector/Configuration/uc.json" ), newName );
             configUpdated = true;
             m_cv.notify_one();
 

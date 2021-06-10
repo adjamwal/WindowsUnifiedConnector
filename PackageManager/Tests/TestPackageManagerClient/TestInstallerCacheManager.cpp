@@ -70,12 +70,12 @@ protected:
 
 TEST_F( TestInstallerCacheManager, CanDeleteInstaller )
 {
-    std::string installerPath = "SomePath";
+    std::filesystem::path installerPath = "SomePath";
 
     m_fileUtil->MakeFileExistsReturn( true );
     EXPECT_CALL( *m_fileUtil, DeleteFile( installerPath ) );
 
-    m_patient->DeleteInstaller( installerPath );
+    m_patient->DeleteInstaller( installerPath.generic_string() );
 }
 
 TEST_F( TestInstallerCacheManager, WontDeleteEmptyInstaller )
@@ -133,8 +133,8 @@ TEST_F( TestInstallerCacheManager, WillNotDownloadInstallerIfValidInstallerExist
     std::optional<std::string> sha;
     sha.emplace( m_component.installerHash );
 
-    ON_CALL( *m_fileUtil, FileExists( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
+    ON_CALL( *m_fileUtil, FileExists( _ ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( _ ) ).WillByDefault( Return( sha ) );
 
     m_cloud->ExpectDownloadFileIsNotCalled();
 
@@ -146,10 +146,10 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfValidationFails )
     std::optional<std::string> invalidSha;
     invalidSha.emplace( "Invalid Sha" );
 
-    ON_CALL( *m_fileUtil, FileExists( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_fileUtil, FileExists( _ ) ).WillByDefault( Return( true ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( HasSubstr( m_component.installerHash ) ) );
+    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
 
     //Expected but uninteresting exception
     EXPECT_THROW( m_patient->DownloadOrUpdateInstaller( m_component ), PackageException );
@@ -161,14 +161,14 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfDownloadFails )
     invalidSha.emplace( "Invalid Sha" );
 
     m_cloud->MakeDownloadFileReturn( 200 );
-    EXPECT_CALL( *m_fileUtil, FileExists( HasSubstr( m_component.installerHash ) ) )
+    EXPECT_CALL( *m_fileUtil, FileExists( _ ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( true ) )
         .WillOnce( Return( true ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( HasSubstr( m_component.installerHash ) ) );
+    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
 
     //Expected but uninteresting exception
     EXPECT_THROW( m_patient->DownloadOrUpdateInstaller( m_component ), PackageException );
@@ -179,13 +179,13 @@ TEST_F( TestInstallerCacheManager, CanDownloadInstallerSuccessfully )
     std::optional<std::string> sha;
     sha.emplace( m_component.installerHash );
 
-    EXPECT_CALL( *m_fileUtil, FileExists( HasSubstr( m_component.installerHash ) ) )
+    EXPECT_CALL( *m_fileUtil, FileExists( _ ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( true ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
 
-    EXPECT_CALL( *m_cloud, DownloadFile( _, HasSubstr( m_component.installerHash ) ) ).WillOnce( Return( 200 ) );
+    EXPECT_CALL( *m_cloud, DownloadFile( _, _ ) ).WillOnce( Return( 200 ) );
 
     m_patient->DownloadOrUpdateInstaller( m_component );
 }
@@ -195,7 +195,7 @@ TEST_F( TestInstallerCacheManager, DownloadingSuccessfullyWillReturnPath )
     sha.emplace( m_component.installerHash );
 
     m_cloud->MakeDownloadFileReturn( 200 );
-    EXPECT_CALL( *m_fileUtil, FileExists( HasSubstr( m_component.installerHash ) ) )
+    EXPECT_CALL( *m_fileUtil, FileExists( _ ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( true ) );
@@ -224,7 +224,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteFile )
     ) );
     m_fileUtil->MakeLastWriteTimeReturn( lastWriteTime );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( searchResults[0].string() ) );
+    EXPECT_CALL( *m_fileUtil, DeleteFile( searchResults[0] ) );
     
     m_patient->PruneInstallers( age );
 }

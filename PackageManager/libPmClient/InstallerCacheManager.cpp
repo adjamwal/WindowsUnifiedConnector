@@ -15,7 +15,7 @@ InstallerCacheManager::InstallerCacheManager( IPmCloud& pmCloud, IFileSysUtil& f
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_componentMgr( nullptr )
-    , m_downloadPath( m_fileUtil.AppendPath( m_fileUtil.GetTempDir(),  "Cisco-UC" ) )
+    , m_downloadPath( m_fileUtil.GetTempDir().append( "Cisco-UC" ) )
 {
 
 }
@@ -47,29 +47,29 @@ std::string InstallerCacheManager::DownloadOrUpdateInstaller( const PmComponent&
     if ( componentPackage.installerHash.empty() ) {
         // An empty installerHash means the package is a QA deployed package ( using force_downstream_uri )
         LOG_ERROR( "Deleting QA package %s, ", installerPath.c_str() );
-        DeleteInstaller( installerPath.string() );
+        DeleteInstaller( installerPath.generic_string() );
     }
-    else if ( !ValidateInstaller( componentPackage, installerPath.string() ) ) {
-        DeleteInstaller( installerPath.string() );
+    else if ( !ValidateInstaller( componentPackage, installerPath.generic_string() ) ) {
+        DeleteInstaller( installerPath.generic_string() );
     }
     else {
         installerValid = true;
     }
 
     if ( !installerValid ) {
-        if ( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, installerPath.string() ) != 200 ) {
-            ssError << "Failed to download " << componentPackage.installerUrl << " to \"" << installerPath.string() << "\". HTTP result: " << httpResult;
+        if ( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, installerPath.generic_string() ) != 200 ) {
+            ssError << "Failed to download " << componentPackage.installerUrl << " to \"" << installerPath.generic_string() << "\". HTTP result: " << httpResult;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
         else {
-            if ( !componentPackage.installerHash.empty() && !ValidateInstaller( componentPackage, installerPath.string() ) ) {
-                DeleteInstaller( installerPath.string() );
+            if ( !componentPackage.installerHash.empty() && !ValidateInstaller( componentPackage, installerPath.generic_string() ) ) {
+                DeleteInstaller( installerPath.generic_string() );
                 throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH );
             }
         }
     }
 
-    return installerPath.string();
+    return installerPath.generic_string();
 }
 
 void InstallerCacheManager::DeleteInstaller( const std::string& installerPath )
@@ -126,14 +126,14 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
     std::filesystem::path searchPath = m_downloadPath / "*";
     searchPath.make_preferred();
 
-    LOG_DEBUG( "Searching for Installers in %s", searchPath.string().c_str() );
+    LOG_DEBUG( "Searching for Installers in %s", searchPath.generic_string().c_str() );
     if ( m_componentMgr->FileSearchWithWildCard( searchPath, results ) == 0 ) {
         time_t now = time( NULL );
 
         LOG_DEBUG( "Removing installers older than %d", now - ageInSeconds );
 
         for ( auto& file : results ) {
-            std::string filename = file.make_preferred().string();
+            std::string filename = file.make_preferred().generic_string();
 
             time_t lwt = m_fileUtil.LastWriteTime( filename );
 

@@ -96,15 +96,16 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         std::string knownFolderIdConversion = "";
         std::vector<std::filesystem::path> discoveredFiles;
 
-        std::string resolvedPath = WindowsUtilities::ResolvePath( configurable.path );
+        auto resolvedPath = WindowsUtilities::ResolvePath( configurable.path.generic_string() );
 
         if ( resolvedPath != configurable.path )
         {
             //Resolved path is deferent which means we must calculate the knownfolderid
-            size_t first = configurable.path.find( "<FOLDERID_" );
-            size_t last = configurable.path.find_first_of( ">" );
-            knownFolderId = configurable.path.substr( first, last + 1);
-            std::string remainingPath = configurable.path.substr( last + 1, configurable.path.length() );
+            auto tempPath = configurable.path.generic_string();
+            size_t first = tempPath.find( "<FOLDERID_" );
+            size_t last = tempPath.find_first_of( ">" );
+            knownFolderId = tempPath.substr( first, last + 1);
+            std::string remainingPath = tempPath.substr( last + 1, tempPath.length() );
 
             first = resolvedPath.find( remainingPath );
 

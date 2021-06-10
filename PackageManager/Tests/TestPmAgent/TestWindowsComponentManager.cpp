@@ -127,7 +127,7 @@ TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeToCmdLine )
     c.installerType = "exe";
     c.installerArgs = " /args";
     c.downloadedInstallerPath = "update.exe";
-    std::string expectedCmdLine = c.downloadedInstallerPath + " " + c.installerArgs;
+    std::string expectedCmdLine = c.downloadedInstallerPath.generic_string() + " " + c.installerArgs;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
 

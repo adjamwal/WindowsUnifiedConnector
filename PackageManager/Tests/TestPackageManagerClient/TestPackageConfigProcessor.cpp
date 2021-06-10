@@ -118,15 +118,14 @@ TEST_F( TestPackageConfigProcessor, WillSendErrorEventIfDecodeConfigFileFails )
 TEST_F( TestPackageConfigProcessor, WillCreateTempConfigFile )
 {
     SetupConfig();
-    std::string tempDir( "TempDir" );
+    std::filesystem::path tempDir( "TempDir" );
 
     m_patient->Initialize( m_dep.get() );
 
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakeGetTempDirReturn( tempDir );
-    EXPECT_CALL( *m_fileUtil, PmCreateFile( _ ) ).WillOnce( Invoke( [tempDir]( const std::string& filename )
+    EXPECT_CALL( *m_fileUtil, PmCreateFile( _ ) ).WillOnce( Invoke( [tempDir]( const std::filesystem::path& filename )
         {
-            EXPECT_EQ( filename.find( tempDir ), 0 );
             return ( FileUtilHandle* )1;
         } ) );
 
@@ -169,7 +168,6 @@ TEST_F( TestPackageConfigProcessor, WillMoveConfigFile )
 
     m_patient->Initialize( m_dep.get() );
 
-    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
@@ -187,7 +185,6 @@ TEST_F( TestPackageConfigProcessor, AddFileWillSucceed )
 
     m_patient->Initialize( m_dep.get() );
 
-    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
@@ -204,7 +201,6 @@ TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfAddFileSucceeds )
 
     m_patient->Initialize( m_dep.get() );
 
-    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_sslUtil->MakeDecodeBase64Return( 0 );
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 1 );
@@ -256,10 +252,9 @@ TEST_F( TestPackageConfigProcessor, WillDeleteConfig )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_fileUtil->MakeFileExistsReturn( true );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( m_configInfo.path ) );
+    EXPECT_CALL( *m_fileUtil, DeleteFile( m_configInfo.installLocation / m_configInfo.path ) );
 
     m_patient->ProcessConfig( m_configInfo );
 }
@@ -270,7 +265,6 @@ TEST_F( TestPackageConfigProcessor, RemoveConfigWillSucceed )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
@@ -282,7 +276,6 @@ TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfRemoveConfigSucceeds )
     m_configInfo.deleteConfig = true;
     m_patient->Initialize( m_dep.get() );
 
-    m_fileUtil->MakeAppendPathReturn( m_configInfo.path );
     m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );

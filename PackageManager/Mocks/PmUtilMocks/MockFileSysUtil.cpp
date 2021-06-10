@@ -74,7 +74,7 @@ void MockFileSysUtil::ExpectAppendFileNotCalled()
     EXPECT_CALL( *this, AppendFile( _, _, _ ) ).Times( 0 );
 }
 
-void MockFileSysUtil::MakeGetTempDirReturn( std::string value )
+void MockFileSysUtil::MakeGetTempDirReturn( std::filesystem::path value )
 {
     ON_CALL( *this, GetTempDir() ).WillByDefault( Return( value ) );
 }

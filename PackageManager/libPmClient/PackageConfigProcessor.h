@@ -2,6 +2,7 @@
 
 #include "IPackageConfigProcessor.h"
 #include <mutex>
+#include <filesystem>
 
 class IFileSysUtil;
 class ISslUtil;
@@ -26,7 +27,7 @@ public:
 private:
     bool AddConfig( PackageConfigInfo& config );
     bool RemoveConfig( PackageConfigInfo& config );
-    void RemoveTempFile( const std::string& tempFilePath );
+    void RemoveTempFile( const std::filesystem::path& tempFilePath );
 
     IFileSysUtil& m_fileUtil;
     ISslUtil& m_sslUtil;

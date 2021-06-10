@@ -92,7 +92,7 @@ void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::ve
 
         PmProductDiscoveryConfigurable configEntry
         {
-            cfg[ "path" ].asString(),
+            std::filesystem::u8path(cfg[ "path" ].asString()),
             cfg[ "max_instances" ].asInt(),
             cfg[ "required" ].asBool(),
             formats

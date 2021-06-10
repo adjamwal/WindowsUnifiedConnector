@@ -20,17 +20,17 @@ FileSysUtil::~FileSysUtil()
 
 }
 
-std::string FileSysUtil::ReadFile( const std::string& filename )
+std::string FileSysUtil::ReadFile( const std::filesystem::path& filePath )
 {
     std::stringstream stream;
 
-    if( filename.length() ) {
-        std::ifstream file( filename );
+    if( FileExists( filePath ) ) {
+        std::ifstream file( filePath );
         if( file.is_open() ) {
             stream << file.rdbuf();
         }
         else {
-            LOG_ERROR( "Failed to open file %s", filename.c_str() );
+            LOG_ERROR( "Failed to open file %s", filePath.generic_string().c_str() );
         }
     }
     else {
@@ -40,10 +40,10 @@ std::string FileSysUtil::ReadFile( const std::string& filename )
     return stream.str();
 }
 
-bool FileSysUtil::WriteLine( const std::string& filename, const std::string& data )
+bool FileSysUtil::WriteLine( const std::filesystem::path& filePath, const std::string& data )
 {
     bool ret = false;
-    std::ofstream file( filename, std::ios_base::app );
+    std::ofstream file( filePath, std::ios_base::app );
 
     if ( file.is_open() )
     {
@@ -55,10 +55,10 @@ bool FileSysUtil::WriteLine( const std::string& filename, const std::string& dat
     return ret;
 }
 
-std::vector<std::string> FileSysUtil::ReadFileLines( const std::string& filename )
+std::vector<std::string> FileSysUtil::ReadFileLines( const std::filesystem::path& filePath )
 {
     std::vector<std::string> lines;
-    std::ifstream file( filename );
+    std::ifstream file( filePath );
 
     if ( file.is_open() )
     {
@@ -75,24 +75,23 @@ std::vector<std::string> FileSysUtil::ReadFileLines( const std::string& filename
     return lines;
 }
 
-FileUtilHandle* FileSysUtil::PmCreateFile( const std::string& filename )
+FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath )
 {
     FileUtilHandle* handle = NULL;
 
-    if( filename.empty() ) {
+    if( filePath.empty() ) {
         WLOG_ERROR( L"filename is empty" );
     }
     else {
-        ::std::filesystem::path target( filename );
-        ::std::filesystem::create_directories( target.parent_path() );
+        ::std::filesystem::create_directories( filePath.parent_path() );
 
         handle = ( FileUtilHandle* )malloc( sizeof( FileUtilHandle ) );
-        errno_t rtn = fopen_s( &handle->file, filename.c_str(), "wb" );
+        errno_t rtn = fopen_s( &handle->file, filePath.generic_string().c_str(), "wb" );
         if( rtn != 0 ) {
             WLOG_ERROR( L"fopen_s failed" );
         }
         else {
-            WLOG_DEBUG( L"Created file %hs", filename.c_str() );
+            WLOG_DEBUG( L"Created file %hs", filePath.generic_string().c_str() );
         }
     }
 
@@ -133,7 +132,7 @@ int32_t FileSysUtil::AppendFile( FileUtilHandle* handle, void* data, size_t data
     return bytesWritten;
 }
 
-std::string FileSysUtil::GetTempDir()
+std::filesystem::path FileSysUtil::GetTempDir()
 {
     auto path = std::filesystem::temp_directory_path();
 
@@ -142,16 +141,16 @@ std::string FileSysUtil::GetTempDir()
     path.make_preferred();
 
     // string() will return the path with the prefered sepeartor
-    return path.string();
+    return path;
 }
 
-int32_t FileSysUtil::DeleteFile( const std::string& filename )
+int32_t FileSysUtil::DeleteFile( const std::filesystem::path& filePath )
 {
     int32_t rtn = -1;
  
     try {
-        if ( FileExists( filename ) ) {
-            ::std::filesystem::remove( ::std::filesystem::path( filename ) );
+        if ( FileExists( filePath ) ) {
+            ::std::filesystem::remove( filePath );
             rtn = 0;
         }
     }
@@ -162,14 +161,13 @@ int32_t FileSysUtil::DeleteFile( const std::string& filename )
     return rtn;
 }
 
-int32_t FileSysUtil::Rename( const std::string& oldFilename, const std::string& newName )
+int32_t FileSysUtil::Rename( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
 {
     int32_t rtn = -1;
 
     try {
-        ::std::filesystem::path target( newName );
-        ::std::filesystem::create_directories( target.parent_path() );
-        ::std::filesystem::rename( ::std::filesystem::path( oldFilename ), target );
+        ::std::filesystem::create_directories( newName.parent_path() );
+        ::std::filesystem::rename( oldFilename, newName );
         rtn = 0;
     }
     catch( std::filesystem::filesystem_error& ex ) {
@@ -179,12 +177,12 @@ int32_t FileSysUtil::Rename( const std::string& oldFilename, const std::string& 
     return rtn;
 }
 
-bool FileSysUtil::FileExists( const std::string& filename )
+bool FileSysUtil::FileExists( const std::filesystem::path& filename )
 {
     return ::std::filesystem::exists( filename );
 }
 
-size_t FileSysUtil::FileSize( const std::string& filename )
+size_t FileSysUtil::FileSize( const std::filesystem::path& filename )
 {
     size_t rtn = 0;
 
@@ -201,7 +199,7 @@ size_t FileSysUtil::FileSize( const std::string& filename )
     return rtn;
 }
 
-std::filesystem::file_time_type FileSysUtil::FileTime( const std::string& filename )
+std::filesystem::file_time_type FileSysUtil::FileTime( const std::filesystem::path& filename )
 {
     std::filesystem::file_time_type rtn; //=0
     try
@@ -233,17 +231,17 @@ std::string FileSysUtil::AppendPath( const std::string& basePath, const std::str
     }
 
     path.make_preferred();
-    LOG_DEBUG( "Path resolved to %s", path.string().c_str() );
+    LOG_DEBUG( "Path resolved to %s", path.generic_string().c_str() );
 
-    return path.string();
+    return path.generic_string();
 }
 
-time_t FileSysUtil::LastWriteTime( const std::string& filename )
+time_t FileSysUtil::LastWriteTime( const std::filesystem::path& filename )
 {
     time_t rtn = -1;
 
     struct _stat64 fileInfo;
-    if ( _stati64( filename.c_str(), &fileInfo ) != 0 ) {
+    if ( _stati64( filename.generic_string().c_str(), &fileInfo ) != 0 ) {
         LOG_ERROR( "_stati64 failed on file %s", filename.c_str() );
     }
     else {

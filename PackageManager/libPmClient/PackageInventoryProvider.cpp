@@ -42,9 +42,7 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         {
             for ( auto &configFile : package.configs )
             {
-                auto configFileResolvedPath = m_dependencies->ComponentManager().ResolvePath( configFile.path );
-
-                auto sha256 = m_sslUtil.CalculateSHA256( configFileResolvedPath );
+                auto sha256 = m_sslUtil.CalculateSHA256( configFile.path.generic_string() );
 
                 if ( sha256.has_value() )
                 {
