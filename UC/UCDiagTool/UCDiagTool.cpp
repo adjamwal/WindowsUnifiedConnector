@@ -10,6 +10,7 @@
 
 #define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnositcs"
 #define TOAST_AUMI L"Cisco.UC"
+#define TOAST_TIMEOUT_MS 5 * 60 * 1000  // 5 minutes
 
 class CustomHandler : public WinToastLib::IWinToastHandler {
 public:
@@ -63,7 +64,7 @@ void SendRebootToast()
 {
     WinToastLib::WinToast* toast = WinToastLib::WinToast::instance();
     WinToastLib::WinToastTemplate::AudioOption audioOption = WinToastLib::WinToastTemplate::AudioOption::Default;
-    const DWORD expiration = 10000;
+    const DWORD expiration = TOAST_TIMEOUT_MS;
 
     if (toast) {
         toast->setAppName(TOAST_APP_NAME);
