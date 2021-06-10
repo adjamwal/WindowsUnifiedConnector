@@ -8,7 +8,7 @@
 #include "WinApiWrapper.h"
 #include <tchar.h>
 
-#define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnositcs"
+#define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnostics"
 #define TOAST_AUMI L"Cisco.UC"
 #define TOAST_TIMEOUT_MS 5 * 60 * 1000  // 5 minutes
 
