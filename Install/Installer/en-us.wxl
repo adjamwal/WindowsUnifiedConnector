@@ -2,6 +2,6 @@
 <WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
   <String Id="ProductName">Cisco Unified Connector</String>
   <String Id="Manufacturer">Cisco Systems, Inc.</String>
-  <String Id="DiagToolName">Cisco Unified Connector Diagnositcs</String>
-  <String Id="DiagToolDescription">Cisco Unified Connector Diagnositcs Tool</String>
+  <String Id="DiagToolName">Cisco Unified Connector Diagnostics</String>
+  <String Id="DiagToolDescription">Cisco Unified Connector Diagnostics Tool</String>
 </WixLocalization>
