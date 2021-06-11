@@ -7,10 +7,12 @@
 #include "wintoastlib.h"
 #include "WinApiWrapper.h"
 #include <tchar.h>
+#include <tlhelp32.h>
+#include <Psapi.h>
 
 #define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnostics"
 #define TOAST_AUMI L"Cisco.UC"
-#define TOAST_TIMEOUT_MS 5 * 60 * 1000  // 5 minutes
+#define TOAST_TIMEOUT_MS 10000
 
 class CustomHandler : public WinToastLib::IWinToastHandler {
 public:
@@ -90,22 +92,20 @@ void SendRebootToast()
             templ.addAction(L"Yes");
             templ.addAction(L"No");
 
-            templ.setExpiration(expiration);
-
+            templ.setExpiration( expiration );
 
             if (toast->showToast(templ, new CustomHandler()) < 0) {
                 LOG_ERROR("Could not launch toast notification");
             }
 
-            // Give the handler a chance for 15 seconds (or the expiration plus 1 second)
-            Sleep((DWORD)expiration + 2000);
+            // The application will also be terminated if the user responds or windows timesout the notification
+            // However the notification lifetime is very inconsistent. Adding 20 seconds to the timeout so we can
+            // still respond if the notification is up longer than expected
+            Sleep( ( DWORD )expiration + 20000 );
             LOG_ERROR("Timed Out Waiting");
         }
     }
 }
-
-#include <tlhelp32.h>
-#include <Psapi.h>
 
 DWORD GetParentPID( DWORD pid )
 {
