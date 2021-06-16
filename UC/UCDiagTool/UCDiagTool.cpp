@@ -7,9 +7,12 @@
 #include "wintoastlib.h"
 #include "WinApiWrapper.h"
 #include <tchar.h>
+#include <tlhelp32.h>
+#include <Psapi.h>
 
-#define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnositcs"
+#define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnostics"
 #define TOAST_AUMI L"Cisco.UC"
+#define TOAST_TIMEOUT_MS 10000
 
 class CustomHandler : public WinToastLib::IWinToastHandler {
 public:
@@ -63,7 +66,7 @@ void SendRebootToast()
 {
     WinToastLib::WinToast* toast = WinToastLib::WinToast::instance();
     WinToastLib::WinToastTemplate::AudioOption audioOption = WinToastLib::WinToastTemplate::AudioOption::Default;
-    const DWORD expiration = 10000;
+    const DWORD expiration = TOAST_TIMEOUT_MS;
 
     if (toast) {
         toast->setAppName(TOAST_APP_NAME);
@@ -89,18 +92,80 @@ void SendRebootToast()
             templ.addAction(L"Yes");
             templ.addAction(L"No");
 
-            templ.setExpiration(expiration);
-
+            templ.setExpiration( expiration );
 
             if (toast->showToast(templ, new CustomHandler()) < 0) {
                 LOG_ERROR("Could not launch toast notification");
             }
 
-            // Give the handler a chance for 15 seconds (or the expiration plus 1 second)
-            Sleep((DWORD)expiration + 2000);
+            // The application will also be terminated if the user responds or windows timesout the notification
+            // However the notification lifetime is very inconsistent. Adding 20 seconds to the timeout so we can
+            // still respond if the notification is up longer than expected
+            Sleep( ( DWORD )expiration + 20000 );
             LOG_ERROR("Timed Out Waiting");
         }
     }
+}
+
+DWORD GetParentPID( DWORD pid )
+{
+    HANDLE handle = NULL;
+    PROCESSENTRY32 pe = { 0 };
+    DWORD ppid = 0;
+    
+    pe.dwSize = sizeof( PROCESSENTRY32 );
+    handle = CreateToolhelp32Snapshot( TH32CS_SNAPPROCESS, 0 );
+    if( handle == NULL ) {
+        WLOG_ERROR( L"CreateToolhelp32Snapshot failed" );
+    }
+    else if( !Process32First( handle, &pe ) ) {
+        WLOG_ERROR( L"Process32First failed" );
+    }
+    else {
+        do {
+            if( pe.th32ProcessID == pid ) {
+                ppid = pe.th32ParentProcessID;
+                break;
+            }
+        } while( Process32Next( handle, &pe ) );
+    }
+
+    if( handle ) {
+        CloseHandle( handle );
+    }
+
+    if( ppid == 0 ) {
+        WLOG_ERROR( L"Parrent Process not found for pid %d", pid );
+    }
+
+    return ( ppid );
+}
+
+bool GetProcessName( DWORD pid, std::wstring& processName )
+{
+    HANDLE handle = NULL;
+    WCHAR fname[ MAX_PATH + 1 ] = { 0 };
+    bool rtn = false;
+
+    handle = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid );
+    if( handle == NULL ) {
+        WLOG_ERROR( L"OpenProcess failed" );
+    } 
+    else {
+        if( GetModuleFileNameEx( handle, NULL, fname, MAX_PATH ) ) {
+            rtn = true;
+            processName = fname;
+        }
+        else {
+            WLOG_ERROR( L"GetModuleFileNameEx failed" );
+        }
+    }
+
+    if( handle ) {
+        CloseHandle( handle );
+    }
+
+    return ( rtn );
 }
 
 BOOL IsProcessElevated()
@@ -145,29 +210,40 @@ Cleanup:
 
 void RunElevated( int argc, wchar_t** argv )
 {
-    SHELLEXECUTEINFO shExInfo = { 0 };
-    WCHAR swPath[MAX_PATH + 5] = { 0 };
-    GetModuleFileName(NULL, swPath, MAX_PATH);
-    std::wstring arglist;
-    for (int i = 1; i < argc; i++) {
-        arglist += argv[i];
-        arglist += L" ";
+    std::wstring parentName;
+    DWORD parentPid = GetParentPID( GetCurrentProcessId() );
+
+    if( !GetProcessName( parentPid, parentName ) ) {
+        WLOG_ERROR( L"GetProcessName failed" );
     }
+    else if( parentName == argv[ 0 ]) {
+        WLOG_ERROR( L"Parent process is %s. Elevation likely failed", argv[ 0 ] );
+    }
+    else {
+        SHELLEXECUTEINFO shExInfo = { 0 };
+        WCHAR swPath[ MAX_PATH + 5 ] = { 0 };
+        GetModuleFileName( NULL, swPath, MAX_PATH );
+        std::wstring arglist;
+        for( int i = 1; i < argc; i++ ) {
+            arglist += argv[ i ];
+            arglist += L" ";
+        }
 
-    shExInfo.cbSize = sizeof(shExInfo);
-    shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-    shExInfo.hwnd = 0;
-    shExInfo.lpVerb = _T("runas");                // Operation to perform
-    shExInfo.lpFile = swPath;
-    shExInfo.lpParameters = arglist.c_str();
-    shExInfo.lpDirectory = 0;
-    shExInfo.nShow = SW_SHOW;
-    shExInfo.hInstApp = 0;
+        shExInfo.cbSize = sizeof( shExInfo );
+        shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+        shExInfo.hwnd = 0;
+        shExInfo.lpVerb = _T( "runas" );                // Operation to perform
+        shExInfo.lpFile = swPath;
+        shExInfo.lpParameters = arglist.c_str();
+        shExInfo.lpDirectory = 0;
+        shExInfo.nShow = SW_SHOW;
+        shExInfo.hInstApp = 0;
 
-    if (ShellExecuteEx(&shExInfo))
-    {
-        WaitForSingleObject(shExInfo.hProcess, INFINITE);
-        CloseHandle(shExInfo.hProcess);
+        if( ShellExecuteEx( &shExInfo ) ) {
+            WLOG_DEBUG( L"Created Elevated Child Process" );
+            WaitForSingleObject( shExInfo.hProcess, 5000 );
+            CloseHandle( shExInfo.hProcess );
+        }
     }
 }
 
@@ -190,6 +266,7 @@ int wmain(int argc, wchar_t** argv, wchar_t** envp)
     }
 
     if( !IsProcessElevated() ) {
+        WLOG_DEBUG( L"Elevation required" );
         RunElevated( argc, argv );
         return 0;
     }

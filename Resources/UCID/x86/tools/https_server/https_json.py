@@ -169,12 +169,17 @@ class Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             if ucid_response == '':
                 raise IOError
         except IOError:
-            ucid_response = '{ "ucid": "programmed-default-ucid", "ucid_token": "programmed-default-token" }'
+            if self.path == '/identify':
+                ucid_response = '{ "ucid": "programmed-default-ucid", "ucid_token": "programmed-default-token" }'
+            else:
+                ucid_response = '{"event_count": 1}'
 
         headers=[]
         # based on the response content, decide the error code.
         ucid_response_json = json.loads(ucid_response)
-        if ucid_response_json.has_key("ucid"):
+        if ucid_response_json.has_key("ucid") and self.path == '/identify':
+            response_code = 200
+        elif ucid_response_json.has_key("event_count") and self.path == '/event/1':
             response_code = 200
         # special error code 9999 to trigger "Retry-After" response.
         elif ucid_response_json.has_key("code") and ucid_response_json['code'] == 9999:

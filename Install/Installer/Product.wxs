@@ -319,7 +319,7 @@
             </Component>
 
             <Component Id="ucid.exe" Guid="*">
-                <File Id="ucid.exe" Name="ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucid_$(var.Platform).exe" />
+                <File Id="ucid.exe" Name="csc_ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucid_$(var.Platform).exe" />
             </Component>
 
         </ComponentGroup>
