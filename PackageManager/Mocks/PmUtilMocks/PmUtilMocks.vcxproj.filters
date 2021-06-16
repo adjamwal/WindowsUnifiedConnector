@@ -24,6 +24,9 @@
     <ClInclude Include="MockSslUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CustomPathMatchers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockFileSysUtil.cpp">

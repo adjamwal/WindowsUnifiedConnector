@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomPathMatchers.h" />
     <ClInclude Include="MockFileSysUtil.h" />
     <ClInclude Include="MockPmHttp.h" />
     <ClInclude Include="MockSslUtil.h" />

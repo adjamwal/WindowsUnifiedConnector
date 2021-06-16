@@ -6,6 +6,7 @@
 struct PackageConfigInfo
 {
     std::filesystem::path path;
+    std::filesystem::path unresolvedPath;
     std::string sha256;
     std::string contents;
     std::string verifyBinPath;
@@ -47,6 +48,7 @@ struct PackageInventory
 struct PmProductDiscoveryConfigurable
 {
     std::filesystem::path path;
+    std::filesystem::path unresolvedPath;
     int max_instances;
     bool required;
     std::vector<std::string> formats;

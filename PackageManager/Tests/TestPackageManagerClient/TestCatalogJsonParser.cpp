@@ -2,6 +2,8 @@
 #include "CatalogJsonParser.h"
 #include "PmTypes.h"
 #include "StringUtil.h"
+#include "MockPmPlatformDependencies.h"
+#include "MockPmPlatformComponentManager.h"
 
 #include <memory>
 
@@ -10,8 +12,22 @@ class TestCatalogJsonParser : public ::testing::Test
 protected:
     void SetUp()
     {
+		m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_discoveryRules.clear();
-        m_patient.reset( new CatalogJsonParser() );
+
+		m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
+
+		m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
+		ON_CALL( *m_pmComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
+			[]( const std::string& basePath )
+			{
+				return basePath;
+			}
+		) );
+
+		m_patient.reset( new CatalogJsonParser() );
+
+		m_patient->Initialize( m_dep.get() );
     }
 
     void TearDown()
@@ -19,6 +35,9 @@ protected:
         m_patient.reset();
         m_discoveryRules.clear();
     }
+
+	std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
+	std::unique_ptr<MockPmPlatformDependencies> m_dep;
 
     std::unique_ptr<CatalogJsonParser> m_patient;
     std::vector<PmProductDiscoveryRules> m_discoveryRules;

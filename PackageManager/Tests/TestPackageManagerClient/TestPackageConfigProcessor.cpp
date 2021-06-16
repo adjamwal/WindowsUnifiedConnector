@@ -47,6 +47,7 @@ protected:
     {
         m_configInfo = {
             "configpath",
+            "configpath",
             "configsha256",
             "configcontents",
             "configverifyBinPath",

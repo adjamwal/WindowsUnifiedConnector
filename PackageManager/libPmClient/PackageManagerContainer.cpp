@@ -77,6 +77,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_installeracheMgr,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
+            *m_catalogJsonParser,
             *m_ucidAdapter,
             *m_certsAdapter,
             *m_checkinManifestRetriever,

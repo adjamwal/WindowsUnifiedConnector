@@ -31,6 +31,7 @@
 #include "MockUcUpgradeEventHandler.h"
 #include "MockInstallerCacheManager.h"
 #include "MockRebootHandler.h"
+#include "CustomPathMatchers.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -102,6 +103,7 @@ protected:
             *m_mockInstallerCacheMgr,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
+            *m_catalogJsonParser,
             *m_ucidAdapter,
             *m_certsAdapter,
             *m_checkinManifestRetriever,
@@ -588,9 +590,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( _ ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( _ ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( _ ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -635,12 +637,12 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
         "uc/0.0.1",
         0,
         "",
-        "config.json",
         "",
-        100,
+        "",
+        0,
         "config.json",
         "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4",
-        100
+        0
     );
 }
 
@@ -712,9 +714,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( _) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( _ ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( _ ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -824,9 +826,9 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
-    ON_CALL( *m_mockFileUtil, FileExists( _ ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_mockFileUtil, FileSize( _ ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( _ ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, FileExists( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
+    ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     

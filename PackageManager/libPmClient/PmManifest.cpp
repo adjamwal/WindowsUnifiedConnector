@@ -132,6 +132,7 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     config.deleteConfig = false;
 
     config.path = std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) ) );
+    config.unresolvedPath = std::filesystem::u8path( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) );
 
     config.contents = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_CONTENT, false );
     config.sha256 = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_SHA, false );
