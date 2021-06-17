@@ -139,6 +139,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
             }
 
             configInfo.path = tempPath;
+            configInfo.unresolvedPath = configurable.unresolvedPath;
             packageConfigs.push_back( configInfo );
         }  
     }
