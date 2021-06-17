@@ -12,22 +12,22 @@ class TestCatalogJsonParser : public ::testing::Test
 protected:
     void SetUp()
     {
-		m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
+        m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_discoveryRules.clear();
 
-		m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
+        m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
 
-		m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
-		ON_CALL( *m_pmComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
-			[]( const std::string& basePath )
-			{
-				return basePath;
-			}
-		) );
+        m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
+        ON_CALL( *m_pmComponentManager, ResolvePath( _ ) ).WillByDefault( Invoke(
+            []( const std::string& basePath )
+            {
+                return basePath;
+            }
+        ) );
 
-		m_patient.reset( new CatalogJsonParser() );
+        m_patient.reset( new CatalogJsonParser() );
 
-		m_patient->Initialize( m_dep.get() );
+        m_patient->Initialize( m_dep.get() );
     }
 
     void TearDown()
@@ -36,8 +36,8 @@ protected:
         m_discoveryRules.clear();
     }
 
-	std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
-	std::unique_ptr<MockPmPlatformDependencies> m_dep;
+    std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
+    std::unique_ptr<MockPmPlatformDependencies> m_dep;
 
     std::unique_ptr<CatalogJsonParser> m_patient;
     std::vector<PmProductDiscoveryRules> m_discoveryRules;
@@ -131,7 +131,7 @@ protected:
 	]
 })";
 
-	const std::string m_InvalidConfigurable = R"(
+    const std::string m_InvalidConfigurable = R"(
 {
 	"products": [
 		{
@@ -154,7 +154,7 @@ protected:
 	]
 })";
 
-	const std::string m_InvalidMsiDiscovery = R"(
+    const std::string m_InvalidMsiDiscovery = R"(
 {
 	"products": [
 		{
@@ -177,7 +177,7 @@ protected:
 	]
 })";
 
-	const std::string m_InvalidMsiUpgradeCodeDiscovery = R"(
+    const std::string m_InvalidMsiUpgradeCodeDiscovery = R"(
 {
 	"products": [
 		{
@@ -192,7 +192,7 @@ protected:
 	]
 })";
 
-	const std::string m_InvalidRegistryCodeDiscovery = R"(
+    const std::string m_InvalidRegistryCodeDiscovery = R"(
 {
 	"products": [
 		{
@@ -233,88 +233,88 @@ TEST_F( TestCatalogJsonParser, WillFailToParseMalformedCatalogJson )
 
 TEST_F( TestCatalogJsonParser, WillFailToParseConfirgurablesWithoutValidFormats )
 {
-	m_patient->Parse( m_InvalidConfigurable, m_discoveryRules );
-	EXPECT_TRUE( m_discoveryRules.empty() );
+    m_patient->Parse( m_InvalidConfigurable, m_discoveryRules );
+    EXPECT_TRUE( m_discoveryRules.empty() );
 }
 
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryMsiMethod )
 {
-	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+    m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
 
-	ASSERT_TRUE( m_discoveryRules.size() >= 1 );
-	ASSERT_TRUE( m_discoveryRules[ 0 ].msi_discovery.size() == 1 );
+    ASSERT_TRUE( m_discoveryRules.size() >= 1 );
+    ASSERT_TRUE( m_discoveryRules[ 0 ].msi_discovery.size() == 1 );
 
-	EXPECT_EQ( m_discoveryRules[ 0 ].msi_discovery[ 0 ].name, "TestPackage" );
-	EXPECT_EQ( m_discoveryRules[ 0 ].msi_discovery[ 0 ].vendor, "TestPackage" );
+    EXPECT_EQ( m_discoveryRules[ 0 ].msi_discovery[ 0 ].name, "TestPackage" );
+    EXPECT_EQ( m_discoveryRules[ 0 ].msi_discovery[ 0 ].vendor, "TestPackage" );
 }
 
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryMsiUpgradeCodeMethod )
 {
-	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+    m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
 
-	ASSERT_TRUE( m_discoveryRules.size() >= 2 );
-	ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
+    ASSERT_TRUE( m_discoveryRules.size() >= 2 );
+    ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
 }
 
 TEST_F( TestCatalogJsonParser, WillFormatMsiUpgradeCode )
 {
-	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+    m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
 
-	ASSERT_TRUE( m_discoveryRules.size() >= 2 );
-	ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
+    ASSERT_TRUE( m_discoveryRules.size() >= 2 );
+    ASSERT_TRUE( m_discoveryRules[ 1 ].msiUpgradeCode_discovery.size() == 1 );
 
-	EXPECT_EQ( m_discoveryRules[ 1 ].msiUpgradeCode_discovery[ 0 ].upgradeCode, "{8C028F5DD91640B5A678F66B9789EC2B}" );
+    EXPECT_EQ( m_discoveryRules[ 1 ].msiUpgradeCode_discovery[ 0 ].upgradeCode, "{8C028F5DD91640B5A678F66B9789EC2B}" );
 }
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryRegistryMethod )
 {
-	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+    m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
 
-	ASSERT_TRUE( m_discoveryRules.size() >= 3);
-	ASSERT_TRUE( m_discoveryRules[ 2 ].reg_discovery.size() == 1 );
+    ASSERT_TRUE( m_discoveryRules.size() >= 3 );
+    ASSERT_TRUE( m_discoveryRules[ 2 ].reg_discovery.size() == 1 );
 
-	EXPECT_EQ( m_discoveryRules[ 2 ].reg_discovery[ 0 ].install.key, 
-		"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AD3C0732-A954-43C1-A575-C439A6660AFC}\\InstallLocation" );
-	EXPECT_TRUE( m_discoveryRules[ 2 ].reg_discovery[ 0 ].install.type.empty() );
+    EXPECT_EQ( m_discoveryRules[ 2 ].reg_discovery[ 0 ].install.key,
+        "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AD3C0732-A954-43C1-A575-C439A6660AFC}\\InstallLocation" );
+    EXPECT_TRUE( m_discoveryRules[ 2 ].reg_discovery[ 0 ].install.type.empty() );
 
-	EXPECT_EQ( m_discoveryRules[ 2 ].reg_discovery[ 0 ].version.key,
-		"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AD3C0732-A954-43C1-A575-C439A6660AFC}\\DisplayVersion" );
-	EXPECT_EQ( m_discoveryRules[ 2 ].reg_discovery[ 0 ].version.type, "keyType" );
+    EXPECT_EQ( m_discoveryRules[ 2 ].reg_discovery[ 0 ].version.key,
+        "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AD3C0732-A954-43C1-A575-C439A6660AFC}\\DisplayVersion" );
+    EXPECT_EQ( m_discoveryRules[ 2 ].reg_discovery[ 0 ].version.type, "keyType" );
 }
 
 TEST_F( TestCatalogJsonParser, WillParseDiscoveryWithMultipleMethods )
 {
-	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+    m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
 
-	ASSERT_TRUE( m_discoveryRules.size() >= 4 );
-	
-	EXPECT_EQ( m_discoveryRules[ 3 ].msi_discovery.size(), 1 );
-	EXPECT_EQ( m_discoveryRules[ 3 ].reg_discovery.size(), 1 );
+    ASSERT_TRUE( m_discoveryRules.size() >= 4 );
+
+    EXPECT_EQ( m_discoveryRules[ 3 ].msi_discovery.size(), 1 );
+    EXPECT_EQ( m_discoveryRules[ 3 ].reg_discovery.size(), 1 );
 }
 
 TEST_F( TestCatalogJsonParser, ParseWillIgnoreUnknownMehods )
 {
-	m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
+    m_patient->Parse( m_testPackagesCatalogJson, m_discoveryRules );
 
-	ASSERT_TRUE( m_discoveryRules.size() >= 5 );
+    ASSERT_TRUE( m_discoveryRules.size() >= 5 );
 
-	EXPECT_EQ( m_discoveryRules[ 4 ].msi_discovery.size(), 1 );
-	EXPECT_EQ( m_discoveryRules[ 4 ].reg_discovery.size(), 1 );
+    EXPECT_EQ( m_discoveryRules[ 4 ].msi_discovery.size(), 1 );
+    EXPECT_EQ( m_discoveryRules[ 4 ].reg_discovery.size(), 1 );
 }
 
 TEST_F( TestCatalogJsonParser, WillNotAddRuleWithInvalidMsiDiscovery )
 {
-	m_patient->Parse( m_InvalidMsiDiscovery, m_discoveryRules );
-	EXPECT_TRUE( m_discoveryRules.empty() );
+    m_patient->Parse( m_InvalidMsiDiscovery, m_discoveryRules );
+    EXPECT_TRUE( m_discoveryRules.empty() );
 }
 
 TEST_F( TestCatalogJsonParser, WillNotAddRuleWithInvalidMsiUpgradeCodeDiscovery )
 {
-	m_patient->Parse( m_InvalidMsiUpgradeCodeDiscovery, m_discoveryRules );
-	EXPECT_TRUE( m_discoveryRules.empty() );
+    m_patient->Parse( m_InvalidMsiUpgradeCodeDiscovery, m_discoveryRules );
+    EXPECT_TRUE( m_discoveryRules.empty() );
 }
 
 TEST_F( TestCatalogJsonParser, WillNotAddRuleWithInvalidRegistryDiscovery )
 {
-	m_patient->Parse( m_InvalidRegistryCodeDiscovery, m_discoveryRules );
-	EXPECT_TRUE( m_discoveryRules.empty() );
+    m_patient->Parse( m_InvalidRegistryCodeDiscovery, m_discoveryRules );
+    EXPECT_TRUE( m_discoveryRules.empty() );
 }
