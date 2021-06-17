@@ -26,6 +26,17 @@ def SetGithubFailureStatus() {
   }
 }
 
+def NotifyWebexChannel(String webexUrl) {
+  if (env.CHANGE_ID == null) {
+    webexNotification( webexUrl, 
+      env.GIT_BRANCH,
+      env.STAGE_NAME, 
+      'UnifiedConnector',
+      'WindowsUnifiedConnector',
+      env.GIT_COMMIT )
+  }
+}
+
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
   powershell ".\\AmpRepositorySync.exe -cws ."
@@ -418,11 +429,13 @@ pipeline {
       script {
         SetGithubSuccessStatus()
         email.sendSuccessEmail("fireamp-win-connector")
+		NotifyWebexChannel('https://botworkflows.webex.com/embed/run/99602d2ad1d17a1ba13e5e')
       }
     }
     failure {
       script {
         email.sendFailureEmail("fireamp-win-connector")
+		NotifyWebexChannel('https://botworkflows.webex.com/embed/run/99602d21e3817a1ba0b761')
       }
     }
   }
