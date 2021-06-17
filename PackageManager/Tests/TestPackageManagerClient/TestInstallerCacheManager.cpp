@@ -76,7 +76,7 @@ TEST_F( TestInstallerCacheManager, CanDeleteInstaller )
     m_fileUtil->MakeFileExistsReturn( true );
     EXPECT_CALL( *m_fileUtil, DeleteFile( installerPath ) );
 
-    m_patient->DeleteInstaller( installerPath.generic_string() );
+    m_patient->DeleteInstaller( installerPath );
 }
 
 TEST_F( TestInstallerCacheManager, WontDeleteEmptyInstaller )
@@ -114,7 +114,7 @@ TEST_F( TestInstallerCacheManager, QaScenarioWillSanitizeDownloadPath )
     m_component.installerHash = "";
 
     m_fileUtil->MakeFileExistsReturn( true );
-    EXPECT_CALL( *m_cloud, DownloadFile( _, HasSubstr( "test-1.0.0" ) ) ).WillOnce( Return( 200 ) );
+    EXPECT_CALL( *m_cloud, DownloadFile( _, PathContains( "test-1.0.0" ) ) ).WillOnce( Return( 200 ) );
 
     m_patient->DownloadOrUpdateInstaller( m_component );
 }
@@ -135,7 +135,7 @@ TEST_F( TestInstallerCacheManager, WillNotDownloadInstallerIfValidInstallerExist
     sha.emplace( m_component.installerHash );
 
     ON_CALL( *m_fileUtil, FileExists( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
 
     m_cloud->ExpectDownloadFileIsNotCalled();
 
@@ -148,7 +148,7 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfValidationFails )
     invalidSha.emplace( "Invalid Sha" );
 
     ON_CALL( *m_fileUtil, FileExists( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( true ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
 
     EXPECT_CALL( *m_fileUtil, DeleteFile( PathContains( m_component.installerHash ) ) );
 
@@ -167,7 +167,7 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfDownloadFails )
         .WillOnce( Return( false ) )
         .WillOnce( Return( true ) )
         .WillOnce( Return( true ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
 
     EXPECT_CALL( *m_fileUtil, DeleteFile( PathContains( m_component.installerHash ) ) );
 
@@ -184,9 +184,9 @@ TEST_F( TestInstallerCacheManager, CanDownloadInstallerSuccessfully )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( true ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
 
-    EXPECT_CALL( *m_cloud, DownloadFile( _, HasSubstr( m_component.installerHash ) ) ).WillOnce( Return( 200 ) );
+    EXPECT_CALL( *m_cloud, DownloadFile( _, PathContains( m_component.installerHash ) ) ).WillOnce( Return( 200 ) );
 
     m_patient->DownloadOrUpdateInstaller( m_component );
 }
@@ -200,7 +200,7 @@ TEST_F( TestInstallerCacheManager, DownloadingSuccessfullyWillReturnPath )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( true ) );
-    ON_CALL( *m_sslUtil, CalculateSHA256( HasSubstr( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
+    ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
 
     EXPECT_FALSE( m_patient->DownloadOrUpdateInstaller( m_component ).empty() );
 }

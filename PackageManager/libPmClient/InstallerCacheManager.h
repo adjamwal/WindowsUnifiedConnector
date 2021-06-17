@@ -2,7 +2,6 @@
 
 #include "IInstallerCacheManager.h"
 #include <mutex>
-#include <filesystem>
 
 class IPmCloud;
 class IFileSysUtil;
@@ -16,12 +15,12 @@ public:
     ~InstallerCacheManager();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
-    std::string DownloadOrUpdateInstaller( const PmComponent& componentPackage ) override;
-    void DeleteInstaller( const std::string& installerPath ) override;
+    std::filesystem::path DownloadOrUpdateInstaller( const PmComponent& componentPackage ) override;
+    void DeleteInstaller( const std::filesystem::path& installerPath ) override;
     void PruneInstallers( uint32_t ageInSeconds ) override;
 
 private:
-    bool ValidateInstaller( const PmComponent& componentPackage, const std::string& installerPath );
+    bool ValidateInstaller( const PmComponent& componentPackage, const std::filesystem::path& installerPath );
     std::string SanitizeComponentProductAndVersion( const std::string& productAndVersion );
 
     IPmCloud& m_pmCloud;

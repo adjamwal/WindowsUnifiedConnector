@@ -88,7 +88,7 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
 
     std::string installerPath;
 
-    componentPackage.downloadedInstallerPath = std::filesystem::u8path( m_installerManager.DownloadOrUpdateInstaller( componentPackage ) );
+    componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
 
     return HasDownloadedBinary( componentPackage );
 }
@@ -136,7 +136,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
 
-        tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath.generic_string() );
+        tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath );
         if( !tempSha256.has_value() )
         {
             ssError << "Failed to calculate sha256 of " << componentPackage.downloadedInstallerPath;
@@ -181,7 +181,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
         }
 
-        m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath.generic_string() );
+        m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
 
         rtn = true;
     }

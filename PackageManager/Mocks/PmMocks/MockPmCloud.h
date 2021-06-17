@@ -37,7 +37,7 @@ public:
     void MakePostReturn( int32_t value );
     void ExpectPostIsNotCalled();
 
-    MOCK_METHOD2( DownloadFile, int32_t( const std::string&, const std::string ) );
+    MOCK_METHOD2( DownloadFile, int32_t( const std::string&, const std::filesystem::path& ) );
     void MakeDownloadFileReturn( int32_t value );
     void ExpectDownloadFileIsNotCalled();
 

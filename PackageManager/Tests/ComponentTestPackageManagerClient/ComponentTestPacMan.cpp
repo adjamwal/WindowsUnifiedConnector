@@ -594,8 +594,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
     ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
@@ -718,8 +718,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
     ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) )
         .WillOnce( Invoke(
@@ -830,7 +830,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
     ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
-    ON_CALL( *m_mockSslUtil, CalculateSHA256( HasSubstr( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )

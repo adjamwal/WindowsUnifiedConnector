@@ -76,18 +76,18 @@ ICloudEventBuilder& CloudEventBuilder::WithError( int code, const std::string& m
     return *this;
 }
 
-ICloudEventBuilder& CloudEventBuilder::WithOldFile( const std::string& path, const std::string& hash, int size )
+ICloudEventBuilder& CloudEventBuilder::WithOldFile( const std::filesystem::path& path, const std::string& hash, int size )
 {
-    m_oldPath = path;
+    m_oldPath = path.generic_u8string();
     m_oldHash = hash;
     m_oldSize = size;
     UpdateEventTime();
     return *this;
 }
 
-ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::string& path, const std::string& hash, int size )
+ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::filesystem::path& path, const std::string& hash, int size )
 {
-    m_newPath = path;
+    m_newPath = path.generic_u8string();
     m_newHash = hash;
     m_newSize = size;
     UpdateEventTime();

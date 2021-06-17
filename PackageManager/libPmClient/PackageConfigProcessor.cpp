@@ -67,12 +67,12 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     FileUtilHandle* handle = NULL;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithNewFile( config.path.generic_string(), config.sha256, 0 );
+    m_eventBuilder.WithNewFile( config.path, config.sha256, 0 );
     if( m_fileUtil.FileExists( targetLocation ) )
     {
-        auto old_sha256 = m_sslUtil.CalculateSHA256( targetLocation.generic_string() );
+        auto old_sha256 = m_sslUtil.CalculateSHA256( targetLocation );
         m_eventBuilder.WithOldFile( 
-            config.path.generic_string(),
+            config.path,
             old_sha256.has_value() ? old_sha256.value() : "",
             m_fileUtil.FileSize( targetLocation ) );
     }
@@ -103,7 +103,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
         auto sha256 = m_sslUtil.CalculateSHA256( config.verifyPath );
         m_eventBuilder.WithNewFile(
-            config.path.generic_string(),
+            config.path,
             sha256.has_value() ? sha256.value() : config.sha256,
             m_fileUtil.FileSize( config.verifyPath )
         );
@@ -147,7 +147,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     std::filesystem::path targetLocation = config.installLocation / config.path;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithOldFile( config.path.generic_string(), config.sha256, m_fileUtil.FileSize( targetLocation.generic_string() ) );
+    m_eventBuilder.WithOldFile( config.path, config.sha256, m_fileUtil.FileSize( targetLocation ) );
 
     try
     {
@@ -156,9 +156,9 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
             throw PackageException( "Failed to resolve config " + targetLocation.generic_string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
         }
 
-        auto sha256 = m_sslUtil.CalculateSHA256( targetLocation.generic_string() );
+        auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
         m_eventBuilder.WithOldFile(
-            config.path.generic_string(),
+            config.path,
             sha256.has_value() ? sha256.value() : config.sha256,
             m_fileUtil.FileSize( targetLocation ) );
 

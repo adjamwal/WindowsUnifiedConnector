@@ -376,7 +376,7 @@ int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, s
     return rtn;
 }
 
-int32_t PmHttp::HttpDownload( const std::string& url, const std::string& filepath, int32_t &httpReturn )
+int32_t PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& filepath, int32_t &httpReturn )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     CURLcode rtn = CURLE_OK;
