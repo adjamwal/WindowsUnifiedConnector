@@ -53,7 +53,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     CodesignStatus status = m_codeSignVerifier.Verify( 
-        converter.from_bytes( package.downloadedInstallerPath.generic_string() ),
+        converter.from_bytes( package.downloadedInstallerPath.generic_u8string() ),
         converter.from_bytes( package.signerName ), 
         SIGTYPE_DEFAULT );
 
@@ -62,11 +62,11 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
         if ( package.installerType == "exe" )
         {
             std::string exeCmdline;
-            exeCmdline = package.downloadedInstallerPath.filename().generic_string();
+            exeCmdline = package.downloadedInstallerPath.filename().generic_u8string();
             exeCmdline += " ";
             exeCmdline += package.installerArgs;
 
-            ret = RunPackage( package.downloadedInstallerPath.generic_string(), exeCmdline, error );
+            ret = RunPackage( package.downloadedInstallerPath.generic_u8string(), exeCmdline, error );
         }
         else if ( package.installerType == "msi" )
         {
@@ -83,7 +83,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.downloadedInstallerPath.generic_string() + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
+                msiCmdline = " /package \"" + package.downloadedInstallerPath.generic_u8string() + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }
@@ -117,7 +117,7 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
 {
     int32_t ret = 0;
 
-    std::string verifyFullPath = config.installLocation.generic_string() + "\\" + config.verifyBinPath;
+    std::string verifyFullPath = config.installLocation.generic_u8string() + "\\" + config.verifyBinPath;
     std::string verifyCmdLine = "--config-path " + config.verifyPath;
     std::string errorStr;
 

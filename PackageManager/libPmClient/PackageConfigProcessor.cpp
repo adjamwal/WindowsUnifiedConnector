@@ -85,7 +85,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         }
 
         tempFilePath = m_fileUtil.GetTempDir() / std::string( "tmpPmConf_" ).append( std::to_string( m_fileCount++ ) ).append( RandomUtil::GetString( 10 ) );
-        config.verifyPath = tempFilePath.generic_string();
+        config.verifyPath = tempFilePath.generic_u8string();
 
         if( ( handle = m_fileUtil.PmCreateFile( config.verifyPath ) ) == NULL )
         {
@@ -116,7 +116,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         if( !rtn )
         {
             RemoveTempFile( config.verifyPath );
-            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
+            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
         }
     }
     catch( PackageException& ex )
@@ -153,7 +153,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     {
         if( targetLocation.empty() || !m_fileUtil.FileExists( targetLocation ) )
         {
-            throw PackageException( "Failed to resolve config " + targetLocation.generic_string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
+            throw PackageException( "Failed to resolve config " + targetLocation.generic_u8string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
         }
 
         auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
@@ -164,7 +164,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
         if( m_fileUtil.DeleteFile( targetLocation ) != 0 )
         {
-            throw PackageException( "Failed to remove config " + targetLocation.generic_string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
+            throw PackageException( "Failed to remove config " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
         }
 
         LOG_DEBUG( "Removed config file %s", targetLocation.c_str() );

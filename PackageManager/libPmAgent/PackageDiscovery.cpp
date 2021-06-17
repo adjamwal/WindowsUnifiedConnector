@@ -99,8 +99,8 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         if ( configurable.unresolvedPath != configurable.path )
         {
             //Resolved path is deferent which means we must calculate the knownfolderid
-            std::string tempResolvedPath = configurable.path.generic_string();
-            std::string tempUnresolvedPath = configurable.unresolvedPath.generic_string();
+            std::string tempResolvedPath = configurable.path.generic_u8string();
+            std::string tempUnresolvedPath = configurable.unresolvedPath.generic_u8string();
             size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
             size_t last = tempUnresolvedPath.find_first_of( ">" );
             knownFolderId = tempUnresolvedPath.substr( first, last + 1);
@@ -129,7 +129,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         {
             PackageConfigInfo configInfo = {};
 
-            std::string tempPath = discoveredFile.generic_string();
+            std::string tempPath = discoveredFile.generic_u8string();
 
             if ( knownFolderId != "" )
             {

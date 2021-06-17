@@ -28,7 +28,7 @@ std::filesystem::path DiagTool::GetPackagePath()
 
     packagePath.make_preferred();
 
-    LOG_DEBUG( "Diagnostic Package Path: %s", packagePath.generic_string().c_str() );
+    LOG_DEBUG( "Diagnostic Package Path: %s", packagePath );
 
     return packagePath;
 }

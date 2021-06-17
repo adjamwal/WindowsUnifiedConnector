@@ -60,7 +60,7 @@ TEST_F( TestPmConfig, LoadWillReadBsFile )
 
     EXPECT_CALL( *m_fileUtil, ReadFile( bsfilename ) );
 
-    m_patient->LoadBsConfig( bsfilename.generic_string() );
+    m_patient->LoadBsConfig( bsfilename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, LoadWillReadPmFile )
@@ -71,7 +71,7 @@ TEST_F( TestPmConfig, LoadWillReadPmFile )
 
     EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
 
-    m_patient->LoadPmConfig( pmfilename.generic_string() );
+    m_patient->LoadPmConfig( pmfilename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveCloudCheckinUri )
@@ -154,7 +154,7 @@ TEST_F( TestPmConfig, LoadWillTryBackupFile )
     EXPECT_CALL( *m_fileUtil, ReadFile( filename ) ).WillOnce( Return( "" ) );
     EXPECT_CALL( *m_fileUtil, ReadFile( backupFilename ) ).WillOnce( Return( "" ) );
 
-    m_patient->LoadPmConfig( filename.generic_string() );
+    m_patient->LoadPmConfig( filename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceed )

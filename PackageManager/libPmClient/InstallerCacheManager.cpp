@@ -133,15 +133,13 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
         LOG_DEBUG( "Removing installers older than %d", now - ageInSeconds );
 
         for ( auto& file : results ) {
-            std::string filename = file.make_preferred().generic_string();
+            time_t lwt = m_fileUtil.LastWriteTime( file );
 
-            time_t lwt = m_fileUtil.LastWriteTime( filename );
-
-            LOG_DEBUG( "Checking cache file: %s LastWrite %d", filename.c_str(), lwt );
+            LOG_DEBUG( "Checking cache file: %s LastWrite %d", file.c_str(), lwt );
 
             if( now - lwt > ageInSeconds ) {
-                LOG_DEBUG( "Removing file from cache: %s", filename.c_str() );
-                m_fileUtil.DeleteFile( filename );
+                LOG_DEBUG( "Removing file from cache: %s", file.c_str() );
+                m_fileUtil.DeleteFile( file );
             }
         }
     }
