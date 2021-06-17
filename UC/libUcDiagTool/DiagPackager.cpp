@@ -23,12 +23,12 @@ void DiagPackager::CreatePackage( const std::vector<std::filesystem::path>& file
 
     LOG_DEBUG( "Creating Archive %s", packagePath );
 
-    if ( !m_zlibWrapper.CreateArchiveFile( packagePath.generic_u8string().c_str() ) ) {
+    if ( !m_zlibWrapper.CreateArchiveFile( packagePath.generic_string().c_str() ) ) {
         throw std::runtime_error( __FUNCTION__ ": Failed to create archive" );
     }
 
     for ( auto& file : fileList ) {
-        m_zlibWrapper.AddFileToArchive( file.generic_u8string().c_str() );
+        m_zlibWrapper.AddFileToArchive( file.generic_string().c_str() );
     }
 
     m_zlibWrapper.CloseArchiveFile();

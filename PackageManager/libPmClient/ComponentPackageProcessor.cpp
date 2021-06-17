@@ -111,7 +111,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     if ( !componentPackage.downloadedInstallerPath.empty() ) {
         installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
         LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
-            componentPackage.downloadedInstallerPath.c_str(),
+            componentPackage.downloadedInstallerPath.generic_string().c_str(),
             installerSize );
     }
 
@@ -165,14 +165,14 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" )
         {
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
-                componentPackage.downloadedInstallerPath.c_str() );
+                componentPackage.downloadedInstallerPath.generic_string().c_str() );
             componentPackage.postInstallRebootRequired = true;
             m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_REQ, "Reboot required event" );
         }
         else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
         {
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, reboot initiated by msi",
-                componentPackage.downloadedInstallerPath.c_str() );
+                componentPackage.downloadedInstallerPath.generic_string().c_str() );
             m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_INIT, "Reboot initiated event" );
         }
         else if( updErrCode != 0 )
@@ -232,13 +232,13 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
         try
         {
-            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.c_str(), componentPackage.productAndVersion.c_str() );
+            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.generic_string().c_str(), componentPackage.productAndVersion.c_str() );
             config.forProductAndVersion = componentPackage.productAndVersion;
             processed = m_configProcessor.ProcessConfig( config );
         }
         catch( ... )
         {
-            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path.c_str() );
+            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path.generic_string().c_str() );
         }
 
         failedConfigs += processed ? 0 : 1;

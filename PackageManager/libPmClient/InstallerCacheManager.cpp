@@ -42,11 +42,10 @@ std::filesystem::path InstallerCacheManager::DownloadOrUpdateInstaller( const Pm
         SanitizeComponentProductAndVersion( componentPackage.productAndVersion ) : 
         componentPackage.installerHash;
     installerPath += "." + componentPackage.installerType;
-    installerPath.make_preferred();
 
     if ( componentPackage.installerHash.empty() ) {
         // An empty installerHash means the package is a QA deployed package ( using force_downstream_uri )
-        LOG_ERROR( "Deleting QA package %s, ", installerPath.c_str() );
+        LOG_ERROR( "Deleting QA package %s, ", installerPath.generic_string().c_str() );
         DeleteInstaller( installerPath );
     }
     else if ( !ValidateInstaller( componentPackage, installerPath ) ) {
@@ -78,9 +77,9 @@ void InstallerCacheManager::DeleteInstaller( const std::filesystem::path& instal
         return;
     }
 
-    LOG_DEBUG( "Removing %s", installerPath.c_str() );
+    LOG_DEBUG( "Removing %s", installerPath.generic_string().c_str() );
     if ( m_fileUtil.DeleteFile( installerPath ) != 0 ) {
-        LOG_ERROR( __FUNCTION__ ": Failed to remove %s", installerPath.c_str() );
+        LOG_ERROR( __FUNCTION__ ": Failed to remove %s", installerPath.generic_string().c_str() );
     }
 }
 
@@ -95,7 +94,7 @@ bool InstallerCacheManager::ValidateInstaller( const PmComponent& componentPacka
             installerValid = true;
         }
         else {
-            LOG_ERROR( "Sha mismatch for %s. Actual %s Expected %d", installerPath.c_str(),
+            LOG_ERROR( "Sha mismatch for %s. Actual %s Expected %d", installerPath.generic_string().c_str(),
                 sha.has_value() ? sha.value().c_str() : "Sha Failed",
                 componentPackage.installerHash.c_str() );
         }
@@ -126,7 +125,7 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
     std::filesystem::path searchPath = m_downloadPath / "*";
     searchPath.make_preferred();
 
-    LOG_DEBUG( "Searching for Installers in %s", searchPath.c_str() );
+    LOG_DEBUG( "Searching for Installers in %s", searchPath.generic_string().c_str() );
     if ( m_componentMgr->FileSearchWithWildCard( searchPath, results ) == 0 ) {
         time_t now = time( NULL );
 
@@ -135,10 +134,10 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
         for ( auto& file : results ) {
             time_t lwt = m_fileUtil.LastWriteTime( file );
 
-            LOG_DEBUG( "Checking cache file: %s LastWrite %d", file.c_str(), lwt );
+            LOG_DEBUG( "Checking cache file: %s LastWrite %d", file.generic_string().c_str(), lwt );
 
             if( now - lwt > ageInSeconds ) {
-                LOG_DEBUG( "Removing file from cache: %s", file.c_str() );
+                LOG_DEBUG( "Removing file from cache: %s", file.generic_string().c_str() );
                 m_fileUtil.DeleteFile( file );
             }
         }
