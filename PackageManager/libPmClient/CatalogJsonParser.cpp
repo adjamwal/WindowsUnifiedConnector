@@ -96,6 +96,8 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDisc
 
 void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::vector<PmProductDiscoveryConfigurable>& returnPkgConfigs )
 {
+    std::lock_guard<std::mutex> lock( m_mutex );
+
     returnPkgConfigs.clear();
 
     if( !pkgValue.isMember( UC_CATALOG_KEY_CONFIGURABLES ) || !pkgValue[ UC_CATALOG_KEY_CONFIGURABLES ].isArray() )
