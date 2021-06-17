@@ -21,7 +21,7 @@ void DiagPackager::CreatePackage( const std::vector<std::filesystem::path>& file
         throw std::runtime_error( __FUNCTION__ ": Invalid Parameters" );
     }
 
-    LOG_DEBUG( "Creating Archive %s", packagePath );
+    LOG_DEBUG( "Creating Archive %s", packagePath.generic_string().c_str() );
 
     if ( !m_zlibWrapper.CreateArchiveFile( packagePath.generic_string().c_str() ) ) {
         throw std::runtime_error( __FUNCTION__ ": Failed to create archive" );

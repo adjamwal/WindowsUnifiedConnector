@@ -116,7 +116,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         if( !rtn )
         {
             RemoveTempFile( config.verifyPath );
-            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
+            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
         }
     }
     catch( PackageException& ex )
