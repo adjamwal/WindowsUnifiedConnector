@@ -119,6 +119,8 @@ bool ZlibWrapper::AddFileToArchive( const char* filenameinzip )
 
     if ( err != ZIP_OK ) {
         LOG_ERROR( "error in opening %s in zipfile\n", filenameinzip );
+        fclose( fin );
+        fin = NULL;
         return false;
     }
 
@@ -142,6 +144,7 @@ bool ZlibWrapper::AddFileToArchive( const char* filenameinzip )
     } while ( ( err == ZIP_OK ) && ( size_read > 0 ) );
 
     fclose( fin );
+    fin = NULL;
 
     err = zipCloseFileInZip( m_zipFile );
     if ( err != ZIP_OK ) {

@@ -44,8 +44,9 @@ protected:
         DeleteFile( L"config.json" );
         EXPECT_EQ( m_releaseModule( &m_patient ), PM_MODULE_SUCCESS );
 
-        if( m_controlLib ) {
-            FreeLibrary( m_controlLib );
+        if( m_controlLib && FreeLibrary( m_controlLib ) )
+        {
+            m_controlLib = NULL;
         }
     }
 

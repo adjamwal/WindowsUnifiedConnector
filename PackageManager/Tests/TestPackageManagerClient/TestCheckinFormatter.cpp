@@ -26,11 +26,11 @@ protected:
         m_inventory->architecture = "architecture";
         m_inventory->platform = "platform";
 
-        PmInstalledPackage package;
+        PmInstalledPackage package = {};
         package.product = "Name";
         package.version = "Version";
 
-        PackageConfigInfo config;
+        PackageConfigInfo config = {};
         config.path = "path";
         config.sha256 = "sha";
 
@@ -43,8 +43,8 @@ protected:
         m_inventory->architecture = "architecture";
         m_inventory->platform = "platform";
 
-        PackageConfigInfo config;
-        PmInstalledPackage package;
+        PackageConfigInfo config = {};
+        PmInstalledPackage package = {};
 
         package.product = "Package1";
         package.version = "Version1";

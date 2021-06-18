@@ -34,4 +34,5 @@ public:
 private:
     InstallerConfigData m_configData;
     std::vector<PmComponent> m_ComponentList;
+    std::string m_returnAsRef;
 };

@@ -194,7 +194,7 @@ size_t FileSysUtil::FileSize( const std::string& filename )
             rtn = ::std::filesystem::file_size( filename );
         }
     }
-    catch( std::filesystem::filesystem_error ex ) {
+    catch( std::filesystem::filesystem_error& ex ) {
         LOG_ERROR( "%s", ex.what() );
     }
 
@@ -211,7 +211,7 @@ std::filesystem::file_time_type FileSysUtil::FileTime( const std::string& filena
             rtn = std::filesystem::last_write_time( filename );
         }
     }
-    catch( std::filesystem::filesystem_error ex ) {
+    catch( std::filesystem::filesystem_error& ex ) {
         LOG_ERROR( "%s", ex.what() );
     }
     return rtn;
