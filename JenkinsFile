@@ -418,6 +418,17 @@ pipeline {
         }
       }
       post {
+        // NotifyWebexChannel can't be done in outer post step because it doesn't have access to git environment variables
+        success {
+          script {
+            NotifyWebexChannel('https://botworkflows.webex.com/embed/run/99602d2ad1d17a1ba13e5e')
+          }
+        }
+        failure {
+          script {
+            NotifyWebexChannel('https://botworkflows.webex.com/embed/run/99602d21e3817a1ba0b761')
+          }
+        }
         cleanup {
           cleanWs cleanWhenAborted: true, cleanWhenFailure: false, cleanWhenSuccess: true
         }
@@ -429,13 +440,11 @@ pipeline {
       script {
         SetGithubSuccessStatus()
         email.sendSuccessEmail("fireamp-win-connector")
-		NotifyWebexChannel('https://botworkflows.webex.com/embed/run/99602d2ad1d17a1ba13e5e')
       }
     }
     failure {
       script {
         email.sendFailureEmail("fireamp-win-connector")
-		NotifyWebexChannel('https://botworkflows.webex.com/embed/run/99602d21e3817a1ba0b761')
       }
     }
   }
