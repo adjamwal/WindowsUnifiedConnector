@@ -20,12 +20,12 @@ void MockComponentPackageProcessor::ExpectInitializeIsNotCalled()
 
 void MockComponentPackageProcessor::MakeHasDownloadedBinaryReturn( bool value )
 {
-    ON_CALL( *this, HasDownloadedBinary( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, PreDownloadedBinaryExists( _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockComponentPackageProcessor::ExpectHasDownloadedBinaryIsNotCalled()
 {
-    EXPECT_CALL( *this, HasDownloadedBinary( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, PreDownloadedBinaryExists( _ ) ).Times( 0 );
 }
 
 void MockComponentPackageProcessor::MakeHasConfigsReturn( bool value )

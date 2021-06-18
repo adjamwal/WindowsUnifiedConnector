@@ -14,7 +14,7 @@ public:
     MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
     void ExpectInitializeIsNotCalled();
 
-    MOCK_METHOD1( HasDownloadedBinary, bool( PmComponent& ) );
+    MOCK_METHOD1( PreDownloadedBinaryExists, bool( PmComponent& ) );
     void MakeHasDownloadedBinaryReturn( bool value );
     void ExpectHasDownloadedBinaryIsNotCalled();
 

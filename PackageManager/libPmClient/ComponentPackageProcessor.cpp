@@ -54,7 +54,7 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
     m_installerManager.Initialize( dep );
 }
 
-bool ComponentPackageProcessor::HasDownloadedBinary( PmComponent& componentPackage )
+bool ComponentPackageProcessor::PreDownloadedBinaryExists( PmComponent& componentPackage )
 {
     bool result = !componentPackage.downloadedInstallerPath.empty() &&
         m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
@@ -90,7 +90,7 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
 
     componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
 
-    return HasDownloadedBinary( componentPackage );
+    return PreDownloadedBinaryExists( componentPackage );
 }
 
 bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPackage )
@@ -106,6 +106,13 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     {
         LOG_ERROR( __FUNCTION__ ": Dependencies not initialized" );
         return false;
+    }
+
+    if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 )
+    {
+        //nothing to install for config-only packages (i.e. packages that don't have an installerUrl)
+        //return success, to ensure configuration gets processed
+        return true;
     }
 
     if ( !componentPackage.downloadedInstallerPath.empty() ) {
@@ -131,7 +138,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     try
     {
-        if ( componentPackage.downloadedInstallerPath.empty() ) {
+        if ( !PreDownloadedBinaryExists(componentPackage) ) {
             ssError << "Failed to download " << componentPackage.installerUrl;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }

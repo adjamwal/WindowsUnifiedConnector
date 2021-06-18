@@ -70,7 +70,7 @@ protected:
             "installLocation",
             "signerName",
             "installerHash",
-            "installerPath",
+            "downloadedInstallerPath",
             false,
             {}
         };
@@ -97,6 +97,15 @@ protected:
         m_pmComponentManager->MakeUpdateComponentReturn( 0 );
         m_fileUtil->MakeFileSizeReturn( 1 );
         m_fileUtil->MakeFileExistsReturn( true );
+    }
+
+    void SetupComponentPackageWithMissingBinary()
+    {
+        SetupComponentPackage();
+        m_expectedComponentPackage.installerHash = "";
+        m_patient->Initialize( m_dep.get() );
+        m_fileUtil->MakeFileSizeReturn( -1 );
+        m_fileUtil->MakeFileExistsReturn( false);
     }
 
     PmComponent m_expectedComponentPackage;
@@ -223,6 +232,16 @@ TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPac
 {
     SetupComponentPackageWithConfig();
     m_pmComponentManager->MakeUpdateComponentReturn( -1 );
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPackageIsMissingBinary )
+{
+    SetupComponentPackageWithMissingBinary();
 
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );

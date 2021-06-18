@@ -30,7 +30,7 @@ public:
 
     void Initialize( IPmPlatformDependencies* dep ) override;
 
-    bool HasDownloadedBinary( PmComponent& componentPackage ) override;
+    bool PreDownloadedBinaryExists( PmComponent& componentPackage ) override;
     bool HasConfigs( PmComponent& componentPackage ) override;
 
     bool DownloadPackageBinary( PmComponent& componentPackage ) override;
