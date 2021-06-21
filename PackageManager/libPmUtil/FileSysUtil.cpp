@@ -26,13 +26,16 @@ std::string FileSysUtil::ReadFile( const std::filesystem::path& filePath )
 {
     std::stringstream stream;
 
-    if( FileExists( filePath ) ) {
+    if( !m_utf8PathVerifier.IsPathValid( filePath ) ) {
+        WLOG_ERROR( L"path is invalid" );
+    } 
+    else if( FileExists( filePath ) ) {
         std::ifstream file( filePath );
         if( file.is_open() ) {
             stream << file.rdbuf();
         }
         else {
-            LOG_ERROR( "Failed to open file %s", filePath.c_str() );
+            WLOG_ERROR( L"Failed to open file %s", filePath.wstring().c_str() );
         }
     }
     else {
@@ -45,13 +48,18 @@ std::string FileSysUtil::ReadFile( const std::filesystem::path& filePath )
 bool FileSysUtil::WriteLine( const std::filesystem::path& filePath, const std::string& data )
 {
     bool ret = false;
-    std::ofstream file( filePath, std::ios_base::app );
 
-    if ( file.is_open() )
-    {
-        file << data << "\n";
-        file.close();
-        ret = true;
+    if( !m_utf8PathVerifier.IsPathValid( filePath ) ) {
+        WLOG_ERROR( L"path is invalid" );
+    }
+    else {
+        std::ofstream file( filePath, std::ios_base::app );
+
+        if( file.is_open() ) {
+            file << data << "\n";
+            file.close();
+            ret = true;
+        }
     }
 
     return ret;
@@ -60,20 +68,24 @@ bool FileSysUtil::WriteLine( const std::filesystem::path& filePath, const std::s
 std::vector<std::string> FileSysUtil::ReadFileLines( const std::filesystem::path& filePath )
 {
     std::vector<std::string> lines;
-    std::ifstream file( filePath );
 
-    if ( file.is_open() )
-    {
-        std::string str;
-
-        while ( std::getline( file, str ) )
-        {
-            lines.push_back( str );
-        }
-
-        file.close();
+    if( !m_utf8PathVerifier.IsPathValid( filePath ) ) {
+        WLOG_ERROR( L"path is invalid" );
     }
-    
+    else {
+        std::ifstream file( filePath );
+
+        if( file.is_open() ) {
+            std::string str;
+
+            while( std::getline( file, str ) ) {
+                lines.push_back( str );
+            }
+
+            file.close();
+        }
+    }
+
     return lines;
 }
 
@@ -96,7 +108,7 @@ FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath
             WLOG_ERROR( L"fopen_s failed" );
         }
         else {
-            WLOG_DEBUG( L"Created file %hs", filePath );
+            WLOG_DEBUG( L"Created file %hs", filePath.wstring().c_str() );
         }
     }
 
@@ -267,7 +279,7 @@ std::string FileSysUtil::AppendPath( const std::string& basePath, const std::str
     }
 
     path.make_preferred();
-    LOG_DEBUG( "Path resolved to %s", path.c_str() );
+    WLOG_DEBUG( L"Path resolved to %s", path.wstring().c_str() );
 
     return path.generic_u8string();
 }
@@ -283,7 +295,7 @@ time_t FileSysUtil::LastWriteTime( const std::filesystem::path& filename )
 
     struct _stat64 fileInfo;
     if ( _stati64( filename.generic_u8string().c_str(), &fileInfo ) != 0 ) {
-        LOG_ERROR( "_stati64 failed on file %s", filename.c_str() );
+        WLOG_ERROR( L"_stati64 failed on file %s", filename.wstring().c_str() );
     }
     else {
         rtn = fileInfo.st_mtime;

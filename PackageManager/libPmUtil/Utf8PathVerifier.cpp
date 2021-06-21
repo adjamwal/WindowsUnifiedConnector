@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Utf8PathVerifier.h"
 #include "PmLogger.h"
+#include <sstream>
 
 Utf8PathVerifier::Utf8PathVerifier()
 { 
@@ -14,15 +15,19 @@ Utf8PathVerifier::~Utf8PathVerifier()
 bool Utf8PathVerifier::IsPathValid( const std::filesystem::path& pathToVerify )
 {
     bool rtn = false;
-
+    std::string u8string;
     try {
         //Path is validated by calling u8string(). It will throw if it's not valid
-        LOG_DEBUG( "Validated Path %s", pathToVerify.u8string().c_str() );
+        u8string = pathToVerify.u8string();
         rtn = true;
     }
     catch( ... ) {
-        //Need a better log message
-        WLOG_ERROR( L"Invalid path detected %s", pathToVerify.wstring().c_str() );
+        std::wstringstream pathHex;
+        for( int i = 0; i < pathToVerify.wstring().length(); i++ ) {
+            pathHex << L"0x" << std::setfill( L'0' ) << std::setw( 4 ) << std::hex << ( int )pathToVerify.wstring()[ i ] << L" ";
+        }
+
+        WLOG_ERROR( L"Invalid path detected(hex) %s", pathHex.str().c_str() );
     }
 
     return rtn;
