@@ -51,7 +51,8 @@ protected:
             "installLocation",
             "signerName",
             "installerHash",
-            "installerPath",
+            "downloadedInstallerPath",
+            "downloadErrorMsg",
             false,
             {}
         };

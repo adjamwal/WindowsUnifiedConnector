@@ -58,7 +58,8 @@ bool ComponentPackageProcessor::PreDownloadedBinaryExists( PmComponent& componen
 {
     bool result = !componentPackage.downloadedInstallerPath.empty() &&
         m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
-        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 );
+        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 &&
+        componentPackage.downloadErrorMsg.empty() );
 
     LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
         componentPackage.productAndVersion.c_str(),
@@ -87,8 +88,24 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
     }
 
     std::string installerPath;
-
-    componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
+    std::stringstream ssError;
+    ssError << "Package " << componentPackage.productAndVersion << ": ";
+    
+    try
+    {
+        componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
+        LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", componentPackage.downloadedInstallerPath.c_str() );
+    }
+    catch( PackageException& ex )
+    {
+        ssError << ex.what();
+        componentPackage.downloadErrorMsg = ssError.str();
+    }
+    catch( ... )
+    {
+        ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
+        componentPackage.downloadErrorMsg = ssError.str();
+    }
 
     return PreDownloadedBinaryExists( componentPackage );
 }
@@ -139,7 +156,10 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     try
     {
         if ( !PreDownloadedBinaryExists(componentPackage) ) {
-            ssError << "Failed to download " << componentPackage.installerUrl;
+            if( !componentPackage.downloadErrorMsg.empty() )
+                ssError << componentPackage.downloadErrorMsg;
+            else 
+                ssError << "Failed to pre-download " << componentPackage.installerUrl;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
 

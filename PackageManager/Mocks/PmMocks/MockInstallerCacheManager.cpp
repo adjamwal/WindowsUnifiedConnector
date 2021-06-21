@@ -20,6 +20,12 @@ void MockInstallerCacheManager::MakeDownloadOrUpdateInstallerReturn( const std::
     ON_CALL( *this, DownloadOrUpdateInstaller( _ ) ).WillByDefault( Return( value ) );
 }
 
+void MockInstallerCacheManager::MakeDownloadOrUpdateInstallerThrow( std::string message, int code )
+{
+    ON_CALL( *this, DownloadOrUpdateInstaller( _ ) ).WillByDefault(
+        Throw( PackageException( message, code ) ) );
+}
+
 void MockInstallerCacheManager::ExpectDownloadOrUpdateInstallerIsNotCalled()
 {
     EXPECT_CALL( *this, DownloadOrUpdateInstaller( _ ) ).Times( 0 );

@@ -1,6 +1,7 @@
 #pragma once
 #include "MocksCommon.h"
 #include "PmTypes.h"
+#include "PackageException.h"
 
 #include "IInstallerCacheManager.h"
 
@@ -15,6 +16,7 @@ public:
 
     MOCK_METHOD1( DownloadOrUpdateInstaller, std::string( const PmComponent& ) );
     void MakeDownloadOrUpdateInstallerReturn( const std::string& value );
+    void MakeDownloadOrUpdateInstallerThrow( std::string message, int code );
     void ExpectDownloadOrUpdateInstallerIsNotCalled();
 
     MOCK_METHOD1( DeleteInstaller, void( const std::string& ) );

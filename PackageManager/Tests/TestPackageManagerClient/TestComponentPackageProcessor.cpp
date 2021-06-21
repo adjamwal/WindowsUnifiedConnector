@@ -71,6 +71,7 @@ protected:
             "signerName",
             "installerHash",
             "downloadedInstallerPath",
+            "", //downloadErrorMsg
             false,
             {}
         };
@@ -249,3 +250,12 @@ TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPac
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
+TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillCacheDownloadError )
+{
+    SetupComponentPackageWithMissingBinary();
+    m_installerCacheMgr->MakeDownloadOrUpdateInstallerThrow( "http 1234", 1 );
+
+    m_patient->DownloadPackageBinary( m_expectedComponentPackage );
+
+    EXPECT_TRUE( m_expectedComponentPackage.downloadErrorMsg.find( "http 1234" ) != std::string::npos );
+}

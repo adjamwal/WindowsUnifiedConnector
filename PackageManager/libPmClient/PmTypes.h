@@ -25,6 +25,7 @@ struct PmComponent
     std::string signerName;
     std::string installerHash;
     std::string downloadedInstallerPath;
+    std::string downloadErrorMsg; //cached pre-download error msg
     bool postInstallRebootRequired;
     std::vector<PackageConfigInfo> configs;
 };

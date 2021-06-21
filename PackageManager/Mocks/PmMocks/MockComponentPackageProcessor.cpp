@@ -2,7 +2,7 @@
 
 MockComponentPackageProcessor::MockComponentPackageProcessor()
 {
-    MakeHasDownloadedBinaryReturn( false );
+    MakePreDownloadedBinaryExistsReturn( false );
     MakeHasConfigsReturn( false );
     MakeDownloadPackageBinaryReturn( false );
     MakeProcessPackageBinaryReturn( false );
@@ -18,12 +18,12 @@ void MockComponentPackageProcessor::ExpectInitializeIsNotCalled()
     EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
 }
 
-void MockComponentPackageProcessor::MakeHasDownloadedBinaryReturn( bool value )
+void MockComponentPackageProcessor::MakePreDownloadedBinaryExistsReturn( bool value )
 {
     ON_CALL( *this, PreDownloadedBinaryExists( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockComponentPackageProcessor::ExpectHasDownloadedBinaryIsNotCalled()
+void MockComponentPackageProcessor::ExpectPreDownloadedBinaryExistsIsNotCalled()
 {
     EXPECT_CALL( *this, PreDownloadedBinaryExists( _ ) ).Times( 0 );
 }
