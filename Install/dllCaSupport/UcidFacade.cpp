@@ -7,10 +7,12 @@
 #include "WindowsConfiguration.h"
 #include <WindowsUtilities.h>
 #include <codecvt>
+#include "Utf8PathVerifier.h"
 
 UcidFacade::UcidFacade()
     : m_oldLogger( GetUcLogger() )
-    , m_fileUtil( new FileSysUtil() )
+    , m_utf8PathVerifier( new Utf8PathVerifier() )
+    , m_fileUtil( new FileSysUtil( *m_utf8PathVerifier ) )
     , m_config( new PmConfig( *m_fileUtil ) )
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer( new CodesignVerifier() )

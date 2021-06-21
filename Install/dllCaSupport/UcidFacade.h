@@ -10,6 +10,7 @@ class IPmConfig;
 class ICodesignVerifier;
 class IWinCertLoader;
 class IPmPlatformConfiguration;
+class IUtf8PathVerifier;
 
 class UcidFacade : public IUcidFacade
 {
@@ -21,6 +22,7 @@ public:
 
 private:
     IUcLogger* m_oldLogger; 
+    std::unique_ptr<IUtf8PathVerifier> m_utf8PathVerifier;
     std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<IPmConfig> m_config;
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;

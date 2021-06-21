@@ -5,8 +5,9 @@
 #include "PmTypes.h"
 #include "MockWinApiWrapper.h"
 #include <memory>
-#include <MockMsiApi.h>
-#include <PmMocks/MockPmPlatformComponentManager.h>
+#include "MockMsiApi.h"
+#include "MockUtf8PathVerifier.h"
+#include "MockPmPlatformComponentManager.h"
 
 class TestPackageDiscovery : public ::testing::Test
 {
@@ -18,7 +19,9 @@ protected:
         m_detectedInstallations.clear();
         m_discoveryMethods.reset( new NiceMock<MockPackageDiscoveryMethods>() );
         m_msiApi.reset( new NiceMock<MockMsiApi>() );
-        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods, *m_msiApi );
+        m_utf8PathVerifier.reset( new NiceMock<MockUtf8PathVerifier>() );
+
+        m_patient = std::make_unique<PackageDiscovery>( *m_discoveryMethods, *m_msiApi, *m_utf8PathVerifier );
     }
 
     void TearDown()
@@ -72,8 +75,10 @@ protected:
     std::vector<PmProductDiscoveryRules> m_catalogRules;
     std::vector<PmInstalledPackage> m_detectedInstallations;
     std::unique_ptr<MockPackageDiscoveryMethods> m_discoveryMethods;
-    std::unique_ptr<PackageDiscovery> m_patient;
     std::unique_ptr<MockMsiApi> m_msiApi;
+    std::unique_ptr<MockUtf8PathVerifier> m_utf8PathVerifier;
+
+    std::unique_ptr<PackageDiscovery> m_patient;
 };
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )

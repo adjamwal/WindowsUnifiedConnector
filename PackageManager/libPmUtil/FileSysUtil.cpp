@@ -4,13 +4,15 @@
 #include <fstream>
 #include <filesystem>
 #include <chrono>
+#include "IUtf8PathVerifier.h"
 
 struct FileUtilHandle
 {
     FILE* file;
 };
 
-FileSysUtil::FileSysUtil()
+FileSysUtil::FileSysUtil( IUtf8PathVerifier& utf8PathVerifier ) :
+    m_utf8PathVerifier( utf8PathVerifier )
 {
 
 }
@@ -82,6 +84,9 @@ FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath
     if( filePath.empty() ) {
         WLOG_ERROR( L"filename is empty" );
     }
+    else if( !m_utf8PathVerifier.IsPathValid( filePath ) ) {
+        WLOG_ERROR( L"path is invalid" );
+    }
     else {
         ::std::filesystem::create_directories( filePath.parent_path() );
 
@@ -148,6 +153,11 @@ int32_t FileSysUtil::DeleteFile( const std::filesystem::path& filePath )
 {
     int32_t rtn = -1;
  
+    if( !m_utf8PathVerifier.IsPathValid( filePath ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return rtn;
+    }
+
     try {
         if ( FileExists( filePath ) ) {
             ::std::filesystem::remove( filePath );
@@ -165,6 +175,11 @@ int32_t FileSysUtil::Rename( const std::filesystem::path& oldFilename, const std
 {
     int32_t rtn = -1;
 
+    if( !m_utf8PathVerifier.IsPathValid( oldFilename ) || !m_utf8PathVerifier.IsPathValid( newName ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return rtn;
+    }
+
     try {
         ::std::filesystem::create_directories( newName.parent_path() );
         ::std::filesystem::rename( oldFilename, newName );
@@ -179,12 +194,22 @@ int32_t FileSysUtil::Rename( const std::filesystem::path& oldFilename, const std
 
 bool FileSysUtil::FileExists( const std::filesystem::path& filename )
 {
+    if( !m_utf8PathVerifier.IsPathValid( filename ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return false;
+    }
+
     return ::std::filesystem::exists( filename );
 }
 
 size_t FileSysUtil::FileSize( const std::filesystem::path& filename )
 {
     size_t rtn = 0;
+
+    if( !m_utf8PathVerifier.IsPathValid( filename ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return rtn;
+    }
 
     try {
         if( !filename.empty() && FileExists( filename ) )
@@ -202,6 +227,12 @@ size_t FileSysUtil::FileSize( const std::filesystem::path& filename )
 std::filesystem::file_time_type FileSysUtil::FileTime( const std::filesystem::path& filename )
 {
     std::filesystem::file_time_type rtn; //=0
+
+    if( !m_utf8PathVerifier.IsPathValid( filename ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return rtn;
+    }
+
     try
     {
         if( !filename.empty() && FileExists( filename ) )
@@ -230,6 +261,11 @@ std::string FileSysUtil::AppendPath( const std::string& basePath, const std::str
         path /= configPath;
     }
 
+    if( !m_utf8PathVerifier.IsPathValid( path ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return "";
+    }
+
     path.make_preferred();
     LOG_DEBUG( "Path resolved to %s", path.c_str() );
 
@@ -239,6 +275,11 @@ std::string FileSysUtil::AppendPath( const std::string& basePath, const std::str
 time_t FileSysUtil::LastWriteTime( const std::filesystem::path& filename )
 {
     time_t rtn = -1;
+
+    if( !m_utf8PathVerifier.IsPathValid( filename ) ) {
+        WLOG_ERROR( L"path is invalid" );
+        return rtn;
+    }
 
     struct _stat64 fileInfo;
     if ( _stati64( filename.generic_u8string().c_str(), &fileInfo ) != 0 ) {

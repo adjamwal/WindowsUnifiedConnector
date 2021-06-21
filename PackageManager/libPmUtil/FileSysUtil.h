@@ -2,13 +2,15 @@
 
 #include "IFileSysUtil.h"
 
+class IUtf8PathVerifier;
+
 //original FileUtil.h name was overlapping with 
 //C:\Program Files (x86)\WiX Toolset v3.11\SDK\VS2015\inc\fileutil.h 
 //and couldn't be used from installer project
 class FileSysUtil : public IFileSysUtil
 {
 public:
-    FileSysUtil();
+    FileSysUtil( IUtf8PathVerifier& utf8PathVerifier );
     ~FileSysUtil();
 
     std::string ReadFile( const std::filesystem::path& filePath ) override;
@@ -25,4 +27,7 @@ public:
     std::filesystem::file_time_type FileTime( const std::filesystem::path& filePath ) override;
     std::string AppendPath( const std::string& basePath, const std::string& configPath ) override;
     time_t LastWriteTime( const std::filesystem::path& filePath ) override;
+
+private:
+    IUtf8PathVerifier& m_utf8PathVerifier;
 };
