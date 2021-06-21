@@ -94,7 +94,7 @@ FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath
     FileUtilHandle* handle = NULL;
 
     if( filePath.empty() ) {
-        WLOG_ERROR( L"filename is empty" );
+        LOG_ERROR( "filename is empty" );
     }
     else if( !m_utf8PathVerifier.IsPathValid( filePath ) ) {
         WLOG_ERROR( L"path is invalid" );
@@ -103,9 +103,9 @@ FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath
         ::std::filesystem::create_directories( filePath.parent_path() );
 
         handle = ( FileUtilHandle* )malloc( sizeof( FileUtilHandle ) );
-        errno_t rtn = fopen_s( &handle->file, filePath.generic_u8string().c_str(), "wb" );
+        errno_t rtn = fopen_s( &handle->file, filePath.generic_string().c_str(), "wb" );
         if( rtn != 0 ) {
-            WLOG_ERROR( L"fopen_s failed" );
+            LOG_ERROR( "fopen_s failed" );
         }
         else {
             WLOG_DEBUG( L"Created file %hs", filePath.wstring().c_str() );
@@ -155,7 +155,7 @@ std::filesystem::path FileSysUtil::GetTempDir()
 
     //make_preferred will use the prefered sepeartor for the operating system
     // "//" for windows "/" for linux 
-    path.make_preferred();
+    //path.make_preferred();
 
     // string() will return the path with the prefered sepeartor
     return path;
@@ -281,7 +281,7 @@ std::string FileSysUtil::AppendPath( const std::string& basePath, const std::str
     path.make_preferred();
     WLOG_DEBUG( L"Path resolved to %s", path.wstring().c_str() );
 
-    return path.generic_u8string();
+    return path.generic_string();
 }
 
 time_t FileSysUtil::LastWriteTime( const std::filesystem::path& filename )
