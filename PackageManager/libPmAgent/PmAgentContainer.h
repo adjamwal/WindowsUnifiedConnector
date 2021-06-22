@@ -15,6 +15,7 @@ class IMsiApi;
 class IPackageDiscovery;
 class IPackageDiscoveryMethods;
 class IUserImpersonator;
+class IUtf8PathVerifier;
 
 class PmAgentContainer
 {
@@ -27,6 +28,7 @@ public:
 private:
     std::unique_ptr<IWinApiWrapper> m_winApiWrapper;
     std::unique_ptr<IMsiApi> m_msiApi;
+    std::unique_ptr<IUtf8PathVerifier> m_utf8PathVerifier;
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
     std::unique_ptr<IWinCertLoader> m_certLoader;
     std::unique_ptr<IPackageDiscoveryMethods> m_discoveryMethods;

@@ -9,10 +9,13 @@
 #include <regex>
 #include "..\..\GlobalVersion.h"
 #include <StringUtil.h>
+#include "IUtf8PathVerifier.h"
 
-PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi ) : 
-    m_methods( methods ),
-    m_msiApi( msiApi )
+
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi, IUtf8PathVerifier& utf8PathVerifier ) :
+    m_methods( methods )
+    , m_msiApi( msiApi )
+    , m_utf8PathVerifier( utf8PathVerifier )
 {
 }
 
@@ -112,6 +115,8 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         }
 
         WindowsUtilities::FileSearchWithWildCard( configurable.path, discoveredFiles );
+
+        m_utf8PathVerifier.PruneInvalidPathsFromList( discoveredFiles );
 
         if ( discoveredFiles.size() > configurable.max_instances )
         {
