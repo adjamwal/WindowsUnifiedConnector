@@ -56,8 +56,17 @@ std::filesystem::path InstallerCacheManager::DownloadOrUpdateInstaller( const Pm
     }
 
     if( !installerValid ) {
-        if( int httpResult = m_pmCloud.DownloadFile( componentPackage.installerUrl, installerPath ) != 200 ) {
-            ssError << "Failed to download " << componentPackage.installerUrl << " to \"" << installerPath << "\". HTTP result: " << httpResult;
+        int32_t httpResponse = 0;
+        if( ( httpResponse = m_pmCloud.DownloadFile( componentPackage.installerUrl, installerPath.string() ) ) != 200 ) {
+            ssError << "Failed to download " << componentPackage.installerUrl << " to \"" << installerPath.string() << "\".";
+            if( httpResponse > 0 )
+            {
+                ssError << " HTTP response: " << httpResponse;
+            }
+            else
+            {
+                ssError << " Request timed out or unknown error.";
+            }
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
         else if( !componentPackage.installerHash.empty() && 
