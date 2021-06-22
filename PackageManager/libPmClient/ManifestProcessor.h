@@ -4,7 +4,6 @@
 #include "IPmManifest.h"
 #include "IComponentPackageProcessor.h"
 #include <mutex>
-#include <vector>
 
 class ManifestProcessor : public IManifestProcessor
 {

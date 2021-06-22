@@ -54,10 +54,10 @@ TEST_F( TestPackageInventoryProvider, GetInventorySucceeds )
 
 TEST_F( TestPackageInventoryProvider, GetInventoryWillRetrieveConfigSha )
 {
-    PackageConfigInfo config;
-    PmInstalledPackage package;
-    PackageInventory inventory;
-    PackageInventory detectedPackages;
+    PackageConfigInfo config = {};
+    PmInstalledPackage package = {};
+    PackageInventory inventory = {};
+    PackageInventory detectedPackages = {};
     std::string sha256 = "Sha256";
 
     package.configs.push_back( config );
@@ -75,10 +75,10 @@ TEST_F( TestPackageInventoryProvider, GetInventoryWillRetrieveConfigSha )
 
 TEST_F( TestPackageInventoryProvider, GetInventoryWillFailTooRetrieveConfigSha )
 {
-    PackageConfigInfo config;
-    PmInstalledPackage package;
-    PackageInventory inventory;
-    PackageInventory detectedPackages;
+    PackageConfigInfo config = {};
+    PmInstalledPackage package = {};
+    PackageInventory inventory = {};
+    PackageInventory detectedPackages = {};
     std::optional<std::string> sha256;
 
     package.configs.push_back( config );

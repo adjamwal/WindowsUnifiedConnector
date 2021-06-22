@@ -48,7 +48,8 @@ protected:
                 "installLocation",
                 "signerName",
                 "installerHash",
-                "installerPath",
+                "downloadedInstallerPath",
+                "", //downloadErrorMsg
                 true
         };
 
@@ -58,7 +59,7 @@ protected:
         }
 
         m_pmManifest->MakeGetPackageListReturn( m_packageList );
-        m_componentProcessor->MakeHasDownloadedBinaryReturn( true );
+        m_componentProcessor->MakePreDownloadedBinaryExistsReturn( true );
         m_componentProcessor->MakeHasConfigsReturn( true );
         m_componentProcessor->MakeProcessPackageBinaryReturn( true );
         m_componentProcessor->MakeProcessConfigsForPackageReturn( true );
@@ -106,11 +107,12 @@ TEST_F( TestManifestProcessor, ProcessManifestWillDownloadPackageBinaries )
 
     m_patient->ProcessManifest( "test", m_isRebootRequired );
 }
+
 TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
 {
     SetupPackageList( 2 );
-    EXPECT_CALL( *m_componentProcessor, 
-        ProcessPackageBinary( PmComponentMatch( m_expectedComponentPackage ) ) 
+    EXPECT_CALL( *m_componentProcessor,
+        ProcessPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
     ).Times( m_packageList.size() );
 
     m_patient->ProcessManifest( "test", m_isRebootRequired );
@@ -158,7 +160,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForNonActionable
         ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
     ).Times( m_packageList.size() );
 
-    m_componentProcessor->MakeHasDownloadedBinaryReturn( false );
+    m_componentProcessor->MakePreDownloadedBinaryExistsReturn( false );
     m_patient->ProcessManifest( "test", m_isRebootRequired );
 }
 
@@ -179,4 +181,3 @@ TEST_F( TestManifestProcessor, ProcessManifestWillThrowIfProcessConfigsForPackag
     m_componentProcessor->MakeProcessConfigsForPackageReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test", m_isRebootRequired ), std::exception );
 }
-

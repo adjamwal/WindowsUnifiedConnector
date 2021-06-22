@@ -54,11 +54,12 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
     m_installerManager.Initialize( dep );
 }
 
-bool ComponentPackageProcessor::HasDownloadedBinary( PmComponent& componentPackage )
+bool ComponentPackageProcessor::PreDownloadedBinaryExists( PmComponent& componentPackage )
 {
     bool result = !componentPackage.downloadedInstallerPath.empty() &&
         m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
-        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 );
+        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 &&
+        componentPackage.downloadErrorMsg.empty() );
 
     LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
         componentPackage.productAndVersion.c_str(),
@@ -87,10 +88,26 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
     }
 
     std::string installerPath;
+    std::stringstream ssError;
+    ssError << "Package " << componentPackage.productAndVersion << ": ";
+    
+    try
+    {
+        componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
+        LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", componentPackage.downloadedInstallerPath.c_str() );
+    }
+    catch( PackageException& ex )
+    {
+        ssError << ex.what();
+        componentPackage.downloadErrorMsg = ssError.str();
+    }
+    catch( ... )
+    {
+        ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
+        componentPackage.downloadErrorMsg = ssError.str();
+    }
 
-    componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
-
-    return HasDownloadedBinary( componentPackage );
+    return PreDownloadedBinaryExists( componentPackage );
 }
 
 bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPackage )
@@ -106,6 +123,13 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     {
         LOG_ERROR( __FUNCTION__ ": Dependencies not initialized" );
         return false;
+    }
+
+    if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 )
+    {
+        //nothing to install for config-only packages (i.e. packages that don't have an installerUrl)
+        //return success, to ensure configuration gets processed
+        return true;
     }
 
     if ( !componentPackage.downloadedInstallerPath.empty() ) {
@@ -131,8 +155,11 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     try
     {
-        if ( componentPackage.downloadedInstallerPath.empty() ) {
-            ssError << "Failed to download " << componentPackage.installerUrl;
+        if ( !PreDownloadedBinaryExists(componentPackage) ) {
+            if( !componentPackage.downloadErrorMsg.empty() )
+                ssError << componentPackage.downloadErrorMsg;
+            else 
+                ssError << "Failed to pre-download " << componentPackage.installerUrl;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
 

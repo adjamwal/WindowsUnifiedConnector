@@ -1,4 +1,5 @@
 #include "ManifestProcessor.h"
+#include "PackageException.h"
 #include "PmTypes.h"
 #include "PmLogger.h"
 #include <iostream>
@@ -46,15 +47,7 @@ void ManifestProcessor::PreDownloadAllFromManifest( std::vector<PmComponent>& pa
 {
     for( auto& package : packages )
     {
-        try
-        {
-            m_componentProcessor.DownloadPackageBinary( package );
-            LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", package.downloadedInstallerPath.c_str() );
-        }
-        catch( ... )
-        {
-            LOG_ERROR( __FUNCTION__ ": Failed to download binary for package: %s", package.productAndVersion.c_str() );
-        }
+        m_componentProcessor.DownloadPackageBinary( package );
     }
 }
 
@@ -70,7 +63,7 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmCompo
         try
         {
             processed =
-                ( !m_componentProcessor.HasDownloadedBinary( package ) || m_componentProcessor.ProcessPackageBinary( package ) ) &&
+                ( m_componentProcessor.ProcessPackageBinary( package ) ) &&
                 ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
 
             isRebootRequired |= package.postInstallRebootRequired;

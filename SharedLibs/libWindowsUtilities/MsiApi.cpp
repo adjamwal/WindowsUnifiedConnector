@@ -151,7 +151,7 @@ MsiApiProductInfo MsiApi::GetProductInformation(
     LPWSTR szSid, 
     DWORD pcchSid )
 {
-    MsiApiProductInfo product;
+    MsiApiProductInfo product = {};
     std::wstring propertyStr;
     LPCTSTR tempSzUserSid = NULL;
 

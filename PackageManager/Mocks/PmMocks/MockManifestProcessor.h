@@ -3,6 +3,8 @@
 
 #include "IManifestProcessor.h"
 #include "IPmPlatformDependencies.h"
+#include "PmTypes.h"
+#include <vector>
 
 class MockManifestProcessor : public IManifestProcessor
 {
@@ -16,5 +18,4 @@ public:
     MOCK_METHOD2( ProcessManifest, bool( std::string, bool& ) );
     void MakeProcessManifestReturn( bool value );
     void ExpectProcessManifestIsNotCalled();
-
 };

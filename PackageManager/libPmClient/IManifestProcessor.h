@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class IPmPlatformDependencies;
+struct PmComponent;
 
 class IManifestProcessor
 {

@@ -5,6 +5,7 @@
 InstallerConfig::InstallerConfig()
 {
     m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
+    m_returnAsRef = "";
 }
 
 InstallerConfig::~InstallerConfig()
@@ -38,12 +39,12 @@ int32_t InstallerConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
 
 const std::string& InstallerConfig::GetCloudIdentifyUri()
 {
-    return std::string();
+    return m_returnAsRef;
 }
 
 const std::string& InstallerConfig::GetCloudCheckinUri()
 {
-    return std::string();
+    return m_returnAsRef;
 }
 
 const std::string& InstallerConfig::GetCloudEventUri()
@@ -53,7 +54,7 @@ const std::string& InstallerConfig::GetCloudEventUri()
 
 const std::string& InstallerConfig::GetCloudCatalogUri()
 {
-    return std::string();
+    return m_returnAsRef;
 }
 
 uint32_t InstallerConfig::GetCloudCheckinIntervalMs()
