@@ -143,7 +143,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 tempPath = knownFolderId + tempPath;
             }
 
-            configInfo.path = tempPath;
+            configInfo.path = std::filesystem::u8path( tempPath );
             configInfo.unresolvedPath = configurable.unresolvedPath;
             packageConfigs.push_back( configInfo );
         }  
