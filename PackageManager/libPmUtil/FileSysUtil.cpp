@@ -30,7 +30,7 @@ std::string FileSysUtil::ReadFile( const std::filesystem::path& filePath )
             stream << file.rdbuf();
         }
         else {
-            LOG_ERROR( "Failed to open file %s", filePath.generic_string().c_str() );
+            LOG_ERROR( "Failed to open file %s", filePath.generic_u8string().c_str() );
         }
     }
     else {
@@ -86,12 +86,12 @@ FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath
         ::std::filesystem::create_directories( filePath.parent_path() );
 
         handle = ( FileUtilHandle* )malloc( sizeof( FileUtilHandle ) );
-        errno_t rtn = fopen_s( &handle->file, filePath.generic_string().c_str(), "wb" );
+        errno_t rtn = fopen_s( &handle->file, filePath.generic_u8string().c_str(), "wb" );
         if( rtn != 0 ) {
             LOG_ERROR( "fopen_s failed" );
         }
         else {
-            LOG_DEBUG( "Created file %s", filePath.generic_string().c_str() );
+            LOG_DEBUG( "Created file %s", filePath.generic_u8string().c_str() );
         }
     }
 
@@ -231,9 +231,9 @@ std::string FileSysUtil::AppendPath( const std::string& basePath, const std::str
     }
 
     path.make_preferred();
-    LOG_DEBUG( "Path resolved to %s", path.generic_string().c_str() );
+    LOG_DEBUG( "Path resolved to %s", path.generic_u8string().c_str() );
 
-    return path.generic_string();
+    return path.generic_u8string();
 }
 
 time_t FileSysUtil::LastWriteTime( const std::filesystem::path& filename )
@@ -241,8 +241,8 @@ time_t FileSysUtil::LastWriteTime( const std::filesystem::path& filename )
     time_t rtn = -1;
 
     struct _stat64 fileInfo;
-    if ( _stati64( filename.generic_string().c_str(), &fileInfo ) != 0 ) {
-        LOG_ERROR( "_stati64 failed on file %s", filename.generic_string().c_str() );
+    if ( _stati64( filename.generic_u8string().c_str(), &fileInfo ) != 0 ) {
+        LOG_ERROR( "_stati64 failed on file %s", filename.generic_u8string().c_str() );
     }
     else {
         rtn = fileInfo.st_mtime;

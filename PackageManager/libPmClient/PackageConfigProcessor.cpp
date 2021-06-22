@@ -116,7 +116,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         if( !rtn )
         {
             RemoveTempFile( config.verifyPath );
-            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
+            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
         }
     }
     catch( PackageException& ex )
@@ -153,7 +153,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     {
         if( targetLocation.empty() || !m_fileUtil.FileExists( targetLocation ) )
         {
-            throw PackageException( "Failed to resolve config " + targetLocation.generic_string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
+            throw PackageException( "Failed to resolve config " + targetLocation.generic_u8string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
         }
 
         auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
@@ -164,10 +164,10 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
         if( m_fileUtil.DeleteFile( targetLocation ) != 0 )
         {
-            throw PackageException( "Failed to remove config " + targetLocation.generic_string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
+            throw PackageException( "Failed to remove config " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
         }
 
-        LOG_DEBUG( "Removed config file %s", targetLocation.generic_string().c_str() );
+        LOG_DEBUG( "Removed config file %s", targetLocation.generic_u8string().c_str() );
 
         rtn = true;
     }
@@ -194,8 +194,8 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
 void PackageConfigProcessor::RemoveTempFile( const std::filesystem::path& tempFilePath )
 {
-    LOG_ERROR( "Removing %s", tempFilePath.generic_string().c_str() );
+    LOG_ERROR( "Removing %s", tempFilePath.generic_u8string().c_str() );
     if( m_fileUtil.DeleteFile( tempFilePath ) != 0 ) {
-        LOG_ERROR( "Failed to remove %s", tempFilePath.generic_string().c_str() );
+        LOG_ERROR( "Failed to remove %s", tempFilePath.generic_u8string().c_str() );
     }
 }

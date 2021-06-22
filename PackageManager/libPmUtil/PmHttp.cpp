@@ -399,7 +399,7 @@ int32_t PmHttp::HttpDownload( const std::string& url, const std::filesystem::pat
 
     ctx.handle = m_fileUtil.PmCreateFile( filepath );
     if( ctx.handle == NULL ) {
-        LOG_ERROR( "failed to create file %s", filepath.generic_string().c_str() );
+        LOG_ERROR( "failed to create file %s", filepath.generic_u8string().c_str() );
         return -1;
     }
 
