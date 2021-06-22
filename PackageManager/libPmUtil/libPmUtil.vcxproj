@@ -24,6 +24,7 @@
     <ClInclude Include="IPmHttp.h" />
     <ClInclude Include="IPmLogger.h" />
     <ClInclude Include="ISslUtil.h" />
+    <ClInclude Include="IUtf8PathVerifier.h" />
     <ClInclude Include="IWorkerThread.h" />
     <ClInclude Include="JsonUtil.h" />
     <ClInclude Include="PmHttp.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="SslUtil.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="TimeUtil.h" />
+    <ClInclude Include="Utf8PathVerifier.h" />
     <ClInclude Include="WorkerThread.h" />
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +45,7 @@
     <ClCompile Include="SslUtil.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="TimeUtil.cpp" />
+    <ClCompile Include="Utf8PathVerifier.cpp" />
     <ClCompile Include="WorkerThread.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

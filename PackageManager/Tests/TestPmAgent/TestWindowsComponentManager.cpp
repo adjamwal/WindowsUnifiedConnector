@@ -1,5 +1,3 @@
-#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-
 #include "MocksCommon.h"
 #include "IPmPlatformComponentManager.h"
 #include "WindowsComponentManager.h"
@@ -55,6 +53,7 @@ protected:
         };
 
         m_expectedComponentPackage.configs.push_back( {
+            "configpath",
             "configpath",
             "configsha256",
             "configcontents",
@@ -127,7 +126,7 @@ TEST_F( TestWindowsComponentManager, UpdateExeWillAddExeToCmdLine )
     c.installerType = "exe";
     c.installerArgs = " /args";
     c.downloadedInstallerPath = "update.exe";
-    std::string expectedCmdLine = c.downloadedInstallerPath + " " + c.installerArgs;
+    std::string expectedCmdLine = c.downloadedInstallerPath.generic_u8string() + " " + c.installerArgs;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wExpectedCmdLine = converter.from_bytes( expectedCmdLine );
 

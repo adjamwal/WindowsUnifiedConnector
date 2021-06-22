@@ -21,6 +21,7 @@
 #include "IUcUpgradeEventHandler.h"
 #include "IInstallerCacheManager.h"
 #include "IRebootHandler.h"
+#include "ICatalogJsonParser.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -31,6 +32,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IInstallerCacheManager& installerCacheMgr,
     IPackageDiscoveryManager& packageDiscoveryManager,
     ICheckinFormatter& checkinFormatter,
+    ICatalogJsonParser& catalogJsonParser,
     IUcidAdapter& ucidAdapter,
     ICertsAdapter& certsAdapter,
     ICheckinManifestRetriever& manifestRetriever,
@@ -45,6 +47,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_installerCacheMgr( installerCacheMgr )
     , m_packageDiscoveryManager( packageDiscoveryManager )
     , m_checkinFormatter( checkinFormatter )
+    , m_catalogJsonParser( catalogJsonParser )
     , m_ucidAdapter( ucidAdapter )
     , m_certsAdapter( certsAdapter )
     , m_manifestRetriever( manifestRetriever )
@@ -144,6 +147,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
         m_ucUpgradeEventHandler.Initialize( m_dependencies );
         m_rebootHandler.Initialize( m_dependencies );
+        m_catalogJsonParser.Initialize( m_dependencies );
     }
     catch( std::exception& ex )
     {

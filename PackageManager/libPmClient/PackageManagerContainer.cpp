@@ -28,6 +28,7 @@
 #include "PmConstants.h"
 #include "InstallerCacheManager.h"
 #include "RebootHandler.h"
+#include "Utf8PathVerifier.h"
 
 #include <mutex>
 #include <exception>
@@ -37,7 +38,8 @@ static std::mutex gContainerMutex;
 static PackageManagerContainer* gContainer = NULL;
 
 PackageManagerContainer::PackageManagerContainer() :
-    m_fileUtil( new FileSysUtil() )
+    m_utfPathVerifier( new Utf8PathVerifier() )
+    , m_fileUtil( new FileSysUtil( *m_utfPathVerifier ) )
     , m_sslUtil( new SslUtil() )
     , m_http( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )
@@ -77,6 +79,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_installeracheMgr,
             *m_packageDiscoveryManager,
             *m_checkinFormatter,
+            *m_catalogJsonParser,
             *m_ucidAdapter,
             *m_certsAdapter,
             *m_checkinManifestRetriever,

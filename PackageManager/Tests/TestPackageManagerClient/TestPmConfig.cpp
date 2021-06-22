@@ -54,24 +54,24 @@ protected:
 
 TEST_F( TestPmConfig, LoadWillReadBsFile )
 {
-    std::string bsfilename( "bs file" );
+    std::filesystem::path bsfilename( "bs file" );
 
     m_fileUtil->MakeReadFileReturn( bsConfigData );
 
     EXPECT_CALL( *m_fileUtil, ReadFile( bsfilename ) );
 
-    m_patient->LoadBsConfig( bsfilename );
+    m_patient->LoadBsConfig( bsfilename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, LoadWillReadPmFile )
 {
-    std::string pmfilename( "pm file" );
+    std::filesystem::path pmfilename( "pm file" );
 
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 
     EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
 
-    m_patient->LoadPmConfig( pmfilename );
+    m_patient->LoadPmConfig( pmfilename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveCloudCheckinUri )
@@ -146,14 +146,15 @@ TEST_F( TestPmConfig, PmConfigFileChangedIsFalseAfterLoading )
 
 TEST_F( TestPmConfig, LoadWillTryBackupFile )
 {
-    std::string filename( "filename" );
+    std::filesystem::path filename( "filename" );
+    std::filesystem::path backupFilename( "filename.bak" );
 
     InSequence s;
 
     EXPECT_CALL( *m_fileUtil, ReadFile( filename ) ).WillOnce( Return( "" ) );
-    EXPECT_CALL( *m_fileUtil, ReadFile( filename + ".bak" ) ).WillOnce( Return( "" ) );
+    EXPECT_CALL( *m_fileUtil, ReadFile( backupFilename ) ).WillOnce( Return( "" ) );
 
-    m_patient->LoadPmConfig( filename );
+    m_patient->LoadPmConfig( filename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceed )

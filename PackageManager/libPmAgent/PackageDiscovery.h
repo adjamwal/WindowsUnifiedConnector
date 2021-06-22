@@ -8,11 +8,12 @@
 #include "MsiApi.h"
 
 class IPackageDiscoveryMethods;
+class IUtf8PathVerifier;
 
 class PackageDiscovery : public IPackageDiscovery
 {
 public:
-    PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi );
+    PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi, IUtf8PathVerifier& utf8PathVerifier );
     ~PackageDiscovery();
 
     PackageInventory DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules>& catalogRules ) override;
@@ -31,4 +32,5 @@ private:
     IPackageDiscoveryMethods& m_methods;
     PackageInventory m_lastDetectedPackages;
     IMsiApi& m_msiApi;
+    IUtf8PathVerifier& m_utf8PathVerifier;
 };

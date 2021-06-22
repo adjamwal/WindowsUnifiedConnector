@@ -15,6 +15,7 @@ class IWinCertLoader;
 class IPmPlatformConfiguration;
 class ICloudEventPublisher;
 class ICloudEventBuilder;
+class IUtf8PathVerifier;
 
 class EventFacade : public IEventFacade
 {
@@ -30,6 +31,7 @@ private:
     bool SendEvent( ICloudEventBuilder& ev, std::string& url, std::string& ucid, std::string& ucidToken );
 
     IUcLogger* m_oldLogger;
+    std::unique_ptr<IUtf8PathVerifier> m_utf8PathVerifier;
     std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;

@@ -15,7 +15,7 @@ void MockInstallerCacheManager::ExpectInitializeIsNotCalled()
     EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
 }
 
-void MockInstallerCacheManager::MakeDownloadOrUpdateInstallerReturn( const std::string& value )
+void MockInstallerCacheManager::MakeDownloadOrUpdateInstallerReturn( const std::filesystem::path& value )
 {
     ON_CALL( *this, DownloadOrUpdateInstaller( _ ) ).WillByDefault( Return( value ) );
 }

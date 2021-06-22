@@ -19,14 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomPathMatchers.h" />
     <ClInclude Include="MockFileSysUtil.h" />
     <ClInclude Include="MockPmHttp.h" />
     <ClInclude Include="MockSslUtil.h" />
+    <ClInclude Include="MockUtf8PathVerifier.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockFileSysUtil.cpp" />
     <ClCompile Include="MockPmHttp.cpp" />
     <ClCompile Include="MockSslUtil.cpp" />
+    <ClCompile Include="MockUtf8PathVerifier.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

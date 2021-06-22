@@ -9,10 +9,13 @@
 #include <regex>
 #include "..\..\GlobalVersion.h"
 #include <StringUtil.h>
+#include "IUtf8PathVerifier.h"
 
-PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi ) : 
-    m_methods( methods ),
-    m_msiApi( msiApi )
+
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi, IUtf8PathVerifier& utf8PathVerifier ) :
+    m_methods( methods )
+    , m_msiApi( msiApi )
+    , m_utf8PathVerifier( utf8PathVerifier )
 {
 }
 
@@ -96,22 +99,24 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         std::string knownFolderIdConversion = "";
         std::vector<std::filesystem::path> discoveredFiles;
 
-        std::string resolvedPath = WindowsUtilities::ResolvePath( configurable.path );
-
-        if ( resolvedPath != configurable.path )
+        if ( configurable.unresolvedPath != configurable.path )
         {
             //Resolved path is deferent which means we must calculate the knownfolderid
-            size_t first = configurable.path.find( "<FOLDERID_" );
-            size_t last = configurable.path.find_first_of( ">" );
-            knownFolderId = configurable.path.substr( first, last + 1);
-            std::string remainingPath = configurable.path.substr( last + 1, configurable.path.length() );
+            std::string tempResolvedPath = configurable.path.generic_u8string();
+            std::string tempUnresolvedPath = configurable.unresolvedPath.generic_u8string();
+            size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
+            size_t last = tempUnresolvedPath.find_first_of( ">" );
+            knownFolderId = tempUnresolvedPath.substr( first, last + 1);
+            std::string remainingPath = tempUnresolvedPath.substr( last + 1, tempUnresolvedPath.length() );
 
-            first = resolvedPath.find( remainingPath );
+            first = tempResolvedPath.find( remainingPath );
 
-            knownFolderIdConversion = resolvedPath.substr( 0, first );
+            knownFolderIdConversion = tempResolvedPath.substr( 0, first );
         }
 
-        WindowsUtilities::FileSearchWithWildCard( resolvedPath, discoveredFiles );
+        WindowsUtilities::FileSearchWithWildCard( configurable.path, discoveredFiles );
+
+        m_utf8PathVerifier.PruneInvalidPathsFromList( discoveredFiles );
 
         if ( discoveredFiles.size() > configurable.max_instances )
         {
@@ -129,7 +134,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         {
             PackageConfigInfo configInfo = {};
 
-            std::string tempPath = discoveredFile.generic_string();
+            std::string tempPath = discoveredFile.generic_u8string();
 
             if ( knownFolderId != "" )
             {
@@ -138,7 +143,8 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 tempPath = knownFolderId + tempPath;
             }
 
-            configInfo.path = tempPath;
+            configInfo.path = std::filesystem::u8path( tempPath );
+            configInfo.unresolvedPath = configurable.unresolvedPath;
             packageConfigs.push_back( configInfo );
         }  
     }

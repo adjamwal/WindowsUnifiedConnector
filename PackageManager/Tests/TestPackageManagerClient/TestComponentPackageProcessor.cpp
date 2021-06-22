@@ -78,6 +78,7 @@ protected:
 
         m_expectedComponentPackage.configs.push_back( {
             "configpath",
+            "configpath",
             "configsha256",
             "configcontents",
             "configverifyBinPath",

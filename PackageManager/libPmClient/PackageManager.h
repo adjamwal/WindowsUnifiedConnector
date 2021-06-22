@@ -10,6 +10,7 @@ class IPmConfig;
 class IPmCloud;
 class IPackageDiscoveryManager;
 class ICheckinFormatter;
+class ICatalogJsonParser;
 class IUcidAdapter;
 class ICertsAdapter;
 class ICheckinManifestRetriever;
@@ -34,6 +35,7 @@ public:
         IInstallerCacheManager& installerCacheMgr,
         IPackageDiscoveryManager& packageDiscoveryManager,
         ICheckinFormatter& checkinFormatter,
+        ICatalogJsonParser& catalogJsonParser,
         IUcidAdapter& ucidAdapter, 
         ICertsAdapter& certsAdapter,
         ICheckinManifestRetriever& manifestRetriever,
@@ -58,6 +60,7 @@ private:
     IInstallerCacheManager& m_installerCacheMgr;
     IPackageDiscoveryManager& m_packageDiscoveryManager;
     ICheckinFormatter& m_checkinFormatter;
+    ICatalogJsonParser& m_catalogJsonParser;
     IUcidAdapter& m_ucidAdapter;
     ICertsAdapter& m_certsAdapter;
     ICheckinManifestRetriever& m_manifestRetriever;

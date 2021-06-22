@@ -124,7 +124,7 @@ TEST_F( TestCheckinFormatter, WillBuildPackageConfig )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().path );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().path.generic_u8string() );
     EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "sha256" ], m_inventory->packages.front().configs.front().sha256 );
 }
 

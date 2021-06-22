@@ -1,15 +1,17 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <filesystem>
 
 struct PackageConfigInfo
 {
-    std::string path;
+    std::filesystem::path path;
+    std::filesystem::path unresolvedPath;
     std::string sha256;
     std::string contents;
     std::string verifyBinPath;
     std::string verifyPath;
-    std::string installLocation;
+    std::filesystem::path installLocation;
     std::string signerName;
     std::string forProductAndVersion; // e.g. 'AMP/1.0.0'
     bool deleteConfig;
@@ -21,10 +23,10 @@ struct PmComponent
     std::string installerUrl;
     std::string installerType;
     std::string installerArgs;
-    std::string installLocation;
+    std::filesystem::path installLocation;
     std::string signerName;
     std::string installerHash;
-    std::string downloadedInstallerPath;
+    std::filesystem::path downloadedInstallerPath;
     std::string downloadErrorMsg; //cached pre-download error msg
     bool postInstallRebootRequired;
     std::vector<PackageConfigInfo> configs;
@@ -46,7 +48,8 @@ struct PackageInventory
 
 struct PmProductDiscoveryConfigurable
 {
-    std::string path;
+    std::filesystem::path path;
+    std::filesystem::path unresolvedPath;
     int max_instances;
     bool required;
     std::vector<std::string> formats;

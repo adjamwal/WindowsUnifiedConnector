@@ -27,6 +27,7 @@ class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
 class IRebootHandler;
+class IUtf8PathVerifier;
 
 class PackageManagerContainer
 {
@@ -37,6 +38,7 @@ public:
     IPackageManager& packageManager();
 
 private:
+    std::unique_ptr<IUtf8PathVerifier> m_utfPathVerifier;
     std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;

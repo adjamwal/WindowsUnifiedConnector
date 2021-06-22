@@ -84,7 +84,7 @@ int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize
     return httpStatusResponse;
 }
 
-int32_t PmCloud::DownloadFile( const std::string& uri, const std::string filename )
+int32_t PmCloud::DownloadFile( const std::string& uri, const std::filesystem::path& filename )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     

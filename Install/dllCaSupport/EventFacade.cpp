@@ -11,10 +11,12 @@
 #include "WindowsConfiguration.h"
 #include "CloudEventBuilder.h"
 #include "PmConstants.h"
+#include "Utf8PathVerifier.h"
 
 EventFacade::EventFacade()
     : m_oldLogger( GetUcLogger() )
-    , m_fileUtil( new FileSysUtil() )
+    , m_utf8PathVerifier( new Utf8PathVerifier() )
+    , m_fileUtil( new FileSysUtil( *m_utf8PathVerifier ) )
     , m_http( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )
     , m_config( new InstallerConfig() )
