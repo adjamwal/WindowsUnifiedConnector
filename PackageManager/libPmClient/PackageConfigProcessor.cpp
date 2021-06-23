@@ -67,12 +67,12 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     FileUtilHandle* handle = NULL;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithNewFile( config.path, config.sha256, 0 );
+    m_eventBuilder.WithNewFile( config.unresolvedPath, config.sha256, 0 );
     if( m_fileUtil.FileExists( targetLocation ) )
     {
         auto old_sha256 = m_sslUtil.CalculateSHA256( targetLocation );
         m_eventBuilder.WithOldFile( 
-            config.path,
+            config.unresolvedPath,
             old_sha256.has_value() ? old_sha256.value() : "",
             m_fileUtil.FileSize( targetLocation ) );
     }
@@ -103,7 +103,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
         auto sha256 = m_sslUtil.CalculateSHA256( config.verifyPath );
         m_eventBuilder.WithNewFile(
-            config.path,
+            config.unresolvedPath,
             sha256.has_value() ? sha256.value() : config.sha256,
             m_fileUtil.FileSize( config.verifyPath )
         );
@@ -147,7 +147,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     std::filesystem::path targetLocation = config.installLocation / config.path;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithOldFile( config.path, config.sha256, m_fileUtil.FileSize( targetLocation ) );
+    m_eventBuilder.WithOldFile( config.unresolvedPath, config.sha256, m_fileUtil.FileSize( targetLocation ) );
 
     try
     {
@@ -158,7 +158,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
         auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
         m_eventBuilder.WithOldFile(
-            config.path,
+            config.unresolvedPath,
             sha256.has_value() ? sha256.value() : config.sha256,
             m_fileUtil.FileSize( targetLocation ) );
 
