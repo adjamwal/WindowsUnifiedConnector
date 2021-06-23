@@ -65,7 +65,7 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 {
     std::string eventResponse;
-    int32_t httpReturn;
+    int32_t httpReturn = 0;
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -76,8 +76,7 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
         eventResponse,
         httpReturn );
 
-    if( httpReturn < 200 || httpReturn >= 300 )
-    {
+    if( ( httpReturn < 200 || httpReturn >= 300 ) && ( httpReturn != 400 ) ) {
         m_eventStorage.SaveEvent( eventJson );
     }
 

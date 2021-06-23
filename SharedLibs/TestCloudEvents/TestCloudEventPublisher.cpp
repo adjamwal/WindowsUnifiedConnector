@@ -74,9 +74,18 @@ TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpError )
     m_eventPublisher->Publish( m_eventBuilder );
 }
 
-TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpCode )
+TEST_F( TestCloudEventPublisher, EventPublisherWillNotStoreMalformedEvents )
 {
     m_httpAdapter->MakePostReturn( 400 );
+
+    EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 0 );
+
+    m_eventPublisher->Publish( m_eventBuilder );
+}
+
+TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpCode )
+{
+    m_httpAdapter->MakePostReturn( 401 );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
 
