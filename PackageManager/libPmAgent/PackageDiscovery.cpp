@@ -95,24 +95,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
 {
     for ( auto& configurable : configurables )
     {
-        std::string knownFolderId = "";
-        std::string knownFolderIdConversion = "";
         std::vector<std::filesystem::path> discoveredFiles;
-
-        if ( configurable.unresolvedPath != configurable.path )
-        {
-            //Resolved path is deferent which means we must calculate the knownfolderid
-            std::string tempResolvedPath = configurable.path.generic_u8string();
-            std::string tempUnresolvedPath = configurable.unresolvedPath.generic_u8string();
-            size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
-            size_t last = tempUnresolvedPath.find_first_of( ">" );
-            knownFolderId = tempUnresolvedPath.substr( first, last + 1);
-            std::string remainingPath = tempUnresolvedPath.substr( last + 1, tempUnresolvedPath.length() );
-
-            first = tempResolvedPath.find( remainingPath );
-
-            knownFolderIdConversion = tempResolvedPath.substr( 0, first );
-        }
 
         WindowsUtilities::FileSearchWithWildCard( configurable.path, discoveredFiles );
 
@@ -134,16 +117,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         {
             PackageConfigInfo configInfo = {};
 
-            std::string tempPath = discoveredFile.generic_u8string();
-
-            if ( knownFolderId != "" )
-            {
-                //We need to convert the path to include knownfolderid
-                tempPath = tempPath.substr( knownFolderIdConversion.length(), tempPath.length() );
-                tempPath = knownFolderId + tempPath;
-            }
-
-            configInfo.path = std::filesystem::u8path( tempPath );
+            configInfo.path = discoveredFile;
             configInfo.unresolvedPath = configurable.unresolvedPath;
             packageConfigs.push_back( configInfo );
         }  

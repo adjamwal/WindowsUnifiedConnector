@@ -259,13 +259,13 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
         try
         {
-            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.generic_u8string().c_str(), componentPackage.productAndVersion.c_str() );
+            LOG_DEBUG( "Process config %s, for package %s", config.path.generic_u8string().c_str(), componentPackage.productAndVersion.c_str() );
             config.forProductAndVersion = componentPackage.productAndVersion;
             processed = m_configProcessor.ProcessConfig( config );
         }
-        catch( ... )
+        catch( std::exception& e )
         {
-            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path.generic_u8string().c_str() );
+            LOG_ERROR( "Failed to process %s, %s", config.path.generic_u8string().c_str(), e.what() );
         }
 
         failedConfigs += processed ? 0 : 1;
@@ -273,7 +273,7 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
     if( failedConfigs > 0 )
     {
-        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs for package %s", failedConfigs, componentPackage.productAndVersion.c_str() );
+        LOG_ERROR( "Failed to process %d configs for package %s", failedConfigs, componentPackage.productAndVersion.c_str() );
     }
 
     return failedConfigs == 0;

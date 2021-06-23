@@ -68,11 +68,11 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmCompo
 
             isRebootRequired |= package.postInstallRebootRequired;
 
-            LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s, postInstallRebootRequired=%d", 
+            LOG_DEBUG( "Processed=%d: %s, postInstallRebootRequired=%d", 
                 processed, package.productAndVersion.c_str(), package.postInstallRebootRequired );
         }
-        catch( ... ) {
-            LOG_ERROR( __FUNCTION__ ": Failed to process package: %s", package.productAndVersion.c_str() );
+        catch( std::exception& e ) {
+            LOG_ERROR( "Failed to process package: %s, %s", package.productAndVersion.c_str(), e.what() );
         }
 
         failedPackages += processed ? 0 : 1;

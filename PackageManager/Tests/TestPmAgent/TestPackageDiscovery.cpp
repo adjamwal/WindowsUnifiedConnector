@@ -437,6 +437,6 @@ TEST_F( TestPackageDiscovery, ConfigurablePathWillBeUnresolved )
 
     EXPECT_EQ( installedPackages.packages.size(), 1 );
     EXPECT_EQ( installedPackages.packages[0].configs.size(), 1 );
-    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].path ),
+    EXPECT_EQ( std::filesystem::path( installedPackages.packages[0].configs[0].unresolvedPath ),
         std::filesystem::path( "<FOLDERID_ProgramData>/test/one.xml" ) );
 }

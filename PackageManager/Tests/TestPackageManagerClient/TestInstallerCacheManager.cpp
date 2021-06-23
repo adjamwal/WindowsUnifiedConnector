@@ -53,7 +53,7 @@ protected:
             "signerName",
             "installerHash",
             "downloadedInstallerPath",
-            "downloadErrorMsg",
+            "", //downloadErrorMsg
             false,
             {}
         };
@@ -266,3 +266,64 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteMultipleFile )
 
     m_patient->PruneInstallers( age );
 }
+
+TEST_F( TestInstallerCacheManager, ResultCode200WillNotThrow )
+{
+    m_component.installerHash = "";
+
+    m_cloud->MakeDownloadFileReturn( 200 );
+    m_fileUtil->MakeFileExistsReturn( true );
+
+    EXPECT_NO_THROW( m_patient->DownloadOrUpdateInstaller( m_component ) );
+}
+
+TEST_F( TestInstallerCacheManager, ResultCodeOtherThan200WillThrow )
+{
+    m_component.installerHash = "";
+
+    m_cloud->MakeDownloadFileReturn( 400 );
+    m_fileUtil->MakeFileExistsReturn( true );
+
+    EXPECT_THROW( m_patient->DownloadOrUpdateInstaller( m_component ), PackageException );
+}
+
+TEST_F( TestInstallerCacheManager, ResultCodeLessThan200WillBeReportedAsGenericErrorInExceptionMessage )
+{
+    m_component.installerHash = "";
+
+    m_cloud->MakeDownloadFileReturn( 0 );
+    m_fileUtil->MakeFileExistsReturn( true );
+
+    std::string errorMessage = "";
+    try
+    {
+        m_patient->DownloadOrUpdateInstaller( m_component );
+    }
+    catch( PackageException &ex )
+    {
+        errorMessage = ex.what();
+    }
+
+    EXPECT_TRUE( errorMessage.find( "Request timed out or unknown error." ) != std::string::npos );
+}
+
+TEST_F( TestInstallerCacheManager, ResultCodeOver200WillBeReportedAsHttpErrorInExceptionMessage )
+{
+    m_component.installerHash = "";
+
+    m_cloud->MakeDownloadFileReturn( 300 );
+    m_fileUtil->MakeFileExistsReturn( true );
+
+    std::string errorMessage = "";
+    try
+    {
+        m_patient->DownloadOrUpdateInstaller( m_component );
+    }
+    catch( PackageException& ex )
+    {
+        errorMessage = ex.what();
+    }
+
+    EXPECT_TRUE( errorMessage.find( "HTTP response: 300" ) != std::string::npos );
+}
+

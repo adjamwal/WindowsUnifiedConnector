@@ -81,7 +81,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     {
         if( m_sslUtil.DecodeBase64( config.contents, configData ) != 0 ) {
 
-            throw PackageException( "Failed to decode " + config.contents, UCPM_EVENT_ERROR_CONFIG_DECODE );
+            throw PackageException( __FUNCTION__ ": Failed to decode " + config.contents, UCPM_EVENT_ERROR_CONFIG_DECODE );
         }
 
         tempFilePath = m_fileUtil.GetTempDir() / std::string( "tmpPmConf_" ).append( std::to_string( m_fileCount++ ) ).append( RandomUtil::GetString( 10 ) );
@@ -89,7 +89,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
         if( ( handle = m_fileUtil.PmCreateFile( config.verifyPath ) ) == NULL )
         {
-            throw PackageException( "Failed to create " + config.verifyPath, UCPM_EVENT_ERROR_CONFIG_CREATE );
+            throw PackageException( __FUNCTION__ ": Failed to create " + config.verifyPath, UCPM_EVENT_ERROR_CONFIG_CREATE );
         }
 
         int byteswritten = m_fileUtil.AppendFile( handle, configData.data(), configData.size() );
@@ -116,23 +116,23 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         if( !rtn )
         {
             RemoveTempFile( config.verifyPath );
-            throw PackageException( "Failed to deploy configuration to " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
+            throw PackageException( __FUNCTION__ ": Failed to deploy configuration to " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
         }
     }
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+        LOG_ERROR( "%s", ex.what() );
     }
     catch( std::exception& ex )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
-        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+        LOG_ERROR( "%s", ex.what() );
     }
     catch( ... )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
-        LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
+        LOG_ERROR( "Unknown processing exception" );
     }
 
     m_eventPublisher.Publish( m_eventBuilder );
@@ -153,7 +153,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     {
         if( targetLocation.empty() || !m_fileUtil.FileExists( targetLocation ) )
         {
-            throw PackageException( "Failed to resolve config " + targetLocation.generic_u8string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
+            throw PackageException( __FUNCTION__ ": Failed to resolve config " + targetLocation.generic_u8string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
         }
 
         auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
@@ -164,7 +164,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
         if( m_fileUtil.DeleteFile( targetLocation ) != 0 )
         {
-            throw PackageException( "Failed to remove config " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
+            throw PackageException( __FUNCTION__ ": Failed to remove config " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
         }
 
         LOG_DEBUG( "Removed config file %s", targetLocation.generic_u8string().c_str() );
@@ -174,17 +174,17 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+        LOG_ERROR( "%s", ex.what() );
     }
     catch( std::exception& ex )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
-        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+        LOG_ERROR( "%s", ex.what() );
     }
     catch( ... )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
-        LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
+        LOG_ERROR( "Unknown processing exception" );
     }
 
     m_eventPublisher.Publish( m_eventBuilder );

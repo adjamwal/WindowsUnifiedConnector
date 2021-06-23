@@ -39,7 +39,7 @@ std::string FileSysUtil::ReadFile( const std::filesystem::path& filePath )
         }
     }
     else {
-        LOG_ERROR( "filename is empty" );
+        LOG_ERROR( "filename %s not found", filePath.generic_u8string().c_str() );
     }
 
     return stream.str();
