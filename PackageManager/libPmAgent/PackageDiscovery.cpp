@@ -106,7 +106,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
             std::string tempUnresolvedPath = configurable.unresolvedPath.generic_u8string();
             size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
             size_t last = tempUnresolvedPath.find_first_of( ">" );
-            knownFolderId = tempUnresolvedPath.substr( first, last + 1);
+            knownFolderId = tempUnresolvedPath.substr( first, last + 1 );
             std::string remainingPath = tempUnresolvedPath.substr( last + 1, tempUnresolvedPath.length() );
 
             first = tempResolvedPath.find( remainingPath );
@@ -143,8 +143,8 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 tempPath = knownFolderId + tempPath;
             }
 
-            configInfo.path = std::filesystem::u8path( tempPath );
-            configInfo.unresolvedPath = configurable.unresolvedPath;
+            configInfo.path = discoveredFile;
+            configInfo.unresolvedPath = tempPath;
             packageConfigs.push_back( configInfo );
         }  
     }
