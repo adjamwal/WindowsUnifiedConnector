@@ -131,7 +131,7 @@ std::optional<std::string> SslUtil::CalculateSHA256( const std::filesystem::path
 
     // Read file and update calculated SHA
     char buf[K_READ_BUF_SIZE];
-    std::ifstream file( filename.generic_u8string(), std::ifstream::binary );
+    std::ifstream file( filename.wstring(), std::ifstream::binary );
     while ( file.good() )
     {
         file.read( buf, sizeof( buf ) );

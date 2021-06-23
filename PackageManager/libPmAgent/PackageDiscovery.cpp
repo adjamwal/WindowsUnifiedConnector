@@ -144,7 +144,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
             }
 
             configInfo.path = discoveredFile;
-            configInfo.unresolvedPath = tempPath;
+            configInfo.unresolvedPath = std::filesystem::u8path( tempPath );
             packageConfigs.push_back( configInfo );
         }  
     }

@@ -368,3 +368,33 @@ TEST_F( TestWindowsComponentManager, NotifySystemRestartWillAbortWithoutSessionL
 
     m_patient->NotifySystemRestart();
 }
+
+TEST_F( TestWindowsComponentManager, UpdateComponentWillUseBackSlashesForExePackage )
+{
+    std::string error;
+    PmComponent c;
+    c.installerType = "exe";
+    c.installerArgs = " /args";
+    c.downloadedInstallerPath = "C:/test/update.exe";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+
+    EXPECT_CALL( *m_winApiWrapper, CreateProcessW( StrEq( L"C:\\test\\update.exe" ), _, _, _, _, _, _, _, _, _ ) );
+
+    m_patient->UpdateComponent( c, error );
+}
+
+TEST_F( TestWindowsComponentManager, UpdateComponentWillUseBackSlashesForMsiPackage )
+{
+    std::string error;
+    PmComponent c;
+    c.installerType = "msi";
+    c.installerArgs = " /args";
+    c.downloadedInstallerPath = "C:/test/update.msi";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+
+    EXPECT_CALL( *m_winApiWrapper, CreateProcessW( _, HasSubstr( L"C:\\test\\update.msi" ), _, _, _, _, _, _, _, _ ) );
+
+    m_patient->UpdateComponent( c, error );
+}
