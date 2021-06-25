@@ -120,7 +120,7 @@ abort:
 }
 
 static const int K_READ_BUF_SIZE{ 1024 * 16 };
-std::optional<std::string> SslUtil::CalculateSHA256( const std::string filename )
+std::optional<std::string> SslUtil::CalculateSHA256( const std::filesystem::path& filename )
 {
     // Initialize openssl
     SHA256_CTX context;
@@ -131,7 +131,7 @@ std::optional<std::string> SslUtil::CalculateSHA256( const std::string filename 
 
     // Read file and update calculated SHA
     char buf[K_READ_BUF_SIZE];
-    std::ifstream file( filename, std::ifstream::binary );
+    std::ifstream file( filename.wstring(), std::ifstream::binary );
     while ( file.good() )
     {
         file.read( buf, sizeof( buf ) );

@@ -157,3 +157,13 @@ void MockPmConfig::MakeAllowPostInstallRebootsReturn( bool value )
 {
     ON_CALL( *this, AllowPostInstallReboots() ).WillByDefault( Return( value ) );
 }
+
+void MockPmConfig::MakeGetRebootThrottleSReturn( uint32_t value )
+{
+    ON_CALL( *this, GetRebootThrottleS() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetRebootThrottleSNotCalled()
+{
+    EXPECT_CALL( *this, GetRebootThrottleS() ).Times( 0 );
+}

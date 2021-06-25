@@ -1,6 +1,8 @@
 #include "CatalogJsonParser.h"
 #include "PmTypes.h"
 #include "IUcLogger.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformComponentManager.h"
 #include <vector>
 
 #define UC_CATALOG_KEY_PRODUCTS "products"
@@ -10,6 +12,23 @@
 #define UC_CATALOG_DISCOVERY_TYPE_MSI "msi"
 #define UC_CATALOG_DISCOVERY_TYPE_REGISTRY "registry"
 #define UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE "msi_upgrade_code"
+
+CatalogJsonParser::CatalogJsonParser() :
+    m_dependencies( nullptr )
+{
+
+}
+
+CatalogJsonParser::~CatalogJsonParser()
+{
+
+}
+
+void CatalogJsonParser::Initialize( IPmPlatformDependencies* dep )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    m_dependencies = dep;
+}
 
 bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDiscoveryRules>&returnCatalogDataset )
 {
@@ -77,6 +96,8 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDisc
 
 void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::vector<PmProductDiscoveryConfigurable>& returnPkgConfigs )
 {
+    std::lock_guard<std::mutex> lock( m_mutex );
+
     returnPkgConfigs.clear();
 
     if( !pkgValue.isMember( UC_CATALOG_KEY_CONFIGURABLES ) || !pkgValue[ UC_CATALOG_KEY_CONFIGURABLES ].isArray() )
@@ -89,10 +110,11 @@ void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::ve
 
         ParseConfigFormats( cfg, formats );
         if( formats.size() == 0 ) throw std::exception("Configurable must have at least one valid format");
-
+        
         PmProductDiscoveryConfigurable configEntry
         {
-            cfg[ "path" ].asString(),
+            std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( cfg["path"].asString() ) ),
+            std::filesystem::u8path( cfg[ "path" ].asString() ),
             cfg[ "max_instances" ].asInt(),
             cfg[ "required" ].asBool(),
             formats

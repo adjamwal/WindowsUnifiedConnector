@@ -18,6 +18,11 @@ uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
     return MockWindowsUtilities::GetMockWindowUtilities()->GetFileModifyTime( filename );
 }
 
+bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* content, const size_t contentLen )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->WriteFileContents( filename, content, contentLen );
+}
+
 bool WindowsUtilities::DirectoryExists( const WCHAR* dirname )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->DirectoryExists( dirname );
@@ -58,14 +63,19 @@ std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstal
     return MockWindowsUtilities::GetMockWindowUtilities()->GetInstalledPrograms();
 }
 
-std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+std::string WindowsUtilities::ResolveKnownFolderIdForDefaultUser( const std::string& knownFolderId )
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderId( knownFolderId );
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderIdForDefaultUser( knownFolderId );
+}
+
+std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->ResolveKnownFolderIdForCurrentUser( knownFolderId );
 }
 
 std::wstring WindowsUtilities::GetLogDir()
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->GetDataDir();
+    return MockWindowsUtilities::GetMockWindowUtilities()->GetLogDir();
 }
 
 std::string WindowsUtilities::ResolvePath( const std::string& basePath )
@@ -84,4 +94,9 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
     std::vector<std::filesystem::path>& results )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->SearchFiles( searchPath, begin, end, results );
+}
+
+bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->AllowEveryoneAccessToFile( path );
 }

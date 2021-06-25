@@ -40,5 +40,5 @@ public:
     void MakeFileSearchWithWildCardReturn( int32_t value );
     void ExpectFileSearchWithWildCardNotCalled();
 
-    MOCK_METHOD0( InitiateSystemRestart, void() );
+    MOCK_METHOD0( NotifySystemRestart, void() );
 };

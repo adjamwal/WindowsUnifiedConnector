@@ -1,16 +1,27 @@
 #include "pch.h"
 #include "WindowsComponentManager.h"
 #include "WindowsUtilities.h"
+#include "IWinApiWrapper.h"
+#include "ICodesignVerifier.h"
+#include "IPackageDiscovery.h"
+#include "IUserImpersonator.h"
+#include "IUcLogger.h"
 #include <sstream>
 #include <locale>
 #include <codecvt>
 
+#define UCSERVICE_PATH_REG_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCSERVICE"
+#define DIAG_TOOL_EXE L"csc_ucdt.exe"
+#define DIAG_TOOL_NOTIFY_ARG L"--notifyreboot"
+
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, 
     ICodesignVerifier& codesignVerifier, 
-    IPackageDiscovery& packageDiscovery ) :
+    IPackageDiscovery& packageDiscovery,
+    IUserImpersonator& userImpersonator ) :
     m_winApiWrapper( winApiWrapper )
     , m_codeSignVerifier( codesignVerifier )
     , m_packageDiscovery( packageDiscovery )
+    , m_userImpersonator( userImpersonator )
 {
 }
 
@@ -39,10 +50,13 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 {
     int32_t ret = 0;
 
+    std::filesystem::path downloadedInstallerPath = package.downloadedInstallerPath;
+    downloadedInstallerPath.make_preferred();
+
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     CodesignStatus status = m_codeSignVerifier.Verify( 
-        converter.from_bytes( package.downloadedInstallerPath ),
+        converter.from_bytes( downloadedInstallerPath.u8string() ),
         converter.from_bytes( package.signerName ), 
         SIGTYPE_DEFAULT );
 
@@ -51,18 +65,11 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
         if ( package.installerType == "exe" )
         {
             std::string exeCmdline;
-            size_t idx = package.downloadedInstallerPath.find_last_of( '\\' );
-            if( idx != std::string::npos ) {
-                exeCmdline = package.downloadedInstallerPath.substr( idx + 1 );
-            }
-            else {
-                exeCmdline = package.downloadedInstallerPath;
-            }
-
+            exeCmdline = downloadedInstallerPath.filename().u8string();
             exeCmdline += " ";
             exeCmdline += package.installerArgs;
 
-            ret = RunPackage( package.downloadedInstallerPath, exeCmdline, error );
+            ret = RunPackage( downloadedInstallerPath.u8string(), exeCmdline, error );
         }
         else if ( package.installerType == "msi" )
         {
@@ -79,7 +86,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
-                msiCmdline = " /package \"" + package.downloadedInstallerPath + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
+                msiCmdline = " /package \"" + downloadedInstallerPath.u8string() + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
 
                 ret = RunPackage( msiexecFullPath, msiCmdline, error );
             }
@@ -113,7 +120,7 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
 {
     int32_t ret = 0;
 
-    std::string verifyFullPath = config.installLocation + "\\" + config.verifyBinPath;
+    std::string verifyFullPath = config.installLocation.generic_u8string() + "\\" + config.verifyBinPath;
     std::string verifyCmdLine = "--config-path " + config.verifyPath;
     std::string errorStr;
 
@@ -198,26 +205,33 @@ int32_t WindowsComponentManager::FileSearchWithWildCard( const std::filesystem::
     return WindowsUtilities::FileSearchWithWildCard( searchPath, results );
 }
 
-void WindowsComponentManager::InitiateSystemRestart()
+void WindowsComponentManager::NotifySystemRestart()
 {
-    LOG_DEBUG( __FUNCTION__ ": Enter" );
+    LOG_DEBUG( "Enter" );
 
-    BOOL success = m_winApiWrapper.InitiateSystemShutdownExA(
-        /*lpMachineName*/           NULL, 
-        /*lpMessage*/               NULL,
-        /*dwTimeout*/               0, //prevent aborting the reboot
-        /*bForceAppsClosed*/        false, //user prompted to save any pending work
-        /*bRebootAfterShutdown*/    true,
-        /*dwReason*/                SHTDN_REASON_MAJOR_SOFTWARE | 
-                                    SHTDN_REASON_MINOR_INSTALLATION | 
-                                    SHTDN_REASON_FLAG_PLANNED
-    );
+    std::wstring diagToolDir;
+    std::vector<ULONG> sessionList;
 
-    if( !success )
-    {
-        DWORD errCode = GetLastError();
-        LOG_DEBUG( __FUNCTION__ ": Failed, GetLastError=%ld", errCode );
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UCSERVICE_PATH_REG_KEY, L"Path", diagToolDir ) || diagToolDir.empty() ) {
+        LOG_ERROR( "Failed to get diag tool path" );
+        return;
     }
 
-    LOG_DEBUG( __FUNCTION__ ": Exit" );
+    if( !m_userImpersonator.GetActiveUserSessions( sessionList ) ) {
+        LOG_ERROR( "GetActiveUserSessions failed" );
+    }
+    else {
+        for( auto& session : sessionList ) {
+            if( !m_userImpersonator.RunProcessInSession(
+                DIAG_TOOL_EXE,
+                DIAG_TOOL_NOTIFY_ARG,
+                diagToolDir,
+                session
+            ) ) {
+                WLOG_ERROR( L"RunProcessInSession failed. Sesssion: %d Working directory %s", session, diagToolDir );
+            }
+        }
+    }
+
+    LOG_DEBUG( "Exit" );
 }

@@ -1,4 +1,5 @@
 #include "ManifestProcessor.h"
+#include "PackageException.h"
 #include "PmTypes.h"
 #include "PmLogger.h"
 #include <iostream>
@@ -31,7 +32,6 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest, bool& isRe
 
     if( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
-        //PmSendEvent() bad manifest
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
 
@@ -47,15 +47,7 @@ void ManifestProcessor::PreDownloadAllFromManifest( std::vector<PmComponent>& pa
 {
     for( auto& package : packages )
     {
-        try
-        {
-            m_componentProcessor.DownloadPackageBinary( package );
-            LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", package.downloadedInstallerPath.c_str() );
-        }
-        catch( ... )
-        {
-            LOG_ERROR( __FUNCTION__ ": Failed to download binary for package: %s", package.productAndVersion.c_str() );
-        }
+        m_componentProcessor.DownloadPackageBinary( package );
     }
 }
 
@@ -71,15 +63,16 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmCompo
         try
         {
             processed =
-                ( !m_componentProcessor.HasDownloadedBinary( package ) || m_componentProcessor.ProcessPackageBinary( package ) ) &&
+                ( m_componentProcessor.ProcessPackageBinary( package ) ) &&
                 ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
 
             isRebootRequired |= package.postInstallRebootRequired;
 
-            LOG_DEBUG( __FUNCTION__ ": Processed=%d: %s", processed, package.productAndVersion.c_str() );
+            LOG_DEBUG( "Processed=%d: %s, postInstallRebootRequired=%d", 
+                processed, package.productAndVersion.c_str(), package.postInstallRebootRequired );
         }
-        catch( ... ) {
-            LOG_ERROR( __FUNCTION__ ": Failed to process package: %s", package.productAndVersion.c_str() );
+        catch( std::exception& e ) {
+            LOG_ERROR( "Failed to process package: %s, %s", package.productAndVersion.c_str(), e.what() );
         }
 
         failedPackages += processed ? 0 : 1;

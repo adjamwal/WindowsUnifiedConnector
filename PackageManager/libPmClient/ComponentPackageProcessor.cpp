@@ -2,7 +2,7 @@
 #include "IInstallerCacheManager.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include "ISslUtil.h"
 #include "IPackageConfigProcessor.h"
 #include "IUcidAdapter.h"
@@ -20,7 +20,7 @@
 
 ComponentPackageProcessor::ComponentPackageProcessor(
     IInstallerCacheManager& installerManager,
-    IFileUtil& fileUtil,
+    IFileSysUtil& fileUtil,
     ISslUtil& sslUtil,
     IPackageConfigProcessor& configProcessor,
     IUcidAdapter& ucidAdapter,
@@ -54,11 +54,12 @@ void ComponentPackageProcessor::Initialize( IPmPlatformDependencies* dep )
     m_installerManager.Initialize( dep );
 }
 
-bool ComponentPackageProcessor::HasDownloadedBinary( PmComponent& componentPackage )
+bool ComponentPackageProcessor::PreDownloadedBinaryExists( PmComponent& componentPackage )
 {
     bool result = !componentPackage.downloadedInstallerPath.empty() &&
         m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
-        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 );
+        ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 &&
+        componentPackage.downloadErrorMsg.empty() );
 
     LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
         componentPackage.productAndVersion.c_str(),
@@ -87,10 +88,26 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
     }
 
     std::string installerPath;
+    std::stringstream ssError;
+    ssError << "Package " << componentPackage.productAndVersion << ": ";
+    
+    try
+    {
+        componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
+        LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+    }
+    catch( PackageException& ex )
+    {
+        ssError << ex.what();
+        componentPackage.downloadErrorMsg = ssError.str();
+    }
+    catch( ... )
+    {
+        ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
+        componentPackage.downloadErrorMsg = ssError.str();
+    }
 
-    componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
-
-    return HasDownloadedBinary( componentPackage );
+    return PreDownloadedBinaryExists( componentPackage );
 }
 
 bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPackage )
@@ -108,10 +125,17 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         return false;
     }
 
+    if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 )
+    {
+        //nothing to install for config-only packages (i.e. packages that don't have an installerUrl)
+        //return success, to ensure configuration gets processed
+        return true;
+    }
+
     if ( !componentPackage.downloadedInstallerPath.empty() ) {
         installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
         LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
-            componentPackage.downloadedInstallerPath.c_str(),
+            componentPackage.downloadedInstallerPath.generic_u8string().c_str(),
             installerSize );
     }
 
@@ -131,8 +155,11 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     try
     {
-        if ( componentPackage.downloadedInstallerPath.empty() ) {
-            ssError << "Failed to download " << componentPackage.installerUrl;
+        if ( !PreDownloadedBinaryExists(componentPackage) ) {
+            if( !componentPackage.downloadErrorMsg.empty() )
+                ssError << componentPackage.downloadErrorMsg;
+            else 
+                ssError << "Failed to pre-download " << componentPackage.installerUrl;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
 
@@ -165,14 +192,14 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" )
         {
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
-                componentPackage.downloadedInstallerPath.c_str() );
+                componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
             componentPackage.postInstallRebootRequired = true;
             m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_REQ, "Reboot required event" );
         }
         else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
         {
             LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, reboot initiated by msi",
-                componentPackage.downloadedInstallerPath.c_str() );
+                componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
             m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_INIT, "Reboot initiated event" );
         }
         else if( updErrCode != 0 )
@@ -232,13 +259,13 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
         try
         {
-            LOG_DEBUG( __FUNCTION__ ": Process config %s, for package %s", config.path.c_str(), componentPackage.productAndVersion.c_str() );
+            LOG_DEBUG( "Process config %s, for package %s", config.path.generic_u8string().c_str(), componentPackage.productAndVersion.c_str() );
             config.forProductAndVersion = componentPackage.productAndVersion;
             processed = m_configProcessor.ProcessConfig( config );
         }
-        catch( ... )
+        catch( std::exception& e )
         {
-            LOG_ERROR( __FUNCTION__ ": Failed to process %s", config.path.c_str() );
+            LOG_ERROR( "Failed to process %s, %s", config.path.generic_u8string().c_str(), e.what() );
         }
 
         failedConfigs += processed ? 0 : 1;
@@ -246,7 +273,7 @@ bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& component
 
     if( failedConfigs > 0 )
     {
-        LOG_ERROR( __FUNCTION__ ": Failed to process %d configs for package %s", failedConfigs, componentPackage.productAndVersion.c_str() );
+        LOG_ERROR( "Failed to process %d configs for package %s", failedConfigs, componentPackage.productAndVersion.c_str() );
     }
 
     return failedConfigs == 0;

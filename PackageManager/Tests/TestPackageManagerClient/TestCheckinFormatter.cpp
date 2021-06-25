@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "CheckinFormatter.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "PmTypes.h"
 #include "json/json.h"
 
@@ -26,12 +26,13 @@ protected:
         m_inventory->architecture = "architecture";
         m_inventory->platform = "platform";
 
-        PmInstalledPackage package;
+        PmInstalledPackage package = {};
         package.product = "Name";
         package.version = "Version";
 
-        PackageConfigInfo config;
+        PackageConfigInfo config = {};
         config.path = "path";
+        config.unresolvedPath = "unresolvedpath";
         config.sha256 = "sha";
 
         package.configs.push_back( config );
@@ -43,8 +44,8 @@ protected:
         m_inventory->architecture = "architecture";
         m_inventory->platform = "platform";
 
-        PackageConfigInfo config;
-        PmInstalledPackage package;
+        PackageConfigInfo config = {};
+        PmInstalledPackage package = {};
 
         package.product = "Package1";
         package.version = "Version1";
@@ -124,7 +125,7 @@ TEST_F( TestCheckinFormatter, WillBuildPackageConfig )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().path );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().unresolvedPath.generic_u8string() );
     EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "sha256" ], m_inventory->packages.front().configs.front().sha256 );
 }
 

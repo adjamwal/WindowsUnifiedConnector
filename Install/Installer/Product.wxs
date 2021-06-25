@@ -15,16 +15,71 @@
                  InstallScope="perMachine"
                  InstallPrivileges="elevated"/>
 
+        <!--=
+        Disables Install-on-demand shortcuts
+        What this is: https://docs.microsoft.com/en-us/windows/win32/msi/disableadvtshortcuts
+        
+        Why this matters: 
+        source - https://stackoverflow.com/questions/2058230/wix-create-non-advertised-shortcut-for-all-users-per-machine
+        By default, creating shortcuts for the ALL USERS profile causes a MSI validation errors. There is a validation requirement (ICE43)
+        that specifies that non advertised shortcuts (normal shortcuts) must have a HKCU registry entry. ALL USERS does not have a HKCU profile so this
+        can't be satified. Seems like a windows installer bug. The example in the link above works around this by
+        
+        1. Setting a global property to disable advertised shortcuts
+        2. Set the advertise property in the shortcut
+        
+        The effect is this removes the requirement to have a registry entry for the shortcut under HKCU and windows installer will replace the advertised
+        shortcut with a normal shortcut
+        -->       
+        <Property Id="DISABLEADVTSHORTCUTS" Value="1" />
+
+        <Property Id="UC_EVENT_URL" Value="0" />
+        <Property Id="UC_EVENT_UCID" Value="0" />
+        <Property Id="UC_EVENT_UCID_TOKEN" Value="0" />
+        <Property Id="UC_RESOURCE_DIR" Value="0" />
+        <Property Id="UCDT_SHORTCUT_NAME" Value="!(loc.DiagToolName).lnk" />
+        <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
+        <Property Id="ARPPRODUCTICON" Value="UC.ico" />
+      
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
+        <CustomAction Id="ExtractCaResources" BinaryKey="CustomActionsDll" DllEntry="ExtractCaResources" />
+        <CustomAction Id="RemoveCaResources" BinaryKey="CustomActionsDll" DllEntry="RemoveCaResources" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
+        <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
+        <!--=
+        Commenting out this event till we figure out what we want to do with it
+        <CustomAction Id="SendEventOnUninstallBegin" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallBegin" />
+        -->
+        <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
+        <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
+      
         <InstallExecuteSequence>
-          <Custom Action="DetectInvalidSideGrade" After="FindRelatedProducts">
+          <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
+          <Custom Action="CollectUCData" After="ExtractCaResources">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="DetectInvalidSideGrade" After="ExtractCaResources">
             WIX_UPGRADE_DETECTED
           </Custom>
-          <Custom Action="DetectInvalidOS" After="FindRelatedProducts" />
-          <Custom Action="SetCacheDirectory" After="FindRelatedProducts" />
+          <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
+          <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
+          
+          <!--=
+          Commenting out this event till we figure out what we want to do with it
+          <Custom Action="SendEventOnUninstallBegin" After="CollectUCData">
+              (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          -->
+
+          <Custom Action="SendEventOnUninstallError" OnExit="error">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="SendEventOnUninstallComplete" After="InstallFinalize">
+            (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="RemoveCaResources" OnExit="success" />
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
@@ -69,6 +124,7 @@
             <?endif?>
             <ComponentGroupRef Id="UCPMComponents" />
             <ComponentGroupRef Id="CG.ConfigFiles" />
+            <ComponentGroupRef Id="CiscoStartMenu" />
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
@@ -93,6 +149,7 @@
                     <Directory Id="PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
                         <Directory Id="UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)">
                             <Directory Id="UC_CONFIG_DIRECTORY" Name="$(var.UCConfigDirectory)" />
+                            <Directory Id="UC_DATA_DIRECTORY" Name="$(var.UCDataDirectory)" />
                             <Directory Id="UC_DIRECTORY" Name="$(var.Version)">
                                 <Directory Id="UCSERVICE_BASE_DIRECTORY" Name="$(var.ServiceDictory)">
                                     <Directory Id="UCSERVICE_DIRECTORY" Name="$(var.ServiceVersion)" />
@@ -111,13 +168,8 @@
                     </Directory>
                 </Directory>
             </Directory>
-            <Directory Id="CommonAppDataFolder">
-                <Directory Id="PROGRAMDATA_CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
-                    <Directory Id="PROGRAMDATA_PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
-                        <Directory Id="UC_LOG_DIRECTORY" Name="$(var.UCLogDirectory)">
-                        </Directory>
-                    </Directory>
-                </Directory>
+            <Directory Id="ProgramMenuFolder">
+              <Directory Id="CiscoProgramMenuFolder" Name="$(var.CiscoDirectory)" />
             </Directory>
         </Directory>
     </Fragment>
@@ -135,7 +187,7 @@
             <Component Id="UC_LOG_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector">
-                    <RegistryValue Type="string" Name="LogDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="LogDir" Value="[UC_DATA_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
           
@@ -158,15 +210,42 @@
                     <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
-        
+
+            <Component Id="UCSERVICE_PATH_REGISTRY" Guid="*">
+              <RegistryKey Root="HKLM"
+             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+                <RegistryValue Type="string" Name="Path" Value="[UCSERVICE_DIRECTORY]" KeyPath="yes"/>
+              </RegistryKey>
+            </Component>
+
+            <Component Id="UCDT_SHORTCUT_PATH_REGISTRY" Guid="*">
+              <RegistryKey Root="HKLM"
+             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+                <RegistryValue Type="string" Name="ucdt Shortcut" Value="[CiscoProgramMenuFolder]\!(loc.DiagToolName).lnk" KeyPath="yes"/>
+              </RegistryKey>
+            </Component>
+          
             <Component Id="ucs.exe" Guid="*">
-                <File Id="ucs.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\ucs.exe" />
+                <File Id="ucs.exe" Name="csc_uc.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_uc.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />
                 <ServiceInstall Id="ServiceInstaller" Name="$(var.ServiceName)" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
                     <util:ServiceConfig RestartServiceDelayInSeconds="60" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
                 </ServiceInstall>
             </Component>
 
+            <Component Id="csc_ucdt.exe" Guid="*">
+              <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" >
+                <!--= Set explanation above for Advertise="yes" -->
+                <Shortcut Id="csc_ucdt_start_menu_shortcut" 
+                          Name="!(loc.DiagToolName)" 
+                          Description="!(loc.DiagToolDescription)" 
+                          Directory="CiscoProgramMenuFolder" 
+                          Advertise="yes" 
+                          WorkingDirectory="UCSERVICE_DIRECTORY" >
+                </Shortcut>
+              </File>
+            </Component>
+          
             <?if $(var.Configuration) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
                     <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />
@@ -235,12 +314,12 @@
             <Component Id="UCID_DATA_DIR" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
-                    <RegistryValue Type="string" Name="DataDir" Value="[UC_LOG_DIRECTORY]" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="DataDir" Value="[UC_DATA_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="ucid.exe" Guid="*">
-                <File Id="ucid.exe" Name="ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucid_$(var.Platform).exe" />
+                <File Id="ucid.exe" Name="csc_ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucid_$(var.Platform).exe" />
             </Component>
 
         </ComponentGroup>
@@ -288,7 +367,7 @@
                 <File Id="PM_MCP.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_MCP.dll" />
             </Component>
             <Component Id="ucpm.exe" Guid="*">
-                <File Id="ucpm.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucpm.exe" />
+                <File Id="ucpm.exe" Name="csc_pm.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_pm.exe" />
             </Component>
             <Component Id="PM_Verify.exe" Guid="*">
               <File Id="PM_Verify.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_Verify.exe" />
@@ -431,4 +510,13 @@
             </Component>
         </ComponentGroup>
     </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="CiscoStartMenu" Directory="CiscoProgramMenuFolder">
+      <Component Id="CiscoProgramMenuFolder" Guid="87C0183A-06EA-4616-ACBA-E34EE127C861">
+        <RemoveFolder Id="CiscoProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Name="InstalledStartMenuShortcuts" Type="integer" Value="1" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
 </Wix>

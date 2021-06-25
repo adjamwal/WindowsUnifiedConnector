@@ -146,18 +146,16 @@ BOOL WinApiWrapper::InitiateSystemShutdownExA(
     HANDLE           hToken;
     TOKEN_PRIVILEGES tkp;
 
-    BOOL result = ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
-    if( result != ERROR_SUCCESS ) return result;
+    //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
+    ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
 
-    result = ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
-    if( result != ERROR_SUCCESS ) return result;
+    ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
 
     tkp.PrivilegeCount = 1; // set 1 privilege
     tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
 
     // get the shutdown privilege for this process
-    result = ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
-    if( result != ERROR_SUCCESS ) return result;
+    ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
 
     return ::InitiateSystemShutdownExA(
         lpMachineName,
@@ -167,4 +165,88 @@ BOOL WinApiWrapper::InitiateSystemShutdownExA(
         bRebootAfterShutdown,
         dwReason
     );
+}
+
+BOOL WinApiWrapper::ExitWindowsEx( UINT  uFlags, DWORD dwReason )
+{
+    HANDLE           hToken = NULL;
+    TOKEN_PRIVILEGES tkp;
+
+    //https://docs.microsoft.com/en-us/windows/win32/shutdown/how-to-shut-down-the-system
+    ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken );
+
+    ::LookupPrivilegeValue( NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[ 0 ].Luid );
+
+    tkp.PrivilegeCount = 1; // set 1 privilege
+    tkp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
+
+    // get the shutdown privilege for this process
+    if( hToken != NULL && hToken != INVALID_HANDLE_VALUE ) {
+        ::AdjustTokenPrivileges( hToken, FALSE, &tkp, 0, ( PTOKEN_PRIVILEGES )NULL, 0 );
+    }
+
+    return ::ExitWindowsEx( uFlags, dwReason );
+}
+
+BOOL WinApiWrapper::WTSEnumerateSessionsW(
+    HANDLE hServer,
+    DWORD Reserved,
+    DWORD Version,
+    PWTS_SESSION_INFOW* ppSessionInfo,
+    DWORD* pCount
+)
+{
+    return ::WTSEnumerateSessionsW( hServer, Reserved, Version, ppSessionInfo, pCount );
+}
+
+void WinApiWrapper::WTSFreeMemory( PVOID pMemory )
+{
+    return ::WTSFreeMemory( pMemory );
+}
+
+BOOL WinApiWrapper::WTSQueryUserToken( ULONG SessionId, PHANDLE phToken )
+{
+    return ::WTSQueryUserToken( SessionId, phToken );
+}
+
+BOOL WinApiWrapper::CloseHandle( HANDLE hObject )
+{
+    return ::CloseHandle( hObject );
+}
+
+BOOL WinApiWrapper::CreateEnvironmentBlock( LPVOID* lpEnvironment, HANDLE hToken, BOOL bInherit )
+{
+    return ::CreateEnvironmentBlock( lpEnvironment, hToken, bInherit );
+}
+
+BOOL WinApiWrapper::DestroyEnvironmentBlock( LPVOID  lpEnvironment )
+{
+    return ::DestroyEnvironmentBlock( lpEnvironment );
+}
+
+BOOL WinApiWrapper::CreateProcessAsUserW(
+    HANDLE hToken,
+    LPCWSTR lpApplicationName,
+    LPWSTR lpCommandLine,
+    //LPSECURITY_ATTRIBUTES lpProcessAttributes, USE null
+    //LPSECURITY_ATTRIBUTES lpThreadAttributes, use null
+    //BOOL bInheritHandles, use FALSE
+    DWORD dwCreationFlags,
+    LPVOID lpEnvironment,
+    LPCWSTR lpCurrentDirectory,
+    LPSTARTUPINFOW lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation
+)
+{
+    return ::CreateProcessAsUserW( hToken,
+        lpApplicationName,
+        lpCommandLine,
+        NULL,
+        NULL,
+        FALSE,
+        dwCreationFlags,
+        lpEnvironment,
+        lpCurrentDirectory,
+        lpStartupInfo,
+        lpProcessInformation );
 }

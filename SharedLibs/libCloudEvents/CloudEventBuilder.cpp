@@ -76,7 +76,7 @@ ICloudEventBuilder& CloudEventBuilder::WithError( int code, const std::string& m
     return *this;
 }
 
-ICloudEventBuilder& CloudEventBuilder::WithOldFile( const std::string& path, const std::string& hash, int size )
+ICloudEventBuilder& CloudEventBuilder::WithOldFile( const std::filesystem::path& path, const std::string& hash, int size )
 {
     m_oldPath = path;
     m_oldHash = hash;
@@ -85,7 +85,7 @@ ICloudEventBuilder& CloudEventBuilder::WithOldFile( const std::string& path, con
     return *this;
 }
 
-ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::string& path, const std::string& hash, int size )
+ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::filesystem::path& path, const std::string& hash, int size )
 {
     m_newPath = path;
     m_newHash = hash;
@@ -281,7 +281,7 @@ std::string CloudEventBuilder::Serialize()
         {
             Json::Value oldfilearr;
             Json::Value oldfile;
-            oldfile[ "path" ] = m_oldPath.generic_string();
+            oldfile[ "path" ] = m_oldPath.generic_u8string();
             oldfile[ "sha256" ] = m_oldHash;
             oldfile[ "size" ] = m_oldSize;
             oldfilearr[ 0 ] = oldfile;
@@ -292,7 +292,7 @@ std::string CloudEventBuilder::Serialize()
         {
             Json::Value newfilearr;
             Json::Value newfile;
-            newfile[ "path" ] = m_newPath.generic_string();
+            newfile[ "path" ] = m_newPath.generic_u8string();
             newfile[ "sha256" ] = m_newHash;
             newfile[ "size" ] = m_newSize;
             newfilearr[ 0 ] = newfile;

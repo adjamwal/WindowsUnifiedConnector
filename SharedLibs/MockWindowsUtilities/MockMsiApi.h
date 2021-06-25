@@ -10,6 +10,9 @@ public:
     MockMsiApi();
     ~MockMsiApi();
 
+    MOCK_METHOD1( QueryProducts, int32_t( std::vector<MsiApiProductInfo>& products ) );
+    void MakeFindProductsByNameReturn( int32_t value );
+
     MOCK_METHOD1( FindProductsByName, std::tuple<int32_t, std::vector<MsiApiProductInfo>>( std::wstring displayName ) );
     void MakeFindProductsByNameReturn( std::tuple<int32_t, std::vector<MsiApiProductInfo>> value );
 

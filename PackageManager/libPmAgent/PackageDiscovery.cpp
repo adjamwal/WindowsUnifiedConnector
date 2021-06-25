@@ -9,8 +9,13 @@
 #include <regex>
 #include "..\..\GlobalVersion.h"
 #include <StringUtil.h>
+#include "IUtf8PathVerifier.h"
 
-PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods ) : m_methods( methods )
+
+PackageDiscovery::PackageDiscovery( IPackageDiscoveryMethods& methods, IMsiApi& msiApi, IUtf8PathVerifier& utf8PathVerifier ) :
+    m_methods( methods )
+    , m_msiApi( msiApi )
+    , m_utf8PathVerifier( utf8PathVerifier )
 {
 }
 
@@ -25,10 +30,18 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
     inventory.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
     inventory.platform = "win";
 
+    std::vector<MsiApiProductInfo> productCache;
+    auto ret = m_msiApi.QueryProducts( productCache );
+
+    if ( ret != ERROR_SUCCESS || productCache.empty() )
+    {
+        LOG_ERROR( "Error getting products list from system  %d", ret );
+    }
+
     for( auto& lookupProduct : catalogRules )
     {
         std::vector<PmInstalledPackage> detectedInstallations;
-        ApplyDiscoveryMethods( lookupProduct, detectedInstallations );
+        ApplyDiscoveryMethods( lookupProduct, detectedInstallations, productCache );
         
         for( auto& detectedItem : detectedInstallations )
         {
@@ -49,7 +62,8 @@ PackageInventory PackageDiscovery::CachedInventory()
 }
 
 void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& lookupProduct,
-    std::vector<PmInstalledPackage>& detectedInstallations )
+    std::vector<PmInstalledPackage>& detectedInstallations,
+    std::vector<MsiApiProductInfo>& productCache )
 {
     for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery ) {
         m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
@@ -58,9 +72,9 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
         }
     }
 
-    for( auto msiRule : lookupProduct.msi_discovery )
+    for ( auto msiRule : lookupProduct.msi_discovery )
     {
-        m_methods.DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
+        m_methods.DiscoverByMsiRules( lookupProduct, msiRule, detectedInstallations, productCache );
         if ( !detectedInstallations.empty() ) {
             return;
         }
@@ -85,22 +99,24 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         std::string knownFolderIdConversion = "";
         std::vector<std::filesystem::path> discoveredFiles;
 
-        std::string resolvedPath = WindowsUtilities::ResolvePath( configurable.path );
-
-        if ( resolvedPath != configurable.path )
+        if ( configurable.unresolvedPath != configurable.path )
         {
             //Resolved path is deferent which means we must calculate the knownfolderid
-            size_t first = configurable.path.find( "<FOLDERID_" );
-            size_t last = configurable.path.find_first_of( ">" );
-            knownFolderId = configurable.path.substr( first, last + 1);
-            std::string remainingPath = configurable.path.substr( last + 1, configurable.path.length() );
+            std::string tempResolvedPath = configurable.path.generic_u8string();
+            std::string tempUnresolvedPath = configurable.unresolvedPath.generic_u8string();
+            size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
+            size_t last = tempUnresolvedPath.find_first_of( ">" );
+            knownFolderId = tempUnresolvedPath.substr( first, last + 1 );
+            std::string remainingPath = tempUnresolvedPath.substr( last + 1, tempUnresolvedPath.length() );
 
-            first = resolvedPath.find( remainingPath );
+            first = tempResolvedPath.find( remainingPath );
 
-            knownFolderIdConversion = resolvedPath.substr( 0, first );
+            knownFolderIdConversion = tempResolvedPath.substr( 0, first );
         }
 
-        WindowsUtilities::FileSearchWithWildCard( resolvedPath, discoveredFiles );
+        WindowsUtilities::FileSearchWithWildCard( configurable.path, discoveredFiles );
+
+        m_utf8PathVerifier.PruneInvalidPathsFromList( discoveredFiles );
 
         if ( discoveredFiles.size() > configurable.max_instances )
         {
@@ -118,7 +134,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         {
             PackageConfigInfo configInfo = {};
 
-            std::string tempPath = discoveredFile.generic_string();
+            std::string tempPath = discoveredFile.generic_u8string();
 
             if ( knownFolderId != "" )
             {
@@ -127,7 +143,8 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 tempPath = knownFolderId + tempPath;
             }
 
-            configInfo.path = tempPath;
+            configInfo.path = discoveredFile;
+            configInfo.unresolvedPath = std::filesystem::u8path( tempPath );
             packageConfigs.push_back( configInfo );
         }  
     }

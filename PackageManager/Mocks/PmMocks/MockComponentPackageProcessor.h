@@ -3,6 +3,7 @@
 
 #include "IComponentPackageProcessor.h"
 #include "IPmPlatformDependencies.h"
+#include "PackageException.h"
 #include "PmTypes.h"
 
 class MockComponentPackageProcessor : public IComponentPackageProcessor
@@ -14,9 +15,9 @@ public:
     MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
     void ExpectInitializeIsNotCalled();
 
-    MOCK_METHOD1( HasDownloadedBinary, bool( PmComponent& ) );
-    void MakeHasDownloadedBinaryReturn( bool value );
-    void ExpectHasDownloadedBinaryIsNotCalled();
+    MOCK_METHOD1( PreDownloadedBinaryExists, bool( PmComponent& ) );
+    void MakePreDownloadedBinaryExistsReturn( bool value );
+    void ExpectPreDownloadedBinaryExistsIsNotCalled();
 
     MOCK_METHOD1( HasConfigs, bool( PmComponent& ) );
     void MakeHasConfigsReturn( bool value );

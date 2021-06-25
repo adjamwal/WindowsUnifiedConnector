@@ -10,6 +10,7 @@ class IPmConfig;
 class IPmCloud;
 class IPackageDiscoveryManager;
 class ICheckinFormatter;
+class ICatalogJsonParser;
 class IUcidAdapter;
 class ICertsAdapter;
 class ICheckinManifestRetriever;
@@ -19,6 +20,7 @@ class ICloudEventPublisher;
 class ICloudEventStorage;
 class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
+class IRebootHandler;
 
 struct PmComponent;
 struct PmEvent;
@@ -33,6 +35,7 @@ public:
         IInstallerCacheManager& installerCacheMgr,
         IPackageDiscoveryManager& packageDiscoveryManager,
         ICheckinFormatter& checkinFormatter,
+        ICatalogJsonParser& catalogJsonParser,
         IUcidAdapter& ucidAdapter, 
         ICertsAdapter& certsAdapter,
         ICheckinManifestRetriever& manifestRetriever,
@@ -40,6 +43,7 @@ public:
         ICloudEventPublisher& cloudEventPublisher,
         ICloudEventStorage& cloudEventStorage,
         IUcUpgradeEventHandler& ucUpgradeEventHandler,
+        IRebootHandler& rebootHandler,
         IWorkerThread& thread );
     virtual ~PackageManager();
 
@@ -56,6 +60,7 @@ private:
     IInstallerCacheManager& m_installerCacheMgr;
     IPackageDiscoveryManager& m_packageDiscoveryManager;
     ICheckinFormatter& m_checkinFormatter;
+    ICatalogJsonParser& m_catalogJsonParser;
     IUcidAdapter& m_ucidAdapter;
     ICertsAdapter& m_certsAdapter;
     ICheckinManifestRetriever& m_manifestRetriever;
@@ -63,6 +68,7 @@ private:
     ICloudEventPublisher& m_cloudEventPublisher;
     ICloudEventStorage& m_cloudEventStorage;
     IUcUpgradeEventHandler& m_ucUpgradeEventHandler;
+    IRebootHandler& m_rebootHandler;
     IWorkerThread& m_thread;
     std::mutex m_mutex;
     std::string m_bsConfigFile;

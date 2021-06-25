@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MockFileUtil.h">
+    <ClInclude Include="MockFileSysUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MockPmHttp.h">
@@ -24,15 +24,24 @@
     <ClInclude Include="MockSslUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CustomPathMatchers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MockUtf8PathVerifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MockFileUtil.cpp">
+    <ClCompile Include="MockFileSysUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockPmHttp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockSslUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MockUtf8PathVerifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

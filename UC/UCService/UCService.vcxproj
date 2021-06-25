@@ -70,20 +70,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>ucs</TargetName>
+    <TargetName>csc_uc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>ucs</TargetName>
+    <TargetName>csc_uc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>ucs</TargetName>
+    <TargetName>csc_uc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>ucs</TargetName>
+    <TargetName>csc_uc</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,7 +93,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -117,7 +117,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -141,7 +141,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -167,7 +167,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -185,8 +185,6 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ServiceLogManager.cpp" />
-    <ClCompile Include="UCIDLoader.cpp" />
-    <ClCompile Include="UCMCPLoader.cpp" />
     <ClCompile Include="UCService.cpp" />
     <ClCompile Include="ServiceBase.cpp" />
     <ClCompile Include="ServiceInstaller.cpp" />
@@ -194,8 +192,6 @@
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="ServiceLogManager.h" />
-    <ClInclude Include="UCIDLoader.h" />
-    <ClInclude Include="UCMCPLoader.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="UCService.h" />
     <ClInclude Include="ServiceBase.h" />
@@ -208,6 +204,9 @@
     <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Install\InstallerCustomActions\InstallerCustomActions.vcxproj">
+      <Project>{d72eb94c-bdc3-45ba-8f73-f4eb0c73b334}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libCrashHandlerClient\libCrashHandlerClient.vcxproj">
       <Project>{58783f4f-d8a3-4409-a4d0-618441c95c8e}</Project>
     </ProjectReference>
@@ -222,6 +221,9 @@
     </ProjectReference>
     <ProjectReference Include="..\libUcConfig\libUcConfig.vcxproj">
       <Project>{1a45e256-8923-49ba-95db-f778ddcefa31}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libUcLoader\libUcLoader.vcxproj">
+      <Project>{b5f2fcbe-e412-1736-410a-85a0f4e958fc}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

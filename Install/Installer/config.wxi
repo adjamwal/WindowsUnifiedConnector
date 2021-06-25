@@ -22,7 +22,7 @@
     <?if $(var.UC_CONSUMER) = 1 ?>
         <?define ProductDirectory = "Immunet" ?>
     <?else ?>
-        <?define ProductDirectory = "SecureClient" ?>
+        <?define ProductDirectory = "Cisco Secure Client" ?>
     <?endif ?>
   
     <?define UnifiedConnectorDirectory = "UC" ?>
@@ -30,7 +30,7 @@
     <?define UCIDDirectory = "UCID" ?>
     <?define UCPMDirectory = "UCPM" ?>
     <?define UCConfigDirectory = "Configuration" ?>
-    <?define UCLogDirectory = "UC" ?>
+    <?define UCDataDirectory = "Data" ?>
     <?define PmInstallCacheDirectory = "Cisco-UC" ?>
 
     <!-- Config File Information -->

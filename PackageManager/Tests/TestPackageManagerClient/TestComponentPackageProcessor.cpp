@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "ComponentPackageProcessor.h"
 #include "MockInstallerCacheManager.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformComponentManager.h"
 #include "MockSslUtil.h"
@@ -20,7 +20,7 @@ protected:
     void SetUp()
     {
         m_installerCacheMgr.reset( new NiceMock<MockInstallerCacheManager>() );
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_pmComponentManager.reset( new NiceMock<MockPmPlatformComponentManager>() );
         m_dep.reset( new NiceMock<MockPmPlatformDependencies>() );
         m_sslUtil.reset( new NiceMock<MockSslUtil>() );
@@ -70,12 +70,14 @@ protected:
             "installLocation",
             "signerName",
             "installerHash",
-            "installerPath",
+            "downloadedInstallerPath",
+            "", //downloadErrorMsg
             false,
             {}
         };
 
         m_expectedComponentPackage.configs.push_back( {
+            "configpath",
             "configpath",
             "configsha256",
             "configcontents",
@@ -99,9 +101,18 @@ protected:
         m_fileUtil->MakeFileExistsReturn( true );
     }
 
+    void SetupComponentPackageWithMissingBinary()
+    {
+        SetupComponentPackage();
+        m_expectedComponentPackage.installerHash = "";
+        m_patient->Initialize( m_dep.get() );
+        m_fileUtil->MakeFileSizeReturn( -1 );
+        m_fileUtil->MakeFileExistsReturn( false);
+    }
+
     PmComponent m_expectedComponentPackage;
     std::unique_ptr<MockInstallerCacheManager> m_installerCacheMgr;
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<MockPmPlatformComponentManager> m_pmComponentManager;
     std::unique_ptr<MockPmPlatformDependencies> m_dep;
     std::unique_ptr<MockSslUtil> m_sslUtil;
@@ -230,3 +241,22 @@ TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPac
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
+TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPackageIsMissingBinary )
+{
+    SetupComponentPackageWithMissingBinary();
+
+    EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) );
+    EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillCacheDownloadError )
+{
+    SetupComponentPackageWithMissingBinary();
+    m_installerCacheMgr->MakeDownloadOrUpdateInstallerThrow( "http 1234", 1 );
+
+    m_patient->DownloadPackageBinary( m_expectedComponentPackage );
+
+    EXPECT_TRUE( m_expectedComponentPackage.downloadErrorMsg.find( "http 1234" ) != std::string::npos );
+}

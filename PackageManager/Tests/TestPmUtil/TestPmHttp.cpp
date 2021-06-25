@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "PmHttp.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 #include "fff.h"
 
 #include <memory>
@@ -70,7 +70,7 @@ protected:
     void SetUp()
     {
         ResetFakes();
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
 
         m_patient.reset( new PmHttp( *m_fileUtil ) );
     }
@@ -100,7 +100,7 @@ protected:
         ResetFakes();
     }
 
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<PmHttp> m_patient;
 };
 

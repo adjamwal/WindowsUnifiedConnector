@@ -63,6 +63,9 @@
     <ClInclude Include="MockInstallerCacheManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MockRebootHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockCertsAdapter.cpp">
@@ -111,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockInstallerCacheManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MockRebootHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

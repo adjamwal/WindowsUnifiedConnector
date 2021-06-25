@@ -20,6 +20,8 @@
 #include "ICloudEventStorage.h"
 #include "IUcUpgradeEventHandler.h"
 #include "IInstallerCacheManager.h"
+#include "IRebootHandler.h"
+#include "ICatalogJsonParser.h"
 #include "PmTypes.h"
 #include <sstream>
 
@@ -30,6 +32,7 @@ PackageManager::PackageManager( IPmConfig& config,
     IInstallerCacheManager& installerCacheMgr,
     IPackageDiscoveryManager& packageDiscoveryManager,
     ICheckinFormatter& checkinFormatter,
+    ICatalogJsonParser& catalogJsonParser,
     IUcidAdapter& ucidAdapter,
     ICertsAdapter& certsAdapter,
     ICheckinManifestRetriever& manifestRetriever,
@@ -37,12 +40,14 @@ PackageManager::PackageManager( IPmConfig& config,
     ICloudEventPublisher& cloudEventPublisher,
     ICloudEventStorage& cloudEventStorage,
     IUcUpgradeEventHandler& ucUpgradeEventHandler,
+    IRebootHandler& rebootHandler,
     IWorkerThread& thread ) :
     m_config( config )
     , m_cloud( cloud )
     , m_installerCacheMgr( installerCacheMgr )
     , m_packageDiscoveryManager( packageDiscoveryManager )
     , m_checkinFormatter( checkinFormatter )
+    , m_catalogJsonParser( catalogJsonParser )
     , m_ucidAdapter( ucidAdapter )
     , m_certsAdapter( certsAdapter )
     , m_manifestRetriever( manifestRetriever )
@@ -50,6 +55,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_cloudEventPublisher( cloudEventPublisher )
     , m_cloudEventStorage( cloudEventStorage )
     , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
+    , m_rebootHandler( rebootHandler )
     , m_thread( thread )
     , m_dependencies( nullptr )
 {
@@ -140,6 +146,8 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
         m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
         m_ucUpgradeEventHandler.Initialize( m_dependencies );
+        m_rebootHandler.Initialize( m_dependencies );
+        m_catalogJsonParser.Initialize( m_dependencies );
     }
     catch( std::exception& ex )
     {
@@ -160,9 +168,8 @@ void PackageManager::PmWorkflowThread()
 {
     LOG_DEBUG( "Enter " );
 
-    if( !LoadPmConfig() ) {
+    if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
         LOG_ERROR( "Failed to load PM configuration" );
-        //Send event? might fail without a config/cloudURL
     }
 
     PackageInventory inventory;
@@ -192,6 +199,11 @@ void PackageManager::PmWorkflowThread()
         {
             LOG_ERROR( "ProcessManifest failed" );
         }
+
+        //new config might've been deployed
+        if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
+            LOG_DEBUG( "Failed to load PM configuration" );
+        }
     }
     catch( std::exception& ex ) {
         LOG_ERROR( "Checkin failed: %s", ex.what() );
@@ -205,17 +217,7 @@ void PackageManager::PmWorkflowThread()
         m_cloudEventPublisher.PublishFailedEvents();
         m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAge() );
 
-        if( isRebootRequired )
-        {
-            if( m_config.AllowPostInstallReboots() ) 
-            {
-                m_dependencies->ComponentManager().InitiateSystemRestart();
-            }
-            else
-            { 
-                LOG_ERROR( "Post-install reboots disabled by PM configuration" );
-            }
-        }
+        m_rebootHandler.HandleReboot( isRebootRequired );
     }
     catch ( std::exception& ex ) {
         LOG_ERROR( "Post Checkin failed: %s", ex.what() );

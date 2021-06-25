@@ -8,7 +8,7 @@ class IPmCloud;
 class IPmConfig;
 class IPmManifest;
 class IWorkerThread;
-class IFileUtil;
+class IFileSysUtil;
 class IPackageInventoryProvider;
 class IPackageDiscoveryManager;
 class ICheckinFormatter;
@@ -26,6 +26,8 @@ class ICloudEventBuilder;
 class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
+class IRebootHandler;
+class IUtf8PathVerifier;
 
 class PackageManagerContainer
 {
@@ -36,7 +38,8 @@ public:
     IPackageManager& packageManager();
 
 private:
-    std::unique_ptr<IFileUtil> m_fileUtil;
+    std::unique_ptr<IUtf8PathVerifier> m_utfPathVerifier;
+    std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;
@@ -61,6 +64,7 @@ private:
     std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
+    std::unique_ptr<IRebootHandler> m_rebootHandler;
 
     std::unique_ptr<IPackageManager> m_pacMan;
 };

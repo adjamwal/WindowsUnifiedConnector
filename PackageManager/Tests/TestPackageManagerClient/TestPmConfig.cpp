@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "PmConfig.h"
-#include "MockFileUtil.h"
+#include "MockFileSysUtil.h"
 
 #include <memory>
 
@@ -9,7 +9,7 @@ class TestPmConfig : public ::testing::Test
 protected:
     void SetUp()
     {
-        m_fileUtil.reset( new NiceMock<MockFileUtil>() );
+        m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
         m_aTimeStamp = std::filesystem::file_time_type::clock::now();
         m_patient.reset( new PmConfig( *m_fileUtil ) );
     }
@@ -41,36 +41,37 @@ protected:
         "CheckinInterval": 150000,
         "MaxStartupDelay": 200000,
         "maxFileCacheAge_s": 1000,
-        "AllowPostInstallReboots": true
+        "AllowPostInstallReboots": true,
+        "RebootThrottleS": 1000
     }
 }
 )";
 
-    std::unique_ptr<MockFileUtil> m_fileUtil;
+    std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::filesystem::file_time_type m_aTimeStamp;
     std::unique_ptr<PmConfig> m_patient;
 };
 
 TEST_F( TestPmConfig, LoadWillReadBsFile )
 {
-    std::string bsfilename( "bs file" );
+    std::filesystem::path bsfilename( "bs file" );
 
     m_fileUtil->MakeReadFileReturn( bsConfigData );
 
     EXPECT_CALL( *m_fileUtil, ReadFile( bsfilename ) );
 
-    m_patient->LoadBsConfig( bsfilename );
+    m_patient->LoadBsConfig( bsfilename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, LoadWillReadPmFile )
 {
-    std::string pmfilename( "pm file" );
+    std::filesystem::path pmfilename( "pm file" );
 
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 
     EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
 
-    m_patient->LoadPmConfig( pmfilename );
+    m_patient->LoadPmConfig( pmfilename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveCloudCheckinUri )
@@ -145,14 +146,15 @@ TEST_F( TestPmConfig, PmConfigFileChangedIsFalseAfterLoading )
 
 TEST_F( TestPmConfig, LoadWillTryBackupFile )
 {
-    std::string filename( "filename" );
+    std::filesystem::path filename( "filename" );
+    std::filesystem::path backupFilename( "filename.bak" );
 
     InSequence s;
 
     EXPECT_CALL( *m_fileUtil, ReadFile( filename ) ).WillOnce( Return( "" ) );
-    EXPECT_CALL( *m_fileUtil, ReadFile( filename + ".bak" ) ).WillOnce( Return( "" ) );
+    EXPECT_CALL( *m_fileUtil, ReadFile( backupFilename ) ).WillOnce( Return( "" ) );
 
-    m_patient->LoadPmConfig( filename );
+    m_patient->LoadPmConfig( filename.generic_u8string() );
 }
 
 TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceed )
@@ -183,7 +185,7 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailOnEmptyContents )
     EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
-TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProvided )
+TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailWhenMaxFileCacheAgeNotProvided )
 {
     m_fileUtil->MakeReadFileReturn( R"(
 {
@@ -196,7 +198,7 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceedWhenMaxFileCacheAgeNotProv
 }
 )" );
 
-    EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
+    EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailIfMaxFileCacheAgeIsInvalid )
@@ -249,6 +251,15 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultInterval )
     EXPECT_EQ( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
 }
 
+//Not a great test... but not worthwihle to mock out RandomUtil
+TEST_F(TestPmConfig, LoadingEmptyConfigSetsDefaultMaxStartupDelay)
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
+}
 TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
 {
     m_fileUtil->MakeReadFileReturn( "" );
@@ -256,5 +267,32 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
     m_patient->LoadPmConfig( "filename" );
 
     EXPECT_EQ( m_patient->GetLogLevel(), PM_CONFIG_LOGLEVEL_DEFAULT );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsMaxFileCacheAge )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetMaxFileCacheAge(), PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsAllowPostInstallReboots )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->AllowPostInstallReboots(), false );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsRebootThrottle )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetRebootThrottleS(), PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS );
 }
 

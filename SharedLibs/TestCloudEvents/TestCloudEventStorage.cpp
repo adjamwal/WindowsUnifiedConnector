@@ -1,11 +1,12 @@
 #include "pch.h"
 
 #include "CloudEventBuilder.h"
-#include "FileUtil.h"
+#include "FileSysUtil.h"
 #include "CloudEventStorage.h"
 #include "MockPmPlatformDependencies.h"
 #include "MockPmPlatformConfiguration.h"
 #include <memory>
+#include "MockUtf8PathVerifier.h"
 
 class TestCloudEventStorage : public ::testing::Test
 {
@@ -13,7 +14,10 @@ protected:
     void SetUp()
     {
         std::string filename = "TestCloudEventStorage";
-        m_fileUtil.reset( new FileUtil() );
+        m_utf8PathVerifier.reset( new NiceMock<MockUtf8PathVerifier>() );
+        m_utf8PathVerifier->MakeIsPathValidReturn( true );
+
+        m_fileUtil.reset( new FileSysUtil( *m_utf8PathVerifier ) );
         m_eventStorage.reset( new CloudEventStorage( filename, *m_fileUtil ) );
 
         m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
@@ -51,7 +55,8 @@ protected:
         m_platformConfiguration.reset();
     }
 
-    std::unique_ptr<IFileUtil> m_fileUtil;
+    std::unique_ptr<MockUtf8PathVerifier> m_utf8PathVerifier;
+    std::unique_ptr<IFileSysUtil> m_fileUtil;
     CloudEventBuilder m_eventBuilder1;
     CloudEventBuilder m_eventBuilder2;
     std::unique_ptr<ICloudEventStorage> m_eventStorage;

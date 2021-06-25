@@ -93,4 +93,42 @@ public:
 
     MOCK_METHOD6( InitiateSystemShutdownExA, 
         BOOL( LPSTR, LPSTR, DWORD, BOOL, BOOL, DWORD ) );
+
+    MOCK_METHOD2( ExitWindowsEx, BOOL( UINT, DWORD ) );
+
+    MOCK_METHOD5( WTSEnumerateSessionsW, BOOL( HANDLE, DWORD, DWORD, PWTS_SESSION_INFOW*, DWORD* ) );
+    void MakeWTSEnumerateSessionsWReturn( BOOL value );
+    void ExpectWTSEnumerateSessionsWNotCalled();
+
+    MOCK_METHOD1( WTSFreeMemory, void( PVOID ) );
+    void ExpectWTSFreeMemoryNotCalled();
+
+    MOCK_METHOD2( WTSQueryUserToken, BOOL( ULONG, PHANDLE ) );
+    void MakeWTSQueryUserTokenReturn( BOOL value );
+    void ExpectWTSQueryUserTokenNotCalled();
+
+    MOCK_METHOD1( CloseHandle, BOOL( HANDLE ) );
+    void MakeCloseHandleReturn( BOOL value );
+    void ExpectCloseHandleNotCalled();
+
+    MOCK_METHOD3( CreateEnvironmentBlock, BOOL( LPVOID*, HANDLE, BOOL ) );
+    void MakeCreateEnvironmentBlockReturn( BOOL value );
+    void ExpectCreateEnvironmentBlockNotCalled();
+
+    MOCK_METHOD1( DestroyEnvironmentBlock, BOOL( LPVOID ) );
+    void MakeDestroyEnvironmentBlockReturn( BOOL value );
+    void ExpectDestroyEnvironmentBlockNotCalled();
+
+    MOCK_METHOD8( CreateProcessAsUserW, BOOL(
+        HANDLE,
+        LPCWSTR,
+        LPWSTR,
+        DWORD,
+        LPVOID,
+        LPCWSTR,
+        LPSTARTUPINFOW,
+        LPPROCESS_INFORMATION
+    ) );
+    void MakeCreateProcessAsUserWReturn( BOOL value );
+    void ExpectCreateProcessAsUserWNotCalled();
 };

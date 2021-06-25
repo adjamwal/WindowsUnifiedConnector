@@ -1,6 +1,6 @@
 #include "PmHttp.h"
 #include "PmLogger.h"
-#include "IFileUtil.h"
+#include "IFileSysUtil.h"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -111,7 +111,7 @@ CURLcode PmHttp::SslCallback( CURL* curl, void* sslctx, void* param )
     return cb_ret;
 }
 
-PmHttp::PmHttp( IFileUtil& fileUtil ) :
+PmHttp::PmHttp( IFileSysUtil& fileUtil ) :
     m_fileUtil( fileUtil )
     , m_curlHandle( nullptr )
     , m_userAgent( "DefaultPackageManager" )
@@ -376,7 +376,7 @@ int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, s
     return rtn;
 }
 
-int32_t PmHttp::HttpDownload( const std::string& url, const std::string& filepath, int32_t &httpReturn )
+int32_t PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& filepath, int32_t &httpReturn )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     CURLcode rtn = CURLE_OK;
@@ -399,7 +399,7 @@ int32_t PmHttp::HttpDownload( const std::string& url, const std::string& filepat
 
     ctx.handle = m_fileUtil.PmCreateFile( filepath );
     if( ctx.handle == NULL ) {
-        WLOG_ERROR( L"failed to create file %hs", filepath.c_str() );
+        LOG_ERROR( "failed to create file %s", filepath.generic_u8string().c_str() );
         return -1;
     }
 

@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -110,7 +110,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -127,7 +127,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -144,7 +144,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmClient;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -158,10 +158,12 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MockPackageDiscovery.h" />
     <ClInclude Include="MockPackageDiscoveryMethods.h" />
+    <ClInclude Include="MockUserImpersonator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockPackageDiscovery.cpp" />
     <ClCompile Include="MockPackageDiscoveryMethods.cpp" />
+    <ClCompile Include="MockUserImpersonator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

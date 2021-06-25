@@ -36,7 +36,7 @@ MockWindowsUtilities::MockWindowsUtilities()
     MakeGetExePathReturn( L"" );
     MakeGetDirPathReturn( L"" );
     MakeGetInstalledProgramsReturn( m_defaultDiscoveryList );
-    MakeGetDataDirReturn( L"" );
+    MakeGetLogDirReturn( L"" );
 }
 
 MockWindowsUtilities::~MockWindowsUtilities()
@@ -72,6 +72,16 @@ void MockWindowsUtilities::MakeGetFileModifyTimeReturn( uint32_t value )
 void MockWindowsUtilities::ExpectGetFileModifyTimeIsNotCalled()
 {
     EXPECT_CALL( *this, GetFileModifyTime( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeWriteFileContentsReturn( bool  value )
+{
+    ON_CALL( *this, WriteFileContents( _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectWriteFileContentsIsNotCalled()
+{
+    EXPECT_CALL( *this, WriteFileContents( _, _, _ ) ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeDirectoryExistsReturn( bool value )
@@ -156,22 +166,32 @@ void MockWindowsUtilities::ExpectGetInstalledProgramsIsNotCalled()
 
 void MockWindowsUtilities::MakeResolveKnownFolderIdReturn( std::string value )
 {
-    ON_CALL( *this, ResolveKnownFolderId( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ResolveKnownFolderIdForDefaultUser( _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockWindowsUtilities::ExpectResolveKnownFolderIdIsNotCalled()
 {
-    EXPECT_CALL( *this, ResolveKnownFolderId( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ResolveKnownFolderIdForDefaultUser( _ ) ).Times( 0 );
 }
 
-void MockWindowsUtilities::MakeGetDataDirReturn( std::wstring value )
+void MockWindowsUtilities::MakeResolveKnownFolderIdForCurrentUserReturn( std::string value )
 {
-    ON_CALL( *this, GetDataDir() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ResolveKnownFolderIdForCurrentUser( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockWindowsUtilities::ExpectGetDataDirIsNotCalled()
+void MockWindowsUtilities::ExpectResolveKnownFolderIdForCurrentUserIsNotCalled()
 {
-    EXPECT_CALL( *this, GetDataDir() ).Times( 0 );
+    EXPECT_CALL( *this, ResolveKnownFolderIdForCurrentUser( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeGetLogDirReturn( std::wstring value )
+{
+    ON_CALL( *this, GetLogDir() ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectGetLogDirIsNotCalled()
+{
+    EXPECT_CALL( *this, GetLogDir() ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeResolvePathReturn( std::string value )
@@ -202,4 +222,14 @@ void MockWindowsUtilities::MakeSearchFilesReturn( int32_t value )
 void MockWindowsUtilities::ExpectSearchFilesIsNotCalled()
 {
     EXPECT_CALL( *this, SearchFiles( _, _, _, _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeAllowEveryoneAccessToFileReturn( bool value )
+{
+    ON_CALL( *this, AllowEveryoneAccessToFile( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectAllowEveryoneAccessToFileNotCalled()
+{
+    EXPECT_CALL( *this, AllowEveryoneAccessToFile( _ ) ).Times( 0 );
 }

@@ -31,6 +31,7 @@
     <ClInclude Include="IInstallerCacheManager.h" />
     <ClInclude Include="InstallerCacheManager.h" />
     <ClInclude Include="IPackageDiscoveryManager.h" />
+    <ClInclude Include="IRebootHandler.h" />
     <ClInclude Include="IUcUpgradeEventHandler.h" />
     <ClInclude Include="PackageDiscoveryManager.h" />
     <ClInclude Include="PackageException.h" />
@@ -59,6 +60,7 @@
     <ClInclude Include="PmConfig.h" />
     <ClInclude Include="PmManifest.h" />
     <ClInclude Include="PmTypes.h" />
+    <ClInclude Include="RebootHandler.h" />
     <ClInclude Include="UcidAdapter.h" />
     <ClInclude Include="UcUpgradeEventHandler.h" />
   </ItemGroup>
@@ -79,6 +81,7 @@
     <ClCompile Include="PmCloud.cpp" />
     <ClCompile Include="PmConfig.cpp" />
     <ClCompile Include="PmManifest.cpp" />
+    <ClCompile Include="RebootHandler.cpp" />
     <ClCompile Include="UcidAdapter.cpp" />
     <ClCompile Include="UcUpgradeEventHandler.cpp" />
   </ItemGroup>

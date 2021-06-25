@@ -215,3 +215,53 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductFound )
     EXPECT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
     EXPECT_EQ( "testVersion", detectedInstallations[ 0 ].version );
 }
+
+TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesNoneFound )
+{
+    std::vector<PmInstalledPackage> detectedInstallations;
+
+    PmProductDiscoveryRules lookupProduct = {};
+    SetupProductDiscoveryRules( lookupProduct );
+
+    PmProductDiscoveryMsiMethod msiRule = {};
+    SetupProductDiscoveryMsiMethod( msiRule );
+
+    auto msiReturnList = new std::vector<MsiApiProductInfo>();
+    auto methodReturnValue = std::make_tuple( 0, *msiReturnList );
+
+    std::vector<MsiApiProductInfo> productCache;
+
+    ON_CALL( *m_msiApi, FindProductsByNameAndPublisher( _, _ ) )
+        .WillByDefault( Return( methodReturnValue ) );
+
+    m_patient->DiscoverByMsiRules( lookupProduct, msiRule, detectedInstallations, productCache );
+
+    EXPECT_EQ( 0, detectedInstallations.size() );
+}
+
+TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesProductFound )
+{
+    std::vector<PmInstalledPackage> detectedInstallations;
+
+    PmProductDiscoveryRules lookupProduct = {};
+    SetupProductDiscoveryRules( lookupProduct );
+
+    PmProductDiscoveryMsiMethod msiRule = {};
+    SetupProductDiscoveryMsiMethod( msiRule );
+
+    std::vector<MsiApiProductInfo> productCache;
+
+    MsiApiProductInfo msiApiProductInfo = {};
+    msiApiProductInfo.Properties.Publisher = L"testVendor";
+    msiApiProductInfo.Properties.InstalledProductName = L"testName";
+    msiApiProductInfo.Properties.VersionString = L"testVersion";
+
+    productCache.push_back( msiApiProductInfo );
+
+
+    m_patient->DiscoverByMsiRules( lookupProduct, msiRule, detectedInstallations, productCache );
+
+    ASSERT_EQ( 1, detectedInstallations.size() );
+    EXPECT_EQ( lookupProduct.product, detectedInstallations[0].product );
+    EXPECT_EQ( "testVersion", detectedInstallations[0].version );
+}

@@ -6,6 +6,8 @@
 #include <ShlObj.h>
 #include <Msi.h>
 #include <unordered_map>
+#include <AclAPI.h>
+#include <Sddl.h>
 
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
@@ -170,6 +172,31 @@ uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
     return ( uint32_t )stFileInfo.st_mtime;
 }
 
+bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* content, const size_t contentLen )
+{
+    bool rtn = false;
+    if ( !filename || !content || contentLen == 0 ) {
+        return false;
+    }
+
+    try {
+        std::ofstream file( filename, std::ofstream::out | std::ofstream::trunc );
+
+        if ( file.is_open() ) {
+            file.write( ( const char* )content, contentLen );
+
+            file.close();
+
+            rtn = true;
+        }
+    }
+    catch ( ... ) {
+
+    }
+
+    return rtn;
+}
+
 bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)
 {
     DWORD ftyp = GetFileAttributes(dirname);
@@ -206,7 +233,10 @@ std::wstring WindowsUtilities::GetDirPath(const std::wstring& path)
 bool WindowsUtilities::ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data)
 {
     DWORD dataSize{};
-    LONG retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize);
+
+    //NOTE: RRF_SUBKEY_WOW6464KEY flag only works with Windows 10 or greater, and is ignored on 32 bit Windows
+    //if we ever need to support Windows 7/8.1 we'll have to switch to RegOpenKeyEx() and RegQueryValueEx()
+    LONG retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, nullptr, &dataSize);
 
     if (retCode != ERROR_SUCCESS)
     {
@@ -215,7 +245,7 @@ bool WindowsUtilities::ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstrin
 
     data.resize(dataSize / sizeof(wchar_t));
 
-    retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, &data[0], &dataSize);
+    retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, &data[0], &dataSize);
     if (retCode != ERROR_SUCCESS)
     {
         return false;
@@ -321,19 +351,30 @@ std::vector<WindowsUtilities::WindowsInstallProgram> WindowsUtilities::GetInstal
     return list;
 }
 
-std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId )
+//Only supportting System and current user. NULL = current user, -1 = system user
+std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle )
 {
     std::string knownFolder;
 
-    if( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
+    if ( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
         PWSTR wpath = NULL;
-        if( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, ( HANDLE )-1, &wpath ) ) ) {
+        if ( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, userHandle, &wpath ) ) ) {
             knownFolder = _g_converter.to_bytes( wpath );
             CoTaskMemFree( wpath );
         }
     }
 
     return knownFolder;
+}
+
+std::string WindowsUtilities::ResolveKnownFolderIdForDefaultUser( const std::string& knownFolderId )
+{
+    return ResolveKnownFolderId( knownFolderId, ( HANDLE )-1 );
+}
+
+std::string WindowsUtilities::ResolveKnownFolderIdForCurrentUser( const std::string& knownFolderId )
+{
+    return ResolveKnownFolderId( knownFolderId, NULL );
 }
 
 std::wstring WindowsUtilities::GetLogDir()
@@ -354,7 +395,7 @@ std::string WindowsUtilities::ResolvePath( const std::string& basePath )
         if ( end != std::string::npos ) {
             begin;
 
-            std::string knownFolder = WindowsUtilities::ResolveKnownFolderId( basePath.substr( begin + 1, end - (begin + 1) ) );
+            std::string knownFolder = WindowsUtilities::ResolveKnownFolderIdForDefaultUser( basePath.substr( begin + 1, end - (begin + 1) ) );
             if ( !knownFolder.empty() ) {
                 knownFolder = basePath.substr( 0, begin ) + knownFolder + basePath.substr( end + 1 );
                 return knownFolder;
@@ -449,4 +490,41 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
     }
 
     return dwError;
+}
+
+bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
+{
+    bool rtn = false;
+    PACL pDacl = NULL;
+    PACL pNewDACL = NULL;
+    EXPLICIT_ACCESS ExplicitAccess = { 0 };
+    PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
+    PSID psid = NULL;
+
+    LPTSTR lpStr;
+    lpStr = ( LPTSTR )path.c_str();
+
+    if( !path.empty() &&
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pDacl, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
+        ConvertStringSidToSid( L"S-1-1-0", &psid ) 
+      ) {
+        ExplicitAccess.grfAccessMode = SET_ACCESS;
+        ExplicitAccess.grfAccessPermissions = GENERIC_ALL;
+        ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+        ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+        ExplicitAccess.Trustee.pMultipleTrustee = NULL;
+        ExplicitAccess.Trustee.ptstrName = ( LPTSTR )psid;
+        ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
+
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pDacl, &pNewDACL ) == ERROR_SUCCESS ) &&
+            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
+            rtn = true;
+        }
+    }
+
+    if( pNewDACL ) LocalFree( pNewDACL );
+    if( psid ) LocalFree( psid );
+
+    return rtn;
 }

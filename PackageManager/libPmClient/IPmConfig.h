@@ -26,4 +26,5 @@ public:
     virtual const std::vector<PmComponent>& GetSupportedComponentList() = 0;
     virtual uint32_t GetMaxFileCacheAge() = 0;
     virtual bool AllowPostInstallReboots() = 0;
+    virtual uint32_t GetRebootThrottleS() = 0;
 };

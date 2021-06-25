@@ -4,14 +4,14 @@
 #include <curl/curl.h>
 #include <mutex>
 
-class IFileUtil;
+class IFileSysUtil;
 
 struct FileUtilHandle;
 
 class PmHttp : public IPmHttp
 {
 public:
-    PmHttp( IFileUtil& fileUtil );
+    PmHttp( IFileSysUtil& fileUtil );
     ~PmHttp();
 
     int32_t Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& agent ) override;
@@ -20,10 +20,10 @@ public:
     int32_t SetCerts( const PmHttpCertList& cert ) override;
     int32_t HttpGet( const std::string& url, std::string& response, int32_t &httpReturn ) override;
     int32_t HttpPost( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t &httpReturn ) override;
-    int32_t HttpDownload( const std::string& url, const std::string& filepath, int32_t &httpReturn ) override;
+    int32_t HttpDownload( const std::string& url, const std::filesystem::path& filepath, int32_t &httpReturn ) override;
 
 private:
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
     CURL *m_curlHandle;
     std::string m_userAgent;
     std::mutex m_mutex;
@@ -32,7 +32,7 @@ private:
     PmHttpCertList m_certList;
 
     struct WriteFileCtx {
-        IFileUtil* fileUtil;
+        IFileSysUtil* fileUtil;
         FileUtilHandle* handle;
     };
 

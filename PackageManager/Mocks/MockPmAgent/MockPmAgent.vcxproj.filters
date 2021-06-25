@@ -24,12 +24,18 @@
     <ClInclude Include="MockPackageDiscoveryMethods.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MockUserImpersonator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockPackageDiscovery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockPackageDiscoveryMethods.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MockUserImpersonator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

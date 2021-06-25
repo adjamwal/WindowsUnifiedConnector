@@ -2,8 +2,9 @@
 
 #include "IPackageConfigProcessor.h"
 #include <mutex>
+#include <filesystem>
 
-class IFileUtil;
+class IFileSysUtil;
 class ISslUtil;
 class IUcidAdapter;
 class ICloudEventBuilder;
@@ -13,7 +14,7 @@ class PackageConfigProcessor : public IPackageConfigProcessor
 {
 public:
     PackageConfigProcessor( 
-        IFileUtil& fileUtil, 
+        IFileSysUtil& fileUtil, 
         ISslUtil& sslUtil,
         IUcidAdapter& ucidAdapter,
         ICloudEventBuilder& eventBuilder,
@@ -26,9 +27,9 @@ public:
 private:
     bool AddConfig( PackageConfigInfo& config );
     bool RemoveConfig( PackageConfigInfo& config );
-    void RemoveTempFile( const std::string& tempFilePath );
+    void RemoveTempFile( const std::filesystem::path& tempFilePath );
 
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
     ISslUtil& m_sslUtil;
     IUcidAdapter& m_ucidAdapter;
     ICloudEventBuilder& m_eventBuilder;

@@ -110,9 +110,10 @@ void PmManifest::AddPackage( Json::Value& packageJson )
             package.installerArgs += m_dependencies->ComponentManager().ResolvePath( packageJson[ MANIFEST_FIELD_INSTALL_ARGS ][ i ].asString() ) + " ";
         }
     }
-    package.installLocation = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_LOCATION, false ) );
+    package.installLocation = std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_LOCATION, false ) ) );
     package.signerName = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_SIGNER, false );
     package.installerHash = GetJsonStringField( packageJson, MANIFEST_FIELD_INSTALL_SHA, false );
+    package.postInstallRebootRequired = false;
 
     if( packageJson[ MANIFEST_FIELD_FILES ].isArray() ) {
         for( Json::Value::ArrayIndex i = 0; i != packageJson[ MANIFEST_FIELD_FILES ].size(); i++ ) {
@@ -130,7 +131,8 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     PackageConfigInfo config;
     config.deleteConfig = false;
 
-    config.path = m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) );
+    config.path = std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) ) );
+    config.unresolvedPath = std::filesystem::u8path( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) );
 
     config.contents = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_CONTENT, false );
     config.sha256 = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_SHA, false );

@@ -7,8 +7,14 @@
 #define PM_CONFIG_LOGLEVEL_DEFAULT 7
 #define PM_CONFIG_INTERVAL_DEFAULT 300000
 #define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
+#define PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS 3600 // One hour
 
-class IFileUtil;
+class IFileSysUtil;
+
+namespace Json
+{
+    class Value;
+};
 
 struct PmConfigData
 {
@@ -21,12 +27,13 @@ struct PmConfigData
     uint32_t log_level;
     uint32_t maxFileCacheAge;
     bool allowPostInstallReboots;
+    uint32_t rebootThrottleS;
 };
 
 class PmConfig : public IPmConfig
 {
 public:
-    PmConfig( IFileUtil& fileUtil );
+    PmConfig( IFileSysUtil& fileUtil );
     ~PmConfig();
 
     int32_t LoadBsConfig( const std::string& bsConfig ) override;
@@ -43,9 +50,9 @@ public:
     const std::vector<PmComponent>& GetSupportedComponentList() override;
     uint32_t GetMaxFileCacheAge() override;
     bool AllowPostInstallReboots() override;
-
+    uint32_t GetRebootThrottleS() override;
 private:
-    IFileUtil& m_fileUtil;
+    IFileSysUtil& m_fileUtil;
 
     std::atomic<bool> m_isFirstCheckin;
     PmConfigData m_configData;
@@ -58,4 +65,11 @@ private:
 
     int32_t VerifyBsContents( const std::string& bsConfig );
     int32_t VerifyPmContents( const std::string& pmConfig );
+    bool VerifyPmLogLevel( const Json::Value& pmRoot );
+    bool VerifyPmCheckinInterval( const Json::Value& pmRoot );
+    bool VerifyPmMaxStartupDelay( const Json::Value& pmRoot );
+    bool VerifyPmMaxFileCacheAge(const Json::Value& pmRoot);
+    bool VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot );
+    bool VerifyPmRebootThrottle( const Json::Value& pmRoot );
+    
 };
