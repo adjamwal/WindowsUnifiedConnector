@@ -21,14 +21,14 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
 
     if( inventory.packages.size() ) {
         Json::Value& packages = root[ "installed" ];
-        for( int i = 0; i < inventory.packages.size(); i++ ) {
+        for( int i = 0; i < ( int )inventory.packages.size(); i++ ) {
             Json::Value package;
             PmInstalledPackage& packageDetection = inventory.packages[ i ];
 
             package[ "package" ] = packageDetection.product + "/" + packageDetection.version;
             if( packageDetection.configs.size() ) {
                 Json::Value& configs = package[ "configs" ];
-                for( int j = 0; j < packageDetection.configs.size(); j++ ) {
+                for( int j = 0; j < ( int )packageDetection.configs.size(); j++ ) {
                     Json::Value config;
                     PackageConfigInfo& packageConfig = packageDetection.configs[ j ];
                     config[ "path" ] = packageConfig.unresolvedPath.generic_u8string();

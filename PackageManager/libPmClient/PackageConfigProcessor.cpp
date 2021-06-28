@@ -92,7 +92,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
             throw PackageException( __FUNCTION__ ": Failed to create " + config.verifyPath, UCPM_EVENT_ERROR_CONFIG_CREATE );
         }
 
-        int byteswritten = m_fileUtil.AppendFile( handle, configData.data(), configData.size() );
+        size_t byteswritten = m_fileUtil.AppendFile( handle, configData.data(), configData.size() );
         m_fileUtil.CloseFile( handle );
 
         if( !byteswritten )

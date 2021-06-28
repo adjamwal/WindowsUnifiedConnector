@@ -28,8 +28,8 @@ public:
     void MakeCloseFileReturn( int32_t value );
     void ExpectCloseFileNotCalled();
 
-    MOCK_METHOD3( AppendFile, int32_t( FileUtilHandle*, void*, size_t ) );
-    void MakeAppendFileReturn( int32_t value );
+    MOCK_METHOD3( AppendFile, size_t( FileUtilHandle*, void*, size_t ) );
+    void MakeAppendFileReturn( size_t value );
     void ExpectAppendFileNotCalled();
 
     MOCK_METHOD0( GetTempDir, std::filesystem::path() );
@@ -48,8 +48,8 @@ public:
     void MakeFileExistsReturn( bool value );
     void ExpectFileExistsNotCalled();
 
-    MOCK_METHOD1( FileSize, size_t( const std::filesystem::path& ) );
-    void MakeFileSizeReturn( size_t value );
+    MOCK_METHOD1( FileSize, uint64_t( const std::filesystem::path& ) );
+    void MakeFileSizeReturn( uint64_t value );
     void ExpectFileSizeNotCalled();
 
     MOCK_METHOD1( FileTime, std::filesystem::file_time_type( const std::filesystem::path& ) );

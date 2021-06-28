@@ -132,9 +132,9 @@ int32_t FileSysUtil::CloseFile( FileUtilHandle* handle )
     return rtn;
 }
 
-int32_t FileSysUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen )
+size_t FileSysUtil::AppendFile( FileUtilHandle* handle, void* data, size_t dataLen )
 {
-    int32_t bytesWritten = 0;
+    size_t bytesWritten = 0;
 
     if( !handle || handle->file == NULL ) {
         WLOG_ERROR( L"Invalid file handle" );
@@ -214,9 +214,9 @@ bool FileSysUtil::FileExists( const std::filesystem::path& filename )
     return ::std::filesystem::exists( filename );
 }
 
-size_t FileSysUtil::FileSize( const std::filesystem::path& filename )
+uint64_t FileSysUtil::FileSize( const std::filesystem::path& filename )
 {
-    size_t rtn = 0;
+    uint64_t rtn = 0;
 
     if( !m_utf8PathVerifier.IsPathValid( filename ) ) {
         WLOG_ERROR( L"path is invalid" );

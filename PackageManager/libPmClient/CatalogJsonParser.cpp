@@ -115,7 +115,7 @@ void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::ve
         {
             std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( cfg["path"].asString() ) ),
             std::filesystem::u8path( cfg[ "path" ].asString() ),
-            cfg[ "max_instances" ].asInt(),
+            cfg[ "max_instances" ].asUInt(),
             cfg[ "required" ].asBool(),
             formats
         };

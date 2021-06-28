@@ -153,7 +153,7 @@ std::string WindowsUtilities::ReadFileContents( const WCHAR* filename )
 
         if( file.is_open() ) {
             file.seekg( 0, std::ios::end );
-            contents.resize( file.tellg() );
+            contents.resize( ( size_t )file.tellg() );
             file.seekg( 0, std::ios::beg );
 
             file.read( &contents[ 0 ], contents.size() );

@@ -92,7 +92,7 @@ std::string GetFileVersion( const std::string filename )
 
                 // Read the file description for each language and code page.
 
-                for( int i = 0; i < ( cbTranslate / sizeof( struct LANGANDCODEPAGE ) ); i++ ) {
+                for( size_t i = 0; i < ( cbTranslate / sizeof( struct LANGANDCODEPAGE ) ); i++ ) {
                     char SubBlock[ 100 ] = { 0 };
                     hr = StringCchPrintfA( SubBlock, 50,
                         "\\StringFileInfo\\%04x%04x\\FileVersion",

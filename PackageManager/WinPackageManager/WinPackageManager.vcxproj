@@ -101,6 +101,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,6 +125,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +149,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,6 +173,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCrashHandlerClient;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmAgent;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

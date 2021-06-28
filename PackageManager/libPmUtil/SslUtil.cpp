@@ -95,7 +95,7 @@ int32_t SslUtil::DecodeBase64( const std::string& base64Str, std::vector<uint8_t
     pBioMemory = BIO_push( pBio64, pBioMemory );
 
     BIO_set_flags( pBioMemory, BIO_FLAGS_BASE64_NO_NL );
-    tempOutputBufferSize = BIO_read( pBioMemory, pTempOutputBuffer, base64Str.length() );
+    tempOutputBufferSize = BIO_read( pBioMemory, pTempOutputBuffer, ( int )base64Str.length() );
 
     if( tempOutputBufferSize != decodeLength ) {
         LOG_ERROR( "bufferSize should equal decode length." );
@@ -124,8 +124,7 @@ std::optional<std::string> SslUtil::CalculateSHA256( const std::filesystem::path
 {
     // Initialize openssl
     SHA256_CTX context;
-    if ( !SHA256_Init( &context ) )
-    {
+    if ( !SHA256_Init( &context ) ) {
         return std::nullopt;
     }
 
@@ -135,22 +134,19 @@ std::optional<std::string> SslUtil::CalculateSHA256( const std::filesystem::path
     while ( file.good() )
     {
         file.read( buf, sizeof( buf ) );
-        if ( !SHA256_Update( &context, buf, file.gcount() ) )
-        {
+        if ( !SHA256_Update( &context, buf, ( size_t )file.gcount() ) ) {
             return std::nullopt;
         }
     }
 
     // Get Final SHA
     unsigned char result[SHA256_DIGEST_LENGTH];
-    if ( !SHA256_Final( result, &context ) )
-    {
+    if ( !SHA256_Final( result, &context ) ) {
         return std::nullopt;
     }
 
     std::stringstream ss;
-    for ( int i = 0; i < SHA256_DIGEST_LENGTH; i++ )
-    {
+    for ( int i = 0; i < SHA256_DIGEST_LENGTH; i++ ) {
         ss << std::hex << std::setw( 2 ) << std::setfill( '0' ) << (int)result[i];
     }
 

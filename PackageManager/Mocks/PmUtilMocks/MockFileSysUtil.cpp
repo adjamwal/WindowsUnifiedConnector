@@ -64,7 +64,7 @@ void MockFileSysUtil::ExpectCloseFileNotCalled()
     EXPECT_CALL( *this, CloseFile( _ ) ).Times( 0 );
 }
 
-void MockFileSysUtil::MakeAppendFileReturn( int32_t value )
+void MockFileSysUtil::MakeAppendFileReturn( size_t value )
 {
     ON_CALL( *this, AppendFile( _, _, _ ) ).WillByDefault( Return( value ) );
 }
@@ -114,7 +114,7 @@ void MockFileSysUtil::ExpectFileExistsNotCalled()
     EXPECT_CALL( *this, FileExists( _ ) ).Times( 0 );
 }
 
-void MockFileSysUtil::MakeFileSizeReturn( size_t value )
+void MockFileSysUtil::MakeFileSizeReturn( uint64_t value )
 {
     ON_CALL( *this, FileSize( _ ) ).WillByDefault( Return( value ) );
 }

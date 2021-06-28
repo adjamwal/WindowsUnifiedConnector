@@ -23,7 +23,7 @@ bool Utf8PathVerifier::IsPathValid( const std::filesystem::path& pathToVerify )
     }
     catch( ... ) {
         std::wstringstream pathHex;
-        for( int i = 0; i < pathToVerify.wstring().length(); i++ ) {
+        for( size_t i = 0; i < pathToVerify.wstring().length(); i++ ) {
             pathHex << L"0x" << std::setfill( L'0' ) << std::setw( 4 ) << std::hex << ( int )pathToVerify.wstring()[ i ] << L" ";
         }
 

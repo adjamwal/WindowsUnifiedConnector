@@ -38,8 +38,8 @@ public:
     ICloudEventBuilder& WithPackageID( const std::string& idAsNameAndVersion ) override; // e.g. 'AMP/1.0.0'
     ICloudEventBuilder& WithPackage( const std::string& name, const std::string& version ) override;
     ICloudEventBuilder& WithError( int code, const std::string& message ) override;
-    ICloudEventBuilder& WithOldFile( const std::filesystem::path& path, const std::string& hash, int size ) override;
-    ICloudEventBuilder& WithNewFile( const std::filesystem::path& path, const std::string& hash, int size ) override;
+    ICloudEventBuilder& WithOldFile( const std::filesystem::path& path, const std::string& hash, uint64_t size ) override;
+    ICloudEventBuilder& WithNewFile( const std::filesystem::path& path, const std::string& hash, uint64_t size ) override;
 
     std::string GetPackageName() override;
     std::string GetPackageVersion() override;
@@ -60,10 +60,10 @@ private:
     std::string m_errMessage;
     std::filesystem::path m_oldPath;
     std::string m_oldHash;
-    int m_oldSize;
+    uint64_t m_oldSize;
     std::filesystem::path m_newPath;
     std::string m_newHash;
-    int m_newSize;
+    uint64_t m_newSize;
     std::string m_tse;
 
     void UpdateEventTime();

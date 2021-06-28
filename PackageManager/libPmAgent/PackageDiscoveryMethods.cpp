@@ -239,7 +239,7 @@ bool PackageDiscoveryMethods::DecodeRegistryPath( const PmProductDiscoveryRegKey
     //last token is reserved for valueName, not part of the subKey
     valueName = regStr[ regStr.size() - 1 ];
 
-    for( int i = subkeyBegin; i < regStr.size() - 1; i++ ) {
+    for( size_t i = subkeyBegin; i < regStr.size() - 1; i++ ) {
         subKey += ( subKey.empty() ? "" : "\\" ) + regStr[ i ];
     }
 

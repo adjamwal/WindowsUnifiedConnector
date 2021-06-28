@@ -50,7 +50,7 @@ struct PmProductDiscoveryConfigurable
 {
     std::filesystem::path path;
     std::filesystem::path unresolvedPath;
-    int max_instances;
+    uint32_t max_instances;
     bool required;
     std::vector<std::string> formats;
 };

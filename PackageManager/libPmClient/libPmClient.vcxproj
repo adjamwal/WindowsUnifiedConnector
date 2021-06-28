@@ -161,6 +161,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -178,6 +179,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -195,6 +197,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -212,6 +215,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libCloudEvents;$(SolutionDir)PackageManager\libPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>

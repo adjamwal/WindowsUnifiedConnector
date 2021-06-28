@@ -115,7 +115,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     bool rtn = false;
     std::stringstream ssError;
     std::optional<std::string> tempSha256;
-    size_t installerSize = 0;
+    uint64_t installerSize = 0;
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
