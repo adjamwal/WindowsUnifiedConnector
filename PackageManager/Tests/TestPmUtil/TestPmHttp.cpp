@@ -11,27 +11,27 @@
 
 DEFINE_FFF_GLOBALS
 
-FAKE_VALUE_FUNC( const char*, curl_easy_strerror, CURLcode );
-FAKE_VALUE_FUNC( CURL*, curl_easy_init );
-FAKE_VALUE_FUNC_VARARG( CURLcode, curl_easy_setopt, CURL*, CURLoption, ... );
-FAKE_VALUE_FUNC( CURLcode, curl_easy_perform, CURL* );
-FAKE_VOID_FUNC( curl_easy_cleanup, CURL* );
-FAKE_VALUE_FUNC_VARARG( CURLcode, curl_easy_getinfo, CURL*, CURLINFO, ... );
-FAKE_VOID_FUNC( curl_slist_free_all, struct curl_slist* );
-FAKE_VALUE_FUNC( struct curl_slist*, curl_slist_append, struct curl_slist*, const char* );
-FAKE_VALUE_FUNC( int, xferCallback, void*, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T );
-
-FAKE_VALUE_FUNC( BIO*, BIO_new, const BIO_METHOD* );
-FAKE_VALUE_FUNC( int, BIO_free, BIO* );
-FAKE_VALUE_FUNC( long, BIO_ctrl, BIO*, int, long, void* );
-FAKE_VALUE_FUNC( const BIO_METHOD*, BIO_s_mem );
-FAKE_VALUE_FUNC( int, X509_STORE_add_cert, X509_STORE*, X509* );
-FAKE_VALUE_FUNC( int, X509_NAME_print_ex, BIO*, const X509_NAME*, int, unsigned long );
-FAKE_VALUE_FUNC( X509_NAME*, X509_get_subject_name, const X509* );
-FAKE_VOID_FUNC( X509_free, X509* );
-FAKE_VALUE_FUNC( int, X509_up_ref, X509* );
-
 extern "C" {
+    FAKE_VALUE_FUNC( const char*, curl_easy_strerror, CURLcode );
+    FAKE_VALUE_FUNC( CURL*, curl_easy_init );
+    FAKE_VALUE_FUNC_VARARG( CURLcode, curl_easy_setopt, CURL*, CURLoption, ... );
+    FAKE_VALUE_FUNC( CURLcode, curl_easy_perform, CURL* );
+    FAKE_VOID_FUNC( curl_easy_cleanup, CURL* );
+    FAKE_VALUE_FUNC_VARARG( CURLcode, curl_easy_getinfo, CURL*, CURLINFO, ... );
+    FAKE_VOID_FUNC( curl_slist_free_all, struct curl_slist* );
+    FAKE_VALUE_FUNC( struct curl_slist*, curl_slist_append, struct curl_slist*, const char* );
+    FAKE_VALUE_FUNC( int, xferCallback, void*, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T, PM_TYPEOF_OFF_T );
+
+    FAKE_VALUE_FUNC( BIO*, BIO_new, const BIO_METHOD* );
+    FAKE_VALUE_FUNC( int, BIO_free, BIO* );
+    FAKE_VALUE_FUNC( long, BIO_ctrl, BIO*, int, long, void* );
+    FAKE_VALUE_FUNC( const BIO_METHOD*, BIO_s_mem );
+    FAKE_VALUE_FUNC( int, X509_STORE_add_cert, X509_STORE*, X509* );
+    FAKE_VALUE_FUNC( int, X509_NAME_print_ex, BIO*, const X509_NAME*, int, unsigned long );
+    FAKE_VALUE_FUNC( X509_NAME*, X509_get_subject_name, const X509* );
+    FAKE_VOID_FUNC( X509_free, X509* );
+    FAKE_VALUE_FUNC( int, X509_up_ref, X509* );
+
     FAKE_VALUE_FUNC( X509_STORE*, SSL_CTX_get_cert_store, const SSL_CTX* );
     FAKE_VALUE_FUNC( unsigned long, ERR_get_error );
     FAKE_VALUE_FUNC( char*, ERR_error_string, unsigned long, char* );
@@ -84,7 +84,7 @@ protected:
 
     bool FindCurlOpt( CURLoption option ) 
     {
-        for( int i = 0; i < curl_easy_setopt_fake.call_count; i++ ) {
+        for( unsigned int i = 0; i < curl_easy_setopt_fake.call_count; i++ ) {
             if( curl_easy_setopt_fake.arg1_history[ i ] == option ) {
                 return true;
             }

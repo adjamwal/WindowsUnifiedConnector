@@ -216,7 +216,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersCannotBeRunUninitialied )
 TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteFile )
 {
     uint32_t age = 100;
-    uint32_t lastWriteTime = time( NULL ) - ( age * 2 );
+    uint32_t lastWriteTime = ( uint32_t )time( NULL ) - ( age * 2 );
     std::vector<std::filesystem::path> searchResults = { "Path1.exe" };
 
     m_patient->Initialize( m_deps.get() );
@@ -234,7 +234,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteFile )
 TEST_F( TestInstallerCacheManager, PruneInstallersWillIgnoreNonExpiredFile )
 {
     uint32_t age = 100;
-    uint32_t lastWriteTime = time( NULL ) - ( age / 2 );
+    uint32_t lastWriteTime = ( uint32_t )time( NULL ) - ( age / 2 );
     std::vector<std::filesystem::path> searchResults = { "Path1.exe" };
 
     m_patient->Initialize( m_deps.get() );
@@ -252,7 +252,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillIgnoreNonExpiredFile )
 TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteMultipleFile )
 {
     uint32_t age = 100;
-    uint32_t lastWriteTime = time( NULL ) - ( age * 2 );
+    uint32_t lastWriteTime = ( uint32_t )time( NULL ) - ( age * 2 );
     std::vector<std::filesystem::path> searchResults = { "Path1.exe", "Path2.exe", "Path3.exe" };
 
     m_patient->Initialize( m_deps.get() );
@@ -262,7 +262,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteMultipleFile )
     ) );
     m_fileUtil->MakeLastWriteTimeReturn( lastWriteTime );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) ).Times( searchResults.size() );
+    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) ).Times( ( int )searchResults.size() );
 
     m_patient->PruneInstallers( age );
 }

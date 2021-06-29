@@ -244,7 +244,17 @@ pipeline {
                 BUILD_PATH = "${BUILD_PATH}\\${env.BUILD_NUMBER}"
                 bat "if not exist ${BUILD_PATH} ( mkdir ${BUILD_PATH} )"
               }
-                  
+
+              dir('WindowsUnifiedConnector') {
+                bat "if not exist artifacts ( mkdir artifacts )"
+                powershell "Move-Item -Path x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi -Destination artifacts\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                powershell "Move-Item -Path x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi -Destination artifacts\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+
+                bat "COPY artifacts\\${UC_COMPANY}-UC-Installer* ${BUILD_PATH} /Y"
+
+                archiveArtifacts artifacts: "artifacts\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
+              }
+
               dir('WindowsUnifiedConnector') {
                 powershell 'Compress-Archive -Path "Win32\\Debug" -DestinationPath "Debug-Win32.zip"'
                 powershell 'Compress-Archive -Path "x64\\Debug" -DestinationPath "Debug-x64.zip"'
@@ -258,15 +268,7 @@ pipeline {
                 powershell 'Compress-Archive -Path "Symbols\\*" -DestinationPath "Symbols.zip"'
                 
                 archiveArtifacts artifacts: '*.zip', fingerprint: true
-
-                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                
-                bat "COPY Install\\Installer\\bin\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer* ${BUILD_PATH} /Y"
-                bat "COPY Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer* ${BUILD_PATH} /Y"
               }
-              
-              archiveArtifacts artifacts: "**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
             }
           }
         }
@@ -290,13 +292,13 @@ pipeline {
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x64",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "artifacts\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ],
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x86",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "artifacts\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ]
                 ]
@@ -335,8 +337,8 @@ pipeline {
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 -m"
                 bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 -m"
                 
-                bat "RENAME Install\\Installer\\bin\\x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
-                bat "RENAME Install\\Installer\\bin\\x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME x64\\Release\\en-us\\Cisco-UC-Installer-x64.msi ${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
+                bat "RENAME x86\\Release\\en-us\\Cisco-UC-Installer-x86.msi ${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi"
               }
 
               archiveArtifacts artifacts: "**\\Release\\**\\${UC_COMPANY}-UC-Installer*.msi", fingerprint: true
@@ -353,13 +355,13 @@ pipeline {
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x64",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\x64\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ],
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x86",
                     classifier: '',
-                    file: "WindowsUnifiedConnector\\Install\\Installer\\bin\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\x86\\Release\\en-us\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ]
                 ]

@@ -67,7 +67,7 @@ TEST_F( TestDiagPackager, AddfilesToArchive )
     fileList.push_back( "SomeFile3" );
     m_zlibWrapper->MakeCreateArchiveFileReturn( true );
 
-    EXPECT_CALL( *m_zlibWrapper, AddFileToArchive( _ ) ).Times( fileList.size() );
+    EXPECT_CALL( *m_zlibWrapper, AddFileToArchive( _ ) ).Times( ( int )fileList.size() );
 
     m_patient->CreatePackage( fileList, packagePath );
 }

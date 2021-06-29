@@ -108,7 +108,7 @@ TEST_F( TestPmConfig, FirstCheckinIntervalIsRandomizedWithinCustomRange )
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), 200000 );
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), 200000U );
 }
 
 TEST_F( TestPmConfig, LoadBsConfigWillSucceed )
@@ -258,7 +258,7 @@ TEST_F(TestPmConfig, LoadingEmptyConfigSetsDefaultMaxStartupDelay)
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), ( uint32_t )PM_CONFIG_INTERVAL_DEFAULT );
 }
 TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
 {

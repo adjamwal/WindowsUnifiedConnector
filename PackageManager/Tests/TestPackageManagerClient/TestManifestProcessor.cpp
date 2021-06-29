@@ -103,7 +103,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillDownloadPackageBinaries )
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         DownloadPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
-    ).Times( m_packageList.size() );
+    ).Times( ( int )m_packageList.size() );
 
     m_patient->ProcessManifest( "test", m_isRebootRequired );
 }
@@ -113,7 +113,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessComponentPackage )
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         ProcessPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
-    ).Times( m_packageList.size() );
+    ).Times( ( int )m_packageList.size() );
 
     m_patient->ProcessManifest( "test", m_isRebootRequired );
 }
@@ -130,7 +130,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessAllPackagesRegardlessOf
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         ProcessPackageBinary( PmComponentMatch( m_expectedComponentPackage ) )
-    ).Times( m_packageList.size() );
+    ).Times( ( int )m_packageList.size() );
 
     m_componentProcessor->MakeProcessPackageBinaryReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test", m_isRebootRequired ), std::exception );
@@ -148,7 +148,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForActionablePac
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
-    ).Times( m_packageList.size() );
+    ).Times( ( int )m_packageList.size() );
 
     m_patient->ProcessManifest( "test", m_isRebootRequired );
 }
@@ -158,7 +158,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessConfigsForNonActionable
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
-    ).Times( m_packageList.size() );
+    ).Times( ( int )m_packageList.size() );
 
     m_componentProcessor->MakePreDownloadedBinaryExistsReturn( false );
     m_patient->ProcessManifest( "test", m_isRebootRequired );
@@ -169,7 +169,7 @@ TEST_F( TestManifestProcessor, ProcessManifestWillProcessAllConfigsForSuccessful
     SetupPackageList( 2 );
     EXPECT_CALL( *m_componentProcessor,
         ProcessConfigsForPackage( PmComponentMatch( m_expectedComponentPackage ) )
-    ).Times( m_packageList.size() );
+    ).Times( ( int )m_packageList.size() );
 
     m_componentProcessor->MakeProcessConfigsForPackageReturn( false );
     EXPECT_THROW( m_patient->ProcessManifest( "test", m_isRebootRequired ), std::exception );

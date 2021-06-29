@@ -36,10 +36,14 @@ To update these builds, in nexus, update uc-0.0.1.alpha.msi and uc-0.0.1.alpha.m
 
 Repeat for uc-99.0.0.alpha.msi/uc-99.0.0.alpha.msi.txt
 
-## Package UC into AMP
+## Branch Strategy 
 
-The UC is added as a resource to the common-windows-build. AMP will pick up the UC from common. To update the build packages into common:
+Current Branches are:
 
-1. Run this job https://clg5-lab-winjenkins.cisco.com/view/common/job/FireAMP-Windows-Common-Build-vSphere-vs2015/. This will collect build deployed to nexus and add it to the common pakcage
-2. Update the build.spec in the connector repo to use the new common build
-3. Start a new connector build. Check the UC option to include UC
+* master: Main development branch. PRs for UC Beta milestone should be raised here
+* enterprise: Alpha Release Candidate branch. PRs with Alpha bug fixes and configuration updates should be rasie here
+* consumer: Stale consumer branch. Will be updated when we decide to raise Immunet UC from the dead
+
+### Merge Strategy 
+* Use `Squash and Merge` when merging a development PR from a developer fork to any of the branches above
+* Use `Merge Pull Request` when syncing any of the release branches above. ( ie. Merging master to enterprise )

@@ -15,6 +15,12 @@ if (MSVC)
 endif()
 
 if(MSVC)
+  add_compile_options( /W3 /WX)
+else()
+  add_compile_options( -Wall -Wextra -pedantic -Werror)
+endif()
+
+if(MSVC)
     if(DEFINED common_LIBRARY)
         message( "Using common_LIBRARY=${common_LIBRARY}" )
         set(jsoncpp_LIBRARY ${common_LIBRARY})

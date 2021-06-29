@@ -11,6 +11,17 @@
     <VCToolsRedistVersion Condition = "'$(VCToolsRedistVersion)' == ''" >14.28.29325</VCToolsRedistVersion>
 	<UC_CONSUMER>0</UC_CONSUMER>
   </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="IMN_COMMON">
       <Value>$(IMN_COMMON)</Value>

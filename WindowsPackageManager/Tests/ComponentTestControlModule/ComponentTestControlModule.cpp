@@ -23,7 +23,8 @@ protected:
             EXPECT_NE( m_createModule, ( CreateModule )NULL );
             EXPECT_NE( m_releaseModule, ( ReleaseModule )NULL );
 
-            FILE* fp = fopen( "config.json", "w" );
+            FILE* fp = NULL;
+            fopen_s( &fp, "config.json", "w" );
             std::string contents = R"(
 {
     "cloud": {
