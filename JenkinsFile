@@ -292,13 +292,13 @@ pipeline {
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x64",
                     classifier: '',
-                    file: "artifacts\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\artifacts\\${UC_COMPANY}-UC-Installer-x64-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ],
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x86",
                     classifier: '',
-                    file: "artifacts\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
+                    file: "WindowsUnifiedConnector\\artifacts\\${UC_COMPANY}-UC-Installer-x86-${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}.msi",
                     type: 'msi'
                   ]
                 ]
