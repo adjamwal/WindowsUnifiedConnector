@@ -1,6 +1,5 @@
 #pragma once
 #include "IPmConfig.h"
-#include "PmTypes.h"
 
 struct InstallerConfigData
 {
@@ -25,7 +24,6 @@ public:
     const std::string& GetCloudCatalogUri() override;
     uint32_t GetCloudCheckinIntervalMs() override;
     uint32_t GetLogLevel() override;
-    const std::vector<PmComponent>& GetSupportedComponentList() override;
     uint32_t GetMaxFileCacheAge() override;
     bool AllowPostInstallReboots() override;
     uint32_t GetRebootThrottleS() override;
@@ -33,6 +31,5 @@ public:
     void SetCloudEventUri( std::string& uri );
 private:
     InstallerConfigData m_configData;
-    std::vector<PmComponent> m_ComponentList;
     std::string m_returnAsRef;
 };

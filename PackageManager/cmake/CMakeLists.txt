@@ -64,8 +64,10 @@ if(NOT DEFINED gtest_LIBRARY OR NOT DEFINED gtest_INCLUDE_DIRS)
     message( FATAL_ERROR "Missing gtest" )
 endif()
 
-add_subdirectory( util )
-add_subdirectory( pmLib )
+add_subdirectory( libPmUtil )
+add_subdirectory( libPmConfig )
+add_subdirectory( libPmCloud )
+add_subdirectory( libPmClient )
 
 enable_testing() # Must be in main file
 

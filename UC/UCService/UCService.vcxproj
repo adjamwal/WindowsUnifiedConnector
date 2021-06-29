@@ -93,7 +93,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)WindowsPackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -118,7 +118,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)WindowsPackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -143,7 +143,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)WindowsPackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -170,7 +170,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)PackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)UC\libUcConfig;$(UC_PATH)UC\libUcLoader;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libCrashHandlerClient;$(UC_PATH)WindowsPackageManager\libControlModule;$(UC_PATH)SharedLibs\LibVerifier;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\google-breakpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>

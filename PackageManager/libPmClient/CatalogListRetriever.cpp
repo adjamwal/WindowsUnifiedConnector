@@ -1,5 +1,5 @@
 #include "CatalogListRetriever.h"
-#include "IUcLogger.h"
+#include "PmLogger.h"
 #include "PmCloud.h"
 #include <algorithm>
 #include <StringUtil.h>

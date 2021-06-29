@@ -67,11 +67,6 @@ uint32_t InstallerConfig::GetLogLevel()
     return uint32_t();
 }
 
-const std::vector<PmComponent>& InstallerConfig::GetSupportedComponentList()
-{
-    return m_ComponentList;
-}
-
 uint32_t InstallerConfig::GetMaxFileCacheAge()
 {
     return uint32_t();

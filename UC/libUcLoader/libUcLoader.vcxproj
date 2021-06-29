@@ -94,7 +94,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WindowsPackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -114,7 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WindowsPackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -134,7 +134,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WindowsPackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -154,7 +154,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WindowsPackageManager\libControlModule;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libWindowsUtilities;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>

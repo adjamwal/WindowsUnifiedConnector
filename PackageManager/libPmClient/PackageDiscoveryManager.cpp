@@ -2,7 +2,7 @@
 #include "PmCloud.h"
 #include "IPackageInventoryProvider.h"
 #include "CatalogJsonParser.h"
-#include "IUcLogger.h"
+#include "PmLogger.h"
 #include <mutex>
 #include <sstream>
 

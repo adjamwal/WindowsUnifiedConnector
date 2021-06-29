@@ -6,6 +6,14 @@
 class IPmPlatformDependencies;
 struct PmProductDiscoveryRules;
 
+#define UC_CATALOG_KEY_PRODUCTS "products"
+#define UC_CATALOG_KEY_CONFIGURABLES "configurables"
+#define UC_CATALOG_KEY_FORMATS "formats"
+
+#define UC_CATALOG_DISCOVERY_TYPE_MSI "msi"
+#define UC_CATALOG_DISCOVERY_TYPE_REGISTRY "registry"
+#define UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE "msi_upgrade_code"
+
 class ICatalogJsonParser
 {
 public:

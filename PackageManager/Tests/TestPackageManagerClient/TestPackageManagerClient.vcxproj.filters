@@ -30,9 +30,6 @@
     <ClCompile Include="TestPackageConfigProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestPmConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TestPmManifest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

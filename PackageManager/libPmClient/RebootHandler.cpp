@@ -2,7 +2,7 @@
 #include "IPmConfig.h"
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformComponentManager.h"
-#include "IUcLogger.h"
+#include "PmLogger.h"
 
 RebootHandler::RebootHandler( IPmConfig& config ) :
     m_config( config )

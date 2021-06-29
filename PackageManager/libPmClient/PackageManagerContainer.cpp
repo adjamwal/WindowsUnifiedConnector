@@ -1,4 +1,5 @@
 #include "PackageManagerContainer.h"
+#include "PmTypes.h"
 #include "PackageManager.h"
 #include "PmCloud.h"
 #include "PmHttp.h"

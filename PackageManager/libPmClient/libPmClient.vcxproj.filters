@@ -54,12 +54,6 @@
     <ClInclude Include="IPackageManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IPmCloud.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IPmConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IPmManifest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -85,12 +79,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PackageManagerContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PmCloud.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PmConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PmManifest.h">
@@ -174,12 +162,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PackageManagerContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PmCloud.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PmConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PmManifest.cpp">
