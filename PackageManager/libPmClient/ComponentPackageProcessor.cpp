@@ -14,6 +14,7 @@
 #include "PackageException.h"
 #include "RandomUtil.h"
 #include "WinError.h"
+#include "StringUtil.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -59,7 +60,7 @@ bool ComponentPackageProcessor::PreDownloadedBinaryExists( PmComponent& componen
     bool result = !componentPackage.downloadedInstallerPath.empty() &&
         m_fileUtil.FileExists( componentPackage.downloadedInstallerPath ) &&
         ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 &&
-        componentPackage.downloadErrorMsg.empty() );
+            componentPackage.downloadErrorMsg.empty() );
 
     LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
         componentPackage.productAndVersion.c_str(),
@@ -90,7 +91,7 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
     std::string installerPath;
     std::stringstream ssError;
     ssError << "Package " << componentPackage.productAndVersion << ": ";
-    
+
     try
     {
         componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
@@ -132,7 +133,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         return true;
     }
 
-    if ( !componentPackage.downloadedInstallerPath.empty() ) {
+    if( !componentPackage.downloadedInstallerPath.empty() ) {
         installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
         LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
             componentPackage.downloadedInstallerPath.generic_u8string().c_str(),
@@ -144,9 +145,12 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     m_eventBuilder.Reset();
     m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
     m_eventBuilder.WithPackageID( componentPackage.productAndVersion );
+    m_eventBuilder.WithType( CloudEventType::pkginstall );
 
-    bool isAlreadyInstalled = IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() );
-    m_eventBuilder.WithType( isAlreadyInstalled ? CloudEventType::pkgreconfig : CloudEventType::pkginstall );
+    if( IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() ) )
+    {
+        m_eventBuilder.WithFrom( m_eventBuilder.GetPackageVersion() );
+    }
 
     m_eventBuilder.WithNewFile(
         componentPackage.installerUrl,
@@ -155,10 +159,10 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     try
     {
-        if ( !PreDownloadedBinaryExists(componentPackage) ) {
+        if( !PreDownloadedBinaryExists( componentPackage ) ) {
             if( !componentPackage.downloadErrorMsg.empty() )
                 ssError << componentPackage.downloadErrorMsg;
-            else 
+            else
                 ssError << "Failed to pre-download " << componentPackage.installerUrl;
             throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
         }
@@ -242,12 +246,29 @@ bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& name, 
 
     for( auto item : inventory.packages )
     {
-        if( item.product == name &&
-            ( version.empty() || version == item.version )
-            ) return true;
+        if( StringUtil::EqualsIgnoreCase( name, item.product ) &&
+            ( version.empty() || IsPackageVersionMatch( version, item.version ) ) )
+        {
+            LOG_DEBUG( __FUNCTION__ ": Package match: '%s', '%s'", name.c_str(), version.c_str() );
+            return true;
+        }
     }
 
     return false;
+}
+
+bool ComponentPackageProcessor::IsPackageVersionMatch( const std::string& version1, const std::string& version2 )
+{
+    //extract x.x.x.yyyy
+    auto vstr1 = StringUtil::Split( StringUtil::Trim( version1 ), '.' );
+    auto vstr2 = StringUtil::Split( StringUtil::Trim( version2 ), '.' );
+
+    //compare x.x.x and ignore the revision # yyyy
+    for( size_t i = 0; i < vstr1.size() && i < vstr2.size() && i < 3; i++ )
+    {
+        if( !StringUtil::EqualsIgnoreCase( vstr1[ i ], vstr2[ i ] ) ) return false;
+    }
+    return true;
 }
 
 bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& componentPackage )

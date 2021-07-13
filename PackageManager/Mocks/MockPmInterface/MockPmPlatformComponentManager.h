@@ -15,6 +15,8 @@ public:
     void ExpectGetInstalledPackagesIsNotCalled();
 
     MOCK_METHOD1( GetCachedInventory, int32_t( PackageInventory& ) );
+    void MakeGetCachedInventoryReturn( int32_t retval, const PackageInventory& inventory );
+    void ExpectGetCachedInventoryIsNotCalled();
 
     MOCK_METHOD1( InstallComponent, int32_t( const PmComponent& ) );
     void MakeInstallComponentReturn( int32_t value );
@@ -41,4 +43,7 @@ public:
     void ExpectFileSearchWithWildCardNotCalled();
 
     MOCK_METHOD0( NotifySystemRestart, void() );
+
+private:
+    PackageInventory m_cachedInventory;
 };

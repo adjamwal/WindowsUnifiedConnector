@@ -107,7 +107,21 @@ protected:
         m_expectedComponentPackage.installerHash = "";
         m_patient->Initialize( m_dep.get() );
         m_fileUtil->MakeFileSizeReturn( -1 );
-        m_fileUtil->MakeFileExistsReturn( false);
+        m_fileUtil->MakeFileExistsReturn( false );
+    }
+
+    void SetupInventoryCacheWithPackageVer( const std::string& pkgVer )
+    {
+        std::string pkgName = "test";
+        PackageInventory testCache = {};
+        PmInstalledPackage testPackage = {};
+        testPackage.product = pkgName;
+        testPackage.version = pkgVer;
+        testCache.packages.push_back( testPackage );
+        m_pmComponentManager->MakeGetCachedInventoryReturn( 0, testCache );
+
+        ON_CALL( *m_eventBuilder, GetPackageName() ).WillByDefault( Return( pkgName ) );
+        ON_CALL( *m_eventBuilder, GetPackageVersion() ).WillByDefault( Return( pkgVer ) );
     }
 
     PmComponent m_expectedComponentPackage;
@@ -260,3 +274,34 @@ TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillCacheDownloadErr
 
     EXPECT_TRUE( m_expectedComponentPackage.downloadErrorMsg.find( "http 1234" ) != std::string::npos );
 }
+
+TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfVersionedPackageFoundLocally )
+{
+    SetupComponentPackageWithConfig();
+    SetupInventoryCacheWithPackageVer( "1.0.0" );
+
+    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( m_eventBuilder->GetPackageVersion() ) ) ).Times( 1 );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfVersionWithRevFoundLocally )
+{
+    SetupComponentPackageWithConfig();
+    SetupInventoryCacheWithPackageVer( "1.0.0.1234" );
+
+    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( "1.0.0.1234" ) ) ).Times( 1 );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfNonVersionedPackageFoundLocally )
+{
+    SetupComponentPackageWithConfig();
+    SetupInventoryCacheWithPackageVer( "" );
+
+    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( m_eventBuilder->GetPackageVersion() ) ) ).Times( 1 );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+

@@ -94,6 +94,13 @@ ICloudEventBuilder& CloudEventBuilder::WithNewFile( const std::filesystem::path&
     return *this;
 }
 
+ICloudEventBuilder& CloudEventBuilder::WithFrom( const std::string& fromVersion )
+{
+    m_fromVersion = fromVersion;
+    UpdateEventTime();
+    return *this;
+}
+
 std::string CloudEventBuilder::GetPackageName()
 {
     return m_packageName;
@@ -125,6 +132,7 @@ void CloudEventBuilder::Reset()
     m_newPath = "";
     m_newHash = "";
     m_newSize = 0;
+    m_fromVersion = "";
     UpdateEventTime();
 }
 
@@ -142,7 +150,7 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
     std::string orig_newPath = "";
     std::string orig_newHash = "";
     int orig_newSize( 0 );
-
+    std::string orig_fromVersion = "";
     bool isValid = true;
 
     try
@@ -168,6 +176,10 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
                 }
 
                 isValid &= JsonUtil::ExtractJsonString( event, "package", orig_packageName );
+
+                if( !event[ "from" ].isNull() ) {
+                    isValid &= JsonUtil::ExtractJsonString( event, "from", orig_fromVersion );
+                }
 
                 if( !event[ "err" ].isNull() ) {
                     error = event[ "err" ];
@@ -218,7 +230,8 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
             .WithPackageID( orig_packageName )
             .WithOldFile( orig_oldPath, orig_oldHash, orig_oldSize )
             .WithNewFile( orig_newPath, orig_newHash, orig_newSize )
-            .WithError( orig_errCode, orig_errMessage );
+            .WithError( orig_errCode, orig_errMessage )
+            .WithFrom( orig_fromVersion );
     }
 
     return isValid;
@@ -237,7 +250,8 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
         m_oldSize == other.m_oldSize &&
         m_newPath == other.m_newPath &&
         m_newHash._Equal( other.m_newHash ) &&
-        m_newSize == other.m_newSize;
+        m_newSize == other.m_newSize &&
+        m_fromVersion == other.m_fromVersion;
 
     if( !result )
     {
@@ -254,7 +268,8 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
             "'" << m_oldSize << "' ?= '" << other.m_oldSize << "', " <<
             "'" << m_newPath << "' ?= '" << other.m_newPath << "', " <<
             "'" << m_newHash << "' ?= '" << other.m_newHash << "', " <<
-            "'" << m_newSize << "' ?= '" << other.m_newSize << "'";
+            "'" << m_newSize << "' ?= '" << other.m_newSize << "', " <<
+            "'" << m_fromVersion << "' ?= '" << other.m_fromVersion << "'";
 
         LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
     }
@@ -297,6 +312,13 @@ std::string CloudEventBuilder::Serialize()
             newfile[ "size" ] = m_newSize;
             newfilearr[ 0 ] = newfile;
             event[ "new" ] = newfilearr;
+        }
+    }
+    else if( m_evtype == pkginstall )
+    {
+        if( !m_fromVersion.empty() )
+        {
+            event[ "from" ] = m_fromVersion;
         }
     }
 

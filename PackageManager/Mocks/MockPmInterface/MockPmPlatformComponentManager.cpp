@@ -1,8 +1,10 @@
 #include "MockPmPlatformComponentManager.h"
 
 MockPmPlatformComponentManager::MockPmPlatformComponentManager()
+    : m_cachedInventory( {} )
 {
     MakeGetInstalledPackagesReturn( int32_t() );
+    MakeGetCachedInventoryReturn( int32_t(), m_cachedInventory );
     MakeInstallComponentReturn( int32_t() );
     MakeUpdateComponentReturn( int32_t() );
     MakeUninstallComponentReturn( int32_t() );
@@ -23,6 +25,17 @@ void MockPmPlatformComponentManager::MakeGetInstalledPackagesReturn( int32_t val
 void MockPmPlatformComponentManager::ExpectGetInstalledPackagesIsNotCalled()
 {
     EXPECT_CALL( *this, GetInstalledPackages( _, _ ) ).Times( 0 );
+}
+
+void MockPmPlatformComponentManager::MakeGetCachedInventoryReturn( int32_t retval, const PackageInventory& inventory )
+{
+    m_cachedInventory = inventory;
+    ON_CALL( *this, GetCachedInventory( _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<0>( m_cachedInventory ), Return( retval ) ) );
+}
+
+void MockPmPlatformComponentManager::ExpectGetCachedInventoryIsNotCalled()
+{
+    EXPECT_CALL( *this, GetCachedInventory( _ ) ).Times( 0 );
 }
 
 void MockPmPlatformComponentManager::MakeInstallComponentReturn( int32_t value )

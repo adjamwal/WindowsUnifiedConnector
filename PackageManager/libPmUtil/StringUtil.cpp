@@ -57,7 +57,7 @@ std::string StringUtil::WStr2Str( const std::wstring& wstr )
     return str;
 }
 
-bool StringUtil::NoCaseEquals( const std::string& a, const std::string& b )
+bool StringUtil::EqualsIgnoreCase( const std::string& a, const std::string& b )
 {
     return std::equal( a.begin(), a.end(),
         b.begin(), b.end(),

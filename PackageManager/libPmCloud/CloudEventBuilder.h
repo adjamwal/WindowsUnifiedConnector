@@ -40,6 +40,7 @@ public:
     ICloudEventBuilder& WithError( int code, const std::string& message ) override;
     ICloudEventBuilder& WithOldFile( const std::filesystem::path& path, const std::string& hash, uint64_t size ) override;
     ICloudEventBuilder& WithNewFile( const std::filesystem::path& path, const std::string& hash, uint64_t size ) override;
+    ICloudEventBuilder& WithFrom( const std::string& fromVersion ) override;
 
     std::string GetPackageName() override;
     std::string GetPackageVersion() override;
@@ -65,6 +66,7 @@ private:
     std::string m_newHash;
     uint64_t m_newSize;
     std::string m_tse;
+    std::string m_fromVersion;
 
     void UpdateEventTime();
     std::string Serialize();
