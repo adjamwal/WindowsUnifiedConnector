@@ -47,3 +47,56 @@ Current Branches are:
 ### Merge Strategy 
 * Use `Squash and Merge` when merging a development PR from a developer fork to any of the branches above
 * Use `Merge Pull Request` when syncing any of the release branches above. ( ie. Merging master to enterprise )
+
+## Configuring the UC
+
+### Launch the Demo UI
+
+1. Checkout the UC identity repo `git@code.engine.sourcefire.com:UnifiedConnector/identity.git`
+2. Launch browser with CORS disabled `"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="C:/ChromeDevSession"`
+3. Open identity/ui/demo.html
+
+### Configure the Demo UI
+
+On the settings page enter the following information:
+```
+Business ID: hexmen-dev-demo-bus-id
+Base URL: Admin: https://admin.qa.uc.amp.cisco.com
+Base URL: Package Manager: https://pacman.qa.uc.amp.cisco.com
+Max Stats Pages: 100
+Page Size: 100
+Username: hexmen-dev-demo-bus-id
+Password: <qa password>
+```
+
+Check `Auto-Load/Refresh Data`. After all the other pages will load data from the business
+
+### UI Usage
+
+* Computers: Lists all registered endpoints
+* Installers: Only used when creating a new business
+* Package: Used to setup packages for install/upgrade
+* Config Files: Use to setup config files. Config files are assoicated with a Package in the Packages page
+  * Note. When creating a config file, the path should match the path specified in the catalog ( ie `<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/uc.json` for the UC config)
+* Settings: Connect the UI to a business
+
+### Packages
+
+Packages are defined in the catalog repository. https://code.engine.sourcefire.com/UnifiedConnector/identity-catalog/blob/master/catalog-qa.json. If packages need to be updated, ask Hex-Force QA to make the required changes
+
+### Installing UC
+Download and install the latest build from https://clg5-lab-winjenkins.cisco.com/view/UnifiedConnector/job/UnifiedConnector/job/WindowsUnifiedConnector/job/master/. Master currently uses the hexmen-dev-demo-bus-id. Other branches are pointing to a different production (Consummer/Alpha) business
+
+### Making a new Business
+If you wish to make a new business follow these steps:
+1. Configure the Demo UI as mentioned above
+2. Enter a new business ID
+3. Copy the business ID into the username field
+4. leave the password as the QA password
+5. Click on the `Installers` page
+6. Click `Generate ID` and `Create Installer`
+7. In the UC configuration directory, open bs.json and replace the business id and installer key with the ones generated
+8. Restart the UC. It will join the new business
+
+## UC Demos
+[Demo Link](https://code.engine.sourcefire.com/UnifiedConnector/WindowsUnifiedConnector/wiki/UC-Demos)
