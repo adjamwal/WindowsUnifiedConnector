@@ -25,6 +25,8 @@ UINT __stdcall ExtractCaResources( MSIHANDLE hInstall )
         }
     }
 
+    TryKillProcessByName( L"csc_ucdt.exe" );
+
 LExit:
     SetUcLogger( NULL );
     return WcaFinalize( ERROR_SUCCESS );
