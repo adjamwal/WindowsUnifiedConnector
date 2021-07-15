@@ -83,3 +83,13 @@ void MockPmPlatformComponentManager::ExpectFileSearchWithWildCardNotCalled()
 {
     EXPECT_CALL( *this, FileSearchWithWildCard( _, _ ) ).Times( 0 );
 }
+
+void MockPmPlatformComponentManager::MakeApplyUserReadPermissionsReturn( int32_t value )
+{
+    ON_CALL( *this, ApplyUserReadPermissions( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformComponentManager::ExpectApplyUserReadPermissionsNotCalled()
+{
+    EXPECT_CALL( *this, ApplyUserReadPermissions( _ ) ).Times( 0 );
+}

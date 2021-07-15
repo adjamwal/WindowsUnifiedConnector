@@ -196,6 +196,24 @@ TEST_F( TestPackageConfigProcessor, AddFileWillSucceed )
     EXPECT_TRUE( m_patient->ProcessConfig( m_configInfo ) );
 }
 
+TEST_F( TestPackageConfigProcessor, AddFileWillApplyReadPermissions )
+{
+    SetupConfig();
+
+    m_patient->Initialize( m_dep.get() );
+
+    m_sslUtil->MakeDecodeBase64Return( 0 );
+    m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
+    m_fileUtil->MakeAppendFileReturn( 1 );
+    m_pmComponentManager->MakeDeployConfigurationReturn( 0 );
+    m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
+    m_fileUtil->MakeRenameReturn( 0 );
+
+    EXPECT_CALL( *m_pmComponentManager, ApplyUserReadPermissions( _ ) ).WillOnce( Return( 0 ) );
+
+    m_patient->ProcessConfig( m_configInfo );
+}
+
 TEST_F( TestPackageConfigProcessor, WillSendSuccessEventIfAddFileSucceeds )
 {
     SetupConfig();

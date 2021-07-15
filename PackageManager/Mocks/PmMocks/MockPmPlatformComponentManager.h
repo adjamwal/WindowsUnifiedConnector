@@ -41,4 +41,9 @@ public:
     void ExpectFileSearchWithWildCardNotCalled();
 
     MOCK_METHOD0( NotifySystemRestart, void() );
+
+    
+    MOCK_METHOD1( ApplyUserReadPermissions, int32_t( const std::filesystem::path& ) );
+    void MakeApplyUserReadPermissionsReturn( int32_t value );
+    void ExpectApplyUserReadPermissionsNotCalled();
 };

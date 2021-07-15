@@ -109,4 +109,12 @@ public:
     * 
     */
     virtual void NotifySystemRestart() = 0;
+
+    /**
+    * @brief (Optional)Provides Generic Read Access to file
+    *   Used on windows to give read permissions to the Builtin users groups. Similar to chmod +r
+    * 
+    * @return 0 on success
+    */
+    virtual int32_t ApplyUserReadPermissions( const std::filesystem::path& filePath ) = 0;
 };
