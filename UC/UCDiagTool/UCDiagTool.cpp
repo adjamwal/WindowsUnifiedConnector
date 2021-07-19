@@ -12,7 +12,7 @@
 
 #define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnostics"
 #define TOAST_AUMI L"Cisco.UC"
-#define TOAST_TIMEOUT_MS 10000
+#define TOAST_TIMEOUT_MS ( 5 * 60 * 1000)
 
 class CustomHandler : public WinToastLib::IWinToastHandler {
 public:
@@ -22,16 +22,7 @@ public:
     }
 
     void toastActivated(int actionIndex) const {
-        LOG_DEBUG("The user clicked on action #%d", actionIndex);
-        if (actionIndex == 0) {
-            LOG_DEBUG("Rebooting System");
-            WinApiWrapper winApitWrapper;
-            winApitWrapper.ExitWindowsEx(
-                EWX_REBOOT | EWX_FORCEIFHUNG,
-                SHTDN_REASON_MAJOR_SOFTWARE |
-                SHTDN_REASON_MINOR_INSTALLATION |
-                SHTDN_REASON_FLAG_PLANNED);
-        }
+        LOG_DEBUG("The toast was activated", actionIndex);
         exit(0);
     }
 
@@ -85,24 +76,18 @@ void SendRebootToast()
         }
         else {
             WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::Text02);
-            templ.setTextField(L"A software update requires a reboot to complete. Would you like to restart Windows now?", WinToastLib::WinToastTemplate::FirstLine);
+            templ.setTextField(L"A Cisco software update requires a reboot to complete.", WinToastLib::WinToastTemplate::FirstLine);
             templ.setAudioOption(audioOption);
             templ.setAttributionText(L"");
 
-            templ.addAction(L"Yes");
-            templ.addAction(L"No");
-
             templ.setExpiration( expiration );
+
 
             if (toast->showToast(templ, new CustomHandler()) < 0) {
                 LOG_ERROR("Could not launch toast notification");
             }
 
-            // The application will also be terminated if the user responds or windows timesout the notification
-            // However the notification lifetime is very inconsistent. Adding 20 seconds to the timeout so we can
-            // still respond if the notification is up longer than expected
-            Sleep( ( DWORD )expiration + 20000 );
-            LOG_ERROR("Timed Out Waiting");
+            Sleep( 2000 );
         }
     }
 }
