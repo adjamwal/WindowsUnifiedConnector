@@ -483,11 +483,6 @@
                 <Condition>BS_CONFIG</Condition>
             </Component>
 
-            <Component Id="C.BSConfigName" NeverOverwrite="yes">
-              <File Id="bs.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\bs.json" />
-              <Condition>NOT BS_CONFIG</Condition>
-            </Component>
-            
             <Component Id="C.Remove.BootstrapperConfig" Guid="D37A0F1E-EF10-479F-B1EF-D48D29A20086">
                 <RemoveFile Id="RF.BootstrapperConfig" Name="$(var.BootstrapperConfigName)" On="uninstall"/>
             </Component>
