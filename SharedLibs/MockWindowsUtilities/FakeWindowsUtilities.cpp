@@ -100,3 +100,8 @@ bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->AllowEveryoneAccessToFile( path );
 }
+
+bool WindowsUtilities::AllowUserReadAccessToFile( const std::wstring& path )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->AllowUserReadAccessToFile( path );
+}

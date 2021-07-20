@@ -1,12 +1,12 @@
 {
-	"id": {
-		"business_id": "hexmen-dev-demo-bus-id",
-		"installer_key": "11111111-2222-3333-4444-5555f4994519",
-		"url": "https://identify.qa.uc.amp.cisco.com/identify"
-	},
-	"pm": {
-		"url": "https://pacman.qa.uc.amp.cisco.com/checkin",
-		"event_url": "https://identify.qa.uc.amp.cisco.com/event/1",
-		"catalog_url": "https://pacman.qa.uc.amp.cisco.com/catalog"
-	}
+    "id": {
+        "business_id": "csc-alpha",
+        "installer_key": "49fd3fd6-9de4-4a8b-9d94-f7223f4ada6a",
+        "url": "https://identify.alpha.uc.amp.cisco.com/identify"
+    },
+    "pm": {
+        "url": "https://pacman.alpha.uc.amp.cisco.com/checkin",
+        "event_url": "https://identify.alpha.uc.amp.cisco.com/event/1",
+        "catalog_url": "https://pacman.alpha.uc.amp.cisco.com/catalog"
+    }
 }

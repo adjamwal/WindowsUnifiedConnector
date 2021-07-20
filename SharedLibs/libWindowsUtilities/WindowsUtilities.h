@@ -40,6 +40,7 @@ public:
         std::vector<std::filesystem::path>& results );
 
     static bool AllowEveryoneAccessToFile( const std::wstring& path );
+    static bool AllowUserReadAccessToFile( const std::wstring& path );
 
 private:
     static std::string ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle );

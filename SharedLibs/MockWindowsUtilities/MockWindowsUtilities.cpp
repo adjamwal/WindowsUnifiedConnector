@@ -233,3 +233,13 @@ void MockWindowsUtilities::ExpectAllowEveryoneAccessToFileNotCalled()
 {
     EXPECT_CALL( *this, AllowEveryoneAccessToFile( _ ) ).Times( 0 );
 }
+
+void MockWindowsUtilities::MakeAllowUserReadAccessToFileReturn( bool value )
+{
+    ON_CALL( *this, AllowUserReadAccessToFile( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectAllowUserReadAccessToFileNotCalled()
+{
+    EXPECT_CALL( *this, AllowUserReadAccessToFile( _ ) ).Times( 0 );
+}

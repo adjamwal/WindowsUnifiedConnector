@@ -235,3 +235,8 @@ void WindowsComponentManager::NotifySystemRestart()
 
     LOG_DEBUG( "Exit" );
 }
+
+int32_t WindowsComponentManager::ApplyUserReadPermissions( const std::filesystem::path& filePath )
+{
+    return WindowsUtilities::AllowUserReadAccessToFile( filePath.wstring() ) ? 0 : -1;
+}

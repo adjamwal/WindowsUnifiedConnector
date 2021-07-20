@@ -92,6 +92,10 @@ public:
     void MakeAllowEveryoneAccessToFileReturn( bool value );
     void ExpectAllowEveryoneAccessToFileNotCalled();
 
+    MOCK_METHOD1( AllowUserReadAccessToFile, bool( const std::wstring& ) );
+    void MakeAllowUserReadAccessToFileReturn( bool value );
+    void ExpectAllowUserReadAccessToFileNotCalled();
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();
