@@ -111,7 +111,8 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
         // only validate hash if installerHash is not empty
         rtn = ( config.sha256.empty() || sha256 == config.sha256 ) &&
               ( config.verifyBinPath.empty() || ( m_dependencies->ComponentManager().DeployConfiguration( config ) == 0 ) ) &&
-              ( m_fileUtil.Rename( config.verifyPath, targetLocation ) == 0 );
+              ( m_fileUtil.Rename( config.verifyPath, targetLocation ) == 0 ) &&
+              ( m_dependencies->ComponentManager().ApplyUserReadPermissions( targetLocation ) == 0 );
 
         if( !rtn )
         {

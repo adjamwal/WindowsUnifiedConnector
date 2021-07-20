@@ -175,7 +175,6 @@
     </Fragment>
 
     <Fragment>
-        <Property Id="UC_PROGRAMDATA_DIR" Value="%ProgramData%\$(var.CiscoDirectory)\$(var.ProductDirectory)" />
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
@@ -196,7 +195,6 @@
                                Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" 
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
-                <util:RemoveFolderEx On="uninstall" Property="UC_PROGRAMDATA_DIR" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_INSTALLCACHE_DIR" />
             </Component>
         </ComponentGroup>

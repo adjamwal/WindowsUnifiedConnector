@@ -107,6 +107,14 @@ public:
     */
     void NotifySystemRestart() override;
 
+    /**
+     * @brief (Optional)Provides Generic Read Access to file
+     *   Used on windows to give read permissions to the Builtin users groups. Similar to chmod +r
+     *
+     * @return 0 on success
+     */
+    int32_t ApplyUserReadPermissions( const std::filesystem::path& filePath ) override;
+
 private:
     IWinApiWrapper& m_winApiWrapper;
     ICodesignVerifier& m_codeSignVerifier;
