@@ -62,7 +62,7 @@ bool ComponentPackageProcessor::PreDownloadedBinaryExists( PmComponent& componen
         ( m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) > 0 &&
             componentPackage.downloadErrorMsg.empty() );
 
-    LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
+    LOG_DEBUG( "Package %s, result=%d",
         componentPackage.productAndVersion.c_str(),
         result );
 
@@ -73,7 +73,7 @@ bool ComponentPackageProcessor::HasConfigs( PmComponent& componentPackage )
 {
     bool result = componentPackage.configs.size() > 0;
 
-    LOG_DEBUG( __FUNCTION__ ": Package %s, result=%d",
+    LOG_DEBUG( "Package %s, result=%d",
         componentPackage.productAndVersion.c_str(),
         result );
 
@@ -95,7 +95,7 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
     try
     {
         componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
-        LOG_DEBUG( __FUNCTION__ ": Downloaded: %s", componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+        LOG_DEBUG( "Downloaded: %s", componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
     }
     catch( PackageException& ex )
     {
@@ -122,7 +122,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     if( !m_dependencies )
     {
-        LOG_ERROR( __FUNCTION__ ": Dependencies not initialized" );
+        LOG_ERROR( "Dependencies not initialized" );
         return false;
     }
 
@@ -135,7 +135,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     if( !componentPackage.downloadedInstallerPath.empty() ) {
         installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
-        LOG_DEBUG( __FUNCTION__ ": File %s, size %ld",
+        LOG_DEBUG( "File %s, size %ld",
             componentPackage.downloadedInstallerPath.generic_u8string().c_str(),
             installerSize );
     }
@@ -147,9 +147,9 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     m_eventBuilder.WithPackageID( componentPackage.productAndVersion );
     m_eventBuilder.WithType( CloudEventType::pkginstall );
 
-    if( IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion() ) )
-    {
-        m_eventBuilder.WithFrom( m_eventBuilder.GetPackageVersion() );
+    std::string localVersion;
+    if( IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion(), localVersion ) ) {
+        m_eventBuilder.WithFrom( localVersion );
     }
 
     m_eventBuilder.WithNewFile(
@@ -195,14 +195,14 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
         if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" )
         {
-            LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, but requires a reboot",
+            LOG_DEBUG( "Installer '%s' succeeded, but requires a reboot",
                 componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
             componentPackage.postInstallRebootRequired = true;
             m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_REQ, "Reboot required event" );
         }
         else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
         {
-            LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded, reboot initiated by msi",
+            LOG_DEBUG( "Installer '%s' succeeded, reboot initiated by msi",
                 componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
             m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_INIT, "Reboot initiated event" );
         }
@@ -219,17 +219,17 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+        LOG_ERROR( "%s", ex.what() );
     }
     catch( std::exception& ex )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
-        LOG_ERROR( __FUNCTION__ ": %s", ex.what() );
+        LOG_ERROR( "%s", ex.what() );
     }
     catch( ... )
     {
         m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
-        LOG_ERROR( __FUNCTION__ ": Unknown processing exception" );
+        LOG_ERROR( "Unknown processing exception" );
     }
 
     m_eventPublisher.Publish( m_eventBuilder );
@@ -237,7 +237,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     return rtn;
 }
 
-bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& name, const std::string& version )
+bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& name, const std::string& version, std::string& localVersion )
 {
     if( !m_dependencies ) return false;
 
@@ -246,29 +246,15 @@ bool ComponentPackageProcessor::IsPackageFoundLocally( const std::string& name, 
 
     for( auto item : inventory.packages )
     {
-        if( StringUtil::EqualsIgnoreCase( name, item.product ) &&
-            ( version.empty() || IsPackageVersionMatch( version, item.version ) ) )
+        if( StringUtil::EqualsIgnoreCase( name, item.product ) )
         {
-            LOG_DEBUG( __FUNCTION__ ": Package match: '%s', '%s'", name.c_str(), version.c_str() );
+            LOG_DEBUG( "Package match: '%s', '%s'", name.c_str(), version.c_str() );
+            localVersion = item.version;
             return true;
         }
     }
 
     return false;
-}
-
-bool ComponentPackageProcessor::IsPackageVersionMatch( const std::string& version1, const std::string& version2 )
-{
-    //extract x.x.x.yyyy
-    auto vstr1 = StringUtil::Split( StringUtil::Trim( version1 ), '.' );
-    auto vstr2 = StringUtil::Split( StringUtil::Trim( version2 ), '.' );
-
-    //compare x.x.x and ignore the revision # yyyy
-    for( size_t i = 0; i < vstr1.size() && i < vstr2.size() && i < 3; i++ )
-    {
-        if( !StringUtil::EqualsIgnoreCase( vstr1[ i ], vstr2[ i ] ) ) return false;
-    }
-    return true;
 }
 
 bool ComponentPackageProcessor::ProcessConfigsForPackage( PmComponent& componentPackage )

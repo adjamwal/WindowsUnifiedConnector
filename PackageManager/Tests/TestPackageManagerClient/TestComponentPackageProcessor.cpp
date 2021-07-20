@@ -110,9 +110,8 @@ protected:
         m_fileUtil->MakeFileExistsReturn( false );
     }
 
-    void SetupInventoryCacheWithPackageVer( const std::string& pkgVer )
+    void SetupInventoryCacheWithPackageVer( const std::string& pkgName, const std::string& pkgVer )
     {
-        std::string pkgName = "test";
         PackageInventory testCache = {};
         PmInstalledPackage testPackage = {};
         testPackage.product = pkgName;
@@ -278,9 +277,9 @@ TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillCacheDownloadErr
 TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfVersionedPackageFoundLocally )
 {
     SetupComponentPackageWithConfig();
-    SetupInventoryCacheWithPackageVer( "1.0.0" );
+    SetupInventoryCacheWithPackageVer( "test", "1.0.0" );
 
-    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( m_eventBuilder->GetPackageVersion() ) ) ).Times( 1 );
+    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( "1.0.0" ) ) ).Times( 1 );
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
@@ -288,7 +287,7 @@ TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfVersionedPackageFo
 TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfVersionWithRevFoundLocally )
 {
     SetupComponentPackageWithConfig();
-    SetupInventoryCacheWithPackageVer( "1.0.0.1234" );
+    SetupInventoryCacheWithPackageVer( "test", "1.0.0.1234" );
 
     EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( "1.0.0.1234" ) ) ).Times( 1 );
 
@@ -298,9 +297,21 @@ TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfVersionWithRevFoun
 TEST_F( TestComponentPackageProcessor, WillSetEventFromFieldIfNonVersionedPackageFoundLocally )
 {
     SetupComponentPackageWithConfig();
-    SetupInventoryCacheWithPackageVer( "" );
+    SetupInventoryCacheWithPackageVer( "test", "" );
 
-    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( m_eventBuilder->GetPackageVersion() ) ) ).Times( 1 );
+    EXPECT_CALL( *m_eventBuilder, WithFrom( StrEq( "") ) ).Times( 1 );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}
+
+
+TEST_F( TestComponentPackageProcessor, WillNetSetEventFromField )
+{
+    SetupComponentPackageWithConfig();
+    SetupInventoryCacheWithPackageVer( "NotTest", "1.0.0" );
+    ON_CALL( *m_eventBuilder, GetPackageName() ).WillByDefault( Return( "test" ) );
+
+    EXPECT_CALL( *m_eventBuilder, WithFrom( _ ) ).Times( 0 );
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }

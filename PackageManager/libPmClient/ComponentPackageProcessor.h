@@ -51,6 +51,5 @@ private:
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
 
-    bool IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly );
-    bool IsPackageVersionMatch( const std::string& version1, const std::string& version2 );
+    bool IsPackageFoundLocally( const std::string& nameAndVersion, const std::string& nameOnly, std::string& localVersion );
 };
