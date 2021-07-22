@@ -71,6 +71,5 @@ void WorkerThread::Stop()
 
 bool WorkerThread::IsRunning()
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
     return m_enabled;
 }

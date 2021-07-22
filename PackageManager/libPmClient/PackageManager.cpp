@@ -127,7 +127,6 @@ int32_t PackageManager::Stop()
 
 bool PackageManager::IsRunning()
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
     return m_thread.IsRunning();
 }
 
