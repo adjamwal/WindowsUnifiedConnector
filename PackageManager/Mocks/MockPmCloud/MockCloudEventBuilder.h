@@ -15,9 +15,11 @@ public:
     MOCK_METHOD1( WithPackageID, ICloudEventBuilder& ( const std::string& ) );
     MOCK_METHOD2( WithPackage, ICloudEventBuilder& ( const std::string&, const std::string& ) );
     MOCK_METHOD2( WithError, ICloudEventBuilder& ( int, const std::string& ) );
+    MOCK_METHOD2( WithSubError, ICloudEventBuilder& ( int, const std::string& ) );
     MOCK_METHOD3( WithOldFile, ICloudEventBuilder& ( const std::filesystem::path&, const std::string&, uint64_t ) );
     MOCK_METHOD3( WithNewFile, ICloudEventBuilder& ( const std::filesystem::path&, const std::string&, uint64_t ) );
     MOCK_METHOD1( WithFrom, ICloudEventBuilder& ( const std::string& ) );
+    MOCK_METHOD1( WithTse, ICloudEventBuilder& ( const std::string& ) );
 
     MOCK_METHOD0( GetPackageName, std::string() );
     MOCK_METHOD0( GetPackageVersion, std::string() );

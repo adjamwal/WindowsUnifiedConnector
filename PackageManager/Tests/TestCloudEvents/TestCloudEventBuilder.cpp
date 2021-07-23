@@ -13,7 +13,8 @@ protected:
             .WithPackage( "amp", "1.0.0" )
             .WithOldFile( "oldfile", "oldhash123", 123 )
             .WithNewFile( "newfile", "newhash123", 234 )
-            .WithError( 100, "some error" );
+            .WithError( 100, "some error" )
+            .WithSubError( 400, "http" );
     }
 
     void TearDown()
@@ -71,7 +72,7 @@ TEST_F( TestCloudEventBuilder, EventJSONContainsError )
 {
     std::string eventJson = m_eventBuilder.Build();
 
-    ASSERT_TRUE( eventJson.find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
+    ASSERT_TRUE( eventJson.find( "\"err\":{\"code\":100,\"msg\":\"some error\",\"sub_code\":400,\"sub_type\":\"http\"}" ) != std::string::npos );
 }
 
 TEST_F( TestCloudEventBuilder, DeserializeCompletesSuccessfully )
@@ -86,7 +87,7 @@ TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalUCID )
 {
     BuildAndDeserialize();
 
-    ASSERT_TRUE( m_restoredEvent.Build().find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"ucid\":\"5B3861FF-2690-45D4-A49D-8F8CD18BBFC6\"}" ) != std::string::npos );
 }
 
 TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalEventType )
@@ -121,7 +122,7 @@ TEST_F( TestCloudEventBuilder, DeserializeRestoresOriginalError )
 {
     BuildAndDeserialize();
 
-    ASSERT_TRUE( m_restoredEvent.Build().find( "\"err\":{\"code\":100,\"msg\":\"some error\"}" ) != std::string::npos );
+    ASSERT_TRUE( m_restoredEvent.Build().find( "\"err\":{\"code\":100,\"msg\":\"some error\",\"sub_code\":400,\"sub_type\":\"http\"}" ) != std::string::npos );
 }
 
 TEST_F( TestCloudEventBuilder, EventJSONContainsOldFileBackslash )

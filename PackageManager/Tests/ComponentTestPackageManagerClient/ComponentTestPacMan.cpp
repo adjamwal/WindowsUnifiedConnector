@@ -184,6 +184,7 @@ protected:
         CloudEventType evtype,
         std::string packageNameAndVersion,
         int errCode, std::string errMessage,
+        int subErrCode, std::string subErrType,
         std::string oldPath, std::string oldHash, int oldSize,
         std::string newPath, std::string newHash, int newSize )
     {
@@ -192,6 +193,7 @@ protected:
         expectedEventData.WithPackageID( "uc/0.0.1" );
         expectedEventData.WithType( evtype );
         expectedEventData.WithError( errCode, errMessage );
+        expectedEventData.WithSubError( subErrCode, subErrType );
         expectedEventData.WithOldFile( oldPath, oldHash, oldSize );
         expectedEventData.WithNewFile( newPath, newHash, newSize );
 
@@ -295,17 +297,19 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
     EXPECT_TRUE( pass );
 
     PublishedEventHasExpectedData(
-        "",
-        pkginstall,
-        "uc/0.0.1",
-        0,
-        "",
-        "",
-        "",
-        0,
-        "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi",
-        "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3",
-        100
+        "", //ucid
+        pkginstall, //evtype
+        "uc/0.0.1", //packageNameAndVersion
+        0, //errCode
+        "", //errMessage
+        0, //subErrCode
+        "", //subErrType
+        "", //oldPath
+        "", //oldHash
+        0, //oldSize
+        "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/uc-0.0.1-alpha.msi", //newPath
+        "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3", //newHash
+        100 //newSize
     );
 }
 
@@ -383,6 +387,8 @@ TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
         "uc/0.0.1",
         UCPM_EVENT_SUCCESS_REBOOT_REQ,
         "Reboot required event",
+        0, //subErrCode
+        "", //subErrType
         "",
         "",
         0,
@@ -637,6 +643,8 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
         "uc/0.0.1",
         0,
         "",
+        0, //subErrCode
+        "", //subErrType
         "",
         "",
         0,

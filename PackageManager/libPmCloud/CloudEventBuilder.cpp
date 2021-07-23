@@ -76,6 +76,14 @@ ICloudEventBuilder& CloudEventBuilder::WithError( int code, const std::string& m
     return *this;
 }
 
+ICloudEventBuilder& CloudEventBuilder::WithSubError( int subErrCode, const std::string& subErrType )
+{
+    m_subErrCode = subErrCode;
+    m_subErrType = subErrType;
+    UpdateEventTime();
+    return *this;
+}
+
 ICloudEventBuilder& CloudEventBuilder::WithOldFile( const std::filesystem::path& path, const std::string& hash, uint64_t size )
 {
     m_oldPath = path;
@@ -98,6 +106,12 @@ ICloudEventBuilder& CloudEventBuilder::WithFrom( const std::string& fromVersion 
 {
     m_fromVersion = fromVersion;
     UpdateEventTime();
+    return *this;
+}
+
+ICloudEventBuilder& CloudEventBuilder::WithTse( const std::string& tse )
+{
+    m_tse = tse;
     return *this;
 }
 
@@ -126,6 +140,8 @@ void CloudEventBuilder::Reset()
     m_packageVersion = "";
     m_errCode = 0;
     m_errMessage = "";
+    m_subErrCode = 0;
+    m_subErrType = "";
     m_oldPath = "";
     m_oldHash = "";
     m_oldSize = 0;
@@ -142,6 +158,8 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
     std::string orig_tse = "";
     int orig_errCode( 0 );
     std::string orig_errMessage = "";
+    int orig_subErrCode( 0 );
+    std::string orig_subErrType = "";
     CloudEventType orig_evtype( CloudEventType( 0 ) );
     std::string orig_packageName = "";
     std::string orig_oldPath = "";
@@ -186,6 +204,10 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
 
                     isValid &= JsonUtil::ExtractJsonInt( error, "code", orig_errCode );
                     isValid &= JsonUtil::ExtractJsonString( error, "msg", orig_errMessage );
+                    if( JsonUtil::ExtractJsonInt( error, "sub_code", orig_subErrCode ) && orig_subErrCode != 0 )
+                    {
+                        isValid &= JsonUtil::ExtractJsonString( error, "sub_type", orig_subErrType );
+                    }
                 }
 
                 if( !event[ "old" ].isNull() && event[ "old" ].isArray() && event[ "old" ].size() == 1 ) {
@@ -231,7 +253,9 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
             .WithOldFile( orig_oldPath, orig_oldHash, orig_oldSize )
             .WithNewFile( orig_newPath, orig_newHash, orig_newSize )
             .WithError( orig_errCode, orig_errMessage )
-            .WithFrom( orig_fromVersion );
+            .WithSubError( orig_subErrCode, orig_subErrType )
+            .WithFrom( orig_fromVersion )
+            .WithTse( orig_tse);
     }
 
     return isValid;
@@ -245,13 +269,16 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
         m_packageVersion._Equal( other.m_packageVersion ) &&
         m_errCode == other.m_errCode &&
         m_errMessage._Equal( other.m_errMessage ) &&
+        m_subErrCode == other.m_subErrCode &&
+        m_subErrType._Equal( other.m_subErrType ) &&
         m_oldPath == other.m_oldPath &&
         m_oldHash._Equal( other.m_oldHash ) &&
         m_oldSize == other.m_oldSize &&
         m_newPath == other.m_newPath &&
         m_newHash._Equal( other.m_newHash ) &&
         m_newSize == other.m_newSize &&
-        m_fromVersion == other.m_fromVersion;
+        m_fromVersion == other.m_fromVersion &&
+        m_tse == other.m_tse;
 
     if( !result )
     {
@@ -263,13 +290,16 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
             "'" << m_packageVersion << "' ?= '" << other.m_packageVersion << "', " <<
             "'" << m_errCode << "' ?= '" << other.m_errCode << "', " <<
             "'" << m_errMessage << "' ?= '" << other.m_errMessage << "', " <<
+            "'" << m_subErrCode << "' ?= '" << other.m_subErrCode << "', " <<
+            "'" << m_subErrType << "' ?= '" << other.m_subErrType << "', " <<
             "'" << m_oldPath << "' ?= '" << other.m_oldPath << "', " <<
             "'" << m_oldHash << "' ?= '" << other.m_oldHash << "', " <<
             "'" << m_oldSize << "' ?= '" << other.m_oldSize << "', " <<
             "'" << m_newPath << "' ?= '" << other.m_newPath << "', " <<
             "'" << m_newHash << "' ?= '" << other.m_newHash << "', " <<
             "'" << m_newSize << "' ?= '" << other.m_newSize << "', " <<
-            "'" << m_fromVersion << "' ?= '" << other.m_fromVersion << "'";
+            "'" << m_fromVersion << "' ?= '" << other.m_fromVersion << "'" <<
+            "'" << m_tse << "' ?= '" << other.m_tse << "'";
 
         LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
     }
@@ -327,6 +357,11 @@ std::string CloudEventBuilder::Serialize()
         Json::Value error;
         error[ "code" ] = ( unsigned )m_errCode;
         error[ "msg" ] = m_errMessage;
+        if( m_subErrCode != 0 )
+        {
+            error[ "sub_code" ] = ( unsigned )m_subErrCode;
+            error[ "sub_type" ] = m_subErrType;
+        }
         event[ "err" ] = error;
     }
 

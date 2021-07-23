@@ -219,6 +219,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
+        m_eventBuilder.WithSubError( ex.whatSubCode(), ex.whatSubType() );
         LOG_ERROR( "%s", ex.what() );
     }
     catch( std::exception& ex )
