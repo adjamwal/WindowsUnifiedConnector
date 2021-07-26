@@ -62,12 +62,13 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
         else {
             LOG_ERROR( "Failed to parse %s", ( pmConfig + ".bak" ).c_str() );
 
-            m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT;
-            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
+            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
             m_configData.maxFileCacheAge = PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS;
             m_configData.allowPostInstallReboots = false;
             m_configData.rebootThrottleS = PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS;
+            m_configData.watchdogTimeoutMs = PM_CONFIG_INTERVAL_DEFAULT_MS + PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS;
         }
     }
 
@@ -146,6 +147,13 @@ uint32_t PmConfig::GetRebootThrottleS()
     return m_configData.rebootThrottleS;
 }
 
+uint32_t PmConfig::GetWatchdogTimeoutMs()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.watchdogTimeoutMs;
+}
+
 int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
 {
     int rtn = -1;
@@ -205,7 +213,7 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
 
         if ( !VerifyPmCheckinInterval( pm ) ) {
             LOG_WARNING("Invalid CheckinInterval. Using default");
-            m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
         }
         else {
             m_configData.intervalMs = pm["CheckinInterval"].asUInt();
@@ -214,7 +222,7 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
 
         if ( !VerifyPmMaxStartupDelay( pm ) ) {
             LOG_WARNING("Invalid MaxStartupDelay. Using default");
-            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT;
+            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
         }
         else {
             m_configData.maxDelayMs = pm["MaxStartupDelay"].asUInt();
@@ -242,6 +250,14 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
         }
         else {
             m_configData.rebootThrottleS = pm[ "RebootThrottleS" ].asUInt();
+        }
+
+        if( !VerifyPmWatchdogBuffer( pm ) ) {
+            LOG_WARNING( "Invalid WatchdogInterval. Using default" );
+            m_configData.watchdogTimeoutMs = m_configData.intervalMs + PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS;
+        }
+        else {
+            m_configData.watchdogTimeoutMs = m_configData.intervalMs + pm[ "WatchdogBufferMs" ].asUInt();
         }
         rtn = 0;
     }
@@ -346,6 +362,11 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
             rtn = -1;
         }
 
+        if( !VerifyPmWatchdogBuffer( pm ) ) {
+            LOG_ERROR( "Invalid WatchdogInterval" );
+            rtn = -1;
+        }
+
         if( rtn != 0 ) {
             LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
         }
@@ -402,4 +423,9 @@ bool PmConfig::VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot )
 bool PmConfig::VerifyPmRebootThrottle( const Json::Value& pmRoot )
 {
     return pmRoot.isMember( "RebootThrottleS" ) && pmRoot[ "RebootThrottleS" ].isUInt() && ( pmRoot[ "RebootThrottleS" ].asUInt() >= 60 );
+}
+
+bool PmConfig::VerifyPmWatchdogBuffer( const Json::Value& pmRoot )
+{
+    return pmRoot.isMember( "WatchdogBufferMs" ) && pmRoot[ "WatchdogBufferMs" ].isUInt() && ( pmRoot[ "WatchdogBufferMs" ].asUInt() >= 30000 );
 }

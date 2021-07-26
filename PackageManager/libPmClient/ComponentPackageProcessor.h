@@ -12,6 +12,7 @@ class ICloudEventBuilder;
 class ICloudEventPublisher;
 class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
+class IWatchdog;
 
 class ComponentPackageProcessor : public IComponentPackageProcessor
 {
@@ -24,7 +25,8 @@ public:
         IUcidAdapter& ucidAdapter,
         ICloudEventBuilder& eventBuilder,
         ICloudEventPublisher& eventPublisher,
-        IUcUpgradeEventHandler& ucUpgradeEventHandler
+        IUcUpgradeEventHandler& ucUpgradeEventHandler,
+        IWatchdog& watchdog
     );
     virtual ~ComponentPackageProcessor();
 
@@ -48,6 +50,7 @@ private:
     ICloudEventBuilder& m_eventBuilder;
     ICloudEventPublisher& m_eventPublisher;
     IUcUpgradeEventHandler& m_ucUpgradeEventHandler;
+    IWatchdog& m_watchdog;
     IPmPlatformDependencies* m_dependencies;
     uint32_t m_fileCount;
 

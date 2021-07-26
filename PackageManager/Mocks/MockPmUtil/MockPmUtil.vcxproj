@@ -24,12 +24,14 @@
     <ClInclude Include="MockPmHttp.h" />
     <ClInclude Include="MockSslUtil.h" />
     <ClInclude Include="MockUtf8PathVerifier.h" />
+    <ClInclude Include="MockWatchdog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockFileSysUtil.cpp" />
     <ClCompile Include="MockPmHttp.cpp" />
     <ClCompile Include="MockSslUtil.cpp" />
     <ClCompile Include="MockUtf8PathVerifier.cpp" />
+    <ClCompile Include="MockWatchdog.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

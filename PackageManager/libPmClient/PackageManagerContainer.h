@@ -28,6 +28,7 @@ class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
 class IRebootHandler;
 class IUtf8PathVerifier;
+class IWatchdog;
 
 class PackageManagerContainer
 {
@@ -62,6 +63,7 @@ private:
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<IPackageConfigProcessor> m_packageConfigProcessor;
+    std::unique_ptr<IWatchdog> m_watchdog;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
     std::unique_ptr<IRebootHandler> m_rebootHandler;

@@ -10,6 +10,7 @@
 #include "MockCloudEventPublisher.h"
 #include "MockUcidAdapter.h"
 #include "MockUcUpgradeEventHandler.h"
+#include "MockWatchdog.h"
 #include "WinError.h"
 
 #include <memory>
@@ -29,6 +30,7 @@ protected:
         m_eventBuilder.reset( new NiceMock<MockCloudEventBuilder>() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
+        m_watchdog.reset( new NiceMock<MockWatchdog>() );
 
         m_patient.reset( new ComponentPackageProcessor( *m_installerCacheMgr,
             *m_fileUtil,
@@ -37,7 +39,8 @@ protected:
             *m_ucidAdapter,
             *m_eventBuilder,
             *m_eventPublisher,
-            *m_ucUpgradeEventHandler ) );
+            *m_ucUpgradeEventHandler,
+            *m_watchdog ) );
 
         m_dep->MakeComponentManagerReturn( *m_pmComponentManager );
     }
@@ -46,6 +49,7 @@ protected:
     {
         m_patient.reset();
 
+        m_watchdog.reset();
         m_installerCacheMgr.reset();
         m_fileUtil.reset();
         m_dep.reset();
@@ -134,6 +138,7 @@ protected:
     std::unique_ptr<MockCloudEventBuilder> m_eventBuilder;
     std::unique_ptr<MockCloudEventPublisher> m_eventPublisher;
     std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgradeEventHandler;
+    std::unique_ptr<MockWatchdog> m_watchdog;
 
     std::unique_ptr<ComponentPackageProcessor> m_patient;
 };
@@ -316,3 +321,16 @@ TEST_F( TestComponentPackageProcessor, WillNetSetEventFromField )
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
+TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillKickWatchdog )
+{
+    EXPECT_CALL( *m_watchdog, Kick() );
+
+    m_patient->DownloadPackageBinary( m_expectedComponentPackage );
+}
+
+TEST_F( TestComponentPackageProcessor, ProcessPackageBinaryWillKickWatchdog )
+{
+    EXPECT_CALL( *m_watchdog, Kick() );
+
+    m_patient->ProcessPackageBinary( m_expectedComponentPackage );
+}

@@ -30,6 +30,9 @@
     <ClInclude Include="MockUtf8PathVerifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MockWatchdog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockFileSysUtil.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockUtf8PathVerifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MockWatchdog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

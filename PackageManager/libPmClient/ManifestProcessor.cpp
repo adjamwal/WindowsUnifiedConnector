@@ -2,6 +2,9 @@
 #include "PackageException.h"
 #include "PmTypes.h"
 #include "PmLogger.h"
+#include "IPmManifest.h"
+#include "IComponentPackageProcessor.h"
+#include "IWatchdog.h"
 #include <iostream>
 #include <sstream>
 

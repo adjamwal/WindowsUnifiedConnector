@@ -23,6 +23,7 @@
 #include "IRebootHandler.h"
 #include "ICatalogJsonParser.h"
 #include "PmTypes.h"
+#include "IWatchdog.h"
 #include <sstream>
 
 using namespace std;
@@ -41,7 +42,8 @@ PackageManager::PackageManager( IPmConfig& config,
     ICloudEventStorage& cloudEventStorage,
     IUcUpgradeEventHandler& ucUpgradeEventHandler,
     IRebootHandler& rebootHandler,
-    IWorkerThread& thread ) :
+    IWorkerThread& thread,
+    IWatchdog& watchdog ) :
     m_config( config )
     , m_cloud( cloud )
     , m_installerCacheMgr( installerCacheMgr )
@@ -57,6 +59,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
     , m_rebootHandler( rebootHandler )
     , m_thread( thread )
+    , m_watchdog( watchdog )
     , m_dependencies( nullptr )
 {
 
@@ -95,6 +98,10 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
                 m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
             }
 
+            m_watchdog.Start(
+                std::bind( &PackageManager::PmWatchdogWait, this ),
+                std::bind( &PackageManager::PmWatchdogFired, this )
+            );
             m_thread.Start(
                 std::bind( &PackageManager::PmThreadWait, this ),
                 std::bind( &PackageManager::PmWorkflowThread, this )
@@ -112,6 +119,8 @@ int32_t PackageManager::Stop()
     int32_t rtn = -1;
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
+
+    m_watchdog.Stop();
 
     if( !m_thread.IsRunning() ) {
         LOG_DEBUG( "Package Manager is not running" );
@@ -186,6 +195,8 @@ void PackageManager::PmWorkflowThread()
         return;
     }
 
+    m_watchdog.Kick();
+
     try {
         std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
             m_config.GetCloudCheckinUri(),
@@ -236,11 +247,6 @@ bool PackageManager::LoadPmConfig()
     return m_config.LoadPmConfig( m_pmConfigFile ) == 0;
 }
 
-bool PackageManager::PmSendEvent( const PmEvent& event )
-{
-    return false;
-}
-
 int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
 {
     return m_config.VerifyBsFileIntegrity( bsConfigFile );
@@ -249,4 +255,17 @@ int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
 int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )
 {
     return m_config.VerifyPmFileIntegrity( pmConfigFile );
+}
+
+std::chrono::milliseconds PackageManager::PmWatchdogWait()
+{
+    return std::chrono::milliseconds( m_config.GetWatchdogTimeoutMs() );
+}
+
+void PackageManager::PmWatchdogFired()
+{
+    LOG_EMERGENCY( "Triggering Crash" );
+    int* x = NULL;
+    int y = *x;
+    LOG_EMERGENCY( ": Y is %d", y );
 }

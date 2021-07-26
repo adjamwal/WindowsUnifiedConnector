@@ -32,6 +32,7 @@
 #include "MockInstallerCacheManager.h"
 #include "MockRebootHandler.h"
 #include "CustomPathMatchers.h"
+#include "MockWatchdog.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -75,6 +76,7 @@ protected:
             new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) 
         );
         m_configProcesor.reset( new PackageConfigProcessor( *m_mockFileUtil, *m_mockSslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) );
+        m_watchdog.reset( new NiceMock<MockWatchdog>() );
         m_componentPackageProcessor.reset( new ComponentPackageProcessor(
             *m_mockInstallerCacheMgr,
             *m_mockFileUtil,
@@ -83,7 +85,8 @@ protected:
             *m_ucidAdapter,
             *m_eventBuilder,
             *m_eventPublisher,
-            *m_ucUpgradeEventHandler ) );
+            *m_ucUpgradeEventHandler,
+            *m_watchdog ) );
         m_manifestProcessor.reset( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) );
 
         m_mockDeps->MakeConfigurationReturn( *m_mockPlatformConfiguration );
@@ -112,7 +115,8 @@ protected:
             *m_eventStorage,
             *m_ucUpgradeEventHandler,
             *m_mockRebootHandler,
-            *m_thread ) );
+            *m_thread,
+            *m_watchdog ) );
     }
 
     void TearDown()
@@ -231,6 +235,7 @@ protected:
     std::unique_ptr<MockCloudEventStorage> m_eventStorage;
     std::unique_ptr<MockUcUpgradeEventHandler> m_ucUpgradeEventHandler;
 
+    std::unique_ptr<MockWatchdog> m_watchdog;
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
     std::unique_ptr<IPackageConfigProcessor> m_configProcesor;

@@ -9,6 +9,7 @@
 #include "ICloudEventBuilder.h"
 #include "ICloudEventPublisher.h"
 #include "IUcUpgradeEventHandler.h"
+#include "IWatchdog.h"
 #include "PmLogger.h"
 #include "PmConstants.h"
 #include "PackageException.h"
@@ -27,7 +28,8 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     IUcidAdapter& ucidAdapter,
     ICloudEventBuilder& eventBuilder,
     ICloudEventPublisher& eventPublisher,
-    IUcUpgradeEventHandler& ucUpgradeEventHandler )
+    IUcUpgradeEventHandler& ucUpgradeEventHandler,
+    IWatchdog& watchdog )
     : m_installerManager( installerManager )
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
@@ -36,6 +38,7 @@ ComponentPackageProcessor::ComponentPackageProcessor(
     , m_eventBuilder( eventBuilder )
     , m_eventPublisher( eventPublisher )
     , m_ucUpgradeEventHandler( ucUpgradeEventHandler )
+    , m_watchdog( watchdog )
     , m_dependencies( nullptr )
     , m_fileCount( 0 )
 {
@@ -82,33 +85,34 @@ bool ComponentPackageProcessor::HasConfigs( PmComponent& componentPackage )
 
 bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPackage )
 {
+    bool rtn = false;
     componentPackage.downloadedInstallerPath = "";
-    if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 )
-    {
-        return false;
+    if( componentPackage.installerUrl.length() != 0 && componentPackage.installerType.length() != 0 ) {
+
+
+        std::string installerPath;
+        std::stringstream ssError;
+        ssError << "Package " << componentPackage.productAndVersion << ": ";
+
+        try {
+            componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
+            LOG_DEBUG( "Downloaded: %s", componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+        }
+        catch( PackageException& ex ) {
+            ssError << ex.what();
+            componentPackage.downloadErrorMsg = ssError.str();
+        }
+        catch( ... ) {
+            ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
+            componentPackage.downloadErrorMsg = ssError.str();
+        }
+
+        
+        rtn = PreDownloadedBinaryExists( componentPackage );
     }
 
-    std::string installerPath;
-    std::stringstream ssError;
-    ssError << "Package " << componentPackage.productAndVersion << ": ";
-
-    try
-    {
-        componentPackage.downloadedInstallerPath = m_installerManager.DownloadOrUpdateInstaller( componentPackage );
-        LOG_DEBUG( "Downloaded: %s", componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
-    }
-    catch( PackageException& ex )
-    {
-        ssError << ex.what();
-        componentPackage.downloadErrorMsg = ssError.str();
-    }
-    catch( ... )
-    {
-        ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
-        componentPackage.downloadErrorMsg = ssError.str();
-    }
-
-    return PreDownloadedBinaryExists( componentPackage );
+    m_watchdog.Kick();
+    return rtn;
 }
 
 bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPackage )
@@ -120,121 +124,113 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    if( !m_dependencies )
-    {
+    if( !m_dependencies ) {
         LOG_ERROR( "Dependencies not initialized" );
-        return false;
+        rtn = false;
     }
-
-    if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 )
-    {
+    else if( componentPackage.installerUrl.length() == 0 || componentPackage.installerType.length() == 0 ) {
         //nothing to install for config-only packages (i.e. packages that don't have an installerUrl)
         //return success, to ensure configuration gets processed
-        return true;
+        rtn = true;
     }
-
-    if( !componentPackage.downloadedInstallerPath.empty() ) {
-        installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
-        LOG_DEBUG( "File %s, size %ld",
-            componentPackage.downloadedInstallerPath.generic_u8string().c_str(),
-            installerSize );
-    }
-
-    m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
-
-    m_eventBuilder.Reset();
-    m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
-    m_eventBuilder.WithPackageID( componentPackage.productAndVersion );
-    m_eventBuilder.WithType( CloudEventType::pkginstall );
-
-    std::string localVersion;
-    if( IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion(), localVersion ) ) {
-        m_eventBuilder.WithFrom( localVersion );
-    }
-
-    m_eventBuilder.WithNewFile(
-        componentPackage.installerUrl,
-        componentPackage.installerHash,
-        installerSize );
-
-    try
-    {
-        if( !PreDownloadedBinaryExists( componentPackage ) ) {
-            if( !componentPackage.downloadErrorMsg.empty() )
-                ssError << componentPackage.downloadErrorMsg;
-            else
-                ssError << "Failed to pre-download " << componentPackage.installerUrl;
-            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
+    else {
+        if( !componentPackage.downloadedInstallerPath.empty() ) {
+            installerSize = m_fileUtil.FileSize( componentPackage.downloadedInstallerPath );
+            LOG_DEBUG( "File %s, size %ld",
+                componentPackage.downloadedInstallerPath.generic_u8string().c_str(),
+                installerSize );
         }
 
-        tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath );
-        if( !tempSha256.has_value() )
-        {
-            ssError << "Failed to calculate sha256 of " << componentPackage.downloadedInstallerPath;
-            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_CALC );
+        m_eventPublisher.SetToken( m_ucidAdapter.GetAccessToken() );
+
+        m_eventBuilder.Reset();
+        m_eventBuilder.WithUCID( m_ucidAdapter.GetIdentity() );
+        m_eventBuilder.WithPackageID( componentPackage.productAndVersion );
+        m_eventBuilder.WithType( CloudEventType::pkginstall );
+
+        std::string localVersion;
+        if( IsPackageFoundLocally( m_eventBuilder.GetPackageName(), m_eventBuilder.GetPackageVersion(), localVersion ) ) {
+            m_eventBuilder.WithFrom( localVersion );
         }
 
         m_eventBuilder.WithNewFile(
             componentPackage.installerUrl,
-            tempSha256.has_value() ? tempSha256.value() : componentPackage.installerHash,
-            m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
+            componentPackage.installerHash,
+            installerSize );
 
-        // only validate hash if installerHash is not empty
-        if( !componentPackage.installerHash.empty() &&
-            tempSha256.value() != componentPackage.installerHash )
-        {
-            ssError << "Failed to match hash of download. Calculated Hash: " << tempSha256.value() <<
-                ", Cloud Hash: " << componentPackage.installerHash;
-            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH );
+        try {
+            if( !PreDownloadedBinaryExists( componentPackage ) ) {
+                if( !componentPackage.downloadErrorMsg.empty() )
+                    ssError << componentPackage.downloadErrorMsg;
+                else
+                    ssError << "Failed to pre-download " << componentPackage.installerUrl;
+                throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
+            }
+
+            tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath );
+            if( !tempSha256.has_value() ) {
+                ssError << "Failed to calculate sha256 of " << componentPackage.downloadedInstallerPath;
+                throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_CALC );
+            }
+
+            m_eventBuilder.WithNewFile(
+                componentPackage.installerUrl,
+                tempSha256.has_value() ? tempSha256.value() : componentPackage.installerHash,
+                m_fileUtil.FileSize( componentPackage.downloadedInstallerPath ) );
+
+            // only validate hash if installerHash is not empty
+            if( !componentPackage.installerHash.empty() &&
+                tempSha256.value() != componentPackage.installerHash ) {
+                ssError << "Failed to match hash of download. Calculated Hash: " << tempSha256.value() <<
+                    ", Cloud Hash: " << componentPackage.installerHash;
+                throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_HASH_MISMATCH );
+            }
+
+            m_ucUpgradeEventHandler.StoreUcUpgradeEvent( m_eventBuilder.Build() );
+            std::string updErrText;
+            int32_t updErrCode = m_dependencies->ComponentManager().UpdateComponent( componentPackage, updErrText );
+
+
+            if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" ) {
+                LOG_DEBUG( "Installer '%s' succeeded, but requires a reboot",
+                    componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+                componentPackage.postInstallRebootRequired = true;
+                m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_REQ, "Reboot required event" );
+            }
+            else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" ) {
+                LOG_DEBUG( "Installer '%s' succeeded, reboot initiated by msi",
+                    componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+                m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_INIT, "Reboot initiated event" );
+            }
+            else if( updErrCode != 0 ) {
+                ssError << "Failed to update package. Error: " << updErrCode << ": " << updErrText;
+                throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
+            }
+
+            m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
+
+            rtn = true;
+        }
+        catch( PackageException& ex ) {
+            m_eventBuilder.WithError(ex.whatCode(), ex.what());
+            m_eventBuilder.WithSubError(ex.whatSubCode(), ex.whatSubType());
+            LOG_ERROR("%s", ex.what());
+        }
+        catch( std::exception& ex ) {
+            m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
+            LOG_ERROR( "%s", ex.what() );
+        }
+        catch( ... ) {
+            m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
+            LOG_ERROR( "Unknown processing exception" );
         }
 
-        m_ucUpgradeEventHandler.StoreUcUpgradeEvent( m_eventBuilder.Build() );
-        std::string updErrText;
-        int32_t updErrCode = m_dependencies->ComponentManager().UpdateComponent( componentPackage, updErrText );
-
-
-        if( ( updErrCode == ERROR_SUCCESS_REBOOT_REQUIRED || updErrCode == ERROR_SUCCESS_RESTART_REQUIRED ) && componentPackage.installerType == "msi" )
-        {
-            LOG_DEBUG( "Installer '%s' succeeded, but requires a reboot",
-                componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
-            componentPackage.postInstallRebootRequired = true;
-            m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_REQ, "Reboot required event" );
-        }
-        else if( updErrCode == ERROR_SUCCESS_REBOOT_INITIATED && componentPackage.installerType == "msi" )
-        {
-            LOG_DEBUG( "Installer '%s' succeeded, reboot initiated by msi",
-                componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
-            m_eventBuilder.WithError( UCPM_EVENT_SUCCESS_REBOOT_INIT, "Reboot initiated event" );
-        }
-        else if( updErrCode != 0 )
-        {
-            ssError << "Failed to update package. Error: " << updErrCode << ": " << updErrText;
-            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
-        }
-
-        m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
+        m_eventPublisher.Publish( m_eventBuilder );
 
         rtn = true;
     }
-    catch( PackageException& ex )
-    {
-        m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        m_eventBuilder.WithSubError( ex.whatSubCode(), ex.whatSubType() );
-        LOG_ERROR( "%s", ex.what() );
-    }
-    catch( std::exception& ex )
-    {
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
-        LOG_ERROR( "%s", ex.what() );
-    }
-    catch( ... )
-    {
-        m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, "Unknown processing exception" );
-        LOG_ERROR( "Unknown processing exception" );
-    }
 
-    m_eventPublisher.Publish( m_eventBuilder );
-
+    m_watchdog.Kick();
     return rtn;
 }
 

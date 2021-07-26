@@ -27,6 +27,7 @@ public:
     uint32_t GetMaxFileCacheAge() override;
     bool AllowPostInstallReboots() override;
     uint32_t GetRebootThrottleS() override;
+    uint32_t GetWatchdogTimeoutMs() override;
 
     void SetCloudEventUri( std::string& uri );
 private:

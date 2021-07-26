@@ -21,6 +21,7 @@ class ICloudEventStorage;
 class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
 class IRebootHandler;
+class IWatchdog;
 
 struct PmComponent;
 struct PmEvent;
@@ -44,7 +45,8 @@ public:
         ICloudEventStorage& cloudEventStorage,
         IUcUpgradeEventHandler& ucUpgradeEventHandler,
         IRebootHandler& rebootHandler,
-        IWorkerThread& thread );
+        IWorkerThread& thread,
+        IWatchdog& watchdog );
     virtual ~PackageManager();
 
     int32_t Start( const char* bsConfigFile, const char* pmConfigFile ) override;
@@ -70,6 +72,8 @@ private:
     IUcUpgradeEventHandler& m_ucUpgradeEventHandler;
     IRebootHandler& m_rebootHandler;
     IWorkerThread& m_thread;
+    IWatchdog& m_watchdog;
+
     std::mutex m_mutex;
     std::string m_bsConfigFile;
     std::string m_pmConfigFile;
@@ -80,5 +84,6 @@ private:
     std::chrono::milliseconds PmThreadWait();
     bool LoadBsConfig();
     bool LoadPmConfig();
-    bool PmSendEvent( const PmEvent& event );
+    std::chrono::milliseconds PmWatchdogWait();
+    void PmWatchdogFired();
 };

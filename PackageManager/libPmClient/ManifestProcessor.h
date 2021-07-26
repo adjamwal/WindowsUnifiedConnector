@@ -1,9 +1,10 @@
 #pragma once
 
 #include "IManifestProcessor.h"
-#include "IPmManifest.h"
-#include "IComponentPackageProcessor.h"
 #include <mutex>
+
+class IPmManifest;
+class IComponentPackageProcessor;
 
 class ManifestProcessor : public IManifestProcessor
 {

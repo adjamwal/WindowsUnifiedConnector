@@ -64,6 +64,10 @@ public:
     void MakeGetRebootThrottleSReturn( uint32_t value );
     void ExpectGetRebootThrottleSNotCalled();
 
+    MOCK_METHOD0( GetWatchdogTimeoutMs, uint32_t() );
+    void MakeGetWatchdogTimeoutMsReturn( uint32_t value );
+    void ExpectGetWatchdogTimeoutMsNotCalled();
+
 private:
     std::string m_identifyUri;
     std::string m_checkinUri;

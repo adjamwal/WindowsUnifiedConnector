@@ -156,3 +156,13 @@ void MockPmConfig::ExpectGetRebootThrottleSNotCalled()
 {
     EXPECT_CALL( *this, GetRebootThrottleS() ).Times( 0 );
 }
+
+void MockPmConfig::MakeGetWatchdogTimeoutMsReturn( uint32_t value )
+{
+    ON_CALL( *this, GetWatchdogTimeoutMs() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetWatchdogTimeoutMsNotCalled()
+{
+    EXPECT_CALL( *this, GetWatchdogTimeoutMs() ).Times( 0 );
+}

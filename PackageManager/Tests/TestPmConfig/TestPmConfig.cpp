@@ -33,7 +33,7 @@ protected:
 }
 )";
 
-    //test with a custom CheckinInterval value different than PM_CONFIG_INTERVAL_DEFAULT
+    //test with a custom CheckinInterval value different than PM_CONFIG_INTERVAL_DEFAULT_MS
     const std::string pmConfigData = R"(
 {
     "pm": {
@@ -42,7 +42,8 @@ protected:
         "MaxStartupDelay": 200000,
         "maxFileCacheAge_s": 1000,
         "AllowPostInstallReboots": true,
-        "RebootThrottleS": 1000
+        "RebootThrottleS": 1000,
+        "WatchdogBufferMs": 250000
     }
 }
 )";
@@ -248,7 +249,7 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultInterval )
     m_patient->LoadPmConfig( "filename" );
     m_patient->GetCloudCheckinIntervalMs(); //discard 1st returned value since it is random
 
-    EXPECT_EQ( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT );
+    EXPECT_EQ( m_patient->GetCloudCheckinIntervalMs(), PM_CONFIG_INTERVAL_DEFAULT_MS );
 }
 
 //Not a great test... but not worthwihle to mock out RandomUtil
@@ -258,7 +259,7 @@ TEST_F(TestPmConfig, LoadingEmptyConfigSetsDefaultMaxStartupDelay)
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), ( uint32_t )PM_CONFIG_INTERVAL_DEFAULT );
+    EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), ( uint32_t )PM_CONFIG_INTERVAL_DEFAULT_MS );
 }
 TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultLogLevel )
 {
@@ -296,3 +297,40 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsRebootThrottle )
     EXPECT_EQ( m_patient->GetRebootThrottleS(), PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS );
 }
 
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsWatchDogInterval )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetWatchdogTimeoutMs(), PM_CONFIG_INTERVAL_DEFAULT_MS + PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS );
+}
+
+TEST_F( TestPmConfig, CanOverrideWatchdogBuffer )
+{
+    m_fileUtil->MakeReadFileReturn( pmConfigData );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetWatchdogTimeoutMs(), 150000 + 250000 );
+}
+
+TEST_F( TestPmConfig, WillAddDefaultWatchdogBufferToTimeout )
+{
+    m_fileUtil->MakeReadFileReturn( R"(
+{
+    "pm": {
+        "loglevel": 7,
+        "CheckinInterval": 150000,
+        "MaxStartupDelay": 200000,
+        "maxFileCacheAge_s": 1000,
+        "AllowPostInstallReboots": true,
+        "RebootThrottleS": 1000
+    }
+}
+)" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( m_patient->GetWatchdogTimeoutMs(), 150000 + PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS );
+}

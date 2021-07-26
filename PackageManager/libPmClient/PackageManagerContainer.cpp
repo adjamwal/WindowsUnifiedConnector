@@ -30,6 +30,7 @@
 #include "InstallerCacheManager.h"
 #include "RebootHandler.h"
 #include "Utf8PathVerifier.h"
+#include "Watchdog.h"
 
 #include <mutex>
 #include <exception>
@@ -63,6 +64,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_catalogListRetriever( new CatalogListRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) )
     , m_packageDiscoveryManager( new PackageDiscoveryManager( *m_catalogListRetriever, *m_packageInventoryProvider, *m_catalogJsonParser ) )
     , m_packageConfigProcessor( new PackageConfigProcessor( *m_fileUtil, *m_sslUtil, *m_ucidAdapter, *m_eventBuilder, *m_eventPublisher ) )
+    , m_watchdog( new Watchdog() )
     , m_componentPackageProcessor( 
         new ComponentPackageProcessor( *m_installeracheMgr,
             *m_fileUtil, 
@@ -71,7 +73,8 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_ucidAdapter, 
             *m_eventBuilder, 
             *m_eventPublisher,
-            *m_ucUpgradeEventHandler ) )
+            *m_ucUpgradeEventHandler,
+            *m_watchdog ) )
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_rebootHandler( new RebootHandler( *m_config ) )
     , m_pacMan(
@@ -89,7 +92,8 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_eventStorage,
             *m_ucUpgradeEventHandler,
             *m_rebootHandler,
-            *m_thread ) )
+            *m_thread,
+            *m_watchdog ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );
 }

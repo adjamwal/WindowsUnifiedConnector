@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ComponentTestPmHttp.cpp" />
+    <ClCompile Include="ComponentTestWatchdog.cpp" />
     <ClCompile Include="WindowsCertStore.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
