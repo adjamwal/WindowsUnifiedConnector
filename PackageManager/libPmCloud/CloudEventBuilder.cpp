@@ -298,8 +298,7 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
             "'" << m_newPath << "' ?= '" << other.m_newPath << "', " <<
             "'" << m_newHash << "' ?= '" << other.m_newHash << "', " <<
             "'" << m_newSize << "' ?= '" << other.m_newSize << "', " <<
-            "'" << m_fromVersion << "' ?= '" << other.m_fromVersion << "'" <<
-            "'" << m_tse << "' ?= '" << other.m_tse << "'";
+            "'" << m_fromVersion << "' ?= '" << other.m_fromVersion << "'";
 
         LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
     }
