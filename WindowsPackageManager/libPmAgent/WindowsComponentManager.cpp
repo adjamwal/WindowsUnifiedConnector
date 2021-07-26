@@ -49,16 +49,22 @@ int32_t WindowsComponentManager::InstallComponent( const PmComponent& package )
 int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, std::string& error )
 {
     int32_t ret = 0;
+    CodesignStatus status = CodesignStatus::CODE_SIGNER_ERROR;
 
     std::filesystem::path downloadedInstallerPath = package.downloadedInstallerPath;
     downloadedInstallerPath.make_preferred();
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    CodesignStatus status = m_codeSignVerifier.Verify( 
-        converter.from_bytes( downloadedInstallerPath.u8string() ),
-        converter.from_bytes( package.signerName ), 
-        SIGTYPE_DEFAULT );
+    if( !package.signerName.empty() ) {
+        status = m_codeSignVerifier.Verify(
+            converter.from_bytes(downloadedInstallerPath.u8string()),
+            converter.from_bytes(package.signerName),
+            SIGTYPE_DEFAULT);
+    }
+    else {
+        status = CodesignStatus::CODE_SIGNER_SUCCESS;
+    }
 
     if ( status == CodesignStatus::CODE_SIGNER_SUCCESS )
     {
@@ -119,6 +125,7 @@ int32_t WindowsComponentManager::UninstallComponent( const PmComponent& package 
 int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& config )
 {
     int32_t ret = 0;
+    CodesignStatus status = CodesignStatus::CODE_SIGNER_ERROR;
 
     std::string verifyFullPath = config.installLocation.generic_u8string() + "\\" + config.verifyBinPath;
     std::string verifyCmdLine = "--config-path " + config.verifyPath;
@@ -126,10 +133,15 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    CodesignStatus status = m_codeSignVerifier.Verify(
-        converter.from_bytes( verifyFullPath ),
-        converter.from_bytes( config.signerName ),
-        SIGTYPE_DEFAULT );
+    if (!config.signerName.empty()) {
+        status = m_codeSignVerifier.Verify(
+            converter.from_bytes(verifyFullPath),
+            converter.from_bytes(config.signerName),
+            SIGTYPE_DEFAULT);
+    }
+    else {
+        status = CodesignStatus::CODE_SIGNER_SUCCESS;
+    }
 
     if( status == CodesignStatus::CODE_SIGNER_SUCCESS ) {
         ret = RunPackage( config.verifyBinPath, verifyCmdLine, errorStr );
