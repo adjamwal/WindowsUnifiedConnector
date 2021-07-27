@@ -1,13 +1,13 @@
 /**
  * @file ucidapi.h
  *
- * UCIDAPI has functions for use by clients to get the UCID and
+ * UCIDAPI has functions for use by clients to get the Business ID, UCID and
  * its associated token. It is also possible to request for a refresh
  * of the token associated with UCID.
  *
- * The UCID and token are printable ASCII character sequences.
+ * The UCID, Business ID and token are printable ASCII character sequences.
  *
- * The contents of UCID and token are opaque, and applications
+ * The contents of UCID, Business ID and token are opaque, and applications
  * should not infer any meaning from their contents.
  *
  * Memory Management:
@@ -184,6 +184,40 @@ ucid_get_token(IN OUT char* p_token, IN OUT int* p_buflen);
 UCID_CAPI
 ucid_result_t
 ucid_refresh_token();
+
+/**
+* Get the Business ID.
+*
+* Copies Business ID to the memory pointed to by \c p_bid. The terminating NUL
+* character is also copied.
+*
+* If \c p_buflen is NULL, then returns \c UCID_RES_INVALID_ARG.
+* If \c p_bid is NULL, then updates \c *p_buflen with the size in bytes (including
+* 1 for the terminating NUL) needed to store business ID.
+* If both \c p_bid and \c p_buflen are not NULL, then \c *p_buflen should contain the
+* size in bytes pointed to by \c p_bid. The business ID
+* (including the terminating NUL) is copied to \c p_bid
+* and \c *p_buflen is updated with the size of the business ID
+* (including 1 for terminating NUL).
+*
+* @param[in,out] p_bid pointer to memory that can store the business ID
+* @param[in,out] p_buflen a non-NULL pointer to an integer
+*
+* @return \li UCID_RES_SUCCESS if the call is successful.
+* \li UCID_RES_INVALID_ARG if \c p_buflen is NULL.
+* \li UCID_RES_NOT_INITED if business id is not available.
+* \li UCID_RES_INSUFFICIENT_LEN if \c p_bid is NULL, OR
+* if \c p_bid is not NULL and \c *p_buflen
+* does not have a value
+* >= (size of business ID in bytes
+* +1 for terminating NUL);
+* \c *p_buflen is updated with the required size
+* (including 1 for the terminating NUL).
+* \li UCID_RES_GENERAL_ERROR if any other error occurs.
+*/
+UCID_CAPI
+ucid_result_t
+ucid_get_business_id(IN OUT char* p_bid, IN OUT int* p_buflen);
 
 #ifdef __cplusplus
 }
