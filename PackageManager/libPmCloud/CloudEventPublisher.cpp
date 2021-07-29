@@ -13,6 +13,7 @@
 #include "CloudEventBuilder.h"
 #include <Windows.h>
 #include "PmLogger.h"
+#include "PmHttp.h"
 #include "json\json.h"
 
 CloudEventPublisher::CloudEventPublisher( IPmCloud& pmCloud, ICloudEventStorage& eventStorage, IPmConfig& pmConfig )
@@ -65,7 +66,7 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 {
     std::string eventResponse;
-    int32_t httpReturn = 0;
+    PmHttpExtendedResult eResult = {};
 
     std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -74,11 +75,12 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
         ( void* )eventJson.c_str(),
         eventJson.length(),
         eventResponse,
-        httpReturn );
+        eResult );
 
-    if( ( httpReturn < 200 || httpReturn >= 300 ) && ( httpReturn != 400 ) ) {
+    if( ( eResult.httpResponseCode < 200 || eResult.httpResponseCode >= 300 ) && 
+        ( eResult.httpResponseCode != 400 ) ) {
         m_eventStorage.SaveEvent( eventJson );
     }
 
-    return httpReturn;
+    return eResult.httpResponseCode;
 }

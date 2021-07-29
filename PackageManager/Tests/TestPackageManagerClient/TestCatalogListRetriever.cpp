@@ -20,7 +20,7 @@ protected:
 
         m_config->MakeGetCloudCatalogUriReturn( "uri" );
         m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
-        m_cloud->MakeGetReturn( 200 );
+        m_cloud->MakeGetReturn( true, "content", { 200, 0 } );
     }
 
     void TearDown()
@@ -77,20 +77,20 @@ TEST_F( TestCatalogListRetriever, WillCheckin )
 
 TEST_F( TestCatalogListRetriever, WillThrowIfResponseIsNot200 )
 {
-    m_cloud->MakeGetReturn( 404 );
+    m_cloud->MakeGetReturn( false, "", { 404, 0 } );
     EXPECT_THROW( m_patient->GetCloudCatalog(), std::exception );
 }
 
 TEST_F( TestCatalogListRetriever, WillRefreshTokenOn401Response )
 {
-    m_cloud->MakeGetReturn( 401 );
+    m_cloud->MakeGetReturn( false, "", { 401, 0 } );
     EXPECT_CALL( *m_ucidAdapter, Refresh() ).Times( 1 );
     EXPECT_THROW( m_patient->GetCloudCatalog(), std::exception );
 }
 
 TEST_F( TestCatalogListRetriever, WillSkipTokenRefreshWhenNot401Response )
 {
-    m_cloud->MakeGetReturn( 404 );
+    m_cloud->MakeGetReturn( false, "", { 404, 0 } );
     m_ucidAdapter->ExpectRefreshIsNotCalled();
     EXPECT_THROW( m_patient->GetCloudCatalog(), std::exception );
 }

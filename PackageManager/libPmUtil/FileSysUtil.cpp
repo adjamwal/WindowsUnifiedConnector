@@ -161,7 +161,7 @@ std::filesystem::path FileSysUtil::GetTempDir()
     return path;
 }
 
-int32_t FileSysUtil::DeleteFile( const std::filesystem::path& filePath )
+int32_t FileSysUtil::EraseFile( const std::filesystem::path& filePath )
 {
     int32_t rtn = -1;
  

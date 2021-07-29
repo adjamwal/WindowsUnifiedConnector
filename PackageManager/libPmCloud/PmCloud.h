@@ -12,20 +12,20 @@ public:
     PmCloud( IPmHttp& http );
     ~PmCloud();
 
-    void SetUri( const std::string& uri ) override;
+    void SetCheckinUri( const std::string& uri ) override;
     void SetToken( const std::string& token ) override;
     void SetCerts( const PmHttpCertList& certs ) override;
     void SetUserAgent( const std::string& userAgent ) override;
     void SetShutdownFunc( std::function<bool()> shutdownFunc ) override;
-    int32_t Checkin( const std::string& payload, std::string& response ) override;
-    int32_t Get( const std::string& url, std::string& response, int32_t& httpReturn ) override;
-    int32_t Post( const std::string& url, void* payload, size_t payloadSize, std::string& response, int32_t& httpReturn ) override;
-    int32_t DownloadFile( const std::string& uri, const std::filesystem::path& filename ) override;
+    bool Checkin( const std::string& payload, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
+    bool Get( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
+    bool Post( const std::string& url, const void* payload, size_t payloadSize, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
+    bool DownloadFile( const std::string& uri, const std::filesystem::path& filename, PmHttpExtendedResult& eResult ) override;
 
 private:
     IPmHttp& m_http;
     PmHttpCertList m_certs;
-    std::string m_uri;
+    std::string m_checkinUri;
     std::string m_token;
     std::string m_userAgent;
     std::function<bool()> m_shutdownFunc;

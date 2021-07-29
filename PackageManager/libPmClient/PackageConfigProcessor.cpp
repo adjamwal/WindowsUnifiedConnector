@@ -164,7 +164,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
             sha256.has_value() ? sha256.value() : config.sha256,
             m_fileUtil.FileSize( targetLocation ) );
 
-        if( m_fileUtil.DeleteFile( targetLocation ) != 0 )
+        if( m_fileUtil.EraseFile( targetLocation ) != 0 )
         {
             throw PackageException( __FUNCTION__ ": Failed to remove config " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
         }
@@ -198,7 +198,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 void PackageConfigProcessor::RemoveTempFile( const std::filesystem::path& tempFilePath )
 {
     LOG_ERROR( "Removing %s", tempFilePath.generic_u8string().c_str() );
-    if( m_fileUtil.DeleteFile( tempFilePath ) != 0 ) {
+    if( m_fileUtil.EraseFile( tempFilePath ) != 0 ) {
         LOG_ERROR( "Failed to remove %s", tempFilePath.generic_u8string().c_str() );
     }
 }

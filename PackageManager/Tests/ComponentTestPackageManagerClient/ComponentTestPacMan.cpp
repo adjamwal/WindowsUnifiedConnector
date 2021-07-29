@@ -176,7 +176,7 @@ protected:
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
         m_mockConfig->MakeAllowPostInstallRebootsReturn( true );
-        m_mockCloud->MakeGetReturn( 200 );
+        m_mockCloud->MakeGetReturn( true, "content", { 200, 0 } );
         m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
 
         m_patient->SetPlatformDependencies( m_mockDeps.get() );
@@ -265,11 +265,11 @@ std::string _ucReponseNoConfig( R"(
 TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoConfig, { 200, 0 } );
 
     m_mockFileUtil->MakeFileExistsReturn( true );
     m_mockFileUtil->MakeFileSizeReturn( 100 );
-    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockFileUtil->MakeEraseFileReturn( 0 );
     m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
@@ -321,11 +321,11 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackage )
 TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoConfig, { 200, 0 } );
 
     m_mockFileUtil->MakeFileExistsReturn( true );
     m_mockFileUtil->MakeFileSizeReturn( 100 );
-    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockFileUtil->MakeEraseFileReturn( 0 );
     m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
@@ -355,12 +355,11 @@ TEST_F( ComponentTestPacMan, PacManWillRebootWhenPackageUpdateSetsRequiredFlag )
 TEST_F( ComponentTestPacMan, PacManWillSendRebootEventWhenRebootIsFlagged )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).
-        WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoConfig ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoConfig, { 200, 0 } );
 
     m_mockFileUtil->MakeFileExistsReturn( true );
     m_mockFileUtil->MakeFileSizeReturn( 100 );
-    m_mockFileUtil->MakeDeleteFileReturn( 0 );
+    m_mockFileUtil->MakeEraseFileReturn( 0 );
     m_mockSslUtil->MakeCalculateSHA256Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
@@ -432,7 +431,7 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 {
     bool pass = false;
 
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseConfigOnly, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
 
     ON_CALL( *m_mockSslUtil, DecodeBase64( _, _ ) ).WillByDefault( Invoke(
@@ -466,7 +465,7 @@ TEST_F( ComponentTestPacMan, PacManWillDecodeConfig )
 TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseConfigOnly, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
@@ -495,7 +494,7 @@ TEST_F( ComponentTestPacMan, PacManWillVerifyConfig )
 TEST_F( ComponentTestPacMan, PacManWillMoveConfig )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigOnly ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseConfigOnly, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
@@ -540,7 +539,7 @@ std::string _ucReponseConfigWithoutVerify( R"(
 TEST_F( ComponentTestPacMan, PacManWillMoveConfigWithoutVerification )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseConfigWithoutVerify ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseConfigWithoutVerify, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
@@ -596,14 +595,14 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfig )
 {
     bool packageUpdated = false;
     bool configUpdated = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfig ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseWithConfig, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
     ON_CALL( *m_mockFileUtil, FileExists( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, EraseFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -722,14 +721,14 @@ TEST_F( ComponentTestPacMan, PacManWillUpdateMultiplePackageAndConfig )
 {
     int packageUpdated = 0;
     int configUpdated = 0;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseMultiPackageAndConfig ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseMultiPackageAndConfig, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
     ON_CALL( *m_mockFileUtil, FileExists( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, EraseFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
@@ -834,14 +833,14 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
 {
     bool packageUpdated = false;
     bool configUpdated = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseWithConfigCloudData ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseWithConfigCloudData, { 200, 0 } );
     m_mockFileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_mockFileUtil->MakeAppendFileReturn( 1 );
     m_mockPlatformComponentManager->MakeDeployConfigurationReturn( 0 );
 
     ON_CALL( *m_mockFileUtil, FileExists( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( true ) );
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
-    ON_CALL( *m_mockFileUtil, DeleteFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
+    ON_CALL( *m_mockFileUtil, EraseFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     
@@ -886,7 +885,7 @@ std::string _ucReponseNoPackages( R"(
 TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, GetInstalledPackages( _, _ ) )
         .WillOnce( Invoke(
@@ -911,7 +910,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendDicoveryList )
 TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
 
     EXPECT_CALL( *m_eventPublisher, PublishFailedEvents() ).WillOnce( Invoke(
         [this, &pass]()
@@ -933,7 +932,7 @@ TEST_F( ComponentTestPacMan, PacManWillSendFailedEvents )
 TEST_F( ComponentTestPacMan, PacManWillPruneInstallers )
 {
     bool pass = false;
-    ON_CALL( *m_mockCloud, Checkin( _, _ ) ).WillByDefault( DoAll( SetArgReferee<1>( _ucReponseNoPackages ), Return( 200 ) ) );
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
     EXPECT_CALL( *m_mockInstallerCacheMgr, PruneInstallers( _ ) ).WillOnce( Invoke(
         [this, &pass]( uint32_t ageInSeconds )
         {

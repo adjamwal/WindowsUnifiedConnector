@@ -2,17 +2,19 @@
 
 MockPmCloud::MockPmCloud()
 {
-    MakeCheckinReturn( int32_t() );
-    MakeDownloadFileReturn( int32_t() );
+    MakeCheckinReturn( bool(), "", {200, 0} );
+    MakeGetReturn( bool(), "", { 200, 0 } );
+    MakePostReturn( bool(), "", { 200, 0 } );
+    MakeDownloadFileReturn( bool(), {200, 0} );
 }
 
 MockPmCloud::~MockPmCloud()
 {
 }
 
-void MockPmCloud::ExpectSetUriIsNotCalled()
+void MockPmCloud::ExpectSetCheckinUriIsNotCalled()
 {
-    EXPECT_CALL( *this, SetUri( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, SetCheckinUri( _ ) ).Times( 0 );
 }
 
 void MockPmCloud::ExpectSetTokenIsNotCalled()
@@ -35,19 +37,25 @@ void MockPmCloud::ExpectSetShutdownFuncIsNotCalled()
     EXPECT_CALL( *this, SetShutdownFunc( _ ) ).Times( 0 );
 }
 
-void MockPmCloud::MakeCheckinReturn( int32_t value )
+void MockPmCloud::MakeCheckinReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, Checkin( _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, Checkin( _, _, _ ) ).WillByDefault( DoAll( 
+        ::testing::SetArgReferee<1>( responseContent ), 
+        ::testing::SetArgReferee<2>( eResult ), 
+        Return( retval ) ) );
 }
 
 void MockPmCloud::ExpectCheckinIsNotCalled()
 {
-    EXPECT_CALL( *this, Checkin( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, Checkin( _, _, _ ) ).Times( 0 );
 }
 
-void MockPmCloud::MakeGetReturn( int32_t value )
+void MockPmCloud::MakeGetReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, Get( _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<2>( value ), Return( value ) ) );
+    ON_CALL( *this, Get( _, _, _ ) ).WillByDefault( DoAll( 
+        ::testing::SetArgReferee<1>( responseContent ), 
+        ::testing::SetArgReferee<2>( eResult ), 
+        Return( retval ) ) );
 }
 
 void MockPmCloud::ExpectGetIsNotCalled()
@@ -55,9 +63,12 @@ void MockPmCloud::ExpectGetIsNotCalled()
     EXPECT_CALL( *this, Get( _, _, _ ) ).Times( 0 );
 }
 
-void MockPmCloud::MakePostReturn( int32_t value )
+void MockPmCloud::MakePostReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( value ), Return( value ) ) );
+    ON_CALL( *this, Post( _, _, _, _, _ ) ).WillByDefault( DoAll( 
+        ::testing::SetArgReferee<3>( responseContent ),
+        ::testing::SetArgReferee<4>( eResult ), 
+        Return( retval ) ) );
 }
 
 void MockPmCloud::ExpectPostIsNotCalled()
@@ -65,13 +76,15 @@ void MockPmCloud::ExpectPostIsNotCalled()
     EXPECT_CALL( *this, Post( _, _, _, _, _ ) ).Times( 0 );
 }
 
-void MockPmCloud::MakeDownloadFileReturn( int32_t value )
+void MockPmCloud::MakeDownloadFileReturn( bool retval, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, DownloadFile( _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, DownloadFile( _, _, _ ) ).WillByDefault( DoAll( 
+        ::testing::SetArgReferee<2>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmCloud::ExpectDownloadFileIsNotCalled()
 {
-    EXPECT_CALL( *this, DownloadFile( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, DownloadFile( _, _, _ ) ).Times( 0 );
 }
 

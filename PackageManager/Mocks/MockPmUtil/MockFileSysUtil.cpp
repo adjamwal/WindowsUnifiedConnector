@@ -84,14 +84,14 @@ void MockFileSysUtil::ExpectGetTempDirNotCalled()
     EXPECT_CALL( *this, GetTempDir() ).Times( 0 );
 }
 
-void MockFileSysUtil::MakeDeleteFileReturn( int32_t value )
+void MockFileSysUtil::MakeEraseFileReturn( int32_t value )
 {
-    ON_CALL( *this, DeleteFile( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, EraseFile( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockFileSysUtil::ExpectDeleteFileNotCalled()
+void MockFileSysUtil::ExpectEraseFileNotCalled()
 {
-    EXPECT_CALL( *this, DeleteFile( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, EraseFile( _ ) ).Times( 0 );
 }
 
 void MockFileSysUtil::MakeRenameReturn( int32_t value )

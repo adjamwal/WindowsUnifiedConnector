@@ -60,14 +60,14 @@ TEST_F( TestCloudEventPublisher, EventPublisherRetrievesTheEventUriFromConfig )
 
 TEST_F( TestCloudEventPublisher, EventPublisherCallsHttpPost )
 {
-    m_httpAdapter->MakePostReturn( 5 );
+    m_httpAdapter->MakePostReturn( true, "", { 5, 0 } );
     EXPECT_CALL( *m_httpAdapter, Post( _, _, _, _, _ ) ).Times( 1 );
     EXPECT_EQ( 5, m_eventPublisher->Publish( m_eventBuilder ) );
 }
 
 TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpError )
 {
-    m_httpAdapter->MakePostReturn( -1 );
+    m_httpAdapter->MakePostReturn( false, "", { -1, 0 } );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
 
@@ -76,7 +76,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpError )
 
 TEST_F( TestCloudEventPublisher, EventPublisherWillNotStoreMalformedEvents )
 {
-    m_httpAdapter->MakePostReturn( 400 );
+    m_httpAdapter->MakePostReturn( false, "", { 400, 0 } );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 0 );
 
@@ -85,7 +85,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherWillNotStoreMalformedEvents )
 
 TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpCode )
 {
-    m_httpAdapter->MakePostReturn( 401 );
+    m_httpAdapter->MakePostReturn( false, "", { 401, 0 } );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
 
@@ -94,7 +94,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherStoresFailedEventHttpCode )
 
 TEST_F( TestCloudEventPublisher, EventPublisherSuccessDoesntStoreEvent )
 {
-    m_httpAdapter->MakePostReturn( 200 );
+    m_httpAdapter->MakePostReturn( true, "", { 200, 0 } );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 0 );
 
@@ -105,7 +105,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherSendFailedEventsWithEmptyList )
 {
     std::vector<std::string> list = {};
 
-    m_httpAdapter->MakePostReturn( 0 );
+    m_httpAdapter->MakePostReturn( false, "", { 0, 0 } );
     m_eventStorage->MakeReadAndRemoveEventsReturn( list );
 
     EXPECT_CALL( *m_eventStorage, ReadAndRemoveEvents() ).Times( 1 );
@@ -120,7 +120,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherSendFailedEvents )
     list.push_back( m_eventBuilder.Build() );
     list.push_back( m_eventBuilderTwo.Build() );
 
-    m_httpAdapter->MakePostReturn( 0 );
+    m_httpAdapter->MakePostReturn( false, "", { 0, 0 } );
     m_eventStorage->MakeReadAndRemoveEventsReturn( list );
 
     EXPECT_CALL( *m_httpAdapter, Post( _, _, _, _, _ ) ).Times( 2 );
@@ -133,7 +133,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherSavesFailedEventsThatFailAgain )
     std::vector<std::string> list;
     list.push_back( m_eventBuilder.Build() );
 
-    m_httpAdapter->MakePostReturn( -1 );
+    m_httpAdapter->MakePostReturn( false, "", { -1, 0 } );
     m_eventStorage->MakeReadAndRemoveEventsReturn( list );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 1 );
@@ -146,7 +146,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherDoesntPublishInvalidFailedEvents 
     std::vector<std::string> list;
     list.push_back( "{ event : \"\" }" );
 
-    m_httpAdapter->MakePostReturn( -1 );
+    m_httpAdapter->MakePostReturn( false, "", { -1, 0 } );
     m_eventStorage->MakeReadAndRemoveEventsReturn( list );
 
     EXPECT_CALL( *m_httpAdapter, Post( _, _, _, _, _ ) ).Times( 0 );
@@ -159,7 +159,7 @@ TEST_F( TestCloudEventPublisher, EventPublisherDoesntSaveInvalidFailedEvents )
     std::vector<std::string> list;
     list.push_back( "{ event : \"\" }" );
 
-    m_httpAdapter->MakePostReturn( -1 );
+    m_httpAdapter->MakePostReturn( false, "", { -1, 0 } );
     m_eventStorage->MakeReadAndRemoveEventsReturn( list );
 
     EXPECT_CALL( *m_eventStorage, SaveEvent( Matcher<const std::string&>( _ ) ) ).Times( 0 );

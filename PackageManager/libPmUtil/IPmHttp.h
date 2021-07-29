@@ -22,10 +22,21 @@
 #endif
 #endif
 
+enum class USER_DEF_SUB_ERROR {
+    SC_MISSING_TOKEN    = 0x50000001
+};
+
 struct PmHttpCertList
 {
     X509** certificates;
     size_t count;
+};
+
+struct PmHttpExtendedResult
+{
+    int32_t httpResponseCode;
+    int32_t subErrorCode;
+    std::string subErrorType;
 };
 
 class IPmHttp
@@ -36,11 +47,11 @@ public:
     IPmHttp() {}
     virtual ~IPmHttp() {}
 
-    virtual int32_t Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& userAgent ) = 0;
-    virtual int32_t Deinit() = 0;
-    virtual int32_t SetToken( const std::string& token ) = 0;
-    virtual int32_t SetCerts( const PmHttpCertList& cert ) = 0;
-    virtual int32_t HttpGet( const std::string &url, std::string &response, int32_t &httpReturn ) = 0;
-    virtual int32_t HttpPost( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t &httpReturn ) = 0;
-    virtual int32_t HttpDownload( const std::string& url, const std::filesystem::path& filepath, int32_t &httpReturn ) = 0;
+    virtual bool Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& userAgent, PmHttpExtendedResult& eResult ) = 0;
+    virtual bool Deinit() = 0;
+    virtual bool SetToken( const std::string& token, PmHttpExtendedResult& eResult ) = 0;
+    virtual bool SetCerts( const PmHttpCertList& cert, PmHttpExtendedResult& eResult ) = 0;
+    virtual bool HttpGet( const std::string &url, std::string &responseContent, PmHttpExtendedResult& eResult ) = 0;
+    virtual bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) = 0;
+    virtual bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) = 0;
 };

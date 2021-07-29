@@ -3,6 +3,7 @@
 #include "IFileSysUtil.h"
 #include "ISslUtil.h"
 #include "IPmCloud.h"
+#include "PmHttp.h"
 #include "PmLogger.h"
 #include "PackageException.h"
 #include "PmConstants.h"
@@ -56,18 +57,25 @@ std::filesystem::path InstallerCacheManager::DownloadOrUpdateInstaller( const Pm
     }
 
     if( !installerValid ) {
-        int32_t httpResponse = 0;
-        if( ( httpResponse = m_pmCloud.DownloadFile( componentPackage.installerUrl, installerPath.string() ) ) != 200 ) {
+        PmHttpExtendedResult eResult = {};
+        if( !m_pmCloud.DownloadFile( componentPackage.installerUrl, installerPath.string(), eResult ) ) {
             ssError << "Failed to download " << componentPackage.installerUrl << " to \"" << installerPath.string() << "\".";
-            if( httpResponse > 0 )
+            if( eResult.httpResponseCode > 0 )
             {
-                ssError << " HTTP response: " << httpResponse;
+                ssError << " HTTP response: " << eResult.httpResponseCode;
             }
             else
             {
-                ssError << " Request timed out or unknown error.";
+                if( eResult.subErrorCode > 0 )
+                {
+                    ssError << " Internal HTTP error:" << eResult.subErrorCode;
+                }
+                else
+                {
+                    ssError << " Request timed out or unknown error.";
+                }
             }
-            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
+            throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD, eResult );
         }
         else if( !componentPackage.installerHash.empty() && 
                  !ValidateInstaller( componentPackage, installerPath ) )
@@ -88,7 +96,7 @@ void InstallerCacheManager::DeleteInstaller( const std::filesystem::path& instal
     }
 
     LOG_DEBUG( "Removing %s", installerPath.generic_u8string().c_str() );
-    if( m_fileUtil.DeleteFile( installerPath ) != 0 ) {
+    if( m_fileUtil.EraseFile( installerPath ) != 0 ) {
         LOG_ERROR( __FUNCTION__ ": Failed to remove %s", installerPath.generic_u8string().c_str() );
     }
 }
@@ -147,7 +155,7 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
 
             if( now - lwt > ageInSeconds ) {
                 LOG_DEBUG( "Removing file from cache: %s", file.generic_u8string().c_str() );
-                m_fileUtil.DeleteFile( file );
+                m_fileUtil.EraseFile( file );
             }
         }
     }

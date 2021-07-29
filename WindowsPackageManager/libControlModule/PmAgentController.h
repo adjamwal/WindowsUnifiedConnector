@@ -13,7 +13,7 @@
 #include <mutex>
 #include <string>
 #include <Windows.h>
-#include "PmTypes.h"
+#include "PmStatusTypes.h"
 
 #define PM_AGENT_BINARY "csc_pm.exe"
 #define BS_CONFIG_FILE "bs.json"

@@ -66,7 +66,7 @@ std::vector<std::string> CloudEventStorage::ReadAndRemoveEvents()
 
     auto ret = m_fileUtil.ReadFileLines( m_fullPath );
 
-    m_fileUtil.DeleteFile( m_fullPath );
+    m_fileUtil.EraseFile( m_fullPath );
 
     return ret;
 }

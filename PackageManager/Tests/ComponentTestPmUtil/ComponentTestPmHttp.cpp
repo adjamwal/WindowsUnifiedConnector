@@ -28,17 +28,18 @@ protected:
     void SetUp()
     {
         m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
-
+        m_eResult = {};
         m_patient.reset( new PmHttp( *m_fileUtil ) );
     }
 
     void TearDown()
     {
         m_patient.reset();
-
+        m_eResult = {};
         m_fileUtil.reset();
     }
 
+    PmHttpExtendedResult m_eResult;
     PmHttpCertList m_certList;
     std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<PmHttp> m_patient;
@@ -47,36 +48,34 @@ protected:
 TEST_F( ComponentTestPmHttp, GetTest )
 {
     std::string response;
-    int32_t rtn = 0;
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
 
-    m_patient->HttpGet( "https://postman-echo.com/get?foo1=bar1&foo2=bar2", response, rtn );
-    EXPECT_EQ( rtn, 200 );
+    m_patient->HttpGet( "https://postman-echo.com/get?foo1=bar1&foo2=bar2", response, m_eResult );
+    EXPECT_EQ( m_eResult.httpResponseCode, 200 );
 }
 
 TEST_F( ComponentTestPmHttp, PostTest )
 {
     std::string response;
     std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
-    int32_t rtn = 0;
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
     
-    m_patient->HttpPost( "https://postman-echo.com/post", ( void* )data.c_str(), data.length(), response, rtn );
+    m_patient->HttpPost( "https://postman-echo.com/post", ( void* )data.c_str(), data.length(), response, m_eResult );
 
-    EXPECT_EQ( rtn, 200 );
+    EXPECT_EQ( m_eResult.httpResponseCode, 200 );
 }
 
 TEST_F( ComponentTestPmHttp, DownloadTest )
 {
     std::string path( "filepath" );
-    int32_t rtn = 0;
+    
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
 
     InSequence s;
     EXPECT_CALL( *m_fileUtil, PmCreateFile( _ ) ).WillOnce( Return( ( FileUtilHandle* )1) );
@@ -86,51 +85,46 @@ TEST_F( ComponentTestPmHttp, DownloadTest )
         } ) );
     EXPECT_CALL( *m_fileUtil, CloseFile( _ ) );
 
-    m_patient->HttpDownload( "https://postman-echo.com/get", path, rtn );
+    m_patient->HttpDownload( "https://postman-echo.com/get", path, m_eResult );
 
-    EXPECT_EQ( rtn, 200 );
+    EXPECT_EQ( m_eResult.httpResponseCode, 200 );
 }
 
-TEST_F( ComponentTestPmHttp, HttpPostHttpProtocalIsNotValid )
+TEST_F( ComponentTestPmHttp, HttpPostHttpProtocolIsNotValid )
 {
     std::string response;
     std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
-    int32_t rtn = 0;
-    int32_t methodRtn = 0;
+    
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    bool success = m_patient->HttpPost( "http://postman-echo.com/post", (void*)data.c_str(), data.length(), response, m_eResult );
 
-    methodRtn = m_patient->HttpPost( "http://postman-echo.com/post", (void*)data.c_str(), data.length(), response, rtn );
-
-    EXPECT_NE( methodRtn, 0 );
+    EXPECT_NE( success, true );
 }
 
-TEST_F( ComponentTestPmHttp, HttpPostBlankProtocalIsNotValid )
+TEST_F( ComponentTestPmHttp, HttpPostBlankProtocolIsNotValid )
 {
     std::string response;
     std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
-    int32_t rtn = 0;
-    int32_t methodRtn = 0;
+    
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    bool success = m_patient->HttpPost( "postman-echo.com/post", (void*)data.c_str(), data.length(), response, m_eResult );
 
-    methodRtn = m_patient->HttpPost( "postman-echo.com/post", (void*)data.c_str(), data.length(), response, rtn );
-
-    EXPECT_NE( methodRtn, 0 );
+    EXPECT_NE( success, true );
 }
 
 TEST_F( ComponentTestPmHttp, GetWillClearResponse)
 {
     std::string badText = "Invalid Text";
     std::string response = badText;
-    int32_t rtn = 0;
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
 
-    m_patient->HttpGet( "https://postman-echo.com/get?foo1=bar1&foo2=bar2", response, rtn );
+    m_patient->HttpGet( "https://postman-echo.com/get?foo1=bar1&foo2=bar2", response, m_eResult );
 
     EXPECT_NE( response.find( badText ), 0 );
 }
@@ -140,12 +134,11 @@ TEST_F( ComponentTestPmHttp, PostWillClearResponse )
     std::string badText = "Invalid Text";
     std::string response = badText;
     std::string data( "{\"args\":{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}}" );
-    int32_t rtn = 0;
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->SetCerts( m_certList );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->SetCerts( m_certList, m_eResult );
 
-    m_patient->HttpPost( "https://postman-echo.com/post", ( void* )data.c_str(), data.length(), response, rtn );
+    m_patient->HttpPost( "https://postman-echo.com/post", ( void* )data.c_str(), data.length(), response, m_eResult );
 
     EXPECT_NE( response.find( badText ), 0 );
 }

@@ -9,33 +9,33 @@ public:
     MockPmHttp();
     ~MockPmHttp();
 
-    MOCK_METHOD3( Init, int32_t( PM_PROGRESS_CALLBACK, void*, const std::string& ) );
-    void MakeInitReturn( int32_t value );
+    MOCK_METHOD4( Init, bool( PM_PROGRESS_CALLBACK, void*, const std::string&, PmHttpExtendedResult& ) );
+    void MakeInitReturn( bool retval, const PmHttpExtendedResult& eResult );
     void ExpectInitIsNotCalled();
 
-    MOCK_METHOD0( Deinit, int32_t() );
-    void MakeDeinitReturn( int32_t value );
+    MOCK_METHOD0( Deinit, bool() );
+    void MakeDeinitReturn( bool retval );
     void ExpectDeinitIsNotCalled();
 
-    MOCK_METHOD1( SetToken, int32_t( const std::string& ) );
-    void MakeSetTokenReturn( int32_t value );
+    MOCK_METHOD2( SetToken, bool( const std::string&, PmHttpExtendedResult& ) );
+    void MakeSetTokenReturn( bool retval, const PmHttpExtendedResult& eResult );
     void ExpectSetTokenIsNotCalled();
 
-    MOCK_METHOD1( SetCerts, int32_t( const PmHttpCertList& ) );
-    void MakeSetCertsReturn( int32_t value );
+    MOCK_METHOD2( SetCerts, bool( const PmHttpCertList&, PmHttpExtendedResult& ) );
+    void MakeSetCertsReturn( bool retval, const PmHttpExtendedResult& eResult );
     void ExpectSetCertsIsNotCalled();
 
-    MOCK_METHOD3( HttpGet, int32_t( const std::string&, std::string&, int32_t& ) );
-    void MakeHttpGetReturn( int32_t value );
+    MOCK_METHOD3( HttpGet, bool( const std::string&, std::string&, PmHttpExtendedResult& ) );
+    void MakeHttpGetReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult );
     void ExpectHttpGetIsNotCalled();
 
-    MOCK_METHOD5( HttpPost, int32_t( const std::string&, void*, size_t, std::string&, int32_t& ) );
-    void MakeHttpPostReturn( int32_t value );
-    void MakeHttpPostReturn( int32_t value, int32_t httpResponse );
+    MOCK_METHOD5( HttpPost, bool( const std::string&, const void*, size_t, std::string&, PmHttpExtendedResult& ) );
+    void MakeHttpPostReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult );
     void ExpectHttpPostIsNotCalled();
 
-    MOCK_METHOD3( HttpDownload, int32_t( const std::string&, const std::string&, int32_t& ) );
-    void MakeHttpDownloadReturn( int32_t value );
+    MOCK_METHOD3( HttpDownload, bool( const std::string&, const std::string&, PmHttpExtendedResult& ) );
+    void MakeHttpDownloadReturn( bool retval, const PmHttpExtendedResult& eResult );
     void ExpectHttpDownloadIsNotCalled();
 
 };
+

@@ -12,10 +12,10 @@ PmCloud::~PmCloud()
 {
 }
 
-void PmCloud::SetUri( const std::string& uri )
+void PmCloud::SetCheckinUri( const std::string& uri )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    m_uri = uri;
+    m_checkinUri = uri;
 }
 
 void PmCloud::SetToken( const std::string& token )
@@ -42,62 +42,57 @@ void PmCloud::SetShutdownFunc( std::function<bool()> shutdownFunc )
     m_shutdownFunc = shutdownFunc;
 }
 
-int32_t PmCloud::Checkin( const std::string& payload, std::string& response )
+bool PmCloud::Checkin( const std::string& payload, std::string& responseContent, PmHttpExtendedResult& eResult )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
-
-    m_http.Init( _ProgressCallback, this, m_userAgent );
-    m_http.SetCerts( m_certs );
-    m_http.SetToken( m_token );
-
-    int32_t httpStatusResponse = 0;
-    m_http.HttpPost( m_uri, (void*)payload.c_str(), payload.length() + 1, response, httpStatusResponse );
-    m_http.Deinit();
-    return httpStatusResponse;
+    return Post( m_checkinUri, payload.c_str(), payload.length() + 1, responseContent, eResult );
 }
 
-int32_t PmCloud::Get( const std::string& url, std::string& response, int32_t& httpStatusResponse )
+bool PmCloud::Get( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_http.Init( _ProgressCallback, this, m_userAgent );
-    m_http.SetCerts( m_certs );
-    m_http.SetToken( m_token );
+    if( m_http.Init( _ProgressCallback, this, m_userAgent, eResult ) &&
+        m_http.SetCerts( m_certs, eResult ) &&
+        m_http.SetToken( m_token, eResult ) )
+    {
+        m_http.HttpGet( url, responseContent, eResult );
+    }
 
-    m_http.HttpGet( url, response, httpStatusResponse );
     m_http.Deinit();
 
-    return httpStatusResponse;
+    return eResult.httpResponseCode >= 200 && eResult.httpResponseCode <= 299;
 }
 
-int32_t PmCloud::Post( const std::string& url, void* payload, size_t payloadSize, std::string& response, int32_t& httpStatusResponse )
+bool PmCloud::Post( const std::string& url, const void* payload, size_t payloadSize, std::string& responseContent, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_http.Init( _ProgressCallback, this, m_userAgent );
-    m_http.SetCerts( m_certs );
-    m_http.SetToken( m_token );
-    
-    m_http.HttpPost( url, payload, payloadSize, response, httpStatusResponse );
+    if( m_http.Init( _ProgressCallback, this, m_userAgent, eResult ) &&
+        m_http.SetCerts( m_certs, eResult ) &&
+        m_http.SetToken( m_token, eResult ) )
+    {
+        m_http.HttpPost( url, payload, payloadSize, responseContent, eResult );
+    }
+
     m_http.Deinit();
 
-    return httpStatusResponse;
+    return eResult.httpResponseCode >= 200 && eResult.httpResponseCode <= 299;
 }
 
-int32_t PmCloud::DownloadFile( const std::string& uri, const std::filesystem::path& filename )
+bool PmCloud::DownloadFile( const std::string& uri, const std::filesystem::path& filename, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    
-    m_http.Init( _ProgressCallback, this, m_userAgent );
 
-    m_http.SetCerts( m_certs );
-    m_http.SetToken( m_token );
+    if( m_http.Init( _ProgressCallback, this, m_userAgent, eResult ) &&
+        m_http.SetCerts( m_certs, eResult ) &&
+        m_http.SetToken( m_token, eResult ) )
+    {
+        m_http.HttpDownload( uri, filename, eResult );
+    }
 
-    int32_t httpStatusResponse = 0;
-    m_http.HttpDownload( uri, filename, httpStatusResponse );
     m_http.Deinit();
 
-    return httpStatusResponse;
+    return eResult.httpResponseCode >= 200 && eResult.httpResponseCode <= 299;
 }
 
 int PmCloud::ProgressCallback( PM_TYPEOF_OFF_T dltotal, PM_TYPEOF_OFF_T dlnow, PM_TYPEOF_OFF_T ultotal, PM_TYPEOF_OFF_T ulnow )

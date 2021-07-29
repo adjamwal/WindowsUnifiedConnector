@@ -106,7 +106,6 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
             ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
             componentPackage.downloadErrorMsg = ssError.str();
         }
-
         
         rtn = PreDownloadedBinaryExists( componentPackage );
     }

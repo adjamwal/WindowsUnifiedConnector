@@ -176,7 +176,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PmAgentController.h" />
     <ClInclude Include="PmControlPlugin.h" />
-    <ClInclude Include="PmTypes.h" />
+    <ClInclude Include="PmStatusTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PmControlPlugin.cpp" />

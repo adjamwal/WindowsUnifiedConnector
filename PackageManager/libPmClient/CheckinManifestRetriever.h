@@ -19,6 +19,6 @@ private:
     ICertsAdapter& m_certsAdapter;
     std::mutex m_mutex;
 
-    int32_t InternalGetCheckinManifestFrom( std::string& uri, std::string& payload, std::string& response );
-    void ThrowHttpError( int32_t respStatus );
+    bool InternalGetCheckinManifestFrom( std::string& uri, std::string& payload, std::string& response, PmHttpExtendedResult& eResult );
+    void ThrowHttpError( PmHttpExtendedResult& eResult );
 };

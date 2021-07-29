@@ -15,7 +15,7 @@ protected:
         m_ucidAdapter.reset( new NiceMock<MockUcidAdapter>() );
         m_certs.reset( new NiceMock<MockCertsAdapter>() );
         m_patient.reset( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certs ) );
-        m_cloud->MakeCheckinReturn( 200 );
+        m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     }
 
     void TearDown()
@@ -34,17 +34,17 @@ protected:
 
 TEST_F( TestCheckinManifestRetriever, WillSetUri )
 {
-    m_cloud->MakeCheckinReturn( 200 );
+    m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
-    EXPECT_CALL( *m_cloud, SetUri( "testuri" ) ).Times( 1 );
+    EXPECT_CALL( *m_cloud, SetCheckinUri( "testuri" ) ).Times( 1 );
 
     m_patient->GetCheckinManifestFrom( "testuri", "testpayload" );
 }
 
 TEST_F( TestCheckinManifestRetriever, WillGetAccessToken )
 {
-    m_cloud->MakeCheckinReturn( 200 );
+    m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     EXPECT_CALL( *m_ucidAdapter, GetAccessToken() ).Times( 1 );
@@ -54,7 +54,7 @@ TEST_F( TestCheckinManifestRetriever, WillGetAccessToken )
 
 TEST_F( TestCheckinManifestRetriever, WillGetCertsList )
 {
-    m_cloud->MakeCheckinReturn( 200 );
+    m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     EXPECT_CALL( *m_certs, GetCertsList() ).Times( 1 );
@@ -64,7 +64,7 @@ TEST_F( TestCheckinManifestRetriever, WillGetCertsList )
 
 TEST_F( TestCheckinManifestRetriever, WillSetToken )
 {
-    m_cloud->MakeCheckinReturn( 200 );
+    m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     EXPECT_CALL( *m_cloud, SetToken( _ ) ).Times( 1 );
@@ -74,7 +74,7 @@ TEST_F( TestCheckinManifestRetriever, WillSetToken )
 
 TEST_F( TestCheckinManifestRetriever, WillSetCerts )
 {
-    m_cloud->MakeCheckinReturn( 200 );
+    m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     EXPECT_CALL( *m_cloud, SetCerts( _ ) ).Times( 1 );
@@ -84,26 +84,25 @@ TEST_F( TestCheckinManifestRetriever, WillSetCerts )
 
 TEST_F( TestCheckinManifestRetriever, WillCheckin )
 {
-    m_cloud->MakeCheckinReturn( 200 );
+    m_cloud->MakeCheckinReturn( true, "content", { 200, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
-    EXPECT_CALL( *m_cloud, Checkin( "testpayload", _ ) ).Times( 1 );
+    EXPECT_CALL( *m_cloud, Checkin( "testpayload", _, _ ) ).Times( 1 );
 
     m_patient->GetCheckinManifestFrom( "testuri", "testpayload" );
 }
 
 TEST_F( TestCheckinManifestRetriever, WillThrowIfResponseIsNot200 )
 {
-    m_cloud->MakeCheckinReturn( 404 );
+    m_cloud->MakeCheckinReturn( false, "", { 404, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     EXPECT_THROW( m_patient->GetCheckinManifestFrom( "testuri", "testpayload" ), std::exception );
-
 }
 
 TEST_F( TestCheckinManifestRetriever, WillRefreshTokenOnCheckinFailure )
 {
-    m_cloud->MakeCheckinReturn( 401 );
+    m_cloud->MakeCheckinReturn( false, "", { 401, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     EXPECT_CALL( *m_ucidAdapter, Refresh() ).Times( 1 );
@@ -112,7 +111,7 @@ TEST_F( TestCheckinManifestRetriever, WillRefreshTokenOnCheckinFailure )
 
 TEST_F( TestCheckinManifestRetriever, WillNotRefreshTokenWhenTokenIsAuthorized )
 {
-    m_cloud->MakeCheckinReturn( 404 );
+    m_cloud->MakeCheckinReturn( false, "", { 404, 0 } );
     m_ucidAdapter->MakeGetUcidTokenReturn( "token" );
 
     m_ucidAdapter->ExpectRefreshIsNotCalled();

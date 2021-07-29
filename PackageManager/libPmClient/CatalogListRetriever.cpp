@@ -21,18 +21,19 @@ std::string CatalogListRetriever::GetCloudCatalog()
     std::string uri = m_config.GetCloudCatalogUri();
 
     std::string catalogData;
-    int32_t httpStatusResponse = InternalGetCloudCatalogFrom( uri, catalogData );
+    PmHttpExtendedResult eResult = {};
+    InternalGetCloudCatalogFrom( uri, catalogData, eResult );
 
-    if( httpStatusResponse != 200 ) {
-        if( httpStatusResponse != 401 ) {
-            ThrowHttpError( httpStatusResponse );
+    if( eResult.httpResponseCode != 200 ) {
+        if( eResult.httpResponseCode != 401 ) {
+            ThrowHttpError( eResult );
         }
         else {
             m_ucidAdapter.Refresh();
-            httpStatusResponse = InternalGetCloudCatalogFrom( uri, catalogData );
+            InternalGetCloudCatalogFrom( uri, catalogData, eResult );
 
-            if( httpStatusResponse != 200 ) {
-                ThrowHttpError( httpStatusResponse );
+            if( eResult.httpResponseCode != 200 ) {
+                ThrowHttpError( eResult );
             }
         }
     }
@@ -40,26 +41,30 @@ std::string CatalogListRetriever::GetCloudCatalog()
     return catalogData;
 }
 
-int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std::string& responseData )
+int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std::string& responseData, PmHttpExtendedResult& eResult )
 {
+    eResult = {};
     std::string token = m_ucidAdapter.GetAccessToken();
     if( token.empty() ) {
-        return 0;
+        eResult.subErrorCode = ( int32_t )USER_DEF_SUB_ERROR::SC_MISSING_TOKEN;
+        return false;
     }
 
     m_cloud.SetToken( token );
     m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
 
-    int httpStatusResponse = 0;
-    m_cloud.Get( uri, responseData, httpStatusResponse );
-    LOG_DEBUG( "m_cloud.Get:\n------uri=%s\n------httpStatusResponse=%d\n------responseData=%s\n", 
-        uri.c_str(), httpStatusResponse, responseData.c_str() );
+    m_cloud.Get( uri, responseData, eResult );
+    LOG_DEBUG( "m_cloud.Get:\n------uri=%s\n------httpStatusResponse=%d\n------subError=%d\n------responseData=%s\n", 
+        uri.c_str(), eResult.httpResponseCode, eResult.subErrorCode, responseData.c_str() );
 
-    return httpStatusResponse;
+    return eResult.httpResponseCode;
 }
 
-void CatalogListRetriever::ThrowHttpError( int32_t httpStatusResponse )
+void CatalogListRetriever::ThrowHttpError( PmHttpExtendedResult& eResult )
 {
-    std::string s = __FUNCTION__ ": Http Get status " + std::to_string( httpStatusResponse );
+    std::string s = "CloudCatalog status code: " +
+        std::to_string( eResult.httpResponseCode ) +
+        ", sub_code " + std::to_string( eResult.subErrorCode );
+
     throw std::exception( s.c_str() );
 }

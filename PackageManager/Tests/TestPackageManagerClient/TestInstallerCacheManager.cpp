@@ -75,7 +75,7 @@ TEST_F( TestInstallerCacheManager, CanDeleteInstaller )
     std::filesystem::path installerPath = "SomePath";
 
     m_fileUtil->MakeFileExistsReturn( true );
-    EXPECT_CALL( *m_fileUtil, DeleteFile( installerPath ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( installerPath ) );
 
     m_patient->DeleteInstaller( installerPath );
 }
@@ -84,7 +84,7 @@ TEST_F( TestInstallerCacheManager, WontDeleteEmptyInstaller )
 {
     std::string installerPath = "";
 
-    m_fileUtil->ExpectDeleteFileNotCalled();
+    m_fileUtil->ExpectEraseFileNotCalled();
 
     m_patient->DeleteInstaller( installerPath );
 }
@@ -94,7 +94,7 @@ TEST_F( TestInstallerCacheManager, WontDeleteNonExistantInstaller )
     std::string installerPath = "SomePath";
 
     m_fileUtil->MakeFileExistsReturn( false );
-    m_fileUtil->ExpectDeleteFileNotCalled();
+    m_fileUtil->ExpectEraseFileNotCalled();
 
     m_patient->DeleteInstaller( installerPath );
 }
@@ -103,9 +103,9 @@ TEST_F( TestInstallerCacheManager, QaScenarioDeleteInstallerWhenHashIsEmpty )
 {
     m_component.installerHash = "";
 
-    m_cloud->MakeDownloadFileReturn( 200 );
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
-    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( _ ) );
 
     m_patient->DownloadOrUpdateInstaller( m_component );
 }
@@ -114,8 +114,9 @@ TEST_F( TestInstallerCacheManager, QaScenarioWillSanitizeDownloadPath )
 {
     m_component.installerHash = "";
 
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
-    EXPECT_CALL( *m_cloud, DownloadFile( _, PathContains( "test-1.0.0" ) ) ).WillOnce( Return( 200 ) );
+    EXPECT_CALL( *m_cloud, DownloadFile( _, PathContains( "test-1.0.0" ), _ ) );
 
     m_patient->DownloadOrUpdateInstaller( m_component );
 }
@@ -124,7 +125,7 @@ TEST_F( TestInstallerCacheManager, QaScenarioCanDownloadSuccessfully )
 {
     m_component.installerHash = "";
 
-    m_cloud->MakeDownloadFileReturn( 200 );
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_FALSE( m_patient->DownloadOrUpdateInstaller( m_component ).empty() );
@@ -140,7 +141,7 @@ TEST_F( TestInstallerCacheManager, WillNotDownloadInstallerIfValidInstallerExist
 
     m_cloud->ExpectDownloadFileIsNotCalled();
 
-    m_patient->DownloadOrUpdateInstaller( m_component);
+    m_patient->DownloadOrUpdateInstaller( m_component );
 }
 
 TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfValidationFails )
@@ -151,7 +152,7 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfValidationFails )
     ON_CALL( *m_fileUtil, FileExists( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( true ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( PathContains( m_component.installerHash ) ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( PathContains( m_component.installerHash ) ) );
 
     //Expected but uninteresting exception
     EXPECT_THROW( m_patient->DownloadOrUpdateInstaller( m_component ), PackageException );
@@ -162,7 +163,7 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfDownloadFails )
     std::optional<std::string> invalidSha;
     invalidSha.emplace( "Invalid Sha" );
 
-    m_cloud->MakeDownloadFileReturn( 200 );
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
     EXPECT_CALL( *m_fileUtil, FileExists( PathContains( m_component.installerHash ) ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
@@ -170,7 +171,7 @@ TEST_F( TestInstallerCacheManager, WillDeleteInstallerIfDownloadFails )
         .WillOnce( Return( true ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( invalidSha ) );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( PathContains( m_component.installerHash ) ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( PathContains( m_component.installerHash ) ) );
 
     //Expected but uninteresting exception
     EXPECT_THROW( m_patient->DownloadOrUpdateInstaller( m_component ), PackageException );
@@ -180,6 +181,7 @@ TEST_F( TestInstallerCacheManager, CanDownloadInstallerSuccessfully )
 {
     std::optional<std::string> sha;
     sha.emplace( m_component.installerHash );
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
 
     EXPECT_CALL( *m_fileUtil, FileExists( PathContains( m_component.installerHash ) ) )
         .WillOnce( Return( false ) )
@@ -187,7 +189,7 @@ TEST_F( TestInstallerCacheManager, CanDownloadInstallerSuccessfully )
         .WillOnce( Return( true ) );
     ON_CALL( *m_sslUtil, CalculateSHA256( PathContains( m_component.installerHash ) ) ).WillByDefault( Return( sha ) );
 
-    EXPECT_CALL( *m_cloud, DownloadFile( _, PathContains( m_component.installerHash ) ) ).WillOnce( Return( 200 ) );
+    EXPECT_CALL( *m_cloud, DownloadFile( _, PathContains( m_component.installerHash ), _ ) );
 
     m_patient->DownloadOrUpdateInstaller( m_component );
 }
@@ -196,7 +198,7 @@ TEST_F( TestInstallerCacheManager, DownloadingSuccessfullyWillReturnPath )
     std::optional<std::string> sha;
     sha.emplace( m_component.installerHash );
 
-    m_cloud->MakeDownloadFileReturn( 200 );
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
     EXPECT_CALL( *m_fileUtil, FileExists( PathContains( m_component.installerHash ) ) )
         .WillOnce( Return( false ) )
         .WillOnce( Return( false ) )
@@ -220,14 +222,14 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteFile )
     std::vector<std::filesystem::path> searchResults = { "Path1.exe" };
 
     m_patient->Initialize( m_deps.get() );
-    ON_CALL( *m_componentMgr, FileSearchWithWildCard ).WillByDefault( DoAll( 
-        SetArgReferee<1>( searchResults ), 
-        Return( 0 ) 
+    ON_CALL( *m_componentMgr, FileSearchWithWildCard ).WillByDefault( DoAll(
+        SetArgReferee<1>( searchResults ),
+        Return( 0 )
     ) );
     m_fileUtil->MakeLastWriteTimeReturn( lastWriteTime );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( searchResults[0] ) );
-    
+    EXPECT_CALL( *m_fileUtil, EraseFile( searchResults[ 0 ] ) );
+
     m_patient->PruneInstallers( age );
 }
 
@@ -244,7 +246,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillIgnoreNonExpiredFile )
     ) );
     m_fileUtil->MakeLastWriteTimeReturn( lastWriteTime );
 
-    m_fileUtil->ExpectDeleteFileNotCalled();
+    m_fileUtil->ExpectEraseFileNotCalled();
 
     m_patient->PruneInstallers( age );
 }
@@ -262,7 +264,7 @@ TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteMultipleFile )
     ) );
     m_fileUtil->MakeLastWriteTimeReturn( lastWriteTime );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) ).Times( ( int )searchResults.size() );
+    EXPECT_CALL( *m_fileUtil, EraseFile( _ ) ).Times( ( int )searchResults.size() );
 
     m_patient->PruneInstallers( age );
 }
@@ -271,7 +273,7 @@ TEST_F( TestInstallerCacheManager, ResultCode200WillNotThrow )
 {
     m_component.installerHash = "";
 
-    m_cloud->MakeDownloadFileReturn( 200 );
+    m_cloud->MakeDownloadFileReturn( true, { 200, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_NO_THROW( m_patient->DownloadOrUpdateInstaller( m_component ) );
@@ -281,7 +283,7 @@ TEST_F( TestInstallerCacheManager, ResultCodeOtherThan200WillThrow )
 {
     m_component.installerHash = "";
 
-    m_cloud->MakeDownloadFileReturn( 400 );
+    m_cloud->MakeDownloadFileReturn( false, { 400, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
 
     EXPECT_THROW( m_patient->DownloadOrUpdateInstaller( m_component ), PackageException );
@@ -291,7 +293,7 @@ TEST_F( TestInstallerCacheManager, ResultCodeLessThan200WillBeReportedAsGenericE
 {
     m_component.installerHash = "";
 
-    m_cloud->MakeDownloadFileReturn( 0 );
+    m_cloud->MakeDownloadFileReturn( false, { 0, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
 
     std::string errorMessage = "";
@@ -299,7 +301,7 @@ TEST_F( TestInstallerCacheManager, ResultCodeLessThan200WillBeReportedAsGenericE
     {
         m_patient->DownloadOrUpdateInstaller( m_component );
     }
-    catch( PackageException &ex )
+    catch( PackageException& ex )
     {
         errorMessage = ex.what();
     }
@@ -311,7 +313,7 @@ TEST_F( TestInstallerCacheManager, ResultCodeOver200WillBeReportedAsHttpErrorInE
 {
     m_component.installerHash = "";
 
-    m_cloud->MakeDownloadFileReturn( 300 );
+    m_cloud->MakeDownloadFileReturn( false, { 300, 0 } );
     m_fileUtil->MakeFileExistsReturn( true );
 
     std::string errorMessage = "";

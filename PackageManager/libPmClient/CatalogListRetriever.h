@@ -20,6 +20,6 @@ private:
     ICertsAdapter& m_certsAdapter;
     IPmConfig& m_config;
 
-    int32_t InternalGetCloudCatalogFrom( std::string& uri, std::string& response );
-    void ThrowHttpError( int32_t respStatus );
+    int32_t InternalGetCloudCatalogFrom( std::string& uri, std::string& response, PmHttpExtendedResult& eResult );
+    void ThrowHttpError( PmHttpExtendedResult& eResult );
 };

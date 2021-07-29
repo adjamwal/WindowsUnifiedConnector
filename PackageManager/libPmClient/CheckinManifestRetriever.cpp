@@ -16,46 +16,52 @@ CheckinManifestRetriever::~CheckinManifestRetriever()
 std::string CheckinManifestRetriever::GetCheckinManifestFrom( std::string uri, std::string payload )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    std::string response;
-    int32_t httpStatusResponse;
+    std::string responseContent;
+    PmHttpExtendedResult eResult = {};
 
-    httpStatusResponse = InternalGetCheckinManifestFrom( uri, payload, response );
-    
-    if ( httpStatusResponse != 200 ) {
-        if ( httpStatusResponse != 401 ) {
-            ThrowHttpError( httpStatusResponse );
+    InternalGetCheckinManifestFrom( uri, payload, responseContent, eResult );
+
+    if( eResult.httpResponseCode != 200 ) {
+        if( eResult.httpResponseCode != 401 ) {
+            ThrowHttpError( eResult );
         }
         else {
             m_ucidAdapter.Refresh();
-            httpStatusResponse = InternalGetCheckinManifestFrom( uri, payload, response );
+            InternalGetCheckinManifestFrom( uri, payload, responseContent, eResult );
 
-            if ( httpStatusResponse != 200 ) {
-                ThrowHttpError( httpStatusResponse );
+            if( eResult.httpResponseCode != 200 ) {
+                ThrowHttpError( eResult );
             }
         }
     }
 
-    return response;
+    return responseContent;
 }
 
-int32_t CheckinManifestRetriever::InternalGetCheckinManifestFrom( std::string& uri, std::string& payload, std::string& response )
+bool CheckinManifestRetriever::InternalGetCheckinManifestFrom( std::string& uri, std::string& payload, std::string& responseContent, PmHttpExtendedResult& eResult )
 {
+    eResult = {};
     std::string token = m_ucidAdapter.GetAccessToken();
-    if ( token.empty() ) {
-        return 0;
+
+    if( token.empty() ) {
+        eResult.subErrorCode = ( int32_t )USER_DEF_SUB_ERROR::SC_MISSING_TOKEN;
+        return false;
     }
 
-    m_cloud.SetUri( uri );
+    m_cloud.SetCheckinUri( uri );
     m_cloud.SetToken( token );
     m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
 
     LOG_DEBUG( "Checkin uri:%s, payload:%s", uri.c_str(), payload.c_str() );
 
-    return m_cloud.Checkin( payload, response );
+    return m_cloud.Checkin( payload, responseContent, eResult );
 }
 
-void CheckinManifestRetriever::ThrowHttpError( int32_t httpStatusResponse )
+void CheckinManifestRetriever::ThrowHttpError( PmHttpExtendedResult& eResult )
 {
-    std::string s = __FUNCTION__ ": Http Post status " + std::to_string( httpStatusResponse );
+    std::string s = "Checkin status code: " +
+        std::to_string( eResult.httpResponseCode ) + 
+        ", sub_code " + std::to_string( eResult.subErrorCode );
+
     throw std::exception( s.c_str() );
 }

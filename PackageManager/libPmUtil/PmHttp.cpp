@@ -27,7 +27,7 @@ size_t PmHttp::WriteFile( void* ptr, size_t size, size_t nmemb, WriteFileCtx* da
     return size * nmemb;
 }
 
-int PmHttp::X509_subj_name( const X509* cert, char** subj_name ) 
+int PmHttp::X509_subj_name( const X509* cert, char** subj_name )
 {
     int rc = -1;
 
@@ -60,7 +60,7 @@ int PmHttp::X509_subj_name( const X509* cert, char** subj_name )
             rc = 0;
         }
     }
-    
+
     if( NULL != bio_out ) {
         BIO_free( bio_out );
     }
@@ -70,7 +70,7 @@ int PmHttp::X509_subj_name( const X509* cert, char** subj_name )
 
 CURLcode PmHttp::SslCallback( CURL* curl, void* sslctx, void* param )
 {
-    PmHttpCertList *certList = ( PmHttpCertList* )param;
+    PmHttpCertList* certList = ( PmHttpCertList* )param;
     CURLcode cb_ret = CURLE_ABORTED_BY_CALLBACK;
 
     ( void )curl; /* UNUSED */
@@ -131,84 +131,87 @@ PmHttp::~PmHttp()
     FreeCerts();
 }
 
-int32_t PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& agent )
+bool PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& agent, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    CURLcode rtn = CURLE_OK;
+    eResult = { 0, CURLE_OK, "curl" };
 
     if( m_curlHandle ) {
         WLOG_ERROR( L"PmHttp Instance already initialized" );
-        return rtn;
+        eResult.subErrorCode = CURLE_ALREADY_COMPLETE;
+        return true;
     }
 
     m_curlHandle = curl_easy_init();
     if( !m_curlHandle ) {
         WLOG_ERROR( L"curl_easy_init failed" );
-        return -1;
+        eResult.subErrorCode = CURLE_FAILED_INIT;
+        return false;
     }
 
     if( !agent.empty() ) {
         m_userAgent = agent;
     }
 
-    rtn = curl_easy_setopt( m_curlHandle, CURLOPT_USERAGENT, m_userAgent.c_str() );
-    if( rtn != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_USERAGENT failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_USERAGENT, m_userAgent.c_str() );
+    if( eResult.subErrorCode != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_USERAGENT failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_FOLLOWLOCATION, 1L ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_FOLLOWLOCATION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
-    } 
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_FOLLOWLOCATION, 1L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_FOLLOWLOCATION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
     /* abort if transfer is slower than 30 bytes/sec during 120 seconds */
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_LOW_SPEED_TIME, 120L ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_LOW_SPEED_TIME failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_LOW_SPEED_TIME, 120L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_LOW_SPEED_TIME failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_LOW_SPEED_LIMIT, 30L ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_LOW_SPEED_LIMIT failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_LOW_SPEED_LIMIT, 30L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_LOW_SPEED_LIMIT failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
 #if 0
 #if defined ( WIN32 )
     // CURLSSLOPT_NATIVE_CA is new in Curl 7.71. This tells curl to use the windows cert store. This is a beta feature
     // Otherwise we need to manually fetch the certs
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_FOLLOWLOCATION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_FOLLOWLOCATION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
 #endif
 #endif
     else if( callback ) {
-        if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
-            LOG_ERROR( "CURLOPT_XFERINFOFUNCTION failed on function %x %d:%s", callback, rtn, curl_easy_strerror( rtn ) );
+        if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_XFERINFOFUNCTION failed on function %x %d:%s", callback, eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
         }
-        else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFODATA, ctx ) ) != CURLE_OK ) {
-            LOG_ERROR( "CURLOPT_XFERINFODATA failed on data %x %d:%s", ctx, rtn, curl_easy_strerror( rtn ) );
+        else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFODATA, ctx ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_XFERINFODATA failed on data %x %d:%s", ctx, eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
         }
     }
 
-    return rtn;
+    return eResult.subErrorCode == CURLE_OK;
 }
 
-int32_t PmHttp::Deinit()
+bool PmHttp::Deinit()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
     if( !m_curlHandle ) {
         WLOG_DEBUG( L"curl was not initialized" );
-        return 0;
+        return false;
     }
 
     curl_easy_cleanup( m_curlHandle );
     m_curlHandle = NULL;
 
-    return 0;
+    return true;
 }
 
-int32_t PmHttp::SetToken( const std::string& token )
+bool PmHttp::SetToken( const std::string& token, PmHttpExtendedResult& eResult )
 {
-    CURLcode rtn = CURLE_OK;
     std::lock_guard<std::mutex> lock( m_mutex );
+    eResult = { 0, CURLE_OK, "curl" };
 
     if( !m_curlHandle ) {
         WLOG_ERROR( L"curl was not initialized" );
-        return -1;
+        eResult.subErrorCode = CURLE_FAILED_INIT;
+        return false;
     }
 
     m_token = "X-Identity-Token: " + token;
@@ -220,11 +223,11 @@ int32_t PmHttp::SetToken( const std::string& token )
 
     m_headerList = curl_slist_append( m_headerList, m_token.c_str() );
 
-    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_HTTPHEADER, m_headerList ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_HTTPHEADER failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_HTTPHEADER, m_headerList ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_HTTPHEADER failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
 
-    return rtn;
+    return eResult.subErrorCode == CURLE_OK;
 }
 
 void PmHttp::FreeCerts()
@@ -238,14 +241,15 @@ void PmHttp::FreeCerts()
     m_certList.count = 0;
 }
 
-int32_t PmHttp::SetCerts( const PmHttpCertList& cert )
+bool PmHttp::SetCerts( const PmHttpCertList& cert, PmHttpExtendedResult& eResult )
 {
-    CURLcode rtn = CURLE_OK;
     std::lock_guard<std::mutex> lock( m_mutex );
+    eResult = { 0, CURLE_OK, "curl" };
 
     if( !m_curlHandle ) {
         WLOG_ERROR( L"curl was not initialized" );
-        return -1;
+        eResult.subErrorCode = CURLE_FAILED_INIT;
+        return false;
     }
 
     FreeCerts();
@@ -260,176 +264,185 @@ int32_t PmHttp::SetCerts( const PmHttpCertList& cert )
     }
 
     if( m_certList.count ) {
-        if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_CTX_FUNCTION, SslCallback ) ) != CURLE_OK ) {
-            LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+        if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_CTX_FUNCTION, SslCallback ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
         }
-        else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_CTX_DATA, &m_certList ) ) != CURLE_OK ) {
-            LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
-        }
-    }
-
-    if( rtn == CURLE_OK ) {
-        if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_USE_SSL, CURLUSESSL_ALL ) ) != CURLE_OK ) {
-            LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+        else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_CTX_DATA, &m_certList ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
         }
     }
 
-    return rtn;
+    if( eResult.subErrorCode == CURLE_OK ) {
+        if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_USE_SSL, CURLUSESSL_ALL ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        }
+    }
+
+    return eResult.subErrorCode == CURLE_OK;
 }
 
-int32_t PmHttp::HttpGet( const std::string& url, std::string& response, int32_t &httpReturn )
+bool PmHttp::HttpGet( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    CURLcode rtn = CURLE_OK;
+    eResult = { 0, CURLE_OK, "curl" };
+    responseContent.clear();
 
     if( !m_curlHandle ) {
         WLOG_ERROR( L"curl was not initialized" );
-        return -1;
+        eResult.subErrorCode = CURLE_FAILED_INIT;
+        return false;
     }
 
     if( url.empty() ) {
         WLOG_ERROR( L"Url was not provided" );
-        return -1;
+        eResult.subErrorCode = CURLE_URL_MALFORMAT;
+        return false;
     }
 
-    response.clear();
-    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &response ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &responseContent ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_HTTPGET, 1L ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_HTTPGET, 1L ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_POST failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (rtn = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
-        LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
+        LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &httpReturn ) ) ) {
-        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &eResult.httpResponseCode ) ) ) {
+        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else {
-        LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
+        LOG_DEBUG( "Curl request to %s succeeded. Http responseContent code %d", url.c_str(), eResult.httpResponseCode );
     }
 
-    return rtn;
+    return eResult.subErrorCode == CURLE_OK;
 }
 
-int32_t PmHttp::HttpPost( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t &httpReturn )
+bool PmHttp::HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    CURLcode rtn = CURLE_OK;
+    eResult = { 0, CURLE_OK, "curl" };
+    responseContent.clear();
 
     if( !m_curlHandle ) {
         WLOG_ERROR( L"curl was not initialized" );
-        return -1;
+        eResult.subErrorCode = CURLE_FAILED_INIT;
+        return false;
     }
 
     if( url.empty() ) {
         WLOG_ERROR( L"Url was not provided" );
-        return -1;
+        eResult.subErrorCode = CURLE_URL_MALFORMAT;
+        return false;
     }
 
     if( !data || !dataSize ) {
         WLOG_ERROR( L"post data was not provided" );
-        return -1;
+        eResult.subErrorCode = CURLE_HTTP_POST_ERROR;
+        return false;
     }
 
-    response.clear();
-    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteString ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &response ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &responseContent ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 1 ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 1 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_POST failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (rtn = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDS, data ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDS, data ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDSIZE, dataSize ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDSIZE, dataSize ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
-        LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
+        LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &httpReturn ) ) ) {
-        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &eResult.httpResponseCode ) ) ) {
+        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else {
-        LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
+        LOG_DEBUG( "Curl request to %s succeeded. Http responseContent code %d", url.c_str(), eResult.httpResponseCode );
     }
 
-    return rtn;
+    return eResult.subErrorCode == CURLE_OK;
 }
 
-int32_t PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& filepath, int32_t &httpReturn )
+bool PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
-    CURLcode rtn = CURLE_OK;
+    eResult = { 0, CURLE_OK, "curl" };
     WriteFileCtx ctx = { &m_fileUtil, NULL };
 
     if( !m_curlHandle ) {
         WLOG_ERROR( L"curl was not initialized" );
-        return -1;
+        eResult.subErrorCode = CURLE_FAILED_INIT;
+        return false;
     }
 
     if( url.empty() ) {
         WLOG_ERROR( L"Url was not provided" );
-        return -1;
+        eResult.subErrorCode = CURLE_URL_MALFORMAT;
+        return false;
     }
 
     if( filepath.empty() ) {
         WLOG_ERROR( L"filepath was not provided" );
-        return -1;
+        eResult.subErrorCode = CURLE_BAD_FUNCTION_ARGUMENT;
+        return false;
     }
 
     ctx.handle = m_fileUtil.PmCreateFile( filepath );
     if( ctx.handle == NULL ) {
         LOG_ERROR( "failed to create file %s", filepath.generic_u8string().c_str() );
-        return -1;
+        eResult.subErrorCode = CURLE_WRITE_ERROR;
+        return false;
     }
 
-    if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteFile ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEFUNCTION, WriteFile ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEFUNCTION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &ctx ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_WRITEDATA, &ctx ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 0 ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_POST failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POST, 0 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_POST failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (rtn = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
-        LOG_ERROR( "curl_easy_perform failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
+        LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( rtn = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &httpReturn ) ) ) {
-        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", rtn, curl_easy_strerror( rtn ) );
+    else if( ( eResult.subErrorCode = curl_easy_getinfo( m_curlHandle, CURLINFO_RESPONSE_CODE, &eResult.httpResponseCode ) ) ) {
+        LOG_ERROR( "CURLINFO_RESPONSE_CODE failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else {
-        LOG_DEBUG( "Curl request to %s succeeded. Http response code %d", url.c_str(), httpReturn );
+        LOG_DEBUG( "Curl request to %s succeeded. Http responseContent code %d", url.c_str(), eResult.httpResponseCode );
     }
 
     m_fileUtil.CloseFile( ctx.handle );
     ctx.handle = NULL;
 
-    return rtn;
+    return eResult.subErrorCode == CURLE_OK;
 }

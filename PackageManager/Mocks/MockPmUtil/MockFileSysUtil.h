@@ -36,9 +36,9 @@ public:
     void MakeGetTempDirReturn( std::filesystem::path value );
     void ExpectGetTempDirNotCalled();
 
-    MOCK_METHOD1( DeleteFile, int32_t( const std::filesystem::path& ) );
-    void MakeDeleteFileReturn( int32_t value );
-    void ExpectDeleteFileNotCalled();
+    MOCK_METHOD1( EraseFile, int32_t( const std::filesystem::path& ) );
+    void MakeEraseFileReturn( int32_t value );
+    void ExpectEraseFileNotCalled();
 
     MOCK_METHOD2( Rename, int32_t( const std::filesystem::path&, const std::filesystem::path& ) );
     void MakeRenameReturn( int32_t value );

@@ -14,13 +14,13 @@ public:
     PmHttp( IFileSysUtil& fileUtil );
     ~PmHttp();
 
-    int32_t Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& agent ) override;
-    int32_t Deinit() override;
-    int32_t SetToken( const std::string& token ) override;
-    int32_t SetCerts( const PmHttpCertList& cert ) override;
-    int32_t HttpGet( const std::string& url, std::string& response, int32_t &httpReturn ) override;
-    int32_t HttpPost( const std::string& url, void* data, size_t dataSize, std::string& response, int32_t &httpReturn ) override;
-    int32_t HttpDownload( const std::string& url, const std::filesystem::path& filepath, int32_t &httpReturn ) override;
+    bool Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& agent, PmHttpExtendedResult& eResult ) override;
+    bool Deinit() override;
+    bool SetToken( const std::string& token, PmHttpExtendedResult& eResult ) override;
+    bool SetCerts( const PmHttpCertList& cert, PmHttpExtendedResult& eResult ) override;
+    bool HttpGet( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
+    bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
+    bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) override;
 
 private:
     IFileSysUtil& m_fileUtil;

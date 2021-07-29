@@ -260,7 +260,7 @@ TEST_F( TestPackageConfigProcessor, WillRemoveTempConfig )
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
     m_fileUtil->MakeAppendFileReturn( 0 );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( _ ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( _ ) );
 
     m_patient->ProcessConfig( m_configInfo );
 }
@@ -273,7 +273,7 @@ TEST_F( TestPackageConfigProcessor, WillDeleteConfig )
 
     m_fileUtil->MakeFileExistsReturn( true );
 
-    EXPECT_CALL( *m_fileUtil, DeleteFile( m_configInfo.installLocation / m_configInfo.path ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( m_configInfo.installLocation / m_configInfo.path ) );
 
     m_patient->ProcessConfig( m_configInfo );
 }
@@ -311,7 +311,7 @@ TEST_F( TestPackageConfigProcessor, WillNotDeleteConfigWithoutValidPath )
 
     m_fileUtil->MakeAppendPathReturn( "" );
 
-    m_fileUtil->ExpectDeleteFileNotCalled();
+    m_fileUtil->ExpectEraseFileNotCalled();
 
     m_patient->ProcessConfig( m_configInfo );
 }

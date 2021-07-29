@@ -71,14 +71,14 @@ protected:
     {
         ResetFakes();
         m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
-
+        m_eResult = {};
         m_patient.reset( new PmHttp( *m_fileUtil ) );
     }
 
     void TearDown()
     {
         m_patient.reset();
-
+        m_eResult = {};
         m_fileUtil.reset();
     }
 
@@ -96,10 +96,11 @@ protected:
     void InitPatient()
     {
         curl_easy_init_fake.return_val = ( CURL* )1;
-        m_patient->Init( NULL, NULL, "" );
+        m_patient->Init( NULL, NULL, "", m_eResult );
         ResetFakes();
     }
 
+    PmHttpExtendedResult m_eResult;
     std::unique_ptr<MockFileSysUtil> m_fileUtil;
     std::unique_ptr<PmHttp> m_patient;
 };
@@ -108,8 +109,8 @@ TEST_F( TestPmHttp, WillOnlyInitOnce )
 {
     curl_easy_init_fake.return_val = ( CURL* )1;
 
-    m_patient->Init( NULL, NULL, "" );
-    m_patient->Init( NULL, NULL, "" );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+    m_patient->Init( NULL, NULL, "", m_eResult );
 
     EXPECT_EQ( curl_easy_init_fake.call_count, 1 );
 }
@@ -118,7 +119,7 @@ TEST_F( TestPmHttp, InitWillNotSetCallback )
 {
     curl_easy_init_fake.return_val = ( CURL* )1;
 
-    m_patient->Init( NULL, (void*)1, "" );
+    m_patient->Init( NULL, (void*)1, "", m_eResult );
 
     EXPECT_FALSE( FindCurlOpt( CURLOPT_XFERINFOFUNCTION ) );
     EXPECT_FALSE( FindCurlOpt( CURLOPT_XFERINFODATA ) );
@@ -128,7 +129,7 @@ TEST_F( TestPmHttp, InitWillSetCallback )
 {
     curl_easy_init_fake.return_val = ( CURL* )1;
 
-    m_patient->Init( xferCallback, NULL, "" );
+    m_patient->Init( xferCallback, NULL, "", m_eResult );
 
     EXPECT_TRUE( FindCurlOpt( CURLOPT_XFERINFOFUNCTION ) );
     EXPECT_TRUE( FindCurlOpt( CURLOPT_XFERINFODATA ) );
@@ -138,7 +139,7 @@ TEST_F( TestPmHttp, InitWillSucceed )
 {
     curl_easy_init_fake.return_val = ( CURL* )1;
 
-    EXPECT_EQ( m_patient->Init( NULL, NULL, "" ), CURLE_OK );
+    EXPECT_EQ( m_patient->Init( NULL, NULL, "", m_eResult ), true );
 }
 
 TEST_F( TestPmHttp, InitWillFail )
@@ -146,12 +147,15 @@ TEST_F( TestPmHttp, InitWillFail )
     curl_easy_init_fake.return_val = ( CURL* )1;
     curl_easy_setopt_fake.return_val = CURL_LAST;
 
-    EXPECT_EQ( m_patient->Init( NULL, NULL, "" ), curl_easy_setopt_fake.return_val );
+    m_patient->Init( NULL, NULL, "", m_eResult );
+
+    EXPECT_EQ( m_eResult.subErrorCode, curl_easy_setopt_fake.return_val );
 }
 
 TEST_F( TestPmHttp, DeInitWillSucceed )
 {
-    EXPECT_EQ( m_patient->Deinit(), CURLE_OK );
+    InitPatient();
+    EXPECT_EQ( m_patient->Deinit(), true );
 }
 
 TEST_F( TestPmHttp, DeinitWillCleanup )
@@ -165,133 +169,125 @@ TEST_F( TestPmHttp, DeinitWillCleanup )
 TEST_F( TestPmHttp, HttpGetFailsWhenNotInitialize )
 {
     std::string response;
-    int32_t httpRtn = 0;
 
-    EXPECT_NE( m_patient->HttpGet( "http://", response, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpGet( "http://", response, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpGetFailsWithEmptyURL )
 {
     std::string response;
-    int32_t httpRtn = 0;
 
     InitPatient();
 
-    EXPECT_NE( m_patient->HttpGet( "", response, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpGet( "", response, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpGetWillRun )
 {
     std::string response;
-    int32_t httpRtn = 0;
 
     InitPatient();
 
-    EXPECT_EQ( m_patient->HttpGet( "https://", response, httpRtn ), CURLE_OK );
+    EXPECT_EQ( m_patient->HttpGet( "https://", response, m_eResult ), true );
     EXPECT_EQ( curl_easy_perform_fake.call_count, 1 );
 }
 
 TEST_F( TestPmHttp, HttpPostFailsWhenNotInitialize )
 {
     std::string response;
-    int32_t httpRtn = 0;
+    
     int32_t data = 0;
 
-    EXPECT_NE( m_patient->HttpPost( "http://", &data, sizeof(data), response, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpPost( "http://", &data, sizeof(data), response, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpPostFailsWithEmptyURL )
 {
     std::string response;
-    int32_t httpRtn = 0;
+    
     int32_t data = 0;
 
     InitPatient();
 
-    EXPECT_NE( m_patient->HttpPost( "", &data, sizeof( data ), response, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpPost( "", &data, sizeof( data ), response, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpPostFailsWithInvalidData )
 {
     std::string response;
-    int32_t httpRtn = 0;
+    
     int32_t data = 0;
 
     InitPatient();
 
-    EXPECT_NE( m_patient->HttpPost( "http://", NULL, sizeof( data ), response, httpRtn ), CURLE_OK );
-    EXPECT_NE( m_patient->HttpPost( "http://", &data, 0, response, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpPost( "http://", NULL, sizeof( data ), response, m_eResult ), true );
+    EXPECT_NE( m_patient->HttpPost( "http://", &data, 0, response, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpPostWillRun )
 {
     std::string response;
-    int32_t httpRtn = 0;
     int32_t data = 0;
 
     InitPatient();
 
-    EXPECT_EQ( m_patient->HttpPost( "http://", &data, sizeof( data ), response, httpRtn ), CURLE_OK );
+    EXPECT_EQ( m_patient->HttpPost( "http://", &data, sizeof( data ), response, m_eResult ), true );
     EXPECT_EQ( curl_easy_perform_fake.call_count, 1 );
 }
 
-TEST_F( TestPmHttp, HttpDownlaodFailsWhenNotInitialize )
+TEST_F( TestPmHttp, HttpDownloadFailsWhenNotInitialized )
 {
     std::string filepath = "FilePath";
-    int32_t httpRtn = 0;
     
-    EXPECT_NE( m_patient->HttpDownload( "http://", filepath, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpDownload( "http://", filepath, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpDownloadFailsWithEmptyURL )
 {
     std::string filepath = "FilePath";
-    int32_t httpRtn = 0;
 
     InitPatient();
 
-    EXPECT_NE( m_patient->HttpDownload( "", filepath, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpDownload( "", filepath, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpDownloadFailsWithInvalidFilePath )
 {
     std::string filepath;
-    int32_t httpRtn = 0;
 
     InitPatient();
 
-    EXPECT_NE( m_patient->HttpDownload( "http://", filepath, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpDownload( "http://", filepath, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpDownloadFailsWhenFileIsntCreated )
 {
     std::string filepath;
-    int32_t httpRtn = 0;
 
     InitPatient();
     m_fileUtil->MakePmCreateFileReturn( NULL );
 
-    EXPECT_NE( m_patient->HttpDownload( "http://", filepath, httpRtn ), CURLE_OK );
+    EXPECT_NE( m_patient->HttpDownload( "http://", filepath, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, HttpDownloadWillRun )
 {
     std::string filepath = "FilePath";
-    int32_t httpRtn = 0;
+    
 
     InitPatient();
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
 
-    EXPECT_EQ( m_patient->HttpDownload( "http://", filepath, httpRtn ), CURLE_OK );
+    EXPECT_EQ( m_patient->HttpDownload( "http://", filepath, m_eResult ), true );
     EXPECT_EQ( curl_easy_perform_fake.call_count, 1 );
 }
 
@@ -299,44 +295,44 @@ TEST_F( TestPmHttp, HttpDownloadWillRun )
 TEST_F( TestPmHttp, HttpDownloadWillCloseFile )
 {
     std::string filepath = "FilePath";
-    int32_t httpRtn = 0;
+    
 
     InitPatient();
     m_fileUtil->MakePmCreateFileReturn( ( FileUtilHandle* )1 );
 
     EXPECT_CALL( *m_fileUtil, CloseFile( ( FileUtilHandle* )1 ) );
 
-    m_patient->HttpDownload( "http://", filepath, httpRtn );
+    m_patient->HttpDownload( "http://", filepath, m_eResult );
 }
 
 TEST_F( TestPmHttp, SetTokenFailsWhenNotInitialize )
 {
     std::string token( "MyToken" );
 
-    EXPECT_NE( m_patient->SetToken( token ), CURLE_OK );
+    EXPECT_NE( m_patient->SetToken( token, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
 TEST_F( TestPmHttp, SetTokenWillSucceed )
 {
     std::string token( "MyToken" );
-    int32_t httpRtn = 0;
+    
 
     InitPatient();
     curl_slist_append_fake.return_val = ( struct curl_slist* )1;
 
-    EXPECT_EQ( m_patient->SetToken( token ), CURLE_OK );
+    EXPECT_EQ( m_patient->SetToken( token, m_eResult ), true );
 }
 
 TEST_F( TestPmHttp, SetTokenWillUpdateHeader )
 {
     std::string token( "MyToken" );
-    int32_t httpRtn = 0;
+    
 
     InitPatient();
     curl_slist_append_fake.return_val = ( struct curl_slist* )1;
 
-    m_patient->SetToken( token );
+    m_patient->SetToken( token, m_eResult );
 
     EXPECT_NE( std::string( curl_slist_append_fake.arg1_val ).find( token ), std::string::npos );
     EXPECT_TRUE( FindCurlOpt( CURLOPT_HTTPHEADER ) );
@@ -346,13 +342,13 @@ TEST_F( TestPmHttp, SetTokenWillUpdateHeader )
 TEST_F( TestPmHttp, SetTokenFreePreviousToken )
 {
     std::string token( "MyToken" );
-    int32_t httpRtn = 0;
+    
 
     InitPatient();
     curl_slist_append_fake.return_val = ( struct curl_slist* )1;
 
-    m_patient->SetToken( token );
-    m_patient->SetToken( token );
+    m_patient->SetToken( token, m_eResult );
+    m_patient->SetToken( token, m_eResult );
     
     EXPECT_EQ( curl_slist_free_all_fake.call_count, 1 );
 }
@@ -361,7 +357,7 @@ TEST_F( TestPmHttp, SetCertsFailsWhenNotInitialize )
 {
     PmHttpCertList certs{};
 
-    EXPECT_NE( m_patient->SetCerts( certs ), CURLE_OK );
+    EXPECT_NE( m_patient->SetCerts( certs, m_eResult ), true );
     EXPECT_EQ( curl_easy_setopt_fake.call_count, 0 );
 }
 
@@ -372,5 +368,5 @@ TEST_F( TestPmHttp, SetCertWillSucceed )
     InitPatient();
     curl_slist_append_fake.return_val = ( struct curl_slist* )1;
 
-    EXPECT_EQ( m_patient->SetCerts( certs ), CURLE_OK );
+    EXPECT_EQ( m_patient->SetCerts( certs, m_eResult ), true );
 }

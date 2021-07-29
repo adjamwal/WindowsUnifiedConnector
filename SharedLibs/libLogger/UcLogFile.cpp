@@ -289,7 +289,7 @@ void UcLogFile::CleanLogs()
             strFilePath = strFilePath.substr( 0, pos + 1 );
 
         strFilePath.append( *it );
-        DeleteFile( strFilePath.c_str() );
+        ::DeleteFile( strFilePath.c_str() );
         logFileSet.erase( it );
     }
 }

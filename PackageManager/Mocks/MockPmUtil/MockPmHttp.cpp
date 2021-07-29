@@ -2,32 +2,34 @@
 
 MockPmHttp::MockPmHttp()
 {
-    MakeInitReturn( int32_t() );
-    MakeDeinitReturn( int32_t() );
-    MakeSetTokenReturn( int32_t() );
-    MakeSetCertsReturn( int32_t() );
-    MakeHttpGetReturn( int32_t() );
-    MakeHttpPostReturn( int32_t(), 200 );
-    MakeHttpDownloadReturn( int32_t() );
+    MakeInitReturn( bool(), {} );
+    MakeDeinitReturn( bool() );
+    MakeSetTokenReturn( bool(), {} );
+    MakeSetCertsReturn( bool(), {} );
+    MakeHttpGetReturn( bool(), "", { 200, 0 } );
+    MakeHttpPostReturn( bool(), "", { 200, 0 } );
+    MakeHttpDownloadReturn( bool(), { 200, 0 } );
 }
 
 MockPmHttp::~MockPmHttp()
 {
 }
 
-void MockPmHttp::MakeInitReturn( int32_t value )
+void MockPmHttp::MakeInitReturn( bool retval, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, Init( _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, Init( _, _, _, _ ) ).WillByDefault( DoAll(
+        ::testing::SetArgReferee<3>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmHttp::ExpectInitIsNotCalled()
 {
-    EXPECT_CALL( *this, Init( _, _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, Init( _, _, _, _ ) ).Times( 0 );
 }
 
-void MockPmHttp::MakeDeinitReturn( int32_t value )
+void MockPmHttp::MakeDeinitReturn( bool retval )
 {
-    ON_CALL( *this, Deinit() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, Deinit() ).WillByDefault( Return( retval ) );
 }
 
 void MockPmHttp::ExpectDeinitIsNotCalled()
@@ -35,29 +37,36 @@ void MockPmHttp::ExpectDeinitIsNotCalled()
     EXPECT_CALL( *this, Deinit() ).Times( 0 );
 }
 
-void MockPmHttp::MakeSetTokenReturn( int32_t value )
+void MockPmHttp::MakeSetTokenReturn( bool retval, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, SetToken( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, SetToken( _, _ ) ).WillByDefault( DoAll(
+        ::testing::SetArgReferee<1>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmHttp::ExpectSetTokenIsNotCalled()
 {
-    EXPECT_CALL( *this, SetToken( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, SetToken( _, _ ) ).Times( 0 );
 }
 
-void MockPmHttp::MakeSetCertsReturn( int32_t value )
+void MockPmHttp::MakeSetCertsReturn( bool retval, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, SetCerts( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, SetCerts( _, _ ) ).WillByDefault( DoAll(
+        ::testing::SetArgReferee<1>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmHttp::ExpectSetCertsIsNotCalled()
 {
-    EXPECT_CALL( *this, SetCerts( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, SetCerts( _, _ ) ).Times( 0 );
 }
 
-void MockPmHttp::MakeHttpGetReturn( int32_t value )
+void MockPmHttp::MakeHttpGetReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, HttpGet( _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, HttpGet( _, _, _ ) ).WillByDefault( DoAll(
+        ::testing::SetArgReferee<1>( responseContent ),
+        ::testing::SetArgReferee<2>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmHttp::ExpectHttpGetIsNotCalled()
@@ -65,14 +74,12 @@ void MockPmHttp::ExpectHttpGetIsNotCalled()
     EXPECT_CALL( *this, HttpGet( _, _, _ ) ).Times( 0 );
 }
 
-void MockPmHttp::MakeHttpPostReturn( int32_t value  )
+void MockPmHttp::MakeHttpPostReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, HttpPost( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( 200 ), Return( value ) ) );
-}
-
-void MockPmHttp::MakeHttpPostReturn( int32_t value, int32_t httpResponse )
-{
-    ON_CALL( *this, HttpPost( _, _, _, _, _ ) ).WillByDefault( DoAll( ::testing::SetArgReferee<4>( httpResponse ), Return( value ) ) );
+    ON_CALL( *this, HttpPost( _, _, _, _, _ ) ).WillByDefault( DoAll(
+        ::testing::SetArgReferee<3>( responseContent ),
+        ::testing::SetArgReferee<4>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmHttp::ExpectHttpPostIsNotCalled()
@@ -80,9 +87,11 @@ void MockPmHttp::ExpectHttpPostIsNotCalled()
     EXPECT_CALL( *this, HttpPost( _, _, _, _, _ ) ).Times( 0 );
 }
 
-void MockPmHttp::MakeHttpDownloadReturn( int32_t value )
+void MockPmHttp::MakeHttpDownloadReturn( bool retval, const PmHttpExtendedResult& eResult )
 {
-    ON_CALL( *this, HttpDownload( _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, HttpDownload( _, _, _ ) ).WillByDefault( DoAll(
+        ::testing::SetArgReferee<2>( eResult ),
+        Return( retval ) ) );
 }
 
 void MockPmHttp::ExpectHttpDownloadIsNotCalled()
