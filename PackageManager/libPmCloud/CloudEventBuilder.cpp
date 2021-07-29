@@ -204,7 +204,9 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
 
                     isValid &= JsonUtil::ExtractJsonInt( error, "code", orig_errCode );
                     isValid &= JsonUtil::ExtractJsonString( error, "msg", orig_errMessage );
-                    if( JsonUtil::ExtractJsonInt( error, "sub_code", orig_subErrCode ) && orig_subErrCode != 0 )
+                    if( !error[ "sub_code" ].isNull() &&
+                        JsonUtil::ExtractJsonInt( error, "sub_code", orig_subErrCode ) &&
+                        orig_subErrCode != 0 )
                     {
                         isValid &= JsonUtil::ExtractJsonString( error, "sub_type", orig_subErrType );
                     }
@@ -255,7 +257,7 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
             .WithError( orig_errCode, orig_errMessage )
             .WithSubError( orig_subErrCode, orig_subErrType )
             .WithFrom( orig_fromVersion )
-            .WithTse( orig_tse);
+            .WithTse( orig_tse );
     }
 
     return isValid;
@@ -277,8 +279,7 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
         m_newPath == other.m_newPath &&
         m_newHash._Equal( other.m_newHash ) &&
         m_newSize == other.m_newSize &&
-        m_fromVersion == other.m_fromVersion &&
-        m_tse == other.m_tse;
+        m_fromVersion == other.m_fromVersion;
 
     if( !result )
     {
@@ -351,7 +352,7 @@ std::string CloudEventBuilder::Serialize()
         }
     }
 
-    if( m_errCode != 0 )
+    if( m_errCode != 0 || m_subErrCode != 0 )
     {
         Json::Value error;
         error[ "code" ] = ( unsigned )m_errCode;
