@@ -117,23 +117,36 @@ void UCIDLoader::LoadControlModule()
 
     std::wstring ucidDllDir;
     std::wstring dllFullPath;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID", L"Path", ucidDllDir ) )
-    {
-        WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module data from registry" );
-        return;
-    }
+    std::wstring ucidControlPluginKey;
 
-    dllFullPath = ucidDllDir;
-
-    if(WindowsUtilities::Is64BitWindows() )
+    if ( WindowsUtilities::Is64BitWindows() )
     {
-        dllFullPath.append( L"x64\\" );
+        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x64";
     }
     else
     {
-        dllFullPath.append( L"x86\\" );
+        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x86";
     }
-    dllFullPath.append( L"ucidcontrolplugin.dll" );
+
+    if ( !WindowsUtilities::ReadRegistryString(
+        HKEY_LOCAL_MACHINE,
+        L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID",
+        L"Path",
+        ucidDllDir ) )
+    {
+        WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module folder path from registry" );
+        return;
+    }
+
+    if( !WindowsUtilities::ReadRegistryString( 
+        HKEY_LOCAL_MACHINE, 
+        ucidControlPluginKey,
+        L"ucidcontrolplugin", 
+        dllFullPath ) )
+    {
+        WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module dll path from registry" );
+        return;
+    }
 
     std::wstring pmConfigPath;
 

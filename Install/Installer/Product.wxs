@@ -219,7 +219,7 @@
             <Component Id="UCDT_SHORTCUT_PATH_REGISTRY" Guid="*">
               <RegistryKey Root="HKLM"
              Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
-                <RegistryValue Type="string" Name="ucdt Shortcut" Value="[CiscoProgramMenuFolder]\!(loc.DiagToolName).lnk" KeyPath="yes"/>
+                <RegistryValue Type="string" Name="ucdt Shortcut" Value="[CiscoProgramMenuFolder]!(loc.DiagToolName).lnk" KeyPath="yes"/>
               </RegistryKey>
             </Component>
           
@@ -306,6 +306,34 @@
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
                     <RegistryValue Type="string" Name="Path" Value="[UCID_DIRECTORY]" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+            
+            <Component Id="UCID_API_FILE_PATH_REGISTRY_X86" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x86">
+                    <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X86]ucidapi.dll" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="UCID_CONTROL_FILE_PATH_REGISTRY_X86" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x86">
+                    <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X86]ucidcontrolplugin.dll" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+            
+            <Component Id="UCID_API_FILE_PATH_REGISTRY_X64" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x64">
+                    <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X64]ucidapi.dll" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="UCID_CONTROL_FILE_PATH_REGISTRY_X64" Guid="*">
+                <RegistryKey Root="HKLM"
+							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x64">
+                    <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X64]ucidcontrolplugin.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 

@@ -10,6 +10,12 @@
 #define UCID_API_GET_TOKEN_FUNCTION_NAME "ucid_get_token"
 #define UCID_API_REFRESH_TOKEN_FUNCTION_NAME "ucid_refresh_token"
 
+#if defined(_WIN64)
+#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x64"
+#else
+#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x86"
+#endif
+
 UCIDApiDll::UCIDApiDll( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
     , m_api( 0 )
@@ -180,27 +186,17 @@ bool UCIDApiDll::LoadApi()
         return true;
     }
 
-    std::wstring ucidDllDir;
     std::wstring dllFullPath;
 
     if( !WindowsUtilities::ReadRegistryString( 
         HKEY_LOCAL_MACHINE, 
-        L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID", 
-        L"Path", 
-        ucidDllDir ) )
+        UCID_API_DLL_KEY,
+        L"ucidapi",
+        dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read UnifiedConnectorID Api data from registry" );
         return false;
     }
-
-    dllFullPath = ucidDllDir;
-    //running process can only load a dll of the same bitness as itself
-#if defined(_WIN64)
-    dllFullPath.append( L"x64\\" );
-#else
-    dllFullPath.append( L"x86\\" );
-#endif
-    dllFullPath.append( L"ucidapi.dll" );
 
     try
     {
