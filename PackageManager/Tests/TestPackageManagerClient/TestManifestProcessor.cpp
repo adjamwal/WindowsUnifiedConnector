@@ -50,7 +50,10 @@ protected:
                 "installerHash",
                 "downloadedInstallerPath",
                 "", //downloadErrorMsg
-                true
+                0,  //downloadErrorSubCode
+                "", //downloadErrorSubType
+                true,
+                {}
         };
 
         for( int i = 0; i < componentCount; i++ )

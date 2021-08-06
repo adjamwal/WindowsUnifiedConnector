@@ -101,6 +101,8 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
         catch( PackageException& ex ) {
             ssError << ex.what();
             componentPackage.downloadErrorMsg = ssError.str();
+            componentPackage.downloadErrorSubCode = ex.whatSubCode();
+            componentPackage.downloadErrorSubType = ex.whatSubType();
         }
         catch( ... ) {
             ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;

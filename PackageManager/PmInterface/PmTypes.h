@@ -28,6 +28,8 @@ struct PmComponent
     std::string installerHash;
     std::filesystem::path downloadedInstallerPath;
     std::string downloadErrorMsg; //cached pre-download error msg
+    int32_t downloadErrorSubCode; //cached pre-download error sub_code
+    std::string downloadErrorSubType; //cached pre-download error sub_type
     bool postInstallRebootRequired;
     std::vector<PackageConfigInfo> configs;
 };
