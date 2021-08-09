@@ -76,8 +76,7 @@ protected:
             "installerHash",
             "downloadedInstallerPath",
             "", //downloadErrorMsg
-            0,  //downloadErrorSubCode
-            "", //downloadErrorSubType
+            {}, //downloadSubError
             false,
             {}
         };

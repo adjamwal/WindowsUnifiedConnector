@@ -123,7 +123,7 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        m_eventBuilder.WithSubError( ex.whatSubCode(), ex.whatSubType() );
+        m_eventBuilder.WithSubError( ex.whatSubError().subErrorCode, ex.whatSubError().subErrorType );
         LOG_ERROR( "%s", ex.what() );
     }
     catch( std::exception& ex )
@@ -176,7 +176,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     catch( PackageException& ex )
     {
         m_eventBuilder.WithError( ex.whatCode(), ex.what() );
-        m_eventBuilder.WithSubError( ex.whatSubCode(), ex.whatSubType() );
+        m_eventBuilder.WithSubError( ex.whatSubError().subErrorCode, ex.whatSubError().subErrorType );
         LOG_ERROR( "%s", ex.what() );
     }
     catch( std::exception& ex )

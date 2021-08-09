@@ -54,8 +54,7 @@ protected:
             "installerHash",
             "downloadedInstallerPath",
             "", //downloadErrorMsg
-            0,  //downloadErrorSubCode
-            "", //downloadErrorSubType
+            {}, //downloadSubError
             false,
             {}
         };
@@ -319,8 +318,7 @@ TEST_F( TestInstallerCacheManager, ResultCodeOver200WillBeReportedAsHttpErrorInE
     m_fileUtil->MakeFileExistsReturn( true );
 
     std::string errorMessage = "";
-    int errorSubCode = 0;
-    std::string errorSubType = "";
+    PmHttpExtendedResult extendedError = {};
     try
     {
         m_patient->DownloadOrUpdateInstaller( m_component );
@@ -328,12 +326,11 @@ TEST_F( TestInstallerCacheManager, ResultCodeOver200WillBeReportedAsHttpErrorInE
     catch( PackageException& ex )
     {
         errorMessage = ex.what();
-        errorSubCode = ex.whatSubCode();
-        errorSubType = ex.whatSubType();
+        extendedError = ex.whatSubError();
     }
 
     EXPECT_TRUE( errorMessage.find( "HTTP response: 300" ) != std::string::npos );
-    EXPECT_EQ( 123, errorSubCode );
-    EXPECT_STREQ( "subtype", errorSubType.c_str() );
+    EXPECT_EQ( 123, extendedError.subErrorCode );
+    EXPECT_STREQ( "subtype", extendedError.subErrorType.c_str() );
 }
 

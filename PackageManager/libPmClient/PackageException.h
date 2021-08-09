@@ -2,7 +2,7 @@
 
 #include  <exception>
 #include  <string>
-#include  "IPmHttp.h"
+#include  "PmTypes.h"
 
 class PackageException final : public std::exception
 {
@@ -15,8 +15,7 @@ public:
         PackageException( msg.c_str(), errCode, eResult ) {}
 
     int whatCode() const { return m_errCode; }
-    int whatSubCode() const { return m_eResult.subErrorCode; }
-    const std::string& whatSubType() const { return m_eResult.subErrorType; }
+    const PmHttpExtendedResult& whatSubError() const { return m_eResult; }
 
 private:
     int m_errCode;

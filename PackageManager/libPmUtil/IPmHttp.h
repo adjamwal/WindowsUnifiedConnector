@@ -4,6 +4,7 @@
 #include <string>
 #include <openssl/x509.h>
 #include <filesystem>
+#include "PmTypes.h"
 
 #if _WIN32 || _WIN64
 #if _WIN64
@@ -30,13 +31,6 @@ struct PmHttpCertList
 {
     X509** certificates;
     size_t count;
-};
-
-struct PmHttpExtendedResult
-{
-    int32_t httpResponseCode;
-    int32_t subErrorCode;
-    std::string subErrorType;
 };
 
 class IPmHttp

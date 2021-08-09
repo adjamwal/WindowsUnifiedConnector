@@ -17,6 +17,13 @@ struct PackageConfigInfo
     bool deleteConfig;
 };
 
+struct PmHttpExtendedResult
+{
+    int32_t httpResponseCode;
+    int32_t subErrorCode;
+    std::string subErrorType;
+};
+
 struct PmComponent
 {
     std::string productAndVersion; //e.g. "uc/1.0.0.150"
@@ -28,8 +35,7 @@ struct PmComponent
     std::string installerHash;
     std::filesystem::path downloadedInstallerPath;
     std::string downloadErrorMsg; //cached pre-download error msg
-    int32_t downloadErrorSubCode; //cached pre-download error sub_code
-    std::string downloadErrorSubType; //cached pre-download error sub_type
+    PmHttpExtendedResult downloadSubError; //cached pre-download httpResponseCode, sub_code, sub_type
     bool postInstallRebootRequired;
     std::vector<PackageConfigInfo> configs;
 };

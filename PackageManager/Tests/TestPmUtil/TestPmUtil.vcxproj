@@ -106,7 +106,7 @@
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,7 +124,7 @@
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,7 +142,7 @@
       <PreprocessorDefinitions>CURL_STATICLIB;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,7 +160,7 @@
       <PreprocessorDefinitions>CURL_STATICLIB;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

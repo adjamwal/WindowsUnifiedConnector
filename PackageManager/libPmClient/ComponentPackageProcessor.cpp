@@ -101,14 +101,13 @@ bool ComponentPackageProcessor::DownloadPackageBinary( PmComponent& componentPac
         catch( PackageException& ex ) {
             ssError << ex.what();
             componentPackage.downloadErrorMsg = ssError.str();
-            componentPackage.downloadErrorSubCode = ex.whatSubCode();
-            componentPackage.downloadErrorSubType = ex.whatSubType();
+            componentPackage.downloadSubError = ex.whatSubError();
         }
         catch( ... ) {
             ssError << "Unknown exception while pre-downloading " << componentPackage.installerUrl;
             componentPackage.downloadErrorMsg = ssError.str();
         }
-        
+
         rtn = PreDownloadedBinaryExists( componentPackage );
     }
 
@@ -162,10 +161,18 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         try {
             if( !PreDownloadedBinaryExists( componentPackage ) ) {
                 if( !componentPackage.downloadErrorMsg.empty() )
+                {
                     ssError << componentPackage.downloadErrorMsg;
+                }
                 else
+                {
                     ssError << "Failed to pre-download " << componentPackage.installerUrl;
-                throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD );
+                }
+                throw PackageException(
+                    ssError.str(),
+                    UCPM_EVENT_ERROR_COMPONENT_DOWNLOAD,
+                    componentPackage.downloadSubError
+                );
             }
 
             tempSha256 = m_sslUtil.CalculateSHA256( componentPackage.downloadedInstallerPath );
@@ -213,9 +220,9 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
             rtn = true;
         }
         catch( PackageException& ex ) {
-            m_eventBuilder.WithError(ex.whatCode(), ex.what());
-            m_eventBuilder.WithSubError(ex.whatSubCode(), ex.whatSubType());
-            LOG_ERROR("%s", ex.what());
+            m_eventBuilder.WithError( ex.whatCode(), ex.what() );
+            m_eventBuilder.WithSubError( ex.whatSubError().subErrorCode, ex.whatSubError().subErrorType );
+            LOG_ERROR( "%s", ex.what() );
         }
         catch( std::exception& ex ) {
             m_eventBuilder.WithError( UCPM_EVENT_ERROR_UNDEFINED_EXCEPTION, ex.what() );
