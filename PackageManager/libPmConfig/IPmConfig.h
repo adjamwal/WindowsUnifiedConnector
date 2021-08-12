@@ -23,7 +23,8 @@ public:
     virtual const std::string& GetCloudCatalogUri() = 0;
     virtual uint32_t GetCloudCheckinIntervalMs() = 0;
     virtual uint32_t GetLogLevel() = 0;
-    virtual uint32_t GetMaxFileCacheAge() = 0;
+    virtual uint32_t GetMaxFileCacheAgeS() = 0;
+    virtual uint32_t GetMaxEventTtlS() = 0;
     virtual bool AllowPostInstallReboots() = 0;
     virtual uint32_t GetRebootThrottleS() = 0;
     virtual uint32_t GetWatchdogTimeoutMs() = 0;

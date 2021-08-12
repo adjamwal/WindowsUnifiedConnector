@@ -21,8 +21,9 @@ public:
     MOCK_METHOD1( WithFrom, ICloudEventBuilder& ( const std::string& ) );
     MOCK_METHOD1( WithTse, ICloudEventBuilder& ( const std::string& ) );
 
-    MOCK_METHOD0( GetPackageName, std::string() );
-    MOCK_METHOD0( GetPackageVersion, std::string() );
+    MOCK_CONST_METHOD0( GetPackageName, std::string() );
+    MOCK_CONST_METHOD0( GetPackageVersion, std::string() );
+    MOCK_CONST_METHOD0( GetRFC3339Tse, std::string() );
 
     MOCK_METHOD0( Build, std::string() );
     void MakeBuildReturn( std::string value );

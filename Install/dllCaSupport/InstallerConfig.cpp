@@ -67,7 +67,12 @@ uint32_t InstallerConfig::GetLogLevel()
     return uint32_t();
 }
 
-uint32_t InstallerConfig::GetMaxFileCacheAge()
+uint32_t InstallerConfig::GetMaxFileCacheAgeS()
+{
+    return uint32_t();
+}
+
+uint32_t InstallerConfig::GetMaxEventTtlS()
 {
     return uint32_t();
 }

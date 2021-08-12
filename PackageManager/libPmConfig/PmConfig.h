@@ -7,6 +7,7 @@
 #define PM_CONFIG_LOGLEVEL_DEFAULT 7
 #define PM_CONFIG_INTERVAL_DEFAULT_MS ( 5 * 60 * 1000 )  // 5 minutes
 #define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
+#define PM_CONFIG_MAX_EVENT_TTL_SECS 60
 #define PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS 3600 // One hour
 #define PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS ( 30 * 60 * 1000 ) // 30 minutes
 
@@ -27,6 +28,7 @@ struct PmConfigData
     uint32_t maxDelayMs;
     uint32_t log_level;
     uint32_t maxFileCacheAge;
+    uint32_t maxEventTtl;
     bool allowPostInstallReboots;
     uint32_t rebootThrottleS;
     uint32_t watchdogTimeoutMs;
@@ -49,7 +51,8 @@ public:
     const std::string& GetCloudCatalogUri() override;
     uint32_t GetCloudCheckinIntervalMs() override;
     uint32_t GetLogLevel() override;
-    uint32_t GetMaxFileCacheAge() override;
+    uint32_t GetMaxFileCacheAgeS() override;
+    uint32_t GetMaxEventTtlS() override;
     bool AllowPostInstallReboots() override;
     uint32_t GetRebootThrottleS() override;
     uint32_t GetWatchdogTimeoutMs() override;
@@ -70,7 +73,8 @@ private:
     bool VerifyPmLogLevel( const Json::Value& pmRoot );
     bool VerifyPmCheckinInterval( const Json::Value& pmRoot );
     bool VerifyPmMaxStartupDelay( const Json::Value& pmRoot );
-    bool VerifyPmMaxFileCacheAge(const Json::Value& pmRoot);
+    bool VerifyPmMaxFileCacheAge( const Json::Value& pmRoot );
+    bool VerifyPmMaxEventTtl( const Json::Value& pmRoot );
     bool VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot );
     bool VerifyPmRebootThrottle( const Json::Value& pmRoot );
     bool VerifyPmWatchdogBuffer( const Json::Value& pmRoot );

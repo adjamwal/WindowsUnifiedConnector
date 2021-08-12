@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include <ctime>
+
+#define RFC3339_REGEXP "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}\\:\\d{2}\\:\\d{2}\\.\\d{2}[-+]\\d{2}\\:\\d{2})"
 
 class TimeUtil
 {
@@ -9,4 +12,7 @@ public:
     virtual ~TimeUtil() {}
 
     static std::string Now_RFC3339();
+    static __time64_t Now_HundredMilliTimeStamp();
+    static std::string MilliTsToRFC3339( __time64_t milliTimeStamp );
+    static __time64_t RFC3339ToMilliTs( const std::string& rfc3339_time );
 };

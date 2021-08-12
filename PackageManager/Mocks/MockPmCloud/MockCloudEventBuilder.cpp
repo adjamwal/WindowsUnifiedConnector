@@ -16,6 +16,7 @@ MockCloudEventBuilder::MockCloudEventBuilder()
     ON_CALL( *this, WithTse( _ ) ).WillByDefault( ReturnRef( *this ) );
     ON_CALL( *this, GetPackageName() ).WillByDefault( Return( "" ) );
     ON_CALL( *this, GetPackageVersion() ).WillByDefault( Return( "" ) );
+    ON_CALL( *this, GetRFC3339Tse() ).WillByDefault( Return( "" ) );
     MakeBuildReturn( "" );
 }
 

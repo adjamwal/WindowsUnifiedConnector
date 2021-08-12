@@ -132,14 +132,24 @@ void MockPmConfig::ExpectGetLogLevelIsNotCalled()
     EXPECT_CALL( *this, GetLogLevel() ).Times( 0 );
 }
 
-void MockPmConfig::MakeGetMaxFileCacheAgeReturn( uint32_t value )
+void MockPmConfig::MakeGetMaxFileCacheAgeSReturn( uint32_t value )
 {
-    ON_CALL( *this, GetMaxFileCacheAge() ).WillByDefault( Return( value ) );
+    ON_CALL( *this, GetMaxFileCacheAgeS() ).WillByDefault( Return( value ) );
 }
 
-void MockPmConfig::ExpectGetMaxFileCacheAgeIsNotCalled()
+void MockPmConfig::ExpectGetMaxFileCacheAgeSIsNotCalled()
 {
-    EXPECT_CALL( *this, GetMaxFileCacheAge() ).Times( 0 );
+    EXPECT_CALL( *this, GetMaxFileCacheAgeS() ).Times( 0 );
+}
+
+void MockPmConfig::MakeGetMaxEventTtlSReturn( uint32_t value )
+{
+    ON_CALL( *this, GetMaxEventTtlS() ).WillByDefault( Return( value ) );
+}
+
+void MockPmConfig::ExpectGetMaxEventTtlSIsNotCalled()
+{
+    EXPECT_CALL( *this, GetMaxEventTtlS() ).Times( 0 );
 }
 
 void MockPmConfig::MakeAllowPostInstallRebootsReturn( bool value )

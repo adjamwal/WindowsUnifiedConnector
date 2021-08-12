@@ -69,6 +69,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
             m_configData.allowPostInstallReboots = false;
             m_configData.rebootThrottleS = PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS;
             m_configData.watchdogTimeoutMs = PM_CONFIG_INTERVAL_DEFAULT_MS + PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS;
+            m_configData.maxEventTtl = PM_CONFIG_MAX_EVENT_TTL_SECS;
         }
     }
 
@@ -133,11 +134,18 @@ uint32_t PmConfig::GetLogLevel()
     return m_configData.log_level;
 }
 
-uint32_t PmConfig::GetMaxFileCacheAge()
+uint32_t PmConfig::GetMaxFileCacheAgeS()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
     return m_configData.maxFileCacheAge;
+}
+
+uint32_t PmConfig::GetMaxEventTtlS()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.maxEventTtl;
 }
 
 uint32_t PmConfig::GetRebootThrottleS()
@@ -242,6 +250,14 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
         }
         else {
             m_configData.maxFileCacheAge = pm["maxFileCacheAge_s"].asUInt();
+        }
+
+        if( !VerifyPmMaxEventTtl( pm ) ) {
+            LOG_WARNING( "Invalid MaxEventTTL_s. Using default" );
+            m_configData.maxEventTtl = PM_CONFIG_MAX_EVENT_TTL_SECS;
+        }
+        else {
+            m_configData.maxEventTtl = pm[ "MaxEventTTL_s" ].asUInt();
         }
 
         if( !VerifyPmRebootThrottle( pm ) ) {
@@ -352,6 +368,11 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
             rtn = -1;
         }
 
+        if( !VerifyPmMaxEventTtl( pm ) ) {
+            LOG_ERROR( "Invalid MaxEventTTL_s" );
+            rtn = -1;
+        }
+
         if( !VerifyPmAllowPostInstallReboots( pm ) ) {
             LOG_ERROR( "Invalid AllowPostInstallReboots" );
             rtn = -1;
@@ -380,7 +401,6 @@ int32_t PmConfig::VerifyBsFileIntegrity( const std::string& bsConfig )
     std::string bsData = m_fileUtil.ReadFile( bsConfig );
 
     return VerifyBsContents( bsData );
-
 }
 
 int32_t PmConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
@@ -413,6 +433,11 @@ bool PmConfig::VerifyPmMaxStartupDelay( const Json::Value& pmRoot )
 bool PmConfig::VerifyPmMaxFileCacheAge( const Json::Value& pmRoot )
 {
     return pmRoot.isMember( "maxFileCacheAge_s" ) && pmRoot[ "maxFileCacheAge_s" ].isUInt();
+}
+
+bool PmConfig::VerifyPmMaxEventTtl( const Json::Value& pmRoot )
+{
+    return pmRoot.isMember( "MaxEventTTL_s" ) && pmRoot[ "MaxEventTTL_s" ].isUInt();
 }
 
 bool PmConfig::VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot )

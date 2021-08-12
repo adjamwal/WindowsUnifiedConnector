@@ -53,9 +53,13 @@ public:
     void MakeGetLogLevelReturn( uint32_t value );
     void ExpectGetLogLevelIsNotCalled();
 
-    MOCK_METHOD0( GetMaxFileCacheAge, uint32_t() );
-    void MakeGetMaxFileCacheAgeReturn( uint32_t value );
-    void ExpectGetMaxFileCacheAgeIsNotCalled();
+    MOCK_METHOD0( GetMaxFileCacheAgeS, uint32_t() );
+    void MakeGetMaxFileCacheAgeSReturn( uint32_t value );
+    void ExpectGetMaxFileCacheAgeSIsNotCalled();
+
+    MOCK_METHOD0( GetMaxEventTtlS, uint32_t() );
+    void MakeGetMaxEventTtlSReturn( uint32_t value );
+    void ExpectGetMaxEventTtlSIsNotCalled();
 
     MOCK_METHOD0( AllowPostInstallReboots, bool() );
     void MakeAllowPostInstallRebootsReturn( bool value );

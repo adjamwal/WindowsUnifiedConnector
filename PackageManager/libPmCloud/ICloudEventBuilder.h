@@ -30,8 +30,9 @@ public:
     virtual ICloudEventBuilder& WithFrom( const std::string& fromVersion ) = 0;
     virtual ICloudEventBuilder& WithTse( const std::string& tse ) = 0;
 
-    virtual std::string GetPackageName() = 0;
-    virtual std::string GetPackageVersion() = 0;
+    virtual std::string GetPackageName() const = 0;
+    virtual std::string GetPackageVersion() const = 0;
+    virtual std::string GetRFC3339Tse() const = 0;
 
     virtual std::string Build() = 0;
     virtual void Reset() = 0;

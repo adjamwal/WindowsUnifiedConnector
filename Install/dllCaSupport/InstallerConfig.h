@@ -24,7 +24,8 @@ public:
     const std::string& GetCloudCatalogUri() override;
     uint32_t GetCloudCheckinIntervalMs() override;
     uint32_t GetLogLevel() override;
-    uint32_t GetMaxFileCacheAge() override;
+    uint32_t GetMaxFileCacheAgeS() override;
+    uint32_t GetMaxEventTtlS() override;
     bool AllowPostInstallReboots() override;
     uint32_t GetRebootThrottleS() override;
     uint32_t GetWatchdogTimeoutMs() override;

@@ -31,7 +31,6 @@ ICloudEventBuilder& CloudEventBuilder::FromJson( const std::string& eventJson )
 {
     Reset();
     Deserialize( *this, eventJson );
-    UpdateEventTime();
     return *this;
 }
 
@@ -115,14 +114,19 @@ ICloudEventBuilder& CloudEventBuilder::WithTse( const std::string& tse )
     return *this;
 }
 
-std::string CloudEventBuilder::GetPackageName()
+std::string CloudEventBuilder::GetPackageName() const
 {
     return m_packageName;
 }
 
-std::string CloudEventBuilder::GetPackageVersion()
+std::string CloudEventBuilder::GetPackageVersion() const
 {
     return m_packageVersion;
+}
+
+std::string CloudEventBuilder::GetRFC3339Tse() const
+{
+    return m_tse;
 }
 
 std::string CloudEventBuilder::Build()

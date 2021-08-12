@@ -29,7 +29,7 @@ public:
     }
 };
 
-TEST_F( ComponentTestWatchdog, WatchdogWillFireAfterTimeout )
+TEST_F( ComponentTestWatchdog, DISABLED_WatchdogWillFireAfterTimeout )
 {
     bool pass = false;
     

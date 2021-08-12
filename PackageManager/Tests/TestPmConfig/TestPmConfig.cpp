@@ -43,7 +43,8 @@ protected:
         "maxFileCacheAge_s": 1000,
         "AllowPostInstallReboots": true,
         "RebootThrottleS": 1000,
-        "WatchdogBufferMs": 250000
+        "WatchdogBufferMs": 250000,
+        "MaxEventTTL_s": 60
     }
 }
 )";
@@ -276,7 +277,16 @@ TEST_F( TestPmConfig, LoadingEmptyConfigSetsMaxFileCacheAge )
 
     m_patient->LoadPmConfig( "filename" );
 
-    EXPECT_EQ( m_patient->GetMaxFileCacheAge(), PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS );
+    EXPECT_EQ( m_patient->GetMaxFileCacheAgeS(), PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS );
+}
+
+TEST_F( TestPmConfig, LoadingEmptyConfigSetsMaxEventTTL )
+{
+    m_fileUtil->MakeReadFileReturn( "" );
+
+    m_patient->LoadPmConfig( "filename" );
+
+    EXPECT_EQ( PM_CONFIG_MAX_EVENT_TTL_SECS, m_patient->GetMaxEventTtlS() );
 }
 
 TEST_F( TestPmConfig, LoadingEmptyConfigSetsAllowPostInstallReboots )

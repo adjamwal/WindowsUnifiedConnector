@@ -3,12 +3,13 @@
 #include "ICloudEventStorage.h"
 #include "ICloudEventBuilder.h"
 #include "IFileSysUtil.h"
+#include "IPmConfig.h"
 #include <mutex>
 
 class CloudEventStorage : public ICloudEventStorage
 {
 public:
-    CloudEventStorage( const std::string& fileName, IFileSysUtil& fileUtil );
+    CloudEventStorage( const std::string& fileName, IFileSysUtil& fileUtil, IPmConfig& pmConfig );
     ~CloudEventStorage();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
@@ -22,4 +23,5 @@ private:
     std::string m_fullPath;
     std::string m_fileName;
     IFileSysUtil& m_fileUtil;
+    IPmConfig& m_pmConfig;
 };

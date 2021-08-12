@@ -24,4 +24,6 @@ private:
     std::mutex m_mutex;
 
     int32_t InternalPublish( const std::string& eventJson );
+    bool IsEventExpired( const ICloudEventBuilder& event );
+    bool IsEventExpired( const std::string& eventJson );
 };

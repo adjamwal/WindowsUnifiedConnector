@@ -44,8 +44,9 @@ public:
     ICloudEventBuilder& WithFrom( const std::string& fromVersion ) override;
     ICloudEventBuilder& WithTse( const std::string& tse ) override;
 
-    std::string GetPackageName() override;
-    std::string GetPackageVersion() override;
+    std::string GetPackageName() const override;
+    std::string GetPackageVersion() const override;
+    std::string GetRFC3339Tse() const override;
 
     std::string Build() override;
     void Reset() override;

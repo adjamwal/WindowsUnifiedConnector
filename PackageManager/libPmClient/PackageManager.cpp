@@ -225,7 +225,7 @@ void PackageManager::PmWorkflowThread()
     try {
         LOG_DEBUG( "Post Checkin Steps" );
         m_cloudEventPublisher.PublishFailedEvents();
-        m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAge() );
+        m_installerCacheMgr.PruneInstallers( m_config.GetMaxFileCacheAgeS() );
 
         m_rebootHandler.HandleReboot( isRebootRequired );
     }

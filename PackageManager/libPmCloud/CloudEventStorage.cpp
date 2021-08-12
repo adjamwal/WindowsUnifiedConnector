@@ -3,14 +3,16 @@
 #include "IPmPlatformDependencies.h"
 #include "IPmPlatformConfiguration.h"
 #include "PmLogger.h"
+#include "TimeUtil.h"
 
 #include <fstream>
 #include <filesystem>
 
-CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileSysUtil& fileUtil ) :
-    m_fileName( fileName ),
-    m_fileUtil( fileUtil ),
-    m_dependencies( nullptr )
+CloudEventStorage::CloudEventStorage( const std::string& fileName, IFileSysUtil& fileUtil, IPmConfig& pmConfig )
+    : m_fileName( fileName )
+    , m_fileUtil( fileUtil )
+    , m_pmConfig( pmConfig )
+    , m_dependencies( nullptr )
 {
 }
 
@@ -34,22 +36,30 @@ void CloudEventStorage::Initialize( IPmPlatformDependencies* dep )
 
 bool CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
 {
-    if ( !m_dependencies ) {
+    if( !m_dependencies ) {
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
     }
 
     auto eventStr = event.Build();
 
-    std::lock_guard<std::mutex> lock( m_mutex );
+    __time64_t eventTimeMs = TimeUtil::RFC3339ToMilliTs( event.GetRFC3339Tse() );
+    //add 0 hundreds of msec to match the rfc3339 format
+    __time64_t eventTtl = eventTimeMs + m_pmConfig.GetMaxEventTtlS() * 10; 
 
-    return m_fileUtil.WriteLine( m_fullPath, eventStr );
+    if( eventTtl > TimeUtil::Now_HundredMilliTimeStamp() )
+    {
+        LOG_DEBUG( __FUNCTION__ ": Event expired: %s", eventStr.c_str() );
+        return false;
+    }
+
+    return SaveEvent( eventStr );
 }
 
 bool CloudEventStorage::SaveEvent( const std::string& event )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    if ( !m_dependencies ) {
+    if( !m_dependencies ) {
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
     }
 
@@ -60,7 +70,7 @@ std::vector<std::string> CloudEventStorage::ReadAndRemoveEvents()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    if ( !m_dependencies ) {
+    if( !m_dependencies ) {
         throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
     }
 

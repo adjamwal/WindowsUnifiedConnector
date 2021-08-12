@@ -7,6 +7,7 @@
 #include "MockPmPlatformConfiguration.h"
 #include <memory>
 #include "MockUtf8PathVerifier.h"
+#include "MockPmConfig.h"
 
 class TestCloudEventStorage : public ::testing::Test
 {
@@ -14,11 +15,14 @@ protected:
     void SetUp()
     {
         std::string filename = "TestCloudEventStorage";
+
+        m_mockConfig.reset( new NiceMock<MockPmConfig>() );
+
         m_utf8PathVerifier.reset( new NiceMock<MockUtf8PathVerifier>() );
         m_utf8PathVerifier->MakeIsPathValidReturn( true );
 
         m_fileUtil.reset( new FileSysUtil( *m_utf8PathVerifier ) );
-        m_eventStorage.reset( new CloudEventStorage( filename, *m_fileUtil ) );
+        m_eventStorage.reset( new CloudEventStorage( filename, *m_fileUtil, *m_mockConfig ) );
 
         m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
         m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
@@ -53,6 +57,7 @@ protected:
         m_fileUtil.reset();
         m_deps.reset();
         m_platformConfiguration.reset();
+        m_mockConfig.reset();
     }
 
     std::unique_ptr<MockUtf8PathVerifier> m_utf8PathVerifier;
@@ -60,6 +65,7 @@ protected:
     CloudEventBuilder m_eventBuilder1;
     CloudEventBuilder m_eventBuilder2;
     std::unique_ptr<ICloudEventStorage> m_eventStorage;
+    std::unique_ptr<MockPmConfig> m_mockConfig;
 
     std::unique_ptr<MockPmPlatformConfiguration> m_platformConfiguration;
     std::unique_ptr<MockPmPlatformDependencies> m_deps;

@@ -15,6 +15,7 @@
 #include "PmLogger.h"
 #include "PmHttp.h"
 #include "json\json.h"
+#include "TimeUtil.h"
 
 CloudEventPublisher::CloudEventPublisher( IPmCloud& pmCloud, ICloudEventStorage& eventStorage, IPmConfig& pmConfig )
     : m_pmCloud( pmCloud )
@@ -34,10 +35,26 @@ void CloudEventPublisher::SetToken( const std::string& token )
     m_pmCloud.SetToken( token );
 }
 
+bool CloudEventPublisher::IsEventExpired( const ICloudEventBuilder& event )
+{
+    __time64_t eventTimeMs = TimeUtil::RFC3339ToMilliTs( event.GetRFC3339Tse() );
+    //add 0 hundreds of msec to match the rfc3339 format
+    __time64_t eventTtl = eventTimeMs + m_pmConfig.GetMaxEventTtlS() * 10;
+
+    return eventTtl > TimeUtil::Now_HundredMilliTimeStamp();
+}
+
+bool CloudEventPublisher::IsEventExpired( const std::string& eventJson )
+{
+    CloudEventBuilder event;
+    event.FromJson( eventJson );
+
+    return IsEventExpired( event );
+}
+
 int32_t CloudEventPublisher::Publish( ICloudEventBuilder& event )
 {
     std::string eventPayload = event.Build();
-
     return InternalPublish( eventPayload );
 }
 
@@ -65,6 +82,12 @@ int32_t CloudEventPublisher::PublishFailedEvents()
 
 int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 {
+    if( IsEventExpired( eventJson ) )
+    {
+        LOG_DEBUG( __FUNCTION__ ": Event expired %s", eventJson.c_str() );
+        return 0;
+    }
+
     std::string eventResponse;
     PmHttpExtendedResult eResult = {};
 
