@@ -26,7 +26,7 @@ std::string TimeUtil::Now_RFC3339()
     gmtime_s( &tmbuf, &c_now );
     ss << put_time( &tmbuf, "%FT%T" )
         << '.'
-        << setfill( '0' ) << setw( 2 ) << millis.count() / 100
+        << setfill( '0' ) << setw( 2 ) << millis.count() / 10
         << put_time( &tmbuf, "%z" );
 
     std::string result = ss.str();
@@ -40,9 +40,10 @@ __time64_t TimeUtil::Now_MilliTimeStamp()
     const auto tp_now_millis = time_point_cast< milliseconds >( system_clock::now() );
     auto millis_dur = duration_cast< milliseconds >( tp_now_millis.time_since_epoch() ).count();
 
-    //RFC3339 only retains hundreds of milliseconds
-    millis_dur /= 100;
-    millis_dur *= 100;
+    //remove units - RFC3339 only encodes hundreds + tens of milliseconds
+    //2021-08-11T06:05:54.02-07:00
+    millis_dur /= 10;
+    millis_dur *= 10;
 
     return millis_dur;
 }
@@ -60,7 +61,7 @@ std::string TimeUtil::MillisToRFC3339( __time64_t milliTimeStamp )
     gmtime_s( &tmbuf, &c_now );
     ss << put_time( &tmbuf, "%FT%T" )
         << '.'
-        << setfill( '0' ) << setw( 2 ) << millis.count() / 100
+        << setfill( '0' ) << setw( 2 ) << millis.count() / 10
         << put_time( &tmbuf, "%z" );
 
     std::string result = ss.str();
@@ -126,6 +127,7 @@ __time64_t TimeUtil::RFC3339ToMillis( const std::string& rfc3339_time )
         }
     }
 
-    auto millis_dur = duration_cast< milliseconds >( seconds { timestamp } ).count() + ( __time64_t )msec * 100;
+    auto millis_dur = duration_cast< milliseconds >( seconds { timestamp } ).count() 
+        + ( __time64_t )msec * 10; //we get hundreds and tens of msec from rfc string, no units
     return millis_dur;
 }

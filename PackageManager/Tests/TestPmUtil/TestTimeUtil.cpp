@@ -61,21 +61,21 @@ TEST_F( TestTimeUtil, WillConvertValidRFC3339ToMillis )
 
 TEST_F( TestTimeUtil, RFC3339WillReflectTheExactSecondsSubtracted )
 {
-    auto ts1 = 1628834666800;
+    auto ts1 = 1628834666310;
     std::string tstr1 = TimeUtil::MillisToRFC3339( ts1 );
 
     auto ts_less_20_sec = ts1 - 20 * 1000;
     std::string tstr_less_20_sec = TimeUtil::MillisToRFC3339( ts_less_20_sec );
 
-    EXPECT_TRUE( tstr1.find( ":26.08" ) != std::string::npos );
-    EXPECT_TRUE( tstr_less_20_sec.find( ":06.08" ) != std::string::npos );
+    EXPECT_TRUE( tstr1.find( ":26.31" ) != std::string::npos );
+    EXPECT_TRUE( tstr_less_20_sec.find( ":06.31" ) != std::string::npos );
 }
 
 TEST_F( TestTimeUtil, DISABLED_RFC3339WillDecodePartialHourTimezones )
 {
-    auto newfoundland_time = TimeUtil::RFC3339ToMillis( "2021-08-13T06:04:26.08-02:30" );
-    auto chatam_time = TimeUtil::RFC3339ToMillis( "2021-08-13T06:04:26.08+12:45" );
+    auto newfoundland_time = TimeUtil::RFC3339ToMillis( "2021-08-13T06:04:26.18-02:30" );
+    auto chatam_time = TimeUtil::RFC3339ToMillis( "2021-08-13T06:04:26.05+12:45" );
 
-    EXPECT_EQ( 1628850866800, newfoundland_time );
-    EXPECT_EQ( 1628905766800, chatam_time );
+    EXPECT_EQ( 1628850866180, newfoundland_time );
+    EXPECT_EQ( 1628905766050, chatam_time );
 }
