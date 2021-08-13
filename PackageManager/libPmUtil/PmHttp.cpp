@@ -177,7 +177,11 @@ bool PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& 
 #endif
 #endif
     else if( callback ) {
-        if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
+        
+        if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_NOPROGRESS, 0 ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_NOPROGRESS failed on function %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        }
+        else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
             LOG_ERROR( "CURLOPT_XFERINFOFUNCTION failed on function %x %d:%s", callback, eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
         }
         else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFODATA, ctx ) ) != CURLE_OK ) {

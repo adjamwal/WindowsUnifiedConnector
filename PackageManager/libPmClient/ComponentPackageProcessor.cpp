@@ -214,6 +214,10 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
                 ssError << "Failed to update package. Error: " << updErrCode << ": " << updErrText;
                 throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
             }
+            else {
+                LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded",
+                    componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+            }
 
             m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );
 
