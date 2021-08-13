@@ -38,7 +38,6 @@ void PmCloud::SetUserAgent( const std::string& userAgent )
 
 void PmCloud::SetShutdownFunc( std::function<bool()> shutdownFunc )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
     m_shutdownFunc = shutdownFunc;
 }
 
@@ -102,7 +101,6 @@ int32_t PmCloud::DownloadFile( const std::string& uri, const std::filesystem::pa
 
 int PmCloud::ProgressCallback( PM_TYPEOF_OFF_T dltotal, PM_TYPEOF_OFF_T dlnow, PM_TYPEOF_OFF_T ultotal, PM_TYPEOF_OFF_T ulnow )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
     return m_shutdownFunc() ? 0 : -1;
 }
 

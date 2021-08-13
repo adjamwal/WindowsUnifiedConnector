@@ -175,7 +175,10 @@ int32_t PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::strin
 #endif
 #endif
     else if( callback ) {
-        if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
+        if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_NOPROGRESS, 0 ) ) != CURLE_OK ) {
+            LOG_ERROR( "CURLOPT_NOPROGRESS failed on function %d:%s", rtn, curl_easy_strerror( rtn ) );
+        }
+        else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFOFUNCTION, callback ) ) != CURLE_OK ) {
             LOG_ERROR( "CURLOPT_XFERINFOFUNCTION failed on function %x %d:%s", callback, rtn, curl_easy_strerror( rtn ) );
         }
         else if( ( rtn = curl_easy_setopt( m_curlHandle, CURLOPT_XFERINFODATA, ctx ) ) != CURLE_OK ) {

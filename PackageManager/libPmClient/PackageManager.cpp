@@ -127,7 +127,6 @@ int32_t PackageManager::Stop()
 
 bool PackageManager::IsRunning()
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
     return m_thread.IsRunning();
 }
 
@@ -144,7 +143,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_packageDiscoveryManager.Initialize( m_dependencies );
         m_cloudEventStorage.Initialize( m_dependencies );
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
-        m_cloud.SetShutdownFunc( [this] { return !IsRunning(); } );
+        m_cloud.SetShutdownFunc( [this] { return IsRunning(); } );
         m_ucUpgradeEventHandler.Initialize( m_dependencies );
         m_rebootHandler.Initialize( m_dependencies );
         m_catalogJsonParser.Initialize( m_dependencies );
