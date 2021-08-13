@@ -35,7 +35,7 @@ std::string TimeUtil::Now_RFC3339()
     return result;
 }
 
-__time64_t TimeUtil::Now_HundredMilliTimeStamp()
+__time64_t TimeUtil::Now_MilliTimeStamp()
 {
     const auto tp_now_millis = time_point_cast< milliseconds >( system_clock::now() );
     auto millis_dur = duration_cast< milliseconds >( tp_now_millis.time_since_epoch() ).count();
@@ -47,7 +47,7 @@ __time64_t TimeUtil::Now_HundredMilliTimeStamp()
     return millis_dur;
 }
 
-std::string TimeUtil::MilliTsToRFC3339( __time64_t milliTimeStamp )
+std::string TimeUtil::MillisToRFC3339( __time64_t milliTimeStamp )
 {
     const auto millis_dur = duration_cast< milliseconds >( milliseconds { milliTimeStamp } );
     const auto tp_ms = time_point<system_clock, milliseconds> { millis_dur };
@@ -84,7 +84,7 @@ extern "C" char* strptime( const char* s, const char* f, struct tm* tm )
 }
 #endif
 
-__time64_t TimeUtil::RFC3339ToMilliTs( const std::string& rfc3339_time )
+__time64_t TimeUtil::RFC3339ToMillis( const std::string& rfc3339_time )
 {
     int msec = 0, tzsign = 1;
     __time64_t timestamp = 0;

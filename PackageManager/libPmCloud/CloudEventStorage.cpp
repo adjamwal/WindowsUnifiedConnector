@@ -42,11 +42,10 @@ bool CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
 
     auto eventStr = event.Build();
 
-    __time64_t eventTimeMs = TimeUtil::RFC3339ToMilliTs( event.GetRFC3339Tse() );
-    //add 0 hundreds of msec to match the rfc3339 format
-    __time64_t eventTtl = eventTimeMs + m_pmConfig.GetMaxEventTtlS() * 10; 
+    __time64_t originalTseMs = TimeUtil::RFC3339ToMillis( event.GetRFC3339Tse() );
+    __time64_t eventTtlMs = originalTseMs + m_pmConfig.GetMaxEventTtlS() * 1000;
 
-    if( eventTtl > TimeUtil::Now_HundredMilliTimeStamp() )
+    if( TimeUtil::Now_MilliTimeStamp() > eventTtlMs )
     {
         LOG_DEBUG( __FUNCTION__ ": Event expired: %s", eventStr.c_str() );
         return false;

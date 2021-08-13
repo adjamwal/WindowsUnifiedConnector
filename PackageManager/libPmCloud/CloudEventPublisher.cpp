@@ -37,11 +37,10 @@ void CloudEventPublisher::SetToken( const std::string& token )
 
 bool CloudEventPublisher::IsEventExpired( const ICloudEventBuilder& event )
 {
-    __time64_t eventTimeMs = TimeUtil::RFC3339ToMilliTs( event.GetRFC3339Tse() );
-    //add 0 hundreds of msec to match the rfc3339 format
-    __time64_t eventTtl = eventTimeMs + m_pmConfig.GetMaxEventTtlS() * 10;
+    __time64_t originalTseMs = TimeUtil::RFC3339ToMillis( event.GetRFC3339Tse() );
+    __time64_t eventTtlMs = originalTseMs + m_pmConfig.GetMaxEventTtlS() * 1000;
 
-    return eventTtl > TimeUtil::Now_HundredMilliTimeStamp();
+    return TimeUtil::Now_MilliTimeStamp() > eventTtlMs;
 }
 
 bool CloudEventPublisher::IsEventExpired( const std::string& eventJson )

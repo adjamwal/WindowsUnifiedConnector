@@ -12,7 +12,7 @@ public:
     virtual ~TimeUtil() {}
 
     static std::string Now_RFC3339();
-    static __time64_t Now_HundredMilliTimeStamp();
-    static std::string MilliTsToRFC3339( __time64_t milliTimeStamp );
-    static __time64_t RFC3339ToMilliTs( const std::string& rfc3339_time );
+    static __time64_t Now_MilliTimeStamp();
+    static std::string MillisToRFC3339( __time64_t milliTimeStamp );
+    static __time64_t RFC3339ToMillis( const std::string& rfc3339_time );
 };

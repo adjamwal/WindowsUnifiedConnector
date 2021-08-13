@@ -8,6 +8,8 @@
 #include <memory>
 #include "MockUtf8PathVerifier.h"
 #include "MockPmConfig.h"
+#include "TimeUtil.h"
+#include "PmConfig.h"
 
 class TestCloudEventStorage : public ::testing::Test
 {
@@ -17,6 +19,7 @@ protected:
         std::string filename = "TestCloudEventStorage";
 
         m_mockConfig.reset( new NiceMock<MockPmConfig>() );
+        m_mockConfig->MakeGetMaxEventTtlSReturn( PM_CONFIG_MAX_EVENT_TTL_SECS );
 
         m_utf8PathVerifier.reset( new NiceMock<MockUtf8PathVerifier>() );
         m_utf8PathVerifier->MakeIsPathValidReturn( true );
@@ -27,7 +30,7 @@ protected:
         m_platformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
         m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
 
-        m_platformConfiguration->MakeGetInstallDirectoryReturn(".");
+        m_platformConfiguration->MakeGetInstallDirectoryReturn( "." );
         m_deps->MakeConfigurationReturn( *m_platformConfiguration );
 
         m_eventStorage->Initialize( m_deps.get() );
@@ -100,4 +103,25 @@ TEST_F( TestCloudEventStorage, TestMultipleEventsSaveToFile )
     EXPECT_EQ( events.at( 0 ), event1 );
     EXPECT_EQ( events.at( 1 ), event2 );
     EXPECT_EQ( events.at( 2 ), event1 );
+}
+
+TEST_F( TestCloudEventStorage, ExpiredEventsWillNotBeSavedToFile )
+{
+    std::vector<std::string> events;
+
+    //expired 8 seconds ago
+    std::string rfcExpiredTime = TimeUtil::MillisToRFC3339
+    ( 
+        TimeUtil::Now_MilliTimeStamp() - ( 8 + PM_CONFIG_MAX_EVENT_TTL_SECS ) * 1000
+    );
+    m_eventBuilder1.WithTse( rfcExpiredTime );
+    m_eventBuilder2.WithTse( rfcExpiredTime );
+
+    m_eventStorage->SaveEvent( m_eventBuilder1 );
+    m_eventStorage->SaveEvent( m_eventBuilder2 );
+    m_eventStorage->SaveEvent( m_eventBuilder1 );
+
+    events = m_eventStorage->ReadAndRemoveEvents();
+
+    EXPECT_EQ( 0, events.size() );
 }
