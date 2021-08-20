@@ -19,9 +19,9 @@
 #define UCPM_EVENT_SUCCESS_REBOOT_INIT                  0x00000051
 
 #if UC_CONSUMER == 1
-#define UC_PACKAGE_NAME "uc"
+#define UC_PACKAGE_NAME "ce"
 #else
-#define UC_PACKAGE_NAME "uc-enterprise"
+#define UC_PACKAGE_NAME "ce-enterprise"
 #endif
 
 #define CLOUD_EVENT_STORAGE_FILENAME                    "uc_event.cache"
