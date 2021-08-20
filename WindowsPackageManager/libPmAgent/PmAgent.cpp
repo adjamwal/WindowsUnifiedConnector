@@ -9,8 +9,7 @@
 #include <codecvt>
 
 PmAgent::PmAgent( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath, IPmPlatformDependencies& dependencies, IPMLogger& pmLogger ) :
-    m_bsConfigFile( bsConfigFilePath )
-    , m_pmConfigFile( pmConfigFilePath )
+    m_pmConfigFile( pmConfigFilePath )
     , m_pmDependencies( dependencies )
     , m_pmLogger( pmLogger )
     , m_PacMan( nullptr )
@@ -31,26 +30,16 @@ PmAgent::~PmAgent()
 int32_t PmAgent::Start()
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    std::string bsConfigFile = converter.to_bytes( m_bsConfigFile );
     std::string pmConfigFile = converter.to_bytes( m_pmConfigFile );
     
-    LOG_DEBUG( "Starting Package Manager Client with config files %s %s", bsConfigFile.c_str(), pmConfigFile.c_str() );
-    return m_PacMan->Start( bsConfigFile.c_str(), pmConfigFile.c_str() );
+    LOG_DEBUG( "Starting Package Manager Client with config files %s", pmConfigFile.c_str() );
+    return m_PacMan->Start( pmConfigFile.c_str() );
 }
 
 int32_t PmAgent::Stop()
 {
     LOG_DEBUG( "Stopping Package Manager Client" );
     return m_PacMan->Stop();
-}
-
-int32_t PmAgent::VerifyBsConfig( const std::wstring& bsConfigFilePath )
-{
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    std::string bsConfigFile = converter.to_bytes( m_bsConfigFile );
-
-    LOG_DEBUG( "Verifing config file %s", bsConfigFile.c_str() );
-    return m_PacMan->VerifyBsConfig( bsConfigFile.c_str() );
 }
 
 int32_t PmAgent::VerifyPmConfig( const std::wstring& pmConfigFilePath )

@@ -12,6 +12,7 @@
 #define PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS ( 30 * 60 * 1000 ) // 30 minutes
 
 class IFileSysUtil;
+class IUcidAdapter;
 
 namespace Json
 {
@@ -20,10 +21,6 @@ namespace Json
 
 struct PmConfigData
 {
-    std::string identifyUri;
-    std::string checkinUri;
-    std::string eventUri;
-    std::string catalogUri;
     uint32_t intervalMs;
     uint32_t maxDelayMs;
     uint32_t log_level;
@@ -37,18 +34,15 @@ struct PmConfigData
 class PmConfig : public IPmConfig
 {
 public:
-    PmConfig( IFileSysUtil& fileUtil );
+    PmConfig( IFileSysUtil& fileUtil, IUcidAdapter& ucidAdapter );
     ~PmConfig();
 
-    int32_t LoadBsConfig( const std::string& bsConfig ) override;
     int32_t LoadPmConfig( const std::string& pmConfig ) override;
     bool PmConfigFileChanged( const std::string& pmConfig ) override;
-    int32_t VerifyBsFileIntegrity( const std::string& bsConfig ) override;
     int32_t VerifyPmFileIntegrity( const std::string& pmConfig ) override;
-    const std::string& GetCloudIdentifyUri() override;
-    const std::string& GetCloudCheckinUri() override;
-    const std::string& GetCloudEventUri() override;
-    const std::string& GetCloudCatalogUri() override;
+    std::string GetCloudCheckinUri() override;
+    std::string GetCloudEventUri() override;
+    std::string GetCloudCatalogUri() override;
     uint32_t GetCloudCheckinIntervalMs() override;
     uint32_t GetLogLevel() override;
     uint32_t GetMaxFileCacheAgeS() override;
@@ -59,16 +53,15 @@ public:
 
 private:
     IFileSysUtil& m_fileUtil;
+    IUcidAdapter& m_ucidAdapter;
 
     std::atomic<bool> m_isFirstCheckin;
     PmConfigData m_configData;
     std::mutex m_mutex;
     std::filesystem::file_time_type m_pmConfigFileTimestamp;
 
-    int32_t ParseBsConfig( const std::string& bsConfig );
     int32_t ParsePmConfig( const std::string& pmConfig );
 
-    int32_t VerifyBsContents( const std::string& bsConfig );
     int32_t VerifyPmContents( const std::string& pmConfig );
     bool VerifyPmLogLevel( const Json::Value& pmRoot );
     bool VerifyPmCheckinInterval( const Json::Value& pmRoot );

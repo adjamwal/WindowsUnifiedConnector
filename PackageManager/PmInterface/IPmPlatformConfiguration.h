@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <openssl/ssl.h>
+#include "PmTypes.h"
 
 /**
  * @file IPmPlatformConfiguration.h
@@ -68,4 +69,9 @@ public:
      * @brief Gets the PM version string
      */
     virtual std::string GetPmVersion() = 0;
+
+    /**
+     * @brief Retrieve the PM URLs from the identity module
+     */
+    virtual bool GetPmUrls( PmUrlList& urls ) = 0;
 };

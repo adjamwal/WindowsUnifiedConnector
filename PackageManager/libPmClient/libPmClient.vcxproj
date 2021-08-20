@@ -48,7 +48,6 @@
     <ClInclude Include="IPmPlatformComponentManager.h" />
     <ClInclude Include="IPmPlatformConfiguration.h" />
     <ClInclude Include="IPmPlatformDependencies.h" />
-    <ClInclude Include="IUcidAdapter.h" />
     <ClInclude Include="ManifestProcessor.h" />
     <ClInclude Include="PackageConfigProcessor.h" />
     <ClInclude Include="PackageInventoryProvider.h" />
@@ -57,7 +56,6 @@
     <ClInclude Include="PmManifest.h" />
     <ClInclude Include="PmTypes.h" />
     <ClInclude Include="RebootHandler.h" />
-    <ClInclude Include="UcidAdapter.h" />
     <ClInclude Include="UcUpgradeEventHandler.h" />
   </ItemGroup>
   <ItemGroup>
@@ -76,7 +74,6 @@
     <ClCompile Include="PackageManagerContainer.cpp" />
     <ClCompile Include="PmManifest.cpp" />
     <ClCompile Include="RebootHandler.cpp" />
-    <ClCompile Include="UcidAdapter.cpp" />
     <ClCompile Include="UcUpgradeEventHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

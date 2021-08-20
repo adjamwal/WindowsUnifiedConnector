@@ -31,7 +31,6 @@
     <ClInclude Include="MockPmConfig.h" />
     <ClInclude Include="MockPmManifest.h" />
     <ClInclude Include="MockRebootHandler.h" />
-    <ClInclude Include="MockUcidAdapter.h" />
     <ClInclude Include="MockUcUpgradeEventHandler.h" />
   </ItemGroup>
   <ItemGroup>
@@ -45,7 +44,6 @@
     <ClCompile Include="MockPackageInventoryProvider.cpp" />
     <ClCompile Include="MockPmManifest.cpp" />
     <ClCompile Include="MockRebootHandler.cpp" />
-    <ClCompile Include="MockUcidAdapter.cpp" />
     <ClCompile Include="MockUcUpgradeEventHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

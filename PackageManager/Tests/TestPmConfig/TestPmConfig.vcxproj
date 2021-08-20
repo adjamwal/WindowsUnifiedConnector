@@ -95,7 +95,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,7 +135,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,7 +155,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmConfig;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

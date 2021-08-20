@@ -69,7 +69,7 @@ protected:
         m_eventStorage.reset( new NiceMock<MockCloudEventStorage>() );
         m_ucUpgradeEventHandler.reset( new NiceMock<MockUcUpgradeEventHandler>() );
 
-        m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_mockCloud, *m_ucidAdapter, *m_certsAdapter ) );
+        m_checkinManifestRetriever.reset( new CheckinManifestRetriever( *m_mockCloud, *m_ucidAdapter, *m_certsAdapter, *m_mockConfig ) );
         m_catalogListRetriever.reset( new CatalogListRetriever( *m_mockCloud, *m_ucidAdapter, *m_certsAdapter, *m_mockConfig ) );
         m_catalogJsonParser.reset( new CatalogJsonParser() );
         m_packageDiscoveryManager.reset( 
@@ -171,7 +171,6 @@ protected:
     void StartPacMan()
     {
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
-        m_mockConfig->MakeLoadBsConfigReturn( 0 );
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
@@ -180,7 +179,7 @@ protected:
         m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
 
         m_patient->SetPlatformDependencies( m_mockDeps.get() );
-        m_patient->Start( "ConfigFile", "ConfigFile" );
+        m_patient->Start( "ConfigFile" );
     }
 
     void PublishedEventHasExpectedData(

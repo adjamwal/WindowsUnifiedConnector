@@ -63,16 +63,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
     }
 
     PmAgentContainer agentContainer( L"", L"" );
-    int32_t rtn = agentContainer.pmAgent().VerifyBsConfig( bsConfigFile );
+    int32_t rtn = agentContainer.pmAgent().VerifyPmConfig( pmConfigFile );
 
-    LOG_DEBUG( "Verify Bs: %d", rtn );
-
-    if ( rtn == 0)
-    {
-        rtn = agentContainer.pmAgent().VerifyPmConfig( pmConfigFile );
-
-        LOG_DEBUG( "Verify Pm %d", rtn );
-    }
+    LOG_DEBUG( "Verify Pm %d", rtn );
     
     LOG_DEBUG( "Exit: %d", rtn );
 

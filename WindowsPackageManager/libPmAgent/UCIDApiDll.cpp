@@ -5,10 +5,12 @@
 #include "WindowsUtilities.h"
 #include "StringUtil.h"
 #include <IUcLogger.h>
+#include "PmTypes.h"
 
 #define UCID_API_GET_ID_FUNCTION_NAME "ucid_get_id"
 #define UCID_API_GET_TOKEN_FUNCTION_NAME "ucid_get_token"
 #define UCID_API_REFRESH_TOKEN_FUNCTION_NAME "ucid_refresh_token"
+#define UCID_API_GET_URL_FUNCTION_NAME "ucid_get_url"
 
 #if defined(_WIN64)
 #define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x64"
@@ -95,6 +97,71 @@ int32_t UCIDApiDll::RefreshToken()
     return m_refreshTokenFunc();
 }
 
+ucid_result_t UCIDApiDll::GetUrl( ucid_url_type_t urlType, std::string& url )
+{
+    ucid_result_t result = UCID_RES_GENERAL_ERROR;
+    int urlSize = 1024;
+    char* tmpUrl = ( char* )malloc( urlSize );
+
+    if( !tmpUrl ) {
+        LOG_EMERGENCY( "Failed to allocate %d bytes", urlSize );
+    }
+    else {
+        result = m_getUrlFunc( urlType, tmpUrl, &urlSize );
+        if( result == UCID_RES_INSUFFICIENT_LEN ) {
+            tmpUrl = ( char* )realloc( tmpUrl, urlSize );
+            if( !tmpUrl ) {
+                LOG_EMERGENCY( "Failed to allocate %d bytes", urlSize );
+            }
+            else {
+                result = m_getUrlFunc( urlType, tmpUrl, &urlSize );
+                if( result == UCID_RES_SUCCESS ) {
+                    url = tmpUrl;
+                }
+            }
+        }
+        else {
+            url = tmpUrl;
+        }
+    }
+
+    if( tmpUrl ) {
+        free( tmpUrl );
+        tmpUrl = NULL;
+    }
+
+    return result;
+}
+
+int32_t UCIDApiDll::GetUrls( PmUrlList& urls )
+{
+    int32_t rtn = UCID_RES_SUCCESS;
+    int32_t tmpRtn = 0;
+    LoadApi();
+
+    tmpRtn = GetUrl( UCID_EVENT_URL, urls.eventUrl );
+    if( tmpRtn != UCID_RES_SUCCESS ) {
+        LOG_ERROR( "Failed to fetch event url %d", tmpRtn );
+        rtn = UCID_RES_GENERAL_ERROR;
+    }
+
+    tmpRtn = GetUrl( UCID_CHECKIN_URL, urls.checkinUrl );
+    if( tmpRtn != UCID_RES_SUCCESS ) {
+        LOG_ERROR( "Failed to fetch checking url %d", tmpRtn );
+        rtn = UCID_RES_GENERAL_ERROR;
+    }
+
+    tmpRtn = GetUrl( UCID_CATALOG_URL, urls.catalogUrl );
+    if( tmpRtn != UCID_RES_SUCCESS ) {
+        LOG_ERROR( "Failed to fetch catalog url %d", tmpRtn );
+        rtn = UCID_RES_GENERAL_ERROR;
+    }
+
+    LOG_DEBUG( "Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str() );
+
+    return rtn;
+}
+
 bool UCIDApiDll::LoadDll( const std::wstring dllPath )
 {
     std::wstring dllDir;
@@ -149,6 +216,11 @@ bool UCIDApiDll::LoadDll( const std::wstring dllPath )
     if( m_refreshTokenFunc == NULL )
     {
         throw std::exception( "Couldn't bind to Refresh Token dll function. Error %d", GetLastError() );
+    }
+
+    m_getUrlFunc = ( GetUrlFunc )GetProcAddress( m_api, UCID_API_GET_URL_FUNCTION_NAME );
+    if( m_getUrlFunc == NULL ) {
+        throw std::exception( "Couldn't bind to Get Url dll function. Error %d", GetLastError() );
     }
 
     return true;

@@ -5,16 +5,10 @@
 InstallerConfig::InstallerConfig()
 {
     m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
-    m_returnAsRef = "";
 }
 
 InstallerConfig::~InstallerConfig()
 {
-}
-
-int32_t InstallerConfig::LoadBsConfig( const std::string& bsConfig )
-{
-    return int32_t();
 }
 
 int32_t InstallerConfig::LoadPmConfig( const std::string& pmConfig )
@@ -27,34 +21,24 @@ bool InstallerConfig::PmConfigFileChanged( const std::string& pmConfig )
     return false;
 }
 
-int32_t InstallerConfig::VerifyBsFileIntegrity( const std::string& bsConfig )
-{
-    return int32_t();
-}
-
 int32_t InstallerConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
 {
     return int32_t();
 }
 
-const std::string& InstallerConfig::GetCloudIdentifyUri()
+std::string InstallerConfig::GetCloudCheckinUri()
 {
-    return m_returnAsRef;
+    return "";
 }
 
-const std::string& InstallerConfig::GetCloudCheckinUri()
-{
-    return m_returnAsRef;
-}
-
-const std::string& InstallerConfig::GetCloudEventUri()
+std::string InstallerConfig::GetCloudEventUri()
 {
     return m_configData.eventUri;
 }
 
-const std::string& InstallerConfig::GetCloudCatalogUri()
+std::string InstallerConfig::GetCloudCatalogUri()
 {
-    return m_returnAsRef;
+    return "";
 }
 
 uint32_t InstallerConfig::GetCloudCheckinIntervalMs()

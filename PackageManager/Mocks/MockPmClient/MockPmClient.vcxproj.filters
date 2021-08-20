@@ -42,9 +42,6 @@
     <ClInclude Include="MockPmManifest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MockUcidAdapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MockUcUpgradeEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -78,9 +75,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockPmManifest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MockUcidAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MockUcUpgradeEventHandler.cpp">

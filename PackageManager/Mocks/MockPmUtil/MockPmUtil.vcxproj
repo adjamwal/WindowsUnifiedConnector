@@ -23,6 +23,7 @@
     <ClInclude Include="MockFileSysUtil.h" />
     <ClInclude Include="MockPmHttp.h" />
     <ClInclude Include="MockSslUtil.h" />
+    <ClInclude Include="MockUcidAdapter.h" />
     <ClInclude Include="MockUtf8PathVerifier.h" />
     <ClInclude Include="MockWatchdog.h" />
   </ItemGroup>
@@ -30,6 +31,7 @@
     <ClCompile Include="MockFileSysUtil.cpp" />
     <ClCompile Include="MockPmHttp.cpp" />
     <ClCompile Include="MockSslUtil.cpp" />
+    <ClCompile Include="MockUcidAdapter.cpp" />
     <ClCompile Include="MockUtf8PathVerifier.cpp" />
     <ClCompile Include="MockWatchdog.cpp" />
   </ItemGroup>

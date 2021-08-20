@@ -9,10 +9,6 @@ public:
     MockPmConfig();
     ~MockPmConfig();
 
-    MOCK_METHOD1( LoadBsConfig, int32_t( const std::string& ) );
-    void MakeLoadBsConfigReturn( int32_t value );
-    void ExpectLoadBsConfigIsNotCalled();
-
     MOCK_METHOD1( LoadPmConfig, int32_t( const std::string& ) );
     void MakeLoadPmConfigReturn( int32_t value );
     void ExpectLoadPmConfigIsNotCalled();
@@ -20,10 +16,6 @@ public:
     MOCK_METHOD1( PmConfigFileChanged, bool( const std::string& ) );
     void MakePmConfigFileChangedReturn( bool value );
     void ExpectPmConfigFileChangedIsNotCalled();
-
-    MOCK_METHOD1( VerifyBsFileIntegrity, int32_t( const std::string& ) );
-    void MakeVerifyBsFileIntegrityReturn( int32_t value );
-    void ExpectVerifyBsFileIntegrityIsNotCalled();
 
     MOCK_METHOD1( VerifyPmFileIntegrity, int32_t( const std::string& ) );
     void MakeVerifyPmFileIntegrityReturn( int32_t value );
@@ -33,16 +25,16 @@ public:
     void MakeGetCloudIdentifyUriReturn( const std::string& value );
     void ExpectGetCloudIdentifyUriIsNotCalled();
 
-    MOCK_METHOD0( GetCloudCheckinUri, const std::string&() );
-    void MakeGetCloudCheckinUriReturn( const std::string& value );
+    MOCK_METHOD0( GetCloudCheckinUri, std::string() );
+    void MakeGetCloudCheckinUriReturn( std::string value );
     void ExpectGetCloudCheckinUriIsNotCalled();
 
-    MOCK_METHOD0( GetCloudEventUri, const std::string& ( ) );
-    void MakeGetCloudEventUriReturn( const std::string& value );
+    MOCK_METHOD0( GetCloudEventUri, std::string ( ) );
+    void MakeGetCloudEventUriReturn( std::string value );
     void ExpectGetCloudEventUriIsNotCalled();
 
-    MOCK_METHOD0( GetCloudCatalogUri, const std::string& ( ) );
-    void MakeGetCloudCatalogUriReturn( const std::string& value );
+    MOCK_METHOD0( GetCloudCatalogUri, std::string ( ) );
+    void MakeGetCloudCatalogUriReturn( std::string value );
     void ExpectGetCloudCatalogUriIsNotCalled();
 
     MOCK_METHOD0( GetCloudCheckinIntervalMs, uint32_t() );

@@ -43,3 +43,13 @@ void MockUcidAdapter::ExpectRefreshIsNotCalled()
 {
     EXPECT_CALL( *this, Refresh() ).Times( 0 );
 }
+
+void MockUcidAdapter::MakeGetUrlsReturn( bool value )
+{
+    ON_CALL( *this, GetUrls( _ ) ).WillByDefault(Return(value));
+}
+
+void MockUcidAdapter::ExpectGetUrlsIsNotCalled()
+{
+    EXPECT_CALL( *this, GetUrls( _ ) ).Times( 0 );
+}

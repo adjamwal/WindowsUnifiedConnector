@@ -97,3 +97,10 @@ struct PmProductDiscoveryRules
     std::vector<PmProductDiscoveryMsiMethod> msi_discovery;
     std::vector<PmProductDiscoveryRegistryMethod> reg_discovery;
 };
+
+struct PmUrlList
+{
+    std::string eventUrl;
+    std::string checkinUrl;
+    std::string catalogUrl;
+};

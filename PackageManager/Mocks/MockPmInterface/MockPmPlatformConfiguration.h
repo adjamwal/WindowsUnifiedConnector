@@ -44,6 +44,10 @@ public:
     void MakeGetPmVersionReturn( std::string value );
     void ExpectGetPmVersionIsNotCalled();
 
+    MOCK_METHOD1( GetPmUrls, bool( PmUrlList& ) );
+    void MakeGetPmUrlsReturn( bool value );
+    void ExpectGetPmUrlsIsNotCalled();
+
 private:
     std::string m_defaultUserAgent;
 };

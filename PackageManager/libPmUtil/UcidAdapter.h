@@ -14,6 +14,7 @@ public:
     std::string GetAccessToken() override;
     std::string GetIdentity() override;
     bool Refresh() override;
+    bool GetUrls( PmUrlList& urls ) override;
 
 private:
     IPmPlatformDependencies* m_dependencies;

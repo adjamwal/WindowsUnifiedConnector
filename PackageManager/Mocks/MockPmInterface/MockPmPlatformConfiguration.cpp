@@ -96,3 +96,13 @@ void MockPmPlatformConfiguration::ExpectGetPmVersionIsNotCalled()
 {
     EXPECT_CALL( *this, GetPmVersion() ).Times( 0 );
 }
+
+void MockPmPlatformConfiguration::MakeGetPmUrlsReturn( bool value )
+{
+    ON_CALL( *this, GetPmUrls( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformConfiguration::ExpectGetPmUrlsIsNotCalled()
+{
+    EXPECT_CALL( *this, GetPmUrls( _ ) ).Times( 0 );
+}

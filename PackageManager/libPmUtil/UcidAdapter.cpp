@@ -67,3 +67,20 @@ bool UcidAdapter::Refresh()
 
     return rtn;
 }
+
+bool UcidAdapter::GetUrls( PmUrlList& urls )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+    bool rtn = false;
+
+    if( !m_dependencies ) {
+        throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
+    }
+
+    rtn = m_dependencies->Configuration().GetPmUrls( urls );
+    if( !rtn ) {
+        LOG_ERROR( "Failed to Pm Urls" );
+    }
+
+    return rtn;
+}

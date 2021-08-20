@@ -67,11 +67,16 @@ public:
      */
     std::string GetPmVersion() override;
 
+    /**
+     * @brief Retrieve the PM URLs from the identity module
+     */
+    bool GetPmUrls( PmUrlList& urls ) override;
 private:
     IWinCertLoader& m_winCertLoader;
     UCIDApiDll m_ucidApi;
     std::string m_token;
     std::string m_ucid;
+    PmUrlList m_urls;
     std::mutex m_ucidMutex;
 
     bool UpdateUCID();

@@ -45,12 +45,12 @@ private:
     std::unique_ptr<IPmHttp> m_http;
     std::unique_ptr<IPmCloud> m_cloud;
     std::unique_ptr<IInstallerCacheManager> m_installeracheMgr;
+    std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<IPmConfig> m_config;
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
-    std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<ICertsAdapter> m_certsAdapter;
     std::unique_ptr<ICloudEventStorage> m_eventStorage;
     std::unique_ptr<ICloudEventBuilder> m_eventBuilder;

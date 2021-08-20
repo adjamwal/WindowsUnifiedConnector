@@ -49,11 +49,10 @@ public:
         IWatchdog& watchdog );
     virtual ~PackageManager();
 
-    int32_t Start( const char* bsConfigFile, const char* pmConfigFile ) override;
+    int32_t Start( const char* pmConfigFile ) override;
     int32_t Stop() override;
     bool IsRunning() override;
     void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) override;
-    int32_t VerifyBsConfig( const char* bsConfigFile ) override;
     int32_t VerifyPmConfig( const char* pmConfigFile ) override;
 
 private:
@@ -75,14 +74,12 @@ private:
     IWatchdog& m_watchdog;
 
     std::mutex m_mutex;
-    std::string m_bsConfigFile;
     std::string m_pmConfigFile;
 
     IPmPlatformDependencies* m_dependencies;
 
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
-    bool LoadBsConfig();
     bool LoadPmConfig();
     std::chrono::milliseconds PmWatchdogWait();
     void PmWatchdogFired();

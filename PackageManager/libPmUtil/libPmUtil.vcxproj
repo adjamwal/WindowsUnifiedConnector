@@ -24,6 +24,7 @@
     <ClInclude Include="IPmHttp.h" />
     <ClInclude Include="IPmLogger.h" />
     <ClInclude Include="ISslUtil.h" />
+    <ClInclude Include="IUcidAdapter.h" />
     <ClInclude Include="IUtf8PathVerifier.h" />
     <ClInclude Include="IWatchdog.h" />
     <ClInclude Include="IWorkerThread.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="SslUtil.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="TimeUtil.h" />
+    <ClInclude Include="UcidAdapter.h" />
     <ClInclude Include="Utf8PathVerifier.h" />
     <ClInclude Include="Watchdog.h" />
     <ClInclude Include="WorkerThread.h" />
@@ -47,6 +49,7 @@
     <ClCompile Include="SslUtil.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="TimeUtil.cpp" />
+    <ClCompile Include="UcidAdapter.cpp" />
     <ClCompile Include="Utf8PathVerifier.cpp" />
     <ClCompile Include="Watchdog.cpp" />
     <ClCompile Include="WorkerThread.cpp" />

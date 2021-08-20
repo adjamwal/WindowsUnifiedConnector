@@ -70,13 +70,12 @@ PackageManager::~PackageManager()
 
 }
 
-int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFile )
+int32_t PackageManager::Start( const char* pmConfigFile )
 {
     int32_t rtn = -1;
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_bsConfigFile = bsConfigFile;
     m_pmConfigFile = pmConfigFile;
 
     if( !m_dependencies ) {
@@ -87,27 +86,22 @@ int32_t PackageManager::Start( const char* bsConfigFile, const char* pmConfigFil
             LOG_DEBUG( "Failed to load Pm configuration" );
         }
 
-        if( !LoadBsConfig() ) {
-            LOG_ERROR( "Failed to load Bs configuration" );
+        std::string token = m_ucidAdapter.GetAccessToken();
+        if( !token.empty() ) {
+            m_cloud.SetToken( token );
+            m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
+            m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
         }
-        else {
-            std::string token = m_ucidAdapter.GetAccessToken();
-            if( !token.empty() ) {
-                m_cloud.SetToken( token );
-                m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
-                m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
-            }
 
-            m_watchdog.Start(
-                std::bind( &PackageManager::PmWatchdogWait, this ),
-                std::bind( &PackageManager::PmWatchdogFired, this )
-            );
-            m_thread.Start(
-                std::bind( &PackageManager::PmThreadWait, this ),
-                std::bind( &PackageManager::PmWorkflowThread, this )
-            );
-            rtn = 0;
-        }
+        m_watchdog.Start(
+            std::bind( &PackageManager::PmWatchdogWait, this ),
+            std::bind( &PackageManager::PmWatchdogFired, this )
+        );
+        m_thread.Start(
+            std::bind( &PackageManager::PmThreadWait, this ),
+            std::bind( &PackageManager::PmWorkflowThread, this )
+        );
+        rtn = 0;
     }
 
     LOG_DEBUG( "Exit %d", rtn );
@@ -198,10 +192,7 @@ void PackageManager::PmWorkflowThread()
     m_watchdog.Kick();
 
     try {
-        std::string manifest = m_manifestRetriever.GetCheckinManifestFrom(
-            m_config.GetCloudCheckinUri(),
-            m_checkinFormatter.GetJson( inventory )
-        );
+        std::string manifest = m_manifestRetriever.GetCheckinManifest( m_checkinFormatter.GetJson( inventory ) );
 
         LOG_DEBUG( "Checkin manifest: %s", manifest.c_str() );
 
@@ -237,19 +228,9 @@ void PackageManager::PmWorkflowThread()
     }
 }
 
-bool PackageManager::LoadBsConfig()
-{
-    return m_config.LoadBsConfig( m_bsConfigFile ) == 0;
-}
-
 bool PackageManager::LoadPmConfig()
 {
     return m_config.LoadPmConfig( m_pmConfigFile ) == 0;
-}
-
-int32_t PackageManager::VerifyBsConfig( const char* bsConfigFile )
-{
-    return m_config.VerifyBsFileIntegrity( bsConfigFile );
 }
 
 int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )

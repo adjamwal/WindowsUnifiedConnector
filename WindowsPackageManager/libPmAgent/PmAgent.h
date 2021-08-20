@@ -15,11 +15,9 @@ public:
 
     int32_t Start();
     int32_t Stop();
-    int32_t VerifyBsConfig( const std::wstring& bsConfigFilePath );
     int32_t VerifyPmConfig( const std::wstring& pmConfigFilePath );
 
 private:
-    std::wstring m_bsConfigFile;
     std::wstring m_pmConfigFile;
     IPmPlatformDependencies& m_pmDependencies;
     IPMLogger& m_pmLogger;

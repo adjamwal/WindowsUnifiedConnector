@@ -3,41 +3,19 @@
 #include <json/json.h>
 #include "PmLogger.h"
 #include "RandomUtil.h"
+#include "IUcidAdapter.h"
+#include "PmTypes.h"
 
-PmConfig::PmConfig( IFileSysUtil& fileUtil )
+PmConfig::PmConfig( IFileSysUtil& fileUtil, IUcidAdapter& ucidAdapter )
     : m_fileUtil( fileUtil )
+    , m_ucidAdapter( ucidAdapter )
     , m_isFirstCheckin( true )
+    , m_configData( { 0 } )
 {
 }
 
 PmConfig::~PmConfig()
 {
-}
-
-int32_t PmConfig::LoadBsConfig( const std::string& bsConfig )
-{
-    int rtn = -1;
-    std::lock_guard<std::mutex> lock( m_mutex );
-
-    std::string bsData = m_fileUtil.ReadFile( bsConfig );
-
-    rtn = ParseBsConfig( bsData );
-
-    if( rtn != 0 ) {
-        LOG_ERROR( "Failed to parse %s", bsConfig.c_str() );
-        bsData = m_fileUtil.ReadFile( bsConfig + ".bak" );
-
-        rtn = ParseBsConfig( bsData );
-
-        if( rtn == 0 ) {
-            //replace current file with backup?
-        }
-        else {
-            LOG_ERROR( "Failed to parse %s", ( bsConfig + ".bak" ).c_str() );
-        }
-    }
-
-    return rtn;
 }
 
 int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
@@ -85,32 +63,28 @@ bool PmConfig::PmConfigFileChanged( const std::string& pmConfig )
     return m_pmConfigFileTimestamp != m_fileUtil.FileTime( pmConfig );
 }
 
-const std::string& PmConfig::GetCloudIdentifyUri()
+std::string PmConfig::GetCloudCheckinUri()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return m_configData.identifyUri;
+    PmUrlList urls;
+    return  m_ucidAdapter.GetUrls( urls ) ? urls.checkinUrl : "";
 }
 
-const std::string& PmConfig::GetCloudCheckinUri()
+std::string PmConfig::GetCloudEventUri()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return m_configData.checkinUri;
+    PmUrlList urls;
+    return  m_ucidAdapter.GetUrls( urls ) ? urls.eventUrl + EVENT_URL_VERSION : "";
 }
 
-const std::string& PmConfig::GetCloudEventUri()
+std::string PmConfig::GetCloudCatalogUri()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    return m_configData.eventUri;
-}
-
-const std::string& PmConfig::GetCloudCatalogUri()
-{
-    std::lock_guard<std::mutex> lock( m_mutex );
-
-    return m_configData.catalogUri;
+    PmUrlList urls;
+    return  m_ucidAdapter.GetUrls( urls ) ? urls.catalogUrl : "";
 }
 
 uint32_t PmConfig::GetCloudCheckinIntervalMs()
@@ -160,38 +134,6 @@ uint32_t PmConfig::GetWatchdogTimeoutMs()
     std::lock_guard<std::mutex> lock( m_mutex );
 
     return m_configData.watchdogTimeoutMs;
-}
-
-int32_t PmConfig::ParseBsConfig( const std::string& bsConfig )
-{
-    int rtn = -1;
-
-    std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root, pm, id;
-    std::string jsonError;
-
-    if( bsConfig.empty() ) {
-        LOG_ERROR( "Config contents is empty" );
-    }
-    else if( !jsonReader->parse( bsConfig.c_str(), bsConfig.c_str() + bsConfig.length(), &root, &jsonError ) ) {
-        LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
-    }
-    else if( VerifyBsContents( bsConfig ) != 0 ) {
-        LOG_ERROR( "Failed to verify config contents" );
-    }
-    else {
-        id = root[ "id" ];
-        m_configData.identifyUri = id[ "url" ].asString();
-
-        pm = root[ "pm" ];
-        m_configData.checkinUri = pm[ "url" ].asString();
-        m_configData.eventUri = pm[ "event_url" ].asString();
-        m_configData.catalogUri = pm[ "catalog_url" ].asString();
-
-        rtn = 0;
-    }
-
-    return rtn;
 }
 
 int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
@@ -281,53 +223,6 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
     return rtn;
 }
 
-int32_t PmConfig::VerifyBsContents( const std::string& bsData )
-{
-    int32_t rtn = 0;
-
-    std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
-    Json::Value root, pm, id;
-    std::string jsonError;
-
-    if( bsData.empty() ) {
-        LOG_ERROR( "config contents is empty" );
-        rtn = -1;
-    }
-    else if( !jsonReader->parse( bsData.c_str(), bsData.c_str() + bsData.length(), &root, &jsonError ) ) {
-        LOG_ERROR( "Json Parse error %s", jsonError.c_str() );
-        rtn = -1;
-    }
-    else {
-        id = root[ "id" ];
-        if( !id[ "url" ].isString() ) {
-            LOG_ERROR( "Invalid Identify Url" );
-            rtn = -1;
-        }
-
-        pm = root[ "pm" ];
-        if( !pm[ "url" ].isString() ) {
-            LOG_ERROR( "Invalid Checkin Url" );
-            rtn = -1;
-        }
-
-        if( !pm[ "event_url" ].isString() ) {
-            LOG_ERROR( "Invalid Event Url" );
-            rtn = -1;
-        }
-
-        if( !pm[ "catalog_url" ].isString() ) {
-            LOG_ERROR( "Invalid Catalog Url" );
-            rtn = -1;
-        }
-
-        if( rtn != 0 ) {
-            LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
-        }
-    }
-
-    return rtn;
-}
-
 int32_t PmConfig::VerifyPmContents( const std::string& pmData )
 {
     int32_t rtn = 0;
@@ -394,13 +289,6 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
     }
 
     return rtn;
-}
-
-int32_t PmConfig::VerifyBsFileIntegrity( const std::string& bsConfig )
-{
-    std::string bsData = m_fileUtil.ReadFile( bsConfig );
-
-    return VerifyBsContents( bsData );
 }
 
 int32_t PmConfig::VerifyPmFileIntegrity( const std::string& pmConfig )

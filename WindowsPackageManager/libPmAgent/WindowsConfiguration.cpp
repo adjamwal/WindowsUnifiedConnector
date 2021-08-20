@@ -46,6 +46,12 @@ bool WindowsConfiguration::UpdateUCID()
             ret = false;
         }
 
+        ucidRet = m_ucidApi.GetUrls( m_urls );
+        if( ucidRet != 0 ) {
+            LOG_ERROR( "GetUrls Failed: %d", ucidRet );
+            ret = false;
+        }
+
         m_ucidApi.UnloadApi();
     }
 
@@ -76,6 +82,20 @@ bool WindowsConfiguration::GetUcIdentity( std::string& identity )
     }
 
     identity = m_ucid;
+
+    return ret;
+}
+
+bool WindowsConfiguration::GetPmUrls( PmUrlList& urls )
+{
+    std::lock_guard<std::mutex> lock( m_ucidMutex );
+    bool ret = true;
+
+    if( m_urls.catalogUrl.empty() || m_urls.checkinUrl.empty() || m_urls.eventUrl.empty() ) {
+        ret = UpdateUCID();
+    }
+
+    urls = m_urls;
 
     return ret;
 }

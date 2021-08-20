@@ -3,7 +3,8 @@
  *
  * UCIDAPI has functions for use by clients to get the Business ID, UCID and
  * its associated token. It is also possible to request for a refresh
- * of the token associated with UCID.
+ * of the token associated with UCID. Additionaly, the event, catalog and checkin
+ * URLs can also be requested.
  *
  * The UCID, Business ID and token are printable ASCII character sequences.
  *
@@ -98,6 +99,15 @@ typedef enum ucid_result_e {
                                      ///    with the cloud
     UCID_RES_CLOUD_FAILURE = -7,     ///< the cloud returned a failure response
 } ucid_result_t;
+
+/**
+ * An enumeration to indicate the URL types returned by ucid_get_url.
+ */
+typedef enum ucid_url_type_e {
+    UCID_EVENT_URL = 1,         ///< indicates the un-versioned event url
+    UCID_CHECKIN_URL = 2,       ///< indicates the check-in url
+    UCID_CATALOG_URL = 3,       ///< indicates the catalog url
+} ucid_url_type_t; 
 
 /**
  * Get the UCID.
@@ -218,6 +228,43 @@ ucid_refresh_token();
 UCID_CAPI
 ucid_result_t
 ucid_get_business_id(IN OUT char* p_bid, IN OUT int* p_buflen);
+
+/**
+* Get the event, catalog or checkin url based on the urlType param.
+*
+* Copies the requested URL to the memory pointed to by \c p_url. The terminating NUL
+* character is also copied.
+*
+* If \c p_buflen is NULL, then returns \c UCID_RES_INVALID_ARG.
+* If \c p_url is NULL, then updates \c *p_buflen with the size in bytes (including
+* 1 for the terminating NUL) needed to store the url.
+* If both \c p_url and \c p_buflen are not NULL, then \c *p_buflen should contain the
+* size in bytes pointed to by \c p_url. The requested url
+* (including the terminating NUL) is copied to \c p_url
+* and \c *p_buflen is updated with the size of the url
+* (including 1 for terminating NUL).
+* If \c urlType is not supported, then returns UCID_RES_INVALID_ARG
+*
+* @param[in] urlType enum depicting the requested url type
+* @param[in,out] p_url pointer to memory that can store the requested url
+* @param[in,out] p_buflen a non-NULL pointer to an integer
+*
+* @return \li UCID_RES_SUCCESS if the call is successful.
+* \li UCID_RES_INVALID_ARG if \c p_buflen is NULL, OR
+* if \c urlType is invalid or not supported
+* \li UCID_RES_NOT_INITED if the url is not available.
+* \li UCID_RES_INSUFFICIENT_LEN if \c p_url is NULL, OR
+* if \c p_url is not NULL and \c *p_buflen
+* does not have a value
+* >= (size of requested url in bytes
+* +1 for terminating NUL);
+* \c *p_buflen is updated with the required size
+* (including 1 for the terminating NUL).
+* \li UCID_RES_GENERAL_ERROR if any other error occurs.
+*/
+UCID_CAPI
+ucid_result_t
+ucid_get_url(IN ucid_url_type_t urlType, IN OUT char* p_url, IN OUT int* p_buflen);
 
 #ifdef __cplusplus
 }

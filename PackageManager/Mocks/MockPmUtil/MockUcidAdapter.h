@@ -23,4 +23,8 @@ public:
     MOCK_METHOD0( Refresh, bool() );
     void MakeRefreshReturn( bool value );
     void ExpectRefreshIsNotCalled();
+
+    MOCK_METHOD1( GetUrls, bool( PmUrlList& ) );
+    void MakeGetUrlsReturn( bool value );
+    void ExpectGetUrlsIsNotCalled();
 };

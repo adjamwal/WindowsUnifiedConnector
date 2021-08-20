@@ -87,12 +87,6 @@
     <ClInclude Include="PmTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IUcidAdapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UcidAdapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PmConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -165,9 +159,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PmManifest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UcidAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UcUpgradeEventHandler.cpp">

@@ -1,19 +1,14 @@
 #include "pch.h"
 #include "UcidFacade.h"
-#include "FileSysUtil.h"
-#include "PmConfig.h"
 #include "WinCertLoader.h"
 #include "CodesignVerifier.h"
 #include "WindowsConfiguration.h"
+#include "IPmConfig.h"
 #include <WindowsUtilities.h>
 #include <codecvt>
-#include "Utf8PathVerifier.h"
 
 UcidFacade::UcidFacade()
     : m_oldLogger( GetUcLogger() )
-    , m_utf8PathVerifier( new Utf8PathVerifier() )
-    , m_fileUtil( new FileSysUtil( *m_utf8PathVerifier ) )
-    , m_config( new PmConfig( *m_fileUtil ) )
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer( new CodesignVerifier() )
     , m_winConf( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
@@ -31,25 +26,18 @@ bool UcidFacade::CollectUCData( std::string& url, std::string& ucid, std::string
 
     try
     {
-        std::wstring bsConfigFileW;
-
-        if ( !WindowsUtilities::ReadRegistryString(
-            HKEY_LOCAL_MACHINE,
-            L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector\\config",
-            L"Bootstrapper",
-            bsConfigFileW ) )
-        {
-            LOG_ERROR( __FUNCTION__ ": Failed to get bsConfigFile" );
-
-            return false;
-        }
-
-        m_config->LoadBsConfig( converter.to_bytes( bsConfigFileW ) );
-        url = m_config->GetCloudEventUri();
+        PmUrlList urlList;
 
         retval = m_winConf->RefreshIdentity() &&
                  m_winConf->GetUcIdentity( ucid ) &&
-                 m_winConf->GetIdentityToken( ucidToken );
+                 m_winConf->GetIdentityToken( ucidToken ) &&
+                 m_winConf->GetPmUrls( urlList );
+
+        //RD - 08/18/2021
+        // Shortcut to append the version to the URL. PMConfig does this for us, however including PMConfig in this facade means
+        // we need to create it's dependencies (FileSysUtil, UcidAdapter, new Fake PmDependencies/PmComponentManager classes )
+        // seems like a lot of work to append a string
+        url = urlList.eventUrl + EVENT_URL_VERSION;
     }
     catch( std::exception& ex )
     {

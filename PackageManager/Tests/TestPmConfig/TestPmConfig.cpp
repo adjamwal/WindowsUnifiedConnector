@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "PmConfig.h"
 #include "MockFileSysUtil.h"
-
+#include "MockUcidAdapter.h"
 #include <memory>
 
 class TestPmConfig : public ::testing::Test
@@ -9,15 +9,23 @@ class TestPmConfig : public ::testing::Test
 protected:
     void SetUp()
     {
+        m_urls = {
+            "www.event.com",
+            "www.checkin.com",
+            "www.catalog.com",
+        };
+
         m_fileUtil.reset( new NiceMock<MockFileSysUtil>() );
+        m_ucidAdapter.reset( new NiceMock<MockUcidAdapter>() );
         m_aTimeStamp = std::filesystem::file_time_type::clock::now();
-        m_patient.reset( new PmConfig( *m_fileUtil ) );
+        m_patient.reset( new PmConfig( *m_fileUtil, *m_ucidAdapter ) );
     }
 
     void TearDown()
     {
         m_patient.reset();
         m_fileUtil.reset();
+        m_ucidAdapter.reset();
     }
 
     const std::string bsConfigData = R"(
@@ -50,20 +58,12 @@ protected:
 )";
 
     std::unique_ptr<MockFileSysUtil> m_fileUtil;
+    std::unique_ptr<MockUcidAdapter> m_ucidAdapter;
+
     std::filesystem::file_time_type m_aTimeStamp;
+    PmUrlList m_urls;
     std::unique_ptr<PmConfig> m_patient;
 };
-
-TEST_F( TestPmConfig, LoadWillReadBsFile )
-{
-    std::filesystem::path bsfilename( "bs file" );
-
-    m_fileUtil->MakeReadFileReturn( bsConfigData );
-
-    EXPECT_CALL( *m_fileUtil, ReadFile( bsfilename ) );
-
-    m_patient->LoadBsConfig( bsfilename.generic_u8string() );
-}
 
 TEST_F( TestPmConfig, LoadWillReadPmFile )
 {
@@ -74,24 +74,6 @@ TEST_F( TestPmConfig, LoadWillReadPmFile )
     EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
 
     m_patient->LoadPmConfig( pmfilename.generic_u8string() );
-}
-
-TEST_F( TestPmConfig, LoadWillSaveCloudCheckinUri )
-{
-    m_fileUtil->MakeReadFileReturn( bsConfigData );
-
-    m_patient->LoadBsConfig( "filename" );
-
-    EXPECT_EQ( m_patient->GetCloudCheckinUri(), "https://packagemanager.cisco.com/checkin" );
-}
-
-TEST_F( TestPmConfig, LoadWillSaveCloudCatalogUri )
-{
-    m_fileUtil->MakeReadFileReturn( bsConfigData );
-
-    m_patient->LoadBsConfig( "filename" );
-
-    EXPECT_EQ( m_patient->GetCloudCatalogUri(), "https://packagemanager.cisco.com/catalog" );
 }
 
 TEST_F( TestPmConfig, LoadWillSaveCustomCheckinInterval )
@@ -111,13 +93,6 @@ TEST_F( TestPmConfig, FirstCheckinIntervalIsRandomizedWithinCustomRange )
     m_patient->LoadPmConfig( "filename" );
 
     EXPECT_LE( m_patient->GetCloudCheckinIntervalMs(), 200000U );
-}
-
-TEST_F( TestPmConfig, LoadBsConfigWillSucceed )
-{
-    m_fileUtil->MakeReadFileReturn( bsConfigData );
-
-    EXPECT_EQ( m_patient->LoadBsConfig( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, LoadPmConfigWillSucceed )
@@ -159,25 +134,11 @@ TEST_F( TestPmConfig, LoadWillTryBackupFile )
     m_patient->LoadPmConfig( filename.generic_u8string() );
 }
 
-TEST_F( TestPmConfig, VerifyBsFileIntegrityWillSucceed )
-{
-    m_fileUtil->MakeReadFileReturn( bsConfigData );
-
-    EXPECT_EQ( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
-}
-
 TEST_F( TestPmConfig, VerifyPmFileIntegrityWillSucceed )
 {
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 
     EXPECT_EQ( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
-}
-
-TEST_F( TestPmConfig, VerifyBsFileIntegrityWillFailOnEmptyContents )
-{
-    m_fileUtil->MakeReadFileReturn( "" );
-
-    EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailOnEmptyContents )
@@ -218,29 +179,6 @@ TEST_F( TestPmConfig, VerifyPmFileIntegrityWillFailIfMaxFileCacheAgeIsInvalid )
 )" );
 
     EXPECT_NE( m_patient->VerifyPmFileIntegrity( "filename" ), 0 );
-}
-
-TEST_F( TestPmConfig, VerifyBsFileIntegrityWillNotAcceptInvalidJson )
-{
-    m_fileUtil->MakeReadFileReturn( R"(
-{
-    "wrong": { }
-)" );
-
-    EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
-}
-
-TEST_F( TestPmConfig, VerifyBsFileIntegrityWillNotAcceptInvalidURL )
-{
-    m_fileUtil->MakeReadFileReturn( R"(
-{
-	"pm": {
-        "url": 1
-	}
-}
-)" );
-
-    EXPECT_NE( m_patient->VerifyBsFileIntegrity( "filename" ), 0 );
 }
 
 TEST_F( TestPmConfig, LoadingEmptyConfigSetsDefaultInterval )
@@ -343,4 +281,32 @@ TEST_F( TestPmConfig, WillAddDefaultWatchdogBufferToTimeout )
     m_patient->LoadPmConfig( "filename" );
 
     EXPECT_EQ( m_patient->GetWatchdogTimeoutMs(), 150000 + PM_CONFIG_WATCHDOG_BUFFER_DEFAULT_MS );
+}
+
+TEST_F( TestPmConfig, CanGetCatalogUrl )
+{
+    ON_CALL( *m_ucidAdapter, GetUrls ).WillByDefault( DoAll( SetArgReferee<0>( m_urls ), Return( true ) ) );
+
+    EXPECT_EQ( m_patient->GetCloudCatalogUri(), m_urls.catalogUrl );
+}
+
+TEST_F( TestPmConfig, CanGetCheckinUrl )
+{
+    ON_CALL( *m_ucidAdapter, GetUrls ).WillByDefault( DoAll( SetArgReferee<0>( m_urls ), Return( true ) ) );
+
+    EXPECT_EQ( m_patient->GetCloudCheckinUri(), m_urls.checkinUrl );
+}
+
+TEST_F( TestPmConfig, CanGetEventUrl )
+{
+    ON_CALL( *m_ucidAdapter, GetUrls ).WillByDefault( DoAll( SetArgReferee<0>( m_urls ), Return( true ) ) );
+
+    EXPECT_THAT( m_patient->GetCloudEventUri(), HasSubstr( m_urls.eventUrl ) );
+}
+
+TEST_F( TestPmConfig, GetEventUrlWillAppendApiVersion )
+{
+    ON_CALL( *m_ucidAdapter, GetUrls ).WillByDefault( DoAll( SetArgReferee<0>( m_urls ), Return( true ) ) );
+
+    EXPECT_THAT( m_patient->GetCloudEventUri(), HasSubstr( "/1") );
 }

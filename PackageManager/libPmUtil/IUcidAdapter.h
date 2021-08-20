@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "PmTypes.h"
 
 class IPmPlatformDependencies;
 
@@ -15,4 +16,5 @@ public:
     virtual std::string GetAccessToken() = 0;
     virtual std::string GetIdentity() = 0;
     virtual bool Refresh() = 0;
+    virtual bool GetUrls( PmUrlList& urls ) = 0;
 };
