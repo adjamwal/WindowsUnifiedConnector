@@ -16,7 +16,7 @@ InstallerCacheManager::InstallerCacheManager( IPmCloud& pmCloud, IFileSysUtil& f
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_componentMgr( nullptr )
-    , m_downloadPath( m_fileUtil.GetTempDir().append( "Cisco-UC" ) )
+    , m_tempDownloadPath( m_fileUtil.GetTempDir().append( "Cisco-UC" ) )
 {
 
 }
@@ -31,6 +31,7 @@ void InstallerCacheManager::Initialize( IPmPlatformDependencies* dep )
     std::lock_guard<std::mutex> lock( m_mutex );
 
     m_componentMgr = &dep->ComponentManager();
+    m_componentMgr->RestrictPathPermissionsToAdmins( m_tempDownloadPath );
 }
 
 std::filesystem::path InstallerCacheManager::DownloadOrUpdateInstaller( const PmComponent& componentPackage )
@@ -38,7 +39,7 @@ std::filesystem::path InstallerCacheManager::DownloadOrUpdateInstaller( const Pm
     bool installerValid = false;
     std::stringstream ssError;
 
-    std::filesystem::path installerPath = m_downloadPath;
+    std::filesystem::path installerPath = m_tempDownloadPath;
     installerPath /= componentPackage.installerHash.empty() ?
         SanitizeComponentProductAndVersion( componentPackage.productAndVersion ) :
         componentPackage.installerHash;
@@ -140,7 +141,7 @@ void InstallerCacheManager::PruneInstallers( uint32_t ageInSeconds )
     }
 
     std::vector<std::filesystem::path> results;
-    std::filesystem::path searchPath = m_downloadPath / "*";
+    std::filesystem::path searchPath = m_tempDownloadPath / "*";
     searchPath.make_preferred();
 
     LOG_DEBUG( "Searching for Installers in %s", searchPath.generic_u8string().c_str() );

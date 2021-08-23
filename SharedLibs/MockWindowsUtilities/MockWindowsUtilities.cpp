@@ -234,12 +234,42 @@ void MockWindowsUtilities::ExpectAllowEveryoneAccessToFileNotCalled()
     EXPECT_CALL( *this, AllowEveryoneAccessToFile( _ ) ).Times( 0 );
 }
 
-void MockWindowsUtilities::MakeAllowUserReadAccessToFileReturn( bool value )
+void MockWindowsUtilities::MakeAllowBuiltinUsersReadAccessToPathReturn( bool value )
 {
-    ON_CALL( *this, AllowUserReadAccessToFile( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, AllowBuiltinUsersReadAccessToPath( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockWindowsUtilities::ExpectAllowUserReadAccessToFileNotCalled()
+void MockWindowsUtilities::ExpectAllowBuiltinUsersReadAccessToPathNotCalled()
 {
-    EXPECT_CALL( *this, AllowUserReadAccessToFile( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, AllowBuiltinUsersReadAccessToPath( _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeSetSidAccessToPathReturn( bool value )
+{
+    ON_CALL( *this, SetSidAccessToPath( _, _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectSetSidAccessToPathNotCalled()
+{
+    EXPECT_CALL( *this, SetSidAccessToPath( _, _, _, _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeSetWellKnownGroupAccessToPathReturn( bool value )
+{
+    ON_CALL( *this, SetWellKnownGroupAccessToPath( _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectSetWellKnownGroupAccessToPathNotCalled()
+{
+    EXPECT_CALL( *this, SetWellKnownGroupAccessToPath( _, _, _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeSetNamedUserAccessToPathReturn( bool value )
+{
+    ON_CALL( *this, SetNamedUserAccessToPath( _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectSetNamedUserAccessToPathNotCalled()
+{
+    EXPECT_CALL( *this, SetNamedUserAccessToPath( _, _, _ ) ).Times( 0 );
 }

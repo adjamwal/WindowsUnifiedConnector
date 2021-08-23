@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <vector>
 #include <filesystem>
+#include <AccCtrl.h>
 
 class WindowsUtilities
 {
@@ -40,8 +41,11 @@ public:
         std::vector<std::filesystem::path>& results );
 
     static bool AllowEveryoneAccessToFile( const std::wstring& path );
-    static bool AllowUserReadAccessToFile( const std::wstring& path );
-
+    static bool AllowBuiltinUsersReadAccessToPath( const std::wstring& path );
+    static bool SetSidAccessToPath( const std::wstring& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions );
+    static bool SetWellKnownGroupAccessToPath( const std::wstring& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions );
+    static bool SetNamedUserAccessToPath( const std::wstring& path, const std::wstring& userName, DWORD accessPermissions );
+    
 private:
     static std::string ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle );
 };

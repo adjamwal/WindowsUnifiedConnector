@@ -12,7 +12,7 @@
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> _g_converter;
-// TOOD: Do we acutally need all of thses or just a subset?
+// TOOD: Do we actually need all of these or just a subset?
 static std::unordered_map< std::string, const GUID> _knownFolderMap = {
     { "FOLDERID_AccountPictures", FOLDERID_AccountPictures },
     { "FOLDERID_AddNewPrograms", FOLDERID_AddNewPrograms },
@@ -138,10 +138,10 @@ static std::unordered_map< std::string, const GUID> _knownFolderMap = {
     { "FOLDERID_Windows", FOLDERID_Windows }
 };
 
-bool WindowsUtilities::FileExists(const WCHAR* filename)
+bool WindowsUtilities::FileExists( const WCHAR* filename )
 {
     struct _stat stFileInfo;
-    return (_wstat(filename, &stFileInfo) == 0);
+    return ( _wstat( filename, &stFileInfo ) == 0 );
 }
 
 std::string WindowsUtilities::ReadFileContents( const WCHAR* filename )
@@ -175,14 +175,14 @@ uint32_t WindowsUtilities::GetFileModifyTime( const WCHAR* filename )
 bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* content, const size_t contentLen )
 {
     bool rtn = false;
-    if ( !filename || !content || contentLen == 0 ) {
+    if( !filename || !content || contentLen == 0 ) {
         return false;
     }
 
     try {
         std::ofstream file( filename, std::ofstream::out | std::ofstream::trunc );
 
-        if ( file.is_open() ) {
+        if( file.is_open() ) {
             file.write( ( const char* )content, contentLen );
 
             file.close();
@@ -190,22 +190,22 @@ bool WindowsUtilities::WriteFileContents( const WCHAR* filename, const uint8_t* 
             rtn = true;
         }
     }
-    catch ( ... ) {
+    catch( ... ) {
 
     }
 
     return rtn;
 }
 
-bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)
+bool WindowsUtilities::DirectoryExists( const WCHAR* dirname )
 {
-    DWORD ftyp = GetFileAttributes(dirname);
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
+    DWORD ftyp = GetFileAttributes( dirname );
+    if( ftyp == INVALID_FILE_ATTRIBUTES )
     {
         return false;
     }
 
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+    if( ftyp & FILE_ATTRIBUTE_DIRECTORY )
     {
         return true;
     }
@@ -215,45 +215,45 @@ bool WindowsUtilities::DirectoryExists(const WCHAR* dirname)
 
 std::wstring WindowsUtilities::GetExePath()
 {
-    WCHAR buffer[MAX_PATH] = { 0 };
+    WCHAR buffer[ MAX_PATH ] = { 0 };
 
-    GetModuleFileName(NULL, buffer, MAX_PATH);
-    std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"/\\");
+    GetModuleFileName( NULL, buffer, MAX_PATH );
+    std::wstring::size_type pos = std::wstring( buffer ).find_last_of( L"/\\" );
 
-    return std::wstring(buffer).substr(0, pos);
+    return std::wstring( buffer ).substr( 0, pos );
 }
 
-std::wstring WindowsUtilities::GetDirPath(const std::wstring& path)
+std::wstring WindowsUtilities::GetDirPath( const std::wstring& path )
 {
-    std::wstring::size_type pos = std::wstring(path).find_last_of(L"/\\");
+    std::wstring::size_type pos = std::wstring( path ).find_last_of( L"/\\" );
 
-    return path.substr(0, pos);
+    return path.substr( 0, pos );
 }
 
-bool WindowsUtilities::ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data)
+bool WindowsUtilities::ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data )
 {
-    DWORD dataSize{};
+    DWORD dataSize {};
 
     //NOTE: RRF_SUBKEY_WOW6464KEY flag only works with Windows 10 or greater, and is ignored on 32 bit Windows
     //if we ever need to support Windows 7/8.1 we'll have to switch to RegOpenKeyEx() and RegQueryValueEx()
-    LONG retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, nullptr, &dataSize);
+    LONG retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, nullptr, &dataSize );
 
-    if (retCode != ERROR_SUCCESS)
+    if( retCode != ERROR_SUCCESS )
     {
         return false;
     }
 
-    data.resize(dataSize / sizeof(wchar_t));
+    data.resize( dataSize / sizeof( wchar_t ) );
 
-    retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, &data[0], &dataSize);
-    if (retCode != ERROR_SUCCESS)
+    retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY, nullptr, &data[ 0 ], &dataSize );
+    if( retCode != ERROR_SUCCESS )
     {
         return false;
     }
 
-    DWORD stringLengthInWchars = dataSize / sizeof(wchar_t);
+    DWORD stringLengthInWchars = dataSize / sizeof( wchar_t );
     stringLengthInWchars--; // Exclude the NUL written by the Win32 API
-    data.resize(stringLengthInWchars);
+    data.resize( stringLengthInWchars );
 
     return true;
 }
@@ -290,7 +290,7 @@ bool WindowsUtilities::Is64BitWindows()
 #elif defined(_WIN32)
     // 32-bit programs run on both 32-bit and 64-bit Windows so we must sniff
     BOOL f64 = FALSE;
-    return IsWow64Process(GetCurrentProcess(), &f64) && f64;
+    return IsWow64Process( GetCurrentProcess(), &f64 ) && f64;
 #else
     return FALSE; // Win64 does not support Win16
 #endif
@@ -303,17 +303,17 @@ bool WindowsUtilities::GetSysDirectory( std::string& path )
 
     HRESULT result = ::SHGetKnownFolderPath( FOLDERID_System, KF_FLAG_DEFAULT, NULL, &tmpPath );
 
-    if ( SUCCEEDED( result ) )
+    if( SUCCEEDED( result ) )
     {
-        if ( tmpPath != nullptr )
+        if( tmpPath != nullptr )
         {
             path = _g_converter.to_bytes( tmpPath );
         }
-        
+
         CoTaskMemFree( tmpPath );
         ret = true;
     }
-    
+
     return ret;
 }
 
@@ -356,9 +356,9 @@ std::string WindowsUtilities::ResolveKnownFolderId( const std::string& knownFold
 {
     std::string knownFolder;
 
-    if ( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
+    if( _knownFolderMap.find( knownFolderId ) != _knownFolderMap.end() ) {
         PWSTR wpath = NULL;
-        if ( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, userHandle, &wpath ) ) ) {
+        if( SUCCEEDED( SHGetKnownFolderPath( _knownFolderMap[ knownFolderId ], KF_FLAG_DEFAULT, userHandle, &wpath ) ) ) {
             knownFolder = _g_converter.to_bytes( wpath );
             CoTaskMemFree( wpath );
         }
@@ -390,13 +390,13 @@ std::wstring WindowsUtilities::GetLogDir()
 std::string WindowsUtilities::ResolvePath( const std::string& basePath )
 {
     size_t begin = basePath.find( "<FOLDERID_" );
-    if ( begin != std::string::npos ) {
+    if( begin != std::string::npos ) {
         size_t end = basePath.find( ">", begin + strlen( "<FOLDERID_" ) );
-        if ( end != std::string::npos ) {
+        if( end != std::string::npos ) {
             begin;
 
-            std::string knownFolder = WindowsUtilities::ResolveKnownFolderIdForDefaultUser( basePath.substr( begin + 1, end - (begin + 1) ) );
-            if ( !knownFolder.empty() ) {
+            std::string knownFolder = WindowsUtilities::ResolveKnownFolderIdForDefaultUser( basePath.substr( begin + 1, end - ( begin + 1 ) ) );
+            if( !knownFolder.empty() ) {
                 knownFolder = basePath.substr( 0, begin ) + knownFolder + basePath.substr( end + 1 );
                 return knownFolder;
             }
@@ -427,7 +427,7 @@ int32_t WindowsUtilities::FileSearchWithWildCard( const std::filesystem::path& s
 
     std::vector<std::filesystem::path> searchList;
 
-    for ( const auto& part : searchPath.relative_path() )
+    for( const auto& part : searchPath.relative_path() )
     {
         searchList.emplace_back( part );
     }
@@ -444,7 +444,7 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
 {
     int32_t dwError = 0;
 
-    if ( begin != end )
+    if( begin != end )
     {
         searchPath /= *begin;
 
@@ -458,11 +458,11 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
             0,
             FIND_FIRST_EX_LARGE_FETCH );
 
-        if ( hFindFile != INVALID_HANDLE_VALUE )
+        if( hFindFile != INVALID_HANDLE_VALUE )
         {
             do
             {
-                if ( findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+                if( findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
                 {
                     auto tempIterator = begin;
                     std::filesystem::path directoryPath = searchPath.parent_path();
@@ -474,9 +474,9 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
                 {
                     results.push_back( searchPath.parent_path().append( findFileData.cFileName ) );
                 }
-            } while ( FindNextFile( hFindFile, &findFileData ) );
+            } while( FindNextFile( hFindFile, &findFileData ) );
 
-            if ( (dwError = GetLastError()) == ERROR_NO_MORE_FILES )
+            if( ( dwError = GetLastError() ) == ERROR_NO_MORE_FILES )
             {
                 dwError = NOERROR;
             }
@@ -495,7 +495,7 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
 bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
 {
     bool rtn = false;
-    PACL pDacl = NULL;
+    PACL pOldDACL = NULL;
     PACL pNewDACL = NULL;
     EXPLICIT_ACCESS ExplicitAccess = { 0 };
     PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
@@ -505,9 +505,9 @@ bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
     lpStr = ( LPTSTR )path.c_str();
 
     if( !path.empty() &&
-        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pDacl, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
-        ConvertStringSidToSid( L"S-1-1-0", &psid ) 
-      ) {
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
+        ConvertStringSidToSid( L"S-1-1-0", &psid )
+        ) {
         ExplicitAccess.grfAccessMode = SET_ACCESS;
         ExplicitAccess.grfAccessPermissions = GENERIC_ALL;
         ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
@@ -517,22 +517,23 @@ bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
         ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
         ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
 
-        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pDacl, &pNewDACL ) == ERROR_SUCCESS ) &&
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
             ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
             rtn = true;
         }
     }
 
+    if( ppSecurityDescriptor != NULL ) LocalFree( ( HLOCAL )ppSecurityDescriptor );
     if( pNewDACL ) LocalFree( pNewDACL );
     if( psid ) LocalFree( psid );
 
     return rtn;
 }
 
-bool WindowsUtilities::AllowUserReadAccessToFile( const std::wstring& path )
+bool WindowsUtilities::AllowBuiltinUsersReadAccessToPath( const std::wstring& path )
 {
     bool rtn = false;
-    PACL pDacl = NULL;
+    PACL pOldDACL = NULL;
     PACL pNewDACL = NULL;
     EXPLICIT_ACCESS ExplicitAccess = { 0 };
     PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
@@ -542,7 +543,7 @@ bool WindowsUtilities::AllowUserReadAccessToFile( const std::wstring& path )
     lpStr = ( LPTSTR )path.c_str();
 
     if( !path.empty() &&
-        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pDacl, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
         ConvertStringSidToSid( L"S-1-5-32-545", &psid ) //Builtin Users
         ) {
         ExplicitAccess.grfAccessMode = SET_ACCESS;
@@ -554,14 +555,131 @@ bool WindowsUtilities::AllowUserReadAccessToFile( const std::wstring& path )
         ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
         ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
 
-        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pDacl, &pNewDACL ) == ERROR_SUCCESS ) &&
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
             ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
             rtn = true;
         }
     }
 
+    if( ppSecurityDescriptor != NULL ) LocalFree( ( HLOCAL )ppSecurityDescriptor );
     if( pNewDACL ) LocalFree( pNewDACL );
     if( psid ) LocalFree( psid );
 
     return rtn;
 }
+
+bool WindowsUtilities::SetSidAccessToPath( const std::wstring& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions )
+{
+    bool rtn = false;
+    PACL pOldDACL = NULL;
+    PACL pNewDACL = NULL;
+    EXPLICIT_ACCESS ExplicitAccess = { 0 };
+    PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
+    PSID psid = NULL;
+
+    LPTSTR lpStr;
+    lpStr = ( LPTSTR )path.c_str();
+
+    if( !path.empty() &&
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
+        ConvertStringSidToSid( userSid.c_str(), &psid )
+        ) {
+        ExplicitAccess.grfAccessMode = SET_ACCESS;
+        ExplicitAccess.grfAccessPermissions = accessPermissions;
+        ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+        ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+        ExplicitAccess.Trustee.pMultipleTrustee = NULL;
+        ExplicitAccess.Trustee.ptstrName = ( LPTSTR )psid;
+        ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+        ExplicitAccess.Trustee.TrusteeType = trusteeType;
+
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
+            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
+            rtn = true;
+        }
+    }
+
+    if( ppSecurityDescriptor != NULL ) LocalFree( ( HLOCAL )ppSecurityDescriptor );
+    if( pNewDACL ) LocalFree( pNewDACL );
+    if( psid ) LocalFree( psid );
+
+    return rtn;
+}
+
+bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions)
+{
+    bool rtn = false;
+    PACL pOldDACL = NULL;
+    PACL pNewDACL = NULL;
+    EXPLICIT_ACCESS ExplicitAccess = { 0 };
+    PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
+    PSID psid = NULL;
+    DWORD cbSid = SECURITY_MAX_SID_SIZE;
+
+    LPTSTR lpStr;
+    lpStr = ( LPTSTR )path.c_str();
+
+    if( !path.empty() &&
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
+        ( ( psid = LocalAlloc( LMEM_FIXED, cbSid ) ) != NULL ) &&
+        CreateWellKnownSid( wellKnownSid, NULL, psid, &cbSid )
+      ){
+
+        BuildTrusteeWithSid( &ExplicitAccess.Trustee, psid );
+        ExplicitAccess.grfAccessMode = SET_ACCESS;
+        ExplicitAccess.grfAccessPermissions = accessPermissions;
+        ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+        ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+        ExplicitAccess.Trustee.pMultipleTrustee = NULL;
+        ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_GROUP;
+
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
+            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
+            rtn = true;
+        }
+    }
+
+    if( ppSecurityDescriptor != NULL ) LocalFree( ( HLOCAL )ppSecurityDescriptor );
+    if( pNewDACL ) LocalFree( pNewDACL );
+    if( psid ) LocalFree( psid );
+
+    return rtn;
+}
+
+bool WindowsUtilities::SetNamedUserAccessToPath( const std::wstring& path, const std::wstring& userName, DWORD accessPermissions )
+{
+    bool rtn = false;
+    PACL pOldDACL = NULL;
+    PACL pNewDACL = NULL;
+    EXPLICIT_ACCESS ExplicitAccess = { 0 };
+    PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
+
+    LPTSTR lpStr;
+    lpStr = ( LPTSTR )path.c_str();
+
+    if( !path.empty() &&
+        ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) )
+    {
+        ExplicitAccess.grfAccessMode = SET_ACCESS;
+        ExplicitAccess.grfAccessPermissions = accessPermissions;
+        ExplicitAccess.grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+        ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+        ExplicitAccess.Trustee.pMultipleTrustee = NULL;
+        ExplicitAccess.Trustee.ptstrName = ( LPTSTR )userName.c_str();
+        ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
+        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_USER;
+
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
+            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) )
+        {
+            rtn = true;
+        }
+    }
+
+    if( ppSecurityDescriptor != NULL ) LocalFree( ( HLOCAL )ppSecurityDescriptor );
+    if( pNewDACL ) LocalFree( pNewDACL );
+
+    return rtn;
+}
+

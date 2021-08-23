@@ -113,7 +113,15 @@ public:
      *
      * @return 0 on success
      */
-    int32_t ApplyUserReadPermissions( const std::filesystem::path& filePath ) override;
+    int32_t ApplyBultinUsersReadPermissions( const std::filesystem::path& filePath ) override;
+
+    /**
+    * @brief Provides Full Access to file
+    *   Used on windows to give full permissions to administrators and system users. Similar to chmod +rw
+    *
+    * @return 0 on success
+    */
+    int32_t RestrictPathPermissionsToAdmins( const std::filesystem::path& filePath ) override;
 
 private:
     IWinApiWrapper& m_winApiWrapper;

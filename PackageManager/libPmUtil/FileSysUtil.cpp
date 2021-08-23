@@ -153,11 +153,11 @@ std::filesystem::path FileSysUtil::GetTempDir()
 {
     auto path = std::filesystem::temp_directory_path();
 
-    //make_preferred will use the prefered sepeartor for the operating system
+    //make_preferred will use the preferred separator for the operating system
     // "//" for windows "/" for linux 
     //path.make_preferred();
 
-    // string() will return the path with the prefered sepeartor
+    // string() will return the path with the preferred separator
     return path;
 }
 

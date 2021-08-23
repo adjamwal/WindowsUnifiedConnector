@@ -9,6 +9,7 @@
 #include <sstream>
 #include <locale>
 #include <codecvt>
+#include <AccCtrl.h>
 
 #define UCSERVICE_PATH_REG_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCSERVICE"
 #define DIAG_TOOL_EXE L"csc_ucdt.exe"
@@ -248,7 +249,17 @@ void WindowsComponentManager::NotifySystemRestart()
     LOG_DEBUG( "Exit" );
 }
 
-int32_t WindowsComponentManager::ApplyUserReadPermissions( const std::filesystem::path& filePath )
+int32_t WindowsComponentManager::ApplyBultinUsersReadPermissions( const std::filesystem::path& filePath )
 {
-    return WindowsUtilities::AllowUserReadAccessToFile( filePath.wstring() ) ? 0 : -1;
+    return WindowsUtilities::AllowBuiltinUsersReadAccessToPath( filePath.wstring() ) ? 0 : -1;
+}
+
+int32_t WindowsComponentManager::RestrictPathPermissionsToAdmins( const std::filesystem::path& filePath )
+{
+    return  WindowsUtilities::SetWellKnownGroupAccessToPath( filePath.wstring(), WinAuthenticatedUserSid, GENERIC_READ ) &&
+            //BUILTIN\Administrators (this includes System user, see S-1-5-18 on https://docs.microsoft.com/en-us/windows/security/identity-protection/access-control/security-identifiers)
+            WindowsUtilities::SetSidAccessToPath( filePath.wstring(), L"S-1-5-32-544", TRUSTEE_IS_GROUP, GENERIC_ALL ) &&
+            //NT SERVICE\TrustedInstaller
+            WindowsUtilities::SetSidAccessToPath( filePath.wstring(), L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464", TRUSTEE_IS_USER, GENERIC_ALL )
+         ? 0 : -1;
 }

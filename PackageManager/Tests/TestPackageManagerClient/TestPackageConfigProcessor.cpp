@@ -209,7 +209,7 @@ TEST_F( TestPackageConfigProcessor, AddFileWillApplyReadPermissions )
     m_sslUtil->MakeCalculateSHA256Return( m_configInfo.sha256 );
     m_fileUtil->MakeRenameReturn( 0 );
 
-    EXPECT_CALL( *m_pmComponentManager, ApplyUserReadPermissions( _ ) ).WillOnce( Return( 0 ) );
+    EXPECT_CALL( *m_pmComponentManager, ApplyBultinUsersReadPermissions( _ ) ).WillOnce( Return( 0 ) );
 
     m_patient->ProcessConfig( m_configInfo );
 }

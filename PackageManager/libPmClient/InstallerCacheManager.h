@@ -29,5 +29,5 @@ private:
     std::mutex m_mutex;
     IPmPlatformComponentManager* m_componentMgr;
 
-    const std::filesystem::path m_downloadPath;
+    std::filesystem::path m_tempDownloadPath;
 };

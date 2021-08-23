@@ -43,11 +43,14 @@ public:
     void ExpectFileSearchWithWildCardNotCalled();
 
     MOCK_METHOD0( NotifySystemRestart, void() );
-
     
-    MOCK_METHOD1( ApplyUserReadPermissions, int32_t( const std::filesystem::path& ) );
-    void MakeApplyUserReadPermissionsReturn( int32_t value );
-    void ExpectApplyUserReadPermissionsNotCalled();
+    MOCK_METHOD1( ApplyBultinUsersReadPermissions, int32_t( const std::filesystem::path& ) );
+    void MakeApplyBultinUsersReadPermissionsReturn( int32_t value );
+    void ExpectApplyBultinUsersReadPermissionsNotCalled();
+
+    MOCK_METHOD1( RestrictPathPermissionsToAdmins, int32_t( const std::filesystem::path& ) );
+    void MakeRestrictPathPermissionsToAdminsReturn( int32_t value );
+    void ExpectRestrictPathPermissionsToAdminsNotCalled();
 
 private:
     PackageInventory m_cachedInventory;

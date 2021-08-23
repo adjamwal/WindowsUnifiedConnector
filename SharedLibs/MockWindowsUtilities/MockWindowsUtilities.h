@@ -92,9 +92,21 @@ public:
     void MakeAllowEveryoneAccessToFileReturn( bool value );
     void ExpectAllowEveryoneAccessToFileNotCalled();
 
-    MOCK_METHOD1( AllowUserReadAccessToFile, bool( const std::wstring& ) );
-    void MakeAllowUserReadAccessToFileReturn( bool value );
-    void ExpectAllowUserReadAccessToFileNotCalled();
+    MOCK_METHOD1( AllowBuiltinUsersReadAccessToPath, bool( const std::wstring& ) );
+    void MakeAllowBuiltinUsersReadAccessToPathReturn( bool value );
+    void ExpectAllowBuiltinUsersReadAccessToPathNotCalled();
+
+    MOCK_METHOD4( SetSidAccessToPath, bool( const std::wstring&, const std::wstring&, TRUSTEE_TYPE, DWORD ) );
+    void MakeSetSidAccessToPathReturn( bool value );
+    void ExpectSetSidAccessToPathNotCalled();
+
+    MOCK_METHOD3( SetWellKnownGroupAccessToPath, bool( const std::wstring&, WELL_KNOWN_SID_TYPE, DWORD ) );
+    void MakeSetWellKnownGroupAccessToPathReturn( bool value );
+    void ExpectSetWellKnownGroupAccessToPathNotCalled();
+
+    MOCK_METHOD3( SetNamedUserAccessToPath, bool( const std::wstring&, const std::wstring&, DWORD ) );
+    void MakeSetNamedUserAccessToPathReturn( bool value );
+    void ExpectSetNamedUserAccessToPathNotCalled();
 
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();

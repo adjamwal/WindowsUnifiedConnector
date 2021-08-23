@@ -26,6 +26,7 @@ protected:
         m_deps.reset( new NiceMock<MockPmPlatformDependencies>() );
 
         m_deps->MakeComponentManagerReturn( *m_componentMgr );
+        m_componentMgr->MakeRestrictPathPermissionsToAdminsReturn( 0 );
 
         m_patient.reset( new InstallerCacheManager( *m_cloud, *m_fileUtil, *m_sslUtil ) );
     }
@@ -214,6 +215,13 @@ TEST_F( TestInstallerCacheManager, PruneInstallersCannotBeRunUninitialied )
     m_componentMgr->ExpectFileSearchWithWildCardNotCalled();
 
     EXPECT_NO_THROW( m_patient->PruneInstallers( 0 ) );
+}
+
+TEST_F( TestInstallerCacheManager, InitializeWillSetTempPermissions )
+{
+    EXPECT_CALL( *m_componentMgr, RestrictPathPermissionsToAdmins( _ ) ).Times( 1 );
+
+    m_patient->Initialize( m_deps.get() );
 }
 
 TEST_F( TestInstallerCacheManager, PruneInstallersWillDeleteFile )

@@ -11,6 +11,8 @@ MockPmPlatformComponentManager::MockPmPlatformComponentManager()
     MakeDeployConfigurationReturn( int32_t() );
     MakeResolvePathReturn( "" );
     MakeFileSearchWithWildCardReturn( int32_t() );
+    MakeApplyBultinUsersReadPermissionsReturn( int32_t() );
+    MakeRestrictPathPermissionsToAdminsReturn( int32_t() );
 }
 
 MockPmPlatformComponentManager::~MockPmPlatformComponentManager()
@@ -97,12 +99,22 @@ void MockPmPlatformComponentManager::ExpectFileSearchWithWildCardNotCalled()
     EXPECT_CALL( *this, FileSearchWithWildCard( _, _ ) ).Times( 0 );
 }
 
-void MockPmPlatformComponentManager::MakeApplyUserReadPermissionsReturn( int32_t value )
+void MockPmPlatformComponentManager::MakeApplyBultinUsersReadPermissionsReturn( int32_t value )
 {
-    ON_CALL( *this, ApplyUserReadPermissions( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ApplyBultinUsersReadPermissions( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockPmPlatformComponentManager::ExpectApplyUserReadPermissionsNotCalled()
+void MockPmPlatformComponentManager::ExpectApplyBultinUsersReadPermissionsNotCalled()
 {
-    EXPECT_CALL( *this, ApplyUserReadPermissions( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ApplyBultinUsersReadPermissions( _ ) ).Times( 0 );
+}
+
+void MockPmPlatformComponentManager::MakeRestrictPathPermissionsToAdminsReturn( int32_t value )
+{
+    ON_CALL( *this, RestrictPathPermissionsToAdmins( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformComponentManager::ExpectRestrictPathPermissionsToAdminsNotCalled()
+{
+    EXPECT_CALL( *this, RestrictPathPermissionsToAdmins( _ ) ).Times( 0 );
 }
