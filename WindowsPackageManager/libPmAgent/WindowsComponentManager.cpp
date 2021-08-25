@@ -15,8 +15,8 @@
 #define DIAG_TOOL_EXE L"csc_ucdt.exe"
 #define DIAG_TOOL_NOTIFY_ARG L"--notifyreboot"
 
-WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper, 
-    ICodesignVerifier& codesignVerifier, 
+WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
+    ICodesignVerifier& codesignVerifier,
     IPackageDiscovery& packageDiscovery,
     IUserImpersonator& userImpersonator ) :
     m_winApiWrapper( winApiWrapper )
@@ -59,17 +59,17 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
     if( !package.signerName.empty() ) {
         status = m_codeSignVerifier.Verify(
-            converter.from_bytes(downloadedInstallerPath.u8string()),
-            converter.from_bytes(package.signerName),
-            SIGTYPE_DEFAULT);
+            converter.from_bytes( downloadedInstallerPath.u8string() ),
+            converter.from_bytes( package.signerName ),
+            SIGTYPE_DEFAULT );
     }
     else {
         status = CodesignStatus::CODE_SIGNER_SUCCESS;
     }
 
-    if ( status == CodesignStatus::CODE_SIGNER_SUCCESS )
+    if( status == CodesignStatus::CODE_SIGNER_SUCCESS )
     {
-        if ( package.installerType == "exe" )
+        if( package.installerType == "exe" )
         {
             std::string exeCmdline;
             exeCmdline = downloadedInstallerPath.filename().u8string();
@@ -78,18 +78,18 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
 
             ret = RunPackage( downloadedInstallerPath.u8string(), exeCmdline, error );
         }
-        else if ( package.installerType == "msi" )
+        else if( package.installerType == "msi" )
         {
             std::string msiexecFullPath;
             std::string msiCmdline = "";
 
-            if ( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
+            if( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
             {
-                std::string logFilePath = converter.to_bytes(WindowsUtilities::GetLogDir());
+                std::string logFilePath = converter.to_bytes( WindowsUtilities::GetLogDir() );
                 std::string logFileName = package.productAndVersion;
 
                 std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
-                logFilePath.append( "\\" ).append( logFileName ).append(".log");
+                logFilePath.append( "\\" ).append( logFileName ).append( ".log" );
 
                 msiexecFullPath.append( "\\msiexec.exe" );
 
@@ -112,7 +112,7 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
     else
     {
         error = std::string( "Could not verify Package." );
-        ret = (int32_t)status;
+        ret = ( int32_t )status;
     }
 
     return ret;
@@ -134,11 +134,11 @@ int32_t WindowsComponentManager::DeployConfiguration( const PackageConfigInfo& c
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    if (!config.signerName.empty()) {
+    if( !config.signerName.empty() ) {
         status = m_codeSignVerifier.Verify(
-            converter.from_bytes(verifyFullPath),
-            converter.from_bytes(config.signerName),
-            SIGTYPE_DEFAULT);
+            converter.from_bytes( verifyFullPath ),
+            converter.from_bytes( config.signerName ),
+            SIGTYPE_DEFAULT );
     }
     else {
         status = CodesignStatus::CODE_SIGNER_SUCCESS;
@@ -176,15 +176,15 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
     ZeroMemory( &pi, sizeof( pi ) );
 
     WLOG_DEBUG( L"Executing: %s, args: %s", exe.c_str(), cmd.c_str() );
-    if ( m_winApiWrapper.CreateProcessW( &exe[0], &cmd[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi ) )
+    if( m_winApiWrapper.CreateProcessW( &exe[ 0 ], &cmd[ 0 ], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi ) )
     {
         ret = m_winApiWrapper.WaitForSingleObject( pi.hProcess, 300000 );
 
-        if ( ret == WAIT_OBJECT_0 )
+        if( ret == WAIT_OBJECT_0 )
         {
-            if ( m_winApiWrapper.GetExitCodeProcess( pi.hProcess, &exit_code ) )
+            if( m_winApiWrapper.GetExitCodeProcess( pi.hProcess, &exit_code ) )
             {
-                if ( exit_code != 0 )
+                if( exit_code != 0 )
                 {
                     ret = exit_code;
                     error = std::string( "CreateProcess GetExitCodeProcess returned: " + std::to_string( ret ) );
@@ -195,7 +195,7 @@ int32_t WindowsComponentManager::RunPackage( std::string executable, std::string
                 ret = m_winApiWrapper.GetLastError();
                 error = std::string( "Failed to get last Exit Code for update Exe. GetLastError: " + std::to_string( ret ) );
             }
-        } 
+        }
         else
         {
             error = std::string( "WaitForSingleObject Failed with return value: " + std::to_string( ret ) );
@@ -256,10 +256,10 @@ int32_t WindowsComponentManager::ApplyBultinUsersReadPermissions( const std::fil
 
 int32_t WindowsComponentManager::RestrictPathPermissionsToAdmins( const std::filesystem::path& filePath )
 {
-    return  WindowsUtilities::SetWellKnownGroupAccessToPath( filePath.wstring(), WinAuthenticatedUserSid, GENERIC_READ ) &&
-            //BUILTIN\Administrators (this includes System user, see S-1-5-18 on https://docs.microsoft.com/en-us/windows/security/identity-protection/access-control/security-identifiers)
-            WindowsUtilities::SetSidAccessToPath( filePath.wstring(), L"S-1-5-32-544", TRUSTEE_IS_GROUP, GENERIC_ALL ) &&
-            //NT SERVICE\TrustedInstaller
-            WindowsUtilities::SetSidAccessToPath( filePath.wstring(), L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464", TRUSTEE_IS_USER, GENERIC_ALL )
-         ? 0 : -1;
+    return
+        //BUILTIN\Administrators (this includes System, see https://docs.microsoft.com/en-us/windows/security/identity-protection/access-control/security-identifiers)
+        WindowsUtilities::SetPathOwnership( filePath, WinBuiltinAdministratorsSid, TRUSTEE_IS_GROUP )
+        && WindowsUtilities::SetWellKnownGroupAccessToPath( filePath, WinBuiltinAdministratorsSid, GENERIC_ALL, true )
+        && WindowsUtilities::SetWellKnownGroupAccessToPath( filePath, WinBuiltinUsersSid, GENERIC_READ )
+        ? ERROR_SUCCESS : -1;
 }

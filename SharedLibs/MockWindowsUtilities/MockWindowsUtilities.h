@@ -88,25 +88,29 @@ public:
     void MakeSearchFilesReturn( int32_t value );
     void ExpectSearchFilesIsNotCalled();
 
-    MOCK_METHOD1( AllowEveryoneAccessToFile, bool( const std::wstring& ) );
+    MOCK_METHOD1( AllowEveryoneAccessToFile, bool( const std::filesystem::path& ) );
     void MakeAllowEveryoneAccessToFileReturn( bool value );
     void ExpectAllowEveryoneAccessToFileNotCalled();
 
-    MOCK_METHOD1( AllowBuiltinUsersReadAccessToPath, bool( const std::wstring& ) );
+    MOCK_METHOD1( AllowBuiltinUsersReadAccessToPath, bool( const std::filesystem::path& ) );
     void MakeAllowBuiltinUsersReadAccessToPathReturn( bool value );
     void ExpectAllowBuiltinUsersReadAccessToPathNotCalled();
 
-    MOCK_METHOD4( SetSidAccessToPath, bool( const std::wstring&, const std::wstring&, TRUSTEE_TYPE, DWORD ) );
+    MOCK_METHOD4( SetSidAccessToPath, bool( const std::filesystem::path&, const std::wstring&, TRUSTEE_TYPE, DWORD ) );
     void MakeSetSidAccessToPathReturn( bool value );
     void ExpectSetSidAccessToPathNotCalled();
 
-    MOCK_METHOD3( SetWellKnownGroupAccessToPath, bool( const std::wstring&, WELL_KNOWN_SID_TYPE, DWORD ) );
+    MOCK_METHOD4( SetWellKnownGroupAccessToPath, bool( const std::filesystem::path&, WELL_KNOWN_SID_TYPE, DWORD, bool ) );
     void MakeSetWellKnownGroupAccessToPathReturn( bool value );
     void ExpectSetWellKnownGroupAccessToPathNotCalled();
 
-    MOCK_METHOD3( SetNamedUserAccessToPath, bool( const std::wstring&, const std::wstring&, DWORD ) );
+    MOCK_METHOD3( SetNamedUserAccessToPath, bool( const std::filesystem::path&, const std::wstring&, DWORD ) );
     void MakeSetNamedUserAccessToPathReturn( bool value );
     void ExpectSetNamedUserAccessToPathNotCalled();
+
+    MOCK_METHOD3( SetPathOwnership, bool ( const std::filesystem::path&, WELL_KNOWN_SID_TYPE, TRUSTEE_TYPE ) );
+    void MakeSetPathOwnershipReturn( bool value );
+    void ExpectSetPathOwnershipNotCalled();
 
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();

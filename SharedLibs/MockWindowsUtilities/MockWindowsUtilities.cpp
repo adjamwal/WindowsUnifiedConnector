@@ -256,12 +256,12 @@ void MockWindowsUtilities::ExpectSetSidAccessToPathNotCalled()
 
 void MockWindowsUtilities::MakeSetWellKnownGroupAccessToPathReturn( bool value )
 {
-    ON_CALL( *this, SetWellKnownGroupAccessToPath( _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, SetWellKnownGroupAccessToPath( _, _, _, _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockWindowsUtilities::ExpectSetWellKnownGroupAccessToPathNotCalled()
 {
-    EXPECT_CALL( *this, SetWellKnownGroupAccessToPath( _, _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, SetWellKnownGroupAccessToPath( _, _, _, _ ) ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeSetNamedUserAccessToPathReturn( bool value )
@@ -272,4 +272,14 @@ void MockWindowsUtilities::MakeSetNamedUserAccessToPathReturn( bool value )
 void MockWindowsUtilities::ExpectSetNamedUserAccessToPathNotCalled()
 {
     EXPECT_CALL( *this, SetNamedUserAccessToPath( _, _, _ ) ).Times( 0 );
+}
+
+void MockWindowsUtilities::MakeSetPathOwnershipReturn( bool value )
+{
+    ON_CALL( *this, SetPathOwnership( _, _, _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectSetPathOwnershipNotCalled()
+{
+    EXPECT_CALL( *this, SetPathOwnership( _, _, _ ) ).Times( 0 );
 }

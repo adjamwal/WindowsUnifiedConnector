@@ -40,11 +40,12 @@ public:
         std::vector<std::filesystem::path>::iterator end,
         std::vector<std::filesystem::path>& results );
 
-    static bool AllowEveryoneAccessToFile( const std::wstring& path );
-    static bool AllowBuiltinUsersReadAccessToPath( const std::wstring& path );
-    static bool SetSidAccessToPath( const std::wstring& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions );
-    static bool SetWellKnownGroupAccessToPath( const std::wstring& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions );
-    static bool SetNamedUserAccessToPath( const std::wstring& path, const std::wstring& userName, DWORD accessPermissions );
+    static bool AllowEveryoneAccessToFile( const std::filesystem::path& path );
+    static bool AllowBuiltinUsersReadAccessToPath( const std::filesystem::path& path );
+    static bool SetSidAccessToPath( const std::filesystem::path& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions );
+    static bool SetWellKnownGroupAccessToPath( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions, bool disableInheritance = false );
+    static bool SetNamedUserAccessToPath( const std::filesystem::path& path, const std::wstring& userName, DWORD accessPermissions );
+    static bool SetPathOwnership( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE userOrGroupSid, TRUSTEE_TYPE trusteeType );
     
 private:
     static std::string ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle );

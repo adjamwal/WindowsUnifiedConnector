@@ -31,7 +31,11 @@ void InstallerCacheManager::Initialize( IPmPlatformDependencies* dep )
     std::lock_guard<std::mutex> lock( m_mutex );
 
     m_componentMgr = &dep->ComponentManager();
-    m_componentMgr->RestrictPathPermissionsToAdmins( m_tempDownloadPath );
+    m_tempDownloadPath.make_preferred();
+    if( m_componentMgr->RestrictPathPermissionsToAdmins( m_tempDownloadPath ) != ERROR_SUCCESS )
+    {
+        LOG_ERROR( __FUNCTION__ ": Failed to change ownership/permissions of %s", m_tempDownloadPath.generic_string().c_str() );
+    }
 }
 
 std::filesystem::path InstallerCacheManager::DownloadOrUpdateInstaller( const PmComponent& componentPackage )

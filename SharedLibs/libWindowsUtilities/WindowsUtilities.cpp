@@ -7,6 +7,8 @@
 #include <Msi.h>
 #include <unordered_map>
 #include <AclAPI.h>
+#include <accctrl.h>
+#include <windows.h>
 #include <Sddl.h>
 
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
@@ -492,7 +494,7 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
     return dwError;
 }
 
-bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
+bool WindowsUtilities::AllowEveryoneAccessToFile( const std::filesystem::path& path )
 {
     bool rtn = false;
     PACL pOldDACL = NULL;
@@ -530,7 +532,7 @@ bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
     return rtn;
 }
 
-bool WindowsUtilities::AllowBuiltinUsersReadAccessToPath( const std::wstring& path )
+bool WindowsUtilities::AllowBuiltinUsersReadAccessToPath( const std::filesystem::path& path )
 {
     bool rtn = false;
     PACL pOldDACL = NULL;
@@ -568,7 +570,7 @@ bool WindowsUtilities::AllowBuiltinUsersReadAccessToPath( const std::wstring& pa
     return rtn;
 }
 
-bool WindowsUtilities::SetSidAccessToPath( const std::wstring& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions )
+bool WindowsUtilities::SetSidAccessToPath( const std::filesystem::path& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions )
 {
     bool rtn = false;
     PACL pOldDACL = NULL;
@@ -606,7 +608,7 @@ bool WindowsUtilities::SetSidAccessToPath( const std::wstring& path, const std::
     return rtn;
 }
 
-bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions)
+bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions, bool disableInheritance )
 {
     bool rtn = false;
     PACL pOldDACL = NULL;
@@ -615,6 +617,8 @@ bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, 
     PSECURITY_DESCRIPTOR ppSecurityDescriptor = NULL;
     PSID psid = NULL;
     DWORD cbSid = SECURITY_MAX_SID_SIZE;
+    SECURITY_INFORMATION daclType = DACL_SECURITY_INFORMATION;
+    if( disableInheritance ) daclType |= PROTECTED_DACL_SECURITY_INFORMATION;
 
     LPTSTR lpStr;
     lpStr = ( LPTSTR )path.c_str();
@@ -623,7 +627,7 @@ bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, 
         ( GetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &ppSecurityDescriptor ) == ERROR_SUCCESS ) &&
         ( ( psid = LocalAlloc( LMEM_FIXED, cbSid ) ) != NULL ) &&
         CreateWellKnownSid( wellKnownSid, NULL, psid, &cbSid )
-      ){
+        ) {
 
         BuildTrusteeWithSid( &ExplicitAccess.Trustee, psid );
         ExplicitAccess.grfAccessMode = SET_ACCESS;
@@ -632,10 +636,10 @@ bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, 
         ExplicitAccess.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
         ExplicitAccess.Trustee.pMultipleTrustee = NULL;
         ExplicitAccess.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_GROUP;
+        ExplicitAccess.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
 
-        if( ( SetEntriesInAcl( 1, &ExplicitAccess, pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
-            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
+        if( ( SetEntriesInAcl( 1, &ExplicitAccess, disableInheritance ? NULL : pOldDACL, &pNewDACL ) == ERROR_SUCCESS ) &&
+            ( SetNamedSecurityInfo( lpStr, SE_FILE_OBJECT, daclType, NULL, NULL, pNewDACL, NULL ) == ERROR_SUCCESS ) ) {
             rtn = true;
         }
     }
@@ -647,7 +651,7 @@ bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, 
     return rtn;
 }
 
-bool WindowsUtilities::SetNamedUserAccessToPath( const std::wstring& path, const std::wstring& userName, DWORD accessPermissions )
+bool WindowsUtilities::SetNamedUserAccessToPath( const std::filesystem::path& path, const std::wstring& userName, DWORD accessPermissions )
 {
     bool rtn = false;
     PACL pOldDACL = NULL;
@@ -683,3 +687,30 @@ bool WindowsUtilities::SetNamedUserAccessToPath( const std::wstring& path, const
     return rtn;
 }
 
+bool WindowsUtilities::SetPathOwnership( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE userOrGroupSid, TRUSTEE_TYPE trusteeType )
+{
+    bool rtn = false;
+    PSID psid = NULL;
+    DWORD cbSid = SECURITY_MAX_SID_SIZE;
+    HANDLE hToken = NULL;
+
+    TOKEN_PRIVILEGES tp;
+    tp.PrivilegeCount = 1;
+    tp.Privileges[ 0 ].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if( !path.empty() &&
+        ( ( psid = LocalAlloc( LMEM_FIXED, cbSid ) ) != NULL ) &&
+        CreateWellKnownSid( userOrGroupSid, NULL, psid, &cbSid ) &&
+        OpenProcessToken( GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken ) &&
+        LookupPrivilegeValueA( NULL, "SeTakeOwnershipPrivilege", &tp.Privileges[ 0 ].Luid ) &&
+        AdjustTokenPrivileges( hToken, NULL, &tp, sizeof( tp ), NULL, NULL ) &&
+        SetNamedSecurityInfo( ( LPTSTR )path.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, psid, NULL, NULL, NULL ) == ERROR_SUCCESS )
+    {
+        rtn = true;
+    }
+
+    if( psid ) LocalFree( psid );
+    if( hToken ) CloseHandle( hToken );
+
+    return rtn;
+}

@@ -116,8 +116,8 @@ public:
     int32_t ApplyBultinUsersReadPermissions( const std::filesystem::path& filePath ) override;
 
     /**
-    * @brief Provides Full Access to file
-    *   Used on windows to give full permissions to administrators and system users. Similar to chmod +rw
+    * @brief Restricts user access to Admins only
+    *   Used on windows to give full permissions to administrators and system users, and read-only to other users
     *
     * @return 0 on success
     */

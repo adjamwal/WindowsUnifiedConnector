@@ -96,27 +96,32 @@ int32_t WindowsUtilities::SearchFiles( std::filesystem::path searchPath,
     return MockWindowsUtilities::GetMockWindowUtilities()->SearchFiles( searchPath, begin, end, results );
 }
 
-bool WindowsUtilities::AllowEveryoneAccessToFile( const std::wstring& path )
+bool WindowsUtilities::AllowEveryoneAccessToFile( const std::filesystem::path& path )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->AllowEveryoneAccessToFile( path );
 }
 
-bool WindowsUtilities::AllowBuiltinUsersReadAccessToPath( const std::wstring& path )
+bool WindowsUtilities::AllowBuiltinUsersReadAccessToPath( const std::filesystem::path& path )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->AllowBuiltinUsersReadAccessToPath( path );
 }
 
-bool WindowsUtilities::SetSidAccessToPath( const std::wstring& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions )
+bool WindowsUtilities::SetSidAccessToPath( const std::filesystem::path& path, const std::wstring& userSid, TRUSTEE_TYPE trusteeType, DWORD accessPermissions )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->SetSidAccessToPath( path, userSid, trusteeType, accessPermissions );
 }
 
-bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::wstring& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions )
+bool WindowsUtilities::SetWellKnownGroupAccessToPath( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions, bool disableInheritance )
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->SetWellKnownGroupAccessToPath( path, wellKnownSid, accessPermissions );
+    return MockWindowsUtilities::GetMockWindowUtilities()->SetWellKnownGroupAccessToPath( path, wellKnownSid, accessPermissions, disableInheritance );
 }
 
-bool WindowsUtilities::SetNamedUserAccessToPath( const std::wstring& path, const std::wstring& userName, DWORD accessPermissions )
+bool WindowsUtilities::SetNamedUserAccessToPath( const std::filesystem::path& path, const std::wstring& userName, DWORD accessPermissions )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->SetNamedUserAccessToPath( path, userName, accessPermissions );
+}
+
+bool WindowsUtilities::SetPathOwnership( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE userOrGroupSid, TRUSTEE_TYPE trusteeType )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->SetPathOwnership( path, userOrGroupSid, trusteeType );
 }
