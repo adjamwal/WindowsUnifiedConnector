@@ -58,7 +58,7 @@ uint32_t InstallerConfig::GetMaxFileCacheAgeS()
 
 uint32_t InstallerConfig::GetMaxEventTtlS()
 {
-    return uint32_t();
+    return 1000 * 60 * 60;
 }
 
 bool InstallerConfig::AllowPostInstallReboots()

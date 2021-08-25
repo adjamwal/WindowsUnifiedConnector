@@ -132,7 +132,7 @@ std::string CloudEventBuilder::GetRFC3339Tse() const
 std::string CloudEventBuilder::Build()
 {
     std::string result = Serialize();
-    LOG_DEBUG( __FUNCTION__ ": serialized event: %s", result.c_str() );
+    LOG_DEBUG( "Serialized event: %s", result.c_str() );
     return result;
 }
 

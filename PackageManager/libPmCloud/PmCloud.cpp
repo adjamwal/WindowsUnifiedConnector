@@ -3,7 +3,7 @@
 PmCloud::PmCloud( IPmHttp& http )
     : m_http( http )
     , m_certs( { 0 } )
-    , m_shutdownFunc( [] { return false; } )
+    , m_shutdownFunc( [] { return true; } )
     , m_userAgent( "PackageManager" )
 {
 }

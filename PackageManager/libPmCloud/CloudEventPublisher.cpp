@@ -83,7 +83,7 @@ int32_t CloudEventPublisher::InternalPublish( const std::string& eventJson )
 {
     if( IsEventExpired( eventJson ) )
     {
-        LOG_DEBUG( __FUNCTION__ ": Event expired %s", eventJson.c_str() );
+        LOG_DEBUG( "Event expired %s", eventJson.c_str() );
         return 0;
     }
 

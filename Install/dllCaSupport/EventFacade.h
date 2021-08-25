@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IEventFacade.h"
-#include "IUcLogger.h"
 #include <string>
 #include <memory>
 
@@ -16,6 +15,7 @@ class IPmPlatformConfiguration;
 class ICloudEventPublisher;
 class ICloudEventBuilder;
 class IUtf8PathVerifier;
+class IPMLogger;
 
 class EventFacade : public IEventFacade
 {
@@ -30,7 +30,7 @@ public:
 private:
     bool SendEvent( ICloudEventBuilder& ev, std::string& url, std::string& ucid, std::string& ucidToken );
 
-    IUcLogger* m_oldLogger;
+    std::unique_ptr<IPMLogger> m_pmLogger;
     std::unique_ptr<IUtf8PathVerifier> m_utf8PathVerifier;
     std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<IPmHttp> m_http;

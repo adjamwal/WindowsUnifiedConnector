@@ -12,9 +12,10 @@
 #include "CloudEventBuilder.h"
 #include "PmConstants.h"
 #include "Utf8PathVerifier.h"
+#include "PmLogAdapter.h"
 
 EventFacade::EventFacade()
-    : m_oldLogger( GetUcLogger() )
+    : m_pmLogger( new PmLogAdapter() )
     , m_utf8PathVerifier( new Utf8PathVerifier() )
     , m_fileUtil( new FileSysUtil( *m_utf8PathVerifier ) )
     , m_http( new PmHttp( *m_fileUtil ) )
@@ -26,10 +27,12 @@ EventFacade::EventFacade()
     , m_winConf( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
     , m_eventPublisher( new CloudEventPublisher( *m_cloud, *m_eventStorage, *m_config ) )
 {
+    SetPMLogger( m_pmLogger.get() );
 }
 
 EventFacade::~EventFacade()
 {
+    SetPMLogger( NULL );
 }
 
 bool EventFacade::SendEventOnUninstallBegin( std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken )
@@ -47,11 +50,11 @@ bool EventFacade::SendEventOnUninstallBegin( std::string& url, std::string& prod
     }
     catch ( std::exception& ex )
     {
-        LOG_ERROR( __FUNCTION__ ": Exception caught: %s", ex.what() );
+        LOG_ERROR( "Exception caught: %s", ex.what() );
     }
     catch ( ... )
     {
-        LOG_ERROR( __FUNCTION__ ": Unknown exception caught" );
+        LOG_ERROR( "Unknown exception caught" );
     }
 
     return retval;
@@ -73,11 +76,11 @@ bool EventFacade::SendEventOnUninstallError( std::string& url, std::string& prod
     }
     catch ( std::exception& ex )
     {
-        LOG_ERROR( __FUNCTION__ ": Exception caught: %s", ex.what() );
+        LOG_ERROR( "Exception caught: %s", ex.what() );
     }
     catch ( ... )
     {
-        LOG_ERROR( __FUNCTION__ ": Unknown exception caught" );
+        LOG_ERROR( "Unknown exception caught" );
     }
 
     return retval;
@@ -93,16 +96,15 @@ bool EventFacade::SendEventOnUninstallComplete( std::string& url, std::string& p
         ev.WithUCID( ucid );
         ev.WithPackageID( UC_PACKAGE_NAME + std::string( "/" ) + productVersion );
         ev.WithType( CloudEventType::pkguninstall );
-
         retval = SendEvent( ev, url, ucid, ucidToken );
     }
     catch ( std::exception& ex )
     {
-        LOG_ERROR( __FUNCTION__ ": Exception caught: %s", ex.what() );
+        LOG_ERROR( "Exception caught: %s", ex.what() );
     }
     catch ( ... )
     {
-        LOG_ERROR( __FUNCTION__ ": Unknown exception caught" );
+        LOG_ERROR( "Unknown exception caught" );
     }
 
     return retval;
