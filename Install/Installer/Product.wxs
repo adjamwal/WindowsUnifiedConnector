@@ -495,13 +495,13 @@
             
             <Component Id="C.Registry.UCPMConfig" Guid="*">
                 <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCPMConfigName)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="UCPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="C.Registry.UCIDConfig" Guid="*">
                 <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCIDConfigName)" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
           
@@ -515,19 +515,9 @@
                 <RemoveFile Id="RF.BootstrapperConfig" Name="$(var.BootstrapperConfigName)" On="uninstall"/>
             </Component>
             
-            <!-- UCService Config Management -->
+            <!-- UCService, UCPM, UCID Config Management -->
             <Component Id="C.UCServiceConfig" NeverOverwrite="yes">
-                <File Id="uc.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\uc.json" />
-            </Component>
-            
-            <!-- UCID Config Management -->
-            <Component Id="C.UCIDConfigName" NeverOverwrite="yes">
-                <File Id="id.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\id.json" />
-            </Component>
-
-            <!-- UCPM Config Management -->
-            <Component Id="C.UCPMConfigName" NeverOverwrite="yes">
-                <File Id="pm.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\pm.json" />
+                <File Id="cm_config.json" KeyPath="yes" Checksum="no" DiskId="1" Source="$(var.SolutionDir)Resources\config\cm_config.json" />
             </Component>
         </ComponentGroup>
     </Fragment>

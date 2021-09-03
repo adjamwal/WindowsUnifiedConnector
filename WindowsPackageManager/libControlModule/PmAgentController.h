@@ -17,7 +17,7 @@
 
 #define PM_AGENT_BINARY "csc_pm.exe"
 #define BS_CONFIG_FILE "bs.json"
-#define PM_CONFIG_FILE "pm.json"
+#define PM_CONFIG_FILE "cm_config.json"
 
 class ICodesignVerifier;
 

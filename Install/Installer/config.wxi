@@ -35,9 +35,7 @@
 
     <!-- Config File Information -->
     <?define BootstrapperConfigName = "bs.json" ?>
-    <?define UCServiceConfigName = "uc.json" ?>
-    <?define UCIDConfigName = "id.json" ?>
-    <?define UCPMConfigName = "pm.json" ?>
+    <?define UCServiceConfigName = "cm_config.json" ?>
 
     <!-- Registry key name used to store installation location -->
     <?define InstallNameKey = "Unified Connector" ?>

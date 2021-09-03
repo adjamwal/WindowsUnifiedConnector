@@ -820,7 +820,7 @@ std::string _ucReponseWithConfigCloudData( R"(
       "files": [
         {
           "contents": "ewogICJwYXRoIjogImNvbmZpZy5qc29uIiwKICAic2hhMjU2IjogIjI5MjdkYjM1YjE4NzVlZjNhNDI2ZDA1MjgzNjA5YjJkOTVkNDI5YzA5MWVlMWE4MmYwNjcxNDIzYTY0ZDgzYTQiLCAgICAgICAgICAKICAidmVyaWZ5X3BhdGgiOiAidmVyaWZ5LmV4ZSIsCn0=",
-          "path": "C:/Program Files/Cisco/SecureClient/UnifiedConnector/Configuration/uc.json"
+          "path": "C:/Program Files/Cisco/SecureClient/UnifiedConnector/Configuration/cm_config.json"
         }
       ]
     }
@@ -859,7 +859,7 @@ TEST_F( ComponentTestPacMan, PacManWillUpdatePackageAndConfigCloudData )
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
         {
-            EXPECT_EQ( std::filesystem::path( "C:/Program Files/Cisco/SecureClient/UnifiedConnector/Configuration/uc.json" ), newName );
+            EXPECT_EQ( std::filesystem::path( "C:/Program Files/Cisco/SecureClient/UnifiedConnector/Configuration/cm_config.json" ), newName );
             configUpdated = true;
             m_cv.notify_one();
 
