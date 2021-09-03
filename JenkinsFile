@@ -398,24 +398,6 @@ pipeline {
             }
           }
         }
-        stage ('Coverity') {
-          when {
-            anyOf {
-              not { changeRequest() }
-                expression { env.CHANGE_TITLE.toLowerCase().contains(env.FORCE_COVERITY) }
-            }
-          }
-          steps {
-            script {
-              dir('WindowsUnifiedConnector') {
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x86 /t:clean'
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:clean'
-
-                coverityHelper.analyzeUnifiedConnector("${env.BRANCH_NAME}", "${env.WORKSPACE}\\WindowsUnifiedConnector", 1, 1)
-              }
-            }
-          }
-        }
       }
       post {
         // NotifyWebexChannel can't be done in outer post step because it doesn't have access to git environment variables
