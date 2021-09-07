@@ -30,4 +30,8 @@
   <ItemGroup>
     <ResourceCompile Include="UCService.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Resources\images\UC.ico" />
+    <Image Include="..\..\Resources\images\small.ico" />
+  </ItemGroup>
 </Project>

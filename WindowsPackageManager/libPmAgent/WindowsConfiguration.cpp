@@ -129,9 +129,9 @@ std::string WindowsConfiguration::GetInstallDirectory()
     std::wstring dir;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector", L"Path", dir ) )
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management", L"Path", dir ) )
     {
-        WLOG_ERROR( L"Failed to read UnifiedConnector install path from registry" );
+        WLOG_ERROR( L"Failed to read Cloud Management install path from registry" );
     }
 
     return converter.to_bytes( dir );

@@ -16,7 +16,7 @@ InstallerCacheManager::InstallerCacheManager( IPmCloud& pmCloud, IFileSysUtil& f
     , m_fileUtil( fileUtil )
     , m_sslUtil( sslUtil )
     , m_componentMgr( nullptr )
-    , m_tempDownloadPath( m_fileUtil.GetTempDir().append( "Cisco-UC" ) )
+    , m_tempDownloadPath( m_fileUtil.GetTempDir().append( "Cisco-CM" ) )
 {
 
 }

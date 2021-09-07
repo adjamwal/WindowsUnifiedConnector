@@ -13,9 +13,9 @@
 #define UCID_API_GET_URL_FUNCTION_NAME "ucid_get_url"
 
 #if defined(_WIN64)
-#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x64"
+#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x64"
 #else
-#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x86"
+#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x86"
 #endif
 
 UCIDApiDll::UCIDApiDll( ICodesignVerifier& codeSignVerifier )
@@ -254,7 +254,7 @@ bool UCIDApiDll::LoadApi()
 
     if( m_isModuleLoaded )
     {
-        WLOG_DEBUG( L"UnifiedConnectorID Api already loaded." );
+        WLOG_DEBUG( L"Cloud Management ID Api already loaded." );
         return true;
     }
 
@@ -266,7 +266,7 @@ bool UCIDApiDll::LoadApi()
         L"ucidapi",
         dllFullPath ) )
     {
-        WLOG_ERROR( L"Failed to read UnifiedConnectorID Api data from registry" );
+        WLOG_ERROR( L"Failed to read Cloud Management ID Api data from registry" );
         return false;
     }
 
@@ -287,7 +287,7 @@ bool UCIDApiDll::LoadApi()
 
     m_isModuleLoaded = true;
 
-    WLOG_DEBUG( L"UnifiedConnectorID Api loaded." );
+    WLOG_DEBUG( L"Cloud Management ID Api loaded." );
 
     return ret;
 }
@@ -298,11 +298,11 @@ void UCIDApiDll::UnloadApi()
 
     if( !m_isModuleLoaded )
     {
-        WLOG_DEBUG( L"UnifiedConnectorID Api already unloaded." );
+        WLOG_DEBUG( L"Cloud Management ID Api already unloaded." );
         return;
     }
 
     m_isModuleLoaded = false;
 
-    WLOG_DEBUG( L"UnifiedConnectorID Api unloaded." );
+    WLOG_DEBUG( L"Cloud Management ID Api unloaded." );
 }

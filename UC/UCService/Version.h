@@ -1,6 +1,6 @@
 #pragma once
 
-#define LOCALSTRFILEDESC "Cisco Unified Connector Service\0"
-#define LOCALSTRFILENAME "csc_uc.exe\0"
-#define LOCALSTRINTERNALFILENAME "csc_uc.exe\0"
+#define LOCALSTRFILEDESC "Cisco Cloud Management Service\0"
+#define LOCALSTRFILENAME "csc_cms.exe\0"
+#define LOCALSTRINTERNALFILENAME "csc_cms.exe\0"
 #include "..\..\GlobalVersion.h"

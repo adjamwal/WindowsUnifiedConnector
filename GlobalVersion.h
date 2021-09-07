@@ -7,7 +7,7 @@
 #define STRLEGALCOPYRIGHT "Copyright Cisco Systems, Inc. All rights reserved.\0"
 
 #if UC_CONSUMER == 1
-#define STRPRODUCTNAME "Immunet Unified Connector"
+#define STRPRODUCTNAME "Immunet Cloud Management"
 #else
-#define STRPRODUCTNAME "Cisco Unified Connector"
+#define STRPRODUCTNAME "Cisco Cloud Management"
 #endif

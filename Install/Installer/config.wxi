@@ -7,17 +7,17 @@
 
     <!-- Product name as you want it to appear in Add/Remove Programs-->
     <?if $(var.UC_CONSUMER) = 1 ?>
-        <?define ProductName =  "Immunet Unified Connector" ?>
-        <?define ServiceName =  "ImmunetUnifiedConnector" ?>
+        <?define ProductName =  "Immunet - Cloud Management" ?>
+        <?define ServiceName =  "ImmunetCloudManagement" ?>
     <?else ?>
-        <?define ProductName =  "Cisco Unified Connector" ?>
-        <?define ServiceName =  "CiscoUnifiedConnector" ?>
+        <?define ProductName =  "Cisco Secure Client - Cloud Management" ?>
+        <?define ServiceName =  "CiscoCloudManagement" ?>
     <?endif ?>
     <?define ProductFamily = "SecureClient" ?>
   
     <!-- Directory Information -->
     <!-- Directory name used as default installation location -->
-    <?define InstallName = "Unified Connector" ?>
+    <?define InstallName = "Cloud Management" ?>
     <?define CiscoDirectory = "Cisco" ?>
     <?if $(var.UC_CONSUMER) = 1 ?>
         <?define ProductDirectory = "Immunet" ?>
@@ -25,20 +25,20 @@
         <?define ProductDirectory = "Cisco Secure Client" ?>
     <?endif ?>
   
-    <?define UnifiedConnectorDirectory = "UC" ?>
+    <?define UnifiedConnectorDirectory = "CM" ?>
     <?define ServiceDictory = "Service" ?>
-    <?define UCIDDirectory = "UCID" ?>
-    <?define UCPMDirectory = "UCPM" ?>
+    <?define UCIDDirectory = "CMID" ?>
+    <?define UCPMDirectory = "CMPM" ?>
     <?define UCConfigDirectory = "Configuration" ?>
     <?define UCDataDirectory = "Data" ?>
-    <?define PmInstallCacheDirectory = "Cisco-UC" ?>
+    <?define PmInstallCacheDirectory = "Cisco-CM" ?>
 
     <!-- Config File Information -->
     <?define BootstrapperConfigName = "bs.json" ?>
     <?define UCServiceConfigName = "cm_config.json" ?>
 
     <!-- Registry key name used to store installation location -->
-    <?define InstallNameKey = "Unified Connector" ?>
+    <?define InstallNameKey = "Cloud Management" ?>
 
     <!-- Auto-generate ProductCode for each build, release and upgrade -->
     <?define ProductId = "*" ?>

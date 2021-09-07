@@ -111,7 +111,7 @@ void UCIDLoader::LoadControlModule()
 {
     if( m_isModuleLoaded )
     {
-        WLOG_ERROR( L"UnifiedConnectorID Control Module already running." );
+        WLOG_ERROR( L"Cloud Management ID Control Module already running." );
         return;
     }
 
@@ -121,20 +121,20 @@ void UCIDLoader::LoadControlModule()
 
     if ( WindowsUtilities::Is64BitWindows() )
     {
-        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x64";
+        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x64";
     }
     else
     {
-        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID\\x86";
+        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x86";
     }
 
     if ( !WindowsUtilities::ReadRegistryString(
         HKEY_LOCAL_MACHINE,
-        L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCID",
+        L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID",
         L"Path",
         ucidDllDir ) )
     {
-        WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module folder path from registry" );
+        WLOG_ERROR( L"Failed to read Cloud Management ID Control Module folder path from registry" );
         return;
     }
 
@@ -144,13 +144,13 @@ void UCIDLoader::LoadControlModule()
         L"ucidcontrolplugin", 
         dllFullPath ) )
     {
-        WLOG_ERROR( L"Failed to read UnifiedConnectorID Control Module dll path from registry" );
+        WLOG_ERROR( L"Failed to read Cloud Management ID Control Module dll path from registry" );
         return;
     }
 
     std::wstring pmConfigPath;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\config", L"path", pmConfigPath ) ) {
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\config", L"path", pmConfigPath ) ) {
         WLOG_ERROR( L"Failed to read config path from registry" );
         return;
     }
@@ -178,26 +178,26 @@ void UCIDLoader::LoadControlModule()
 
     if( ( result = CreateModule( &m_context ) ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to load UnifiedConnectorID Control Module: CreateModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to load Cloud Management ID Control Module: CreateModuleInstance() returned %d.", result );
         return;
     }
 
     if( ( result = m_context.fpStart( ucidDllDir.c_str(), ucidDllDir.c_str(), pmConfigPath.c_str() ) ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to start UnifiedConnectorID Control Module: fpStart() returned %d.", result );
+        WLOG_ERROR( L"Failed to start Cloud Management ID Control Module: fpStart() returned %d.", result );
         return;
     }
 
     m_isModuleLoaded = true;
 
-    WLOG_DEBUG( L"UnifiedConnectorID Control Module loaded and started." );
+    WLOG_DEBUG( L"Cloud Management ID Control Module loaded and started." );
 }
 
 void UCIDLoader::UnloadControlModule()
 {
     if( !m_isModuleLoaded )
     {
-        WLOG_ERROR( L"UnifiedConnectorID Control Module already released." );
+        WLOG_ERROR( L"Cloud Management ID Control Module already released." );
         return;
     }
 
@@ -205,17 +205,17 @@ void UCIDLoader::UnloadControlModule()
 
     if( ( result = m_context.fpStop() ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to stop UnifiedConnectorID Control Module: fpStop() returned %d.", result );
+        WLOG_ERROR( L"Failed to stop Cloud Management ID Control Module: fpStop() returned %d.", result );
         return;
     }
 
     if( ( result = ReleaseModule( &m_context ) ) != PM_MODULE_SUCCESS )
     {
-        WLOG_ERROR( L"Failed to release UnifiedConnectorID Control Module: ReleaseModuleInstance() returned %d.", result );
+        WLOG_ERROR( L"Failed to release Cloud Management ID Control Module: ReleaseModuleInstance() returned %d.", result );
         return;
     }
 
     m_isModuleLoaded = false;
 
-    WLOG_DEBUG( L"UnifiedConnectorID Control Module stopped and released." );
+    WLOG_DEBUG( L"Cloud Management ID Control Module stopped and released." );
 }

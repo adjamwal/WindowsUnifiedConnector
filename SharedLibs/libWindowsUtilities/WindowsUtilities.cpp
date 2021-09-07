@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <Sddl.h>
 
-#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
+#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\Cloud Management"
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> _g_converter;
 // TOOD: Do we actually need all of these or just a subset?

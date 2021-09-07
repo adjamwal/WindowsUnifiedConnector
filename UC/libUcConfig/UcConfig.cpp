@@ -9,9 +9,9 @@ UcConfig::UcConfig() :
     m_logLevel( ( uint32_t )DEFAULT_LOG_LEVEL )
     , m_fileModifyTime( 0 )
 {
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\config", L"Service", m_path ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\config", L"Service", m_path ) )
     {
-        WLOG_ERROR( L"Failed to read UnifiedConnector config path from registry" );
+        WLOG_ERROR( L"Failed to read Cloud Management config path from registry" );
     }
 }
 

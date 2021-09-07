@@ -128,7 +128,7 @@
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
-            <RegistrySearch Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
+            <RegistrySearch Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
         </Property>
 
         <?if $(var.UC_CONSUMER) = 1 ?>
@@ -178,21 +178,21 @@
         <ComponentGroup Id="UnifiedConnectorComponents" Directory="UC_BASE_DIRECTORY">
             <Component Id="UC_PRODUCTCODE_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)">
                     <RegistryValue Type="string" Name="ProductCode" Value="[ProductCode]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UC_LOG_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)">
                     <RegistryValue Type="string" Name="LogDir" Value="[UC_DATA_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
           
             <Component Id="C.RemoveFiles">
                 <RegistryValue Root="HKLM" 
-                               Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" 
+                               Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)" 
                                Name="Path" Type="string" Value="[UC_BASE_DIRECTORY]" KeyPath="yes" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_INSTALLCACHE_DIR" />
@@ -204,27 +204,27 @@
         <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
             <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMSERVICE">
                     <RegistryValue Type="string" Name="Version" Value="$(var.ServiceVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCSERVICE_PATH_REGISTRY" Guid="*">
               <RegistryKey Root="HKLM"
-             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+             Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMSERVICE">
                 <RegistryValue Type="string" Name="Path" Value="[UCSERVICE_DIRECTORY]" KeyPath="yes"/>
               </RegistryKey>
             </Component>
 
             <Component Id="UCDT_SHORTCUT_PATH_REGISTRY" Guid="*">
               <RegistryKey Root="HKLM"
-             Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCSERVICE">
+             Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMSERVICE">
                 <RegistryValue Type="string" Name="ucdt Shortcut" Value="[CiscoProgramMenuFolder]!(loc.DiagToolName).lnk" KeyPath="yes"/>
               </RegistryKey>
             </Component>
           
             <Component Id="ucs.exe" Guid="*">
-                <File Id="ucs.exe" Name="csc_uc.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_uc.exe" />
+                <File Id="ucs.exe" Name="csc_cms.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_cms.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />
                 <ServiceInstall Id="ServiceInstaller" Name="$(var.ServiceName)" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
                     <util:ServiceConfig RestartServiceDelayInSeconds="60" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
@@ -232,7 +232,7 @@
             </Component>
 
             <Component Id="csc_ucdt.exe" Guid="*">
-              <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucdt.exe" >
+              <File Id="csc_ucdt.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_cmdt.exe" >
                 <!--= Set explanation above for Advertise="yes" -->
                 <Shortcut Id="csc_ucdt_start_menu_shortcut" 
                           Name="!(loc.DiagToolName)" 
@@ -297,42 +297,42 @@
         <ComponentGroup Id="UCIDComponents" Directory="UCID_DIRECTORY">
             <Component Id="UCID_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID">
                     <RegistryValue Type="string" Name="Version" Value="$(var.UCIDVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID">
                     <RegistryValue Type="string" Name="Path" Value="[UCID_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="UCID_API_FILE_PATH_REGISTRY_X86" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x86">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x86">
                     <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X86]ucidapi.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_CONTROL_FILE_PATH_REGISTRY_X86" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x86">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x86">
                     <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X86]ucidcontrolplugin.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="UCID_API_FILE_PATH_REGISTRY_X64" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x64">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x64">
                     <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X64]ucidapi.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_CONTROL_FILE_PATH_REGISTRY_X64" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID\x64">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x64">
                     <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X64]ucidcontrolplugin.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
@@ -377,14 +377,14 @@
         <ComponentGroup Id="UCPMComponents" Directory="UCPM_DIRECTORY">
             <Component Id="UCPM_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCPM">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMPM">
                     <RegistryValue Type="string" Name="Version" Value="$(var.UCPMVersion)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCPM_DLL_PATH_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCPM">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMPM">
                     <RegistryValue Type="string" Name="DllPath" Value="[UCPM_DIRECTORY]PM_MCP.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
@@ -394,9 +394,6 @@
             </Component>
             <Component Id="ucpm.exe" Guid="*">
                 <File Id="ucpm.exe" Name="csc_pm.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_pm.exe" />
-            </Component>
-            <Component Id="PM_Verify.exe" Guid="*">
-              <File Id="PM_Verify.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\PM_Verify.exe" />
             </Component>
           
             <?if $(var.Configuration) = "Release" ?>
@@ -476,32 +473,32 @@
             <!-- Registry Keys That point to each Config File -->
             <!-- The Registry key will still be writen if the file doesnt exist -->
             <Component Id="C.Registry.Config" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\config">
                     <RegistryValue Type="string" Name="path" Value="[UC_CONFIG_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="C.Registry.BSConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\config">
                     <RegistryValue Type="string" Name="Bootstrapper" Value="[UC_CONFIG_DIRECTORY]$(var.BootstrapperConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="C.Registry.ServiceConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\config">
                     <RegistryValue Type="string" Name="Service" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="C.Registry.UCPMConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\config">
+                    <RegistryValue Type="string" Name="CMPM" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="C.Registry.UCIDConfig" Guid="*">
-                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\config">
-                    <RegistryValue Type="string" Name="UCID" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
+                <RegistryKey Root="HKLM" Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\config">
+                    <RegistryValue Type="string" Name="CMID" Value="[UC_CONFIG_DIRECTORY]$(var.UCServiceConfigName)" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
           
@@ -526,7 +523,7 @@
     <ComponentGroup Id="CiscoStartMenu" Directory="CiscoProgramMenuFolder">
       <Component Id="CiscoProgramMenuFolder" Guid="87C0183A-06EA-4616-ACBA-E34EE127C861">
         <RemoveFolder Id="CiscoProgramMenuFolder" On="uninstall" />
-        <RegistryValue Root="HKMU" Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector" Name="InstalledStartMenuShortcuts" Type="integer" Value="1" />
+        <RegistryValue Root="HKMU" Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)" Name="InstalledStartMenuShortcuts" Type="integer" Value="1" />
       </Component>
     </ComponentGroup>
   </Fragment>

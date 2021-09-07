@@ -7,7 +7,7 @@
 #include <KnownFolders.h>
 #include <ShlObj.h>
 
-#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\UnifiedConnector"
+#define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\Cloud Management"
 
 #if UC_CONSUMER == 1
 #define UC_DEFAULT_LOG_PATH L"\\Cisco\\Immunet\\UC"

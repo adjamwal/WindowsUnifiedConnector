@@ -38,7 +38,7 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
     WLOG_DEBUG( L"in OnStart" );
 
     std::wstring bsConfigFile;
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\config", L"Bootstrapper", bsConfigFile ) )
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\config", L"Bootstrapper", bsConfigFile ) )
     {
         throw std::exception( "Failed to read bootstrapper config path from registry");
     }
@@ -103,7 +103,7 @@ void UCService::FixUcdtShortcut()
     std::wstring shortcutPath;
 
     if( WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE,
-        L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCSERVICE",
+        L"Software\\Cisco\\SecureClient\\Cloud Management\\CMSERVICE",
         L"ucdt Shortcut",
         shortcutPath ) ) {
 

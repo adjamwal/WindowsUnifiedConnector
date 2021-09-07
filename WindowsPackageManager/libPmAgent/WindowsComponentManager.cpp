@@ -11,8 +11,8 @@
 #include <codecvt>
 #include <AccCtrl.h>
 
-#define UCSERVICE_PATH_REG_KEY L"Software\\Cisco\\SecureClient\\UnifiedConnector\\UCSERVICE"
-#define DIAG_TOOL_EXE L"csc_ucdt.exe"
+#define UCSERVICE_PATH_REG_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMSERVICE"
+#define DIAG_TOOL_EXE L"csc_cmdt.exe"
 #define DIAG_TOOL_NOTIFY_ARG L"--notifyreboot"
 
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
