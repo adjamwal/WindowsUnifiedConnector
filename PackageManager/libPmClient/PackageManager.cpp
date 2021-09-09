@@ -177,6 +177,8 @@ void PackageManager::PmWorkflowThread()
     PackageInventory inventory;
     bool isRebootRequired = false;
 
+    m_watchdog.Kick();
+
     try {
         m_packageDiscoveryManager.DiscoverPackages( inventory );
     }
@@ -185,7 +187,7 @@ void PackageManager::PmWorkflowThread()
         return;
     }
     catch ( ... ) {
-        LOG_ERROR( "PackageDiscovery failed: Unkown expcetion" );
+        LOG_ERROR( "PackageDiscovery failed: Unkown exception" );
         return;
     }
 
@@ -212,6 +214,8 @@ void PackageManager::PmWorkflowThread()
     catch ( ... ) {
         LOG_ERROR( "Checkin failed: Unknown exception" );
     }
+
+    m_watchdog.Kick();
 
     try {
         LOG_DEBUG( "Post Checkin Steps" );

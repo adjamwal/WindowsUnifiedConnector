@@ -4,7 +4,6 @@
  * @date 2016-01-28
  */
 
-#if defined( WIN32 )
 #include <Windows.h>
 
 #include <stdint.h>
@@ -565,5 +564,3 @@ int cert_store_retrieve_certs( X509 * **trusted_certificates, size_t * cert_coun
     LeaveCriticalSection( &_global_system_root_cert_lock );
     return ret;
 }
-
-#endif /* WIN32 */

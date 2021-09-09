@@ -948,3 +948,48 @@ TEST_F( ComponentTestPacMan, PacManWillPruneInstallers )
 
     EXPECT_TRUE( pass );
 }
+
+TEST_F( ComponentTestPacMan, PacManWillKickTheWatchdog )
+{
+    bool pass = false;
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
+
+    EXPECT_CALL( *m_watchdog, Kick() ).Times(3).WillRepeatedly( Invoke(
+        [this, &pass]( )
+        {
+            pass = true;
+            m_cv.notify_one();
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
+
+    EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillKickTheWatchdogOnNetworkError )
+{
+    bool pass = false;
+
+    m_mockPlatformConfiguration->MakeGetIdentityTokenReturn( false );
+
+    EXPECT_CALL( *m_watchdog, Kick() ).Times( 1 ).WillRepeatedly( Invoke(
+        [this, &pass]()
+        {
+            pass = true;
+            m_cv.notify_one();
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
+
+    EXPECT_TRUE( pass );
+}
