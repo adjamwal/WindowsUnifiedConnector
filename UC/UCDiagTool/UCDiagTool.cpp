@@ -10,8 +10,8 @@
 #include <tlhelp32.h>
 #include <Psapi.h>
 
-#define TOAST_APP_NAME L"Cisco\\Cisco Unified Connector Diagnostics"
-#define TOAST_AUMI L"Cisco.UC"
+#define TOAST_APP_NAME L"Cisco\\Cisco Cloud Management Diagnostics"
+#define TOAST_AUMI L"Cisco.CM"
 #define TOAST_TIMEOUT_MS ( 5 * 60 * 1000)
 
 class CustomHandler : public WinToastLib::IWinToastHandler {

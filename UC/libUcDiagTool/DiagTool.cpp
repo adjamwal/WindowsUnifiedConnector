@@ -7,6 +7,7 @@
 #include <exception>
 #include <time.h>
 
+#define DIAG_PACKAGE_PREFIX "CM_Diagnostic_"
 DiagTool::DiagTool( IDiagFileListBuilder& fileListBuilder, IDiagPackager& packager ) :
     m_fileListBuilder( fileListBuilder)
     , m_packager( packager )
@@ -22,7 +23,7 @@ DiagTool::~DiagTool()
 std::filesystem::path DiagTool::GetPackagePath()
 {
     std::filesystem::path packagePath = WindowsUtilities::ResolveKnownFolderIdForCurrentUser( "FOLDERID_Desktop" );
-    packagePath /= "UC_Diagnostic_";
+    packagePath /= DIAG_PACKAGE_PREFIX;
     packagePath += std::to_string( time( NULL ) );
     packagePath += ".zip";
 
