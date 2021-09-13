@@ -22,7 +22,7 @@ void DiagFileListBuilder::GetFileList( std::vector<std::filesystem::path>& fileL
 
     fileList.clear();
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\UnifiedConnector\\config", L"path", configPath ) ) {
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\config", L"path", configPath ) ) {
         WLOG_ERROR( L"Failed to read config path from registry" );
     }
     else {
