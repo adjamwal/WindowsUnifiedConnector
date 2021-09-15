@@ -4,7 +4,6 @@
 #include <vector>
 #include "ICatalogListRetriever.h"
 #include "IPackageDiscoveryManager.h"
-#include "PmTypes.h"
 
 class ICatalogListRetriever;
 class IPackageInventoryProvider;
@@ -20,13 +19,12 @@ public:
     ~PackageDiscoveryManager();
 
     void Initialize( IPmPlatformDependencies* dep ) override;
-    bool DiscoverPackages( PackageInventory& inventory ) override;
+    std::vector<PmProductDiscoveryRules> PrepareCatalogDataset() override;
+    bool DiscoverPackages( std::vector<PmProductDiscoveryRules> catalogProductRules, PackageInventory& inventory ) override;
 
 private:
     ICatalogListRetriever& m_catalogListRetriever;
     IPackageInventoryProvider& m_packageInventoryProvider;
     ICatalogJsonParser& m_catalogJsonParser;
     std::mutex m_mutex;
-
-    void PrepareCatalogDataset();
 };

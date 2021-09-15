@@ -64,6 +64,10 @@ public:
     void MakeGetWatchdogTimeoutMsReturn( uint32_t value );
     void ExpectGetWatchdogTimeoutMsNotCalled();
 
+    MOCK_METHOD0( GetNetworkFailureRetryInterval, uint32_t() );
+    void MakeGetNetworkFailureRetryIntervalReturn( uint32_t value );
+    void ExpectGetNetworkFailureRetryIntervalNotCalled();
+
 private:
     std::string m_identifyUri;
     std::string m_checkinUri;

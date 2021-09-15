@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PmTypes.h"
+
 struct PackageInventory;
 
 class IPmPlatformDependencies;
@@ -11,5 +13,7 @@ public:
     virtual ~IPackageDiscoveryManager() {}
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
-    virtual bool DiscoverPackages( PackageInventory& inventory ) = 0;
+
+    virtual std::vector<PmProductDiscoveryRules> PrepareCatalogDataset() = 0;
+    virtual bool DiscoverPackages( std::vector<PmProductDiscoveryRules> catalogProductRules, PackageInventory& inventory ) = 0;
 };

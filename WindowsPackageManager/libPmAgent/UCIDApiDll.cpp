@@ -120,7 +120,7 @@ ucid_result_t UCIDApiDll::GetUrl( ucid_url_type_t urlType, std::string& url )
                 }
             }
         }
-        else {
+        else if ( result == UCID_RES_SUCCESS ) {
             url = tmpUrl;
         }
     }

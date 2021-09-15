@@ -163,7 +163,17 @@ std::chrono::milliseconds PackageManager::PmThreadWait()
         LOG_DEBUG( "Failed to load modified Pm configuration" );
     }
 
-    return std::chrono::milliseconds( m_config.GetCloudCheckinIntervalMs() );
+    if ( m_useShorterInterval )
+    {
+        LOG_DEBUG( "Using NetworkFailureRetryInterval" );
+        m_useShorterInterval = false;
+        return std::chrono::milliseconds( m_config.GetNetworkFailureRetryInterval() );
+    } 
+    else
+    {
+        LOG_DEBUG( "Using CloudCheckinIntervalMs" );
+        return std::chrono::milliseconds( m_config.GetCloudCheckinIntervalMs() );
+    }
 }
 
 void PackageManager::PmWorkflowThread()
@@ -176,18 +186,23 @@ void PackageManager::PmWorkflowThread()
 
     PackageInventory inventory;
     bool isRebootRequired = false;
+    std::vector<PmProductDiscoveryRules> productDiscoveryRules;
 
     m_watchdog.Kick();
 
     try {
-        m_packageDiscoveryManager.DiscoverPackages( inventory );
+        productDiscoveryRules = m_packageDiscoveryManager.PrepareCatalogDataset();
+
+        m_packageDiscoveryManager.DiscoverPackages( productDiscoveryRules, inventory );
     }
     catch( std::exception& ex ) {
         LOG_ERROR( "PackageDiscovery failed: %s", ex.what() );
+        m_useShorterInterval = true;
         return;
     }
     catch ( ... ) {
-        LOG_ERROR( "PackageDiscovery failed: Unkown exception" );
+        LOG_ERROR( "PackageDiscovery failed: Unknown exception" );
+        m_useShorterInterval = true;
         return;
     }
 
@@ -209,9 +224,11 @@ void PackageManager::PmWorkflowThread()
         }
     }
     catch( std::exception& ex ) {
+        m_useShorterInterval = true;
         LOG_ERROR( "Checkin failed: %s", ex.what() );
     }
     catch ( ... ) {
+        m_useShorterInterval = true;
         LOG_ERROR( "Checkin failed: Unknown exception" );
     }
 

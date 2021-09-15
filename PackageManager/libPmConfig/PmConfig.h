@@ -29,6 +29,7 @@ struct PmConfigData
     bool allowPostInstallReboots;
     uint32_t rebootThrottleS;
     uint32_t watchdogTimeoutMs;
+    uint32_t networkFailureRetryInterval;
 };
 
 class PmConfig : public IPmConfig
@@ -50,6 +51,7 @@ public:
     bool AllowPostInstallReboots() override;
     uint32_t GetRebootThrottleS() override;
     uint32_t GetWatchdogTimeoutMs() override;
+    uint32_t GetNetworkFailureRetryInterval() override;
 
 private:
     IFileSysUtil& m_fileUtil;
@@ -71,4 +73,5 @@ private:
     bool VerifyPmAllowPostInstallReboots( const Json::Value& pmRoot );
     bool VerifyPmRebootThrottle( const Json::Value& pmRoot );
     bool VerifyPmWatchdogBuffer( const Json::Value& pmRoot );
+    bool VerifyPmNetworkFailureRetryInterval( const Json::Value& pmRoot );
 };

@@ -52,7 +52,8 @@ protected:
         "AllowPostInstallReboots": true,
         "RebootThrottleS": 1000,
         "WatchdogBufferMs": 250000,
-        "MaxEventTTL_s": 60
+        "MaxEventTTL_s": 60,
+        "NetworkFailureRetryInterval": 300000
     }
 }
 )";

@@ -76,6 +76,8 @@ private:
     std::mutex m_mutex;
     std::string m_pmConfigFile;
 
+    bool m_useShorterInterval = false;
+
     IPmPlatformDependencies* m_dependencies;
 
     void PmWorkflowThread();

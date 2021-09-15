@@ -76,6 +76,11 @@ uint32_t InstallerConfig::GetWatchdogTimeoutMs()
     return uint32_t();
 }
 
+uint32_t InstallerConfig::GetNetworkFailureRetryInterval()
+{
+    return uint32_t();
+}
+
 void InstallerConfig::SetCloudEventUri( std::string& uri )
 {
     m_configData.eventUri = uri;

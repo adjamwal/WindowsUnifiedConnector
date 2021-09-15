@@ -24,4 +24,5 @@ public:
     virtual bool AllowPostInstallReboots() = 0;
     virtual uint32_t GetRebootThrottleS() = 0;
     virtual uint32_t GetWatchdogTimeoutMs() = 0;
+    virtual uint32_t GetNetworkFailureRetryInterval() = 0;
 };

@@ -25,19 +25,20 @@ void PackageDiscoveryManager::Initialize( IPmPlatformDependencies* dep )
     m_packageInventoryProvider.Initialize( dep );
 }
 
-bool PackageDiscoveryManager::DiscoverPackages( PackageInventory& inventory )
-{
-    PrepareCatalogDataset();
-    return m_packageInventoryProvider.GetInventory( inventory );
-}
-
-void PackageDiscoveryManager::PrepareCatalogDataset()
+std::vector<PmProductDiscoveryRules> PackageDiscoveryManager::PrepareCatalogDataset()
 {
     std::string catalogList = m_catalogListRetriever.GetCloudCatalog();
     LOG_DEBUG( "Retrieved Catalog: %s", catalogList.c_str() );
 
     std::vector<PmProductDiscoveryRules> catalogProductRules;
     m_catalogJsonParser.Parse( catalogList, catalogProductRules );
-    
+
+    return catalogProductRules;
+}
+
+bool PackageDiscoveryManager::DiscoverPackages( std::vector<PmProductDiscoveryRules> catalogProductRules, PackageInventory& inventory )
+{
     m_packageInventoryProvider.SetCatalogDataset( catalogProductRules );
+
+    return m_packageInventoryProvider.GetInventory( inventory );
 }

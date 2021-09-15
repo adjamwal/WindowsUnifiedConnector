@@ -136,6 +136,13 @@ uint32_t PmConfig::GetWatchdogTimeoutMs()
     return m_configData.watchdogTimeoutMs;
 }
 
+uint32_t PmConfig::GetNetworkFailureRetryInterval()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    return m_configData.networkFailureRetryInterval;
+}
+
 int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
 {
     int rtn = -1;
@@ -217,6 +224,16 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
         else {
             m_configData.watchdogTimeoutMs = m_configData.intervalMs + pm[ "WatchdogBufferMs" ].asUInt();
         }
+
+        if ( !VerifyPmNetworkFailureRetryInterval( pm ) ) {
+            uint32_t networkFailureRetry = m_configData.intervalMs / 2;
+            LOG_WARNING( "Invalid NetworkFailureRetryInterval. Using %d", networkFailureRetry );
+            m_configData.networkFailureRetryInterval = networkFailureRetry;
+        }
+        else {
+            m_configData.networkFailureRetryInterval = pm[ "NetworkFailureRetryInterval" ].asUInt();
+        }
+
         rtn = 0;
     }
 
@@ -283,6 +300,11 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
             rtn = -1;
         }
 
+        if ( !VerifyPmNetworkFailureRetryInterval( pm ) ) {
+            LOG_ERROR( "Invalid NetworkFailureRetryInterval" );
+            rtn = -1;
+        }
+
         if( rtn != 0 ) {
             LOG_ERROR( "Invalid configuration %s", Json::writeString( Json::StreamWriterBuilder(), root ).c_str() );
         }
@@ -341,4 +363,9 @@ bool PmConfig::VerifyPmRebootThrottle( const Json::Value& pmRoot )
 bool PmConfig::VerifyPmWatchdogBuffer( const Json::Value& pmRoot )
 {
     return pmRoot.isMember( "WatchdogBufferMs" ) && pmRoot[ "WatchdogBufferMs" ].isUInt() && ( pmRoot[ "WatchdogBufferMs" ].asUInt() >= 30000 );
+}
+
+bool PmConfig::VerifyPmNetworkFailureRetryInterval( const Json::Value& pmRoot )
+{
+    return pmRoot.isMember( "NetworkFailureRetryInterval" ) && pmRoot[ "NetworkFailureRetryInterval" ].isUInt();
 }
