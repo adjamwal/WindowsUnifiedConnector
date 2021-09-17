@@ -9,3 +9,7 @@ EXPORTS
 	SendEventOnUninstallComplete
 	ExtractCaResources
 	RemoveCaResources
+	SetupRemoveCscPluginData
+	RemoveCscPlugin
+	SetupCopyCscPluginData
+	CopyCscPlugin

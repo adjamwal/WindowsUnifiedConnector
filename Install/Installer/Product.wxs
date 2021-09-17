@@ -40,6 +40,9 @@
         <Property Id="UCDT_SHORTCUT_NAME" Value="!(loc.DiagToolName).lnk" />
         <Icon Id="UC.ico" SourceFile="$(var.SolutionDir)\Resources\images\UC.ico"/>
         <Property Id="ARPPRODUCTICON" Value="UC.ico" />
+        
+        <Property Id="REMOVE_CSC_PLUGIN_DATA" Value="0" />
+        <Property Id="COPY_CSC_PLUGIN_DATA" Value="0" />
       
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="ExtractCaResources" BinaryKey="CustomActionsDll" DllEntry="ExtractCaResources" />
@@ -54,7 +57,13 @@
         -->
         <CustomAction Id="SendEventOnUninstallError" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallError" />
         <CustomAction Id="SendEventOnUninstallComplete" BinaryKey="CustomActionsDll" DllEntry="SendEventOnUninstallComplete" />
-      
+        <CustomAction Id="SetupRemoveCscPluginData" BinaryKey="CustomActionsDll" DllEntry="SetupRemoveCscPluginData" />
+        <CustomAction Id="RemoveCscPlugin" BinaryKey="CustomActionsDll" DllEntry="RemoveCscPlugin" Execute="deferred" Impersonate="no" />
+        <SetProperty Id="RemoveCscPlugin" Before="RemoveCscPlugin" Value="[REMOVE_CSC_PLUGIN_DATA]" Sequence="execute"/>
+        <CustomAction Id="SetupCopyCscPluginData" BinaryKey="CustomActionsDll" DllEntry="SetupCopyCscPluginData" />
+        <CustomAction Id="CopyCscPlugin" BinaryKey="CustomActionsDll" DllEntry="CopyCscPlugin" Execute="deferred" Impersonate="no" />
+        <SetProperty Id="CopyCscPlugin" Before="CopyCscPlugin" Value="[COPY_CSC_PLUGIN_DATA]" Sequence="execute"/>
+        
         <InstallExecuteSequence>
           <Custom Action="ExtractCaResources" After="FindRelatedProducts" />
           <Custom Action="CollectUCData" After="ExtractCaResources">
@@ -65,13 +74,6 @@
           </Custom>
           <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
           <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
-          
-          <!--=
-          Commenting out this event till we figure out what we want to do with it
-          <Custom Action="SendEventOnUninstallBegin" After="CollectUCData">
-              (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
-          </Custom>
-          -->
 
           <Custom Action="SendEventOnUninstallError" OnExit="error">
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
@@ -80,6 +82,20 @@
             (REMOVE~="ALL") AND (NOT UPGRADINGPRODUCTCODE)
           </Custom>
           <Custom Action="RemoveCaResources" OnExit="success" />
+
+          <Custom Action="SetupRemoveCscPluginData" After="InstallInitialize">
+            (REMOVE~="ALL") OR (UPGRADINGPRODUCTCODE)
+          </Custom>
+          <Custom Action="RemoveCscPlugin" After="SetupRemoveCscPluginData">
+            (REMOVE~="ALL") OR (UPGRADINGPRODUCTCODE)
+          </Custom>
+
+          <Custom Action="SetupCopyCscPluginData" Before="InstallFinalize">
+            (NOT REMOVE~="ALL")
+          </Custom>
+          <Custom Action="CopyCscPlugin" After="SetupCopyCscPluginData">
+            (NOT REMOVE~="ALL")
+          </Custom>
         </InstallExecuteSequence>
 
         <?if $(var.Platform) = x86 ?>
@@ -125,6 +141,7 @@
             <ComponentGroupRef Id="UCPMComponents" />
             <ComponentGroupRef Id="CG.ConfigFiles" />
             <ComponentGroupRef Id="CiscoStartMenu" />
+            <ComponentGroupRef Id="CscPluginComponents" />
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
@@ -165,12 +182,24 @@
                                 </Directory>
                             </Directory>
                         </Directory>
+                        <?if $(var.Platform) != x64?>
+                            <Directory Id="CSC_PLUGIN_DIRECTORY" Name="$(var.CscPluginDirectory)" />
+                        <?endif?>
                     </Directory>
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder">
               <Directory Id="CiscoProgramMenuFolder" Name="$(var.CiscoDirectory)" />
             </Directory>
+            <?if $(var.Platform) = x64?>
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="WIN32_CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
+                    <Directory Id="WIN32_PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
+                        <Directory Id="CSC_PLUGIN_DIRECTORY" Name="$(var.CscPluginDirectory)" />
+                    </Directory>
+                </Directory>
+            </Directory>
+            <?endif?>
         </Directory>
     </Fragment>
 
@@ -201,6 +230,12 @@
     </Fragment>
 
     <Fragment>
+        <ComponentGroup Id="CscPluginComponents" Directory="UCSERVICE_DIRECTORY">
+            <Component Id="CscCmPlugin" Guid="*">
+                <File Id="csccmplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\csccmplugin.dll" />
+            </Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="UCServiceComponents" Directory="UCSERVICE_DIRECTORY">
             <Component Id="UCSERVICE_VERSION_REGISTRY" Guid="*">
                 <RegistryKey Root="HKLM"
@@ -243,7 +278,7 @@
                 </Shortcut>
               </File>
             </Component>
-          
+
             <?if $(var.Configuration) = "Release" ?>
                 <Component Id="msvcp140.dll" Guid="*">
                     <File Id="msvcp140.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\msvcp140.dll" />

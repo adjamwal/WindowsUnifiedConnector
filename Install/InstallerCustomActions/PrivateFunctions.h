@@ -3,6 +3,8 @@
 #include <Msi.h>
 #include <string>
 #include <versionhelpers.h>
+#include <filesystem>
+#include <vector>
 
 class IUcLogger;
 
@@ -25,3 +27,6 @@ bool RunSendEventOnUninstallBegin( IUcLogger* logger, const std::wstring& dllPat
 bool RunSendEventOnUninstallError( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken );
 bool RunSendEventOnUninstallComplete( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& productVersion, std::string& ucid, std::string& ucidToken );
 void TryKillProcessByName( const std::wstring filename );
+void BuildCustomActionData( const std::vector<std::wstring>& propertyList, const char delim, std::wstring& str );
+void Tokenize( const std::wstring& str, const char delim, std::vector<std::wstring>& stringList );
+bool MovePluginForDeletion( const std::filesystem::path& src, const std::filesystem::path& destFolder );

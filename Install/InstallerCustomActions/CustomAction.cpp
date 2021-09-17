@@ -2,6 +2,7 @@
 #include "PrivateFunctions.h"
 #include "MsiLogger.h"
 #include <codecvt>
+#include <filesystem>
 
 HMODULE globalDllHandle;
 
@@ -314,6 +315,168 @@ UINT __stdcall SendEventOnUninstallComplete( MSIHANDLE hInstall )
 LExit:
     SetUcLogger( NULL );
     return WcaFinalize( ERROR_SUCCESS );
+}
+
+UINT __stdcall SetupRemoveCscPluginData( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    LPWSTR tempPath = NULL;
+    std::wstring customData;
+
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
+
+    BuildCustomActionData( { L"CSC_PLUGIN_DIRECTORY", L"UC_INSTALLCACHE_DIR" }, '|', customData );
+
+    if( !customData.length() ) {
+        hr = E_FAIL;
+        ExitOnFailure( hr, __FUNCTION__ "Invalid CustomActionData" );
+    }
+
+    if( ( hr = MsiSetProperty( hInstall, L"REMOVE_CSC_PLUGIN_DATA", customData.c_str() ) ) == ERROR_SUCCESS ) {
+        WLOG_DEBUG( L"Stored REMOVE_CSC_PLUGIN_DATA %s", customData.c_str() );
+    }
+    else {
+        WLOG_ERROR( L"MsiSetProperty failed REMOVE_CSC_PLUGIN_DATA %s", customData.c_str() );
+    }
+LExit:
+    SetUcLogger( NULL );
+    return WcaFinalize( hr );
+}
+
+UINT __stdcall RemoveCscPlugin( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    LPWSTR tempPath = NULL;
+    WCHAR customActionData[ 2048 ] = { 0 };
+    DWORD customActionDataSize = 2048;
+    std::filesystem::path pluginPath;
+    std::filesystem::path cachePath;
+
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
+
+    if( MsiGetProperty( hInstall, L"CustomActionData", customActionData, &customActionDataSize ) == ERROR_SUCCESS ) {
+        WLOG_DEBUG( L"CustomActionData %s", customActionData );
+        std::wstring tempStr = customActionData;
+        std::vector<std::wstring> customActionDataList;
+        Tokenize( customActionData, '|', customActionDataList );
+        if( customActionDataList.size() >= 2 ) {
+            pluginPath = customActionDataList[ 0 ];
+            pluginPath /= "csccmplugin.dll";
+
+            cachePath = customActionDataList[ 1 ];
+        }
+        else {
+            ExitOnFailure( hr, __FUNCTION__ "Invalid CustomActionData" );
+        }
+    }
+    else {
+        ExitOnFailure( hr, __FUNCTION__ "Failed to get CustomActionData" );
+    }
+
+    if( !MovePluginForDeletion( pluginPath, cachePath ) ) {
+        WcaLog( LOGMSG_STANDARD, __FUNCTION__ ": Failed to delete pluging %S", pluginPath.c_str() );
+    }
+
+LExit:
+    SetUcLogger( NULL );
+    return WcaFinalize( ERROR_SUCCESS );
+}
+
+UINT __stdcall SetupCopyCscPluginData( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    LPWSTR tempPath = NULL;
+    std::wstring customData;
+
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
+
+    BuildCustomActionData( { L"CSC_PLUGIN_DIRECTORY", L"UCSERVICE_DIRECTORY", L"UC_INSTALLCACHE_DIR" }, '|', customData );
+
+    if( !customData.length() ) {
+        hr = E_FAIL;
+        ExitOnFailure( hr, __FUNCTION__ "Invalid CustomActionData" );
+    }
+    
+    if( ( hr = MsiSetProperty( hInstall, L"COPY_CSC_PLUGIN_DATA", customData.c_str() ) ) == ERROR_SUCCESS ) {
+        WLOG_DEBUG( L"Stored COPY_CSC_PLUGIN_DATA %s", customData.c_str() );
+    }
+    else {
+        WLOG_ERROR( L"MsiSetProperty failed COPY_CSC_PLUGIN_DATA %s", customData.c_str() );
+    }
+LExit:
+    SetUcLogger( NULL );
+    return WcaFinalize( hr );
+}
+
+UINT __stdcall CopyCscPlugin( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    LPWSTR tempPath = NULL;
+    WCHAR customActionData[ 2048 ] = { 0 };
+    DWORD customActionDataSize = 2048;
+    std::filesystem::path pluginPath;
+    std::filesystem::path ucPlugingPath;
+    std::filesystem::path cachePath;
+    std::error_code ec;
+
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
+
+
+    if( MsiGetProperty( hInstall, L"CustomActionData", customActionData, &customActionDataSize ) == ERROR_SUCCESS ) {
+        WLOG_DEBUG( L"CustomActionData %s", customActionData );
+        std::wstring tempStr = customActionData;
+        std::vector<std::wstring> customActionDataList;
+        Tokenize( customActionData, '|', customActionDataList );
+        if( customActionDataList.size() >= 3 ) {
+            pluginPath = customActionDataList[ 0 ];
+            pluginPath /= "csccmplugin.dll";
+
+            ucPlugingPath = customActionDataList[ 1 ];
+            ucPlugingPath /= "csccmplugin.dll";
+
+            cachePath = customActionDataList[ 2 ];
+        }
+        else {
+            ExitOnFailure( hr, __FUNCTION__ "Invalid CustomActionData" );
+        }
+    }
+    else {
+        ExitOnFailure( hr, __FUNCTION__ "Failed to get CustomActionData" );
+    }
+
+    if( std::filesystem::exists( pluginPath ) ) {
+        if( !MovePluginForDeletion( pluginPath, cachePath ) ) {
+            hr = E_FAIL;
+            ExitOnFailure( hr, __FUNCTION__ "Failed to get move existing plugin" );
+        }
+    }
+
+    std::filesystem::copy_file( ucPlugingPath, pluginPath, std::filesystem::copy_options::overwrite_existing, ec);
+
+    if( ec ) {
+        WcaLogError( LOGMSG_STANDARD, __FUNCTION__ ": Failed to copy %S to %S. %s", ucPlugingPath.c_str(), pluginPath.c_str(), ec.message().c_str() );
+        hr = E_FAIL;
+    }
+
+LExit:
+    SetUcLogger( NULL );
+    return WcaFinalize( hr );
 }
 
 // DllMain - Initialize and cleanup WiX custom action utils.

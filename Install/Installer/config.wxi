@@ -32,7 +32,8 @@
     <?define UCConfigDirectory = "Configuration" ?>
     <?define UCDataDirectory = "Data" ?>
     <?define PmInstallCacheDirectory = "Cisco-CM" ?>
-
+    <?define CscPluginDirectory = "Plugins" ?>
+    
     <!-- Config File Information -->
     <?define BootstrapperConfigName = "bs.json" ?>
     <?define UCServiceConfigName = "cm_config.json" ?>

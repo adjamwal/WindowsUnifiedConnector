@@ -148,6 +148,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPmAgent", "WindowsPacka
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestControlModule", "WindowsPackageManager\Tests\ComponentTestControlModule\ComponentTestControlModule.vcxproj", "{E45A6EFE-211D-4E14-A7FD-A92C613A8879}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dllUiVersionPlugin", "UC\dllUiVersionPlugin\dllUiVersionPlugin.vcxproj", "{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -514,6 +516,12 @@ Global
 		{E45A6EFE-211D-4E14-A7FD-A92C613A8879}.Release|x64.Build.0 = Release|x64
 		{E45A6EFE-211D-4E14-A7FD-A92C613A8879}.Release|x86.ActiveCfg = Release|Win32
 		{E45A6EFE-211D-4E14-A7FD-A92C613A8879}.Release|x86.Build.0 = Release|Win32
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}.Debug|x64.ActiveCfg = Debug|Win32
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}.Debug|x86.ActiveCfg = Debug|Win32
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}.Debug|x86.Build.0 = Debug|Win32
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}.Release|x64.ActiveCfg = Release|Win32
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}.Release|x86.ActiveCfg = Release|Win32
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -575,6 +583,7 @@ Global
 		{7DC3D374-6825-4572-A0BD-196A19BEFB80} = {CF3AB075-744F-492E-85E6-9B34A1A25CC0}
 		{5405CA8D-FEA6-4F3B-902B-F67083F1E8D7} = {4891EE6D-E469-4193-9C04-86BE44890980}
 		{E45A6EFE-211D-4E14-A7FD-A92C613A8879} = {4891EE6D-E469-4193-9C04-86BE44890980}
+		{66257A32-8FBB-4D8F-A34F-F810CE2C4CF9} = {D99E33CC-A481-41A0-A01C-C5F04722912D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

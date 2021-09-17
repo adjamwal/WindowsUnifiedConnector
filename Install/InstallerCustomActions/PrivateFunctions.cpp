@@ -463,3 +463,57 @@ void TryKillProcessByName( const std::wstring filename )
     }
     CloseHandle( hSnapShot );
 }
+
+bool MovePluginForDeletion( const std::filesystem::path& src, const std::filesystem::path& destFolder )
+{
+    bool rtn;
+    std::srand( ( unsigned int )std::time( nullptr ) );
+
+    std::filesystem::path destFile = destFolder;
+
+    destFile /= std::to_wstring( std::rand() );
+    destFile += L"_csccmplugin.dll";
+
+    std::filesystem::create_directories( destFolder );
+    rtn = MoveFileEx( src.c_str(), destFile.c_str(), MOVEFILE_REPLACE_EXISTING );
+
+    if( rtn ) {
+        if( !MoveFileEx( destFile.c_str(), NULL, MOVEFILE_DELAY_UNTIL_REBOOT ) ) {
+            WLOG_WARNING( L"Failed to mark %s for deletion", destFile.c_str() );
+        }
+    }
+    else {
+        WLOG_ERROR( L"Failed to move %s to %s", src.c_str(), destFile.c_str() );
+    }
+
+    return rtn;
+}
+
+void BuildCustomActionData( const std::vector<std::wstring>& propertyList, const char delim, std::wstring& str )
+{
+    str.clear();
+
+    for( size_t i = 0; i < propertyList.size(); i++ ) {
+        LPWSTR tempPath = NULL;
+        HRESULT hr = WcaGetProperty( propertyList[ i ].c_str(), &tempPath );
+        if( SUCCEEDED( hr ) ) {
+            str += tempPath;
+            if( ( i + 1 ) < propertyList.size() ) {
+                str += L"|";
+            }
+        }
+        else {
+            WLOG_ERROR( L"WcaGetProperty failed on %s", propertyList[ i ].c_str() );
+        }
+    }
+}
+void Tokenize( const std::wstring &str, const char delim, std::vector<std::wstring>& stringList )
+{
+    size_t start;
+    size_t end = 0;
+
+    while( ( start = str.find_first_not_of( delim, end ) ) != std::wstring::npos ) {
+        end = str.find( delim, start );
+        stringList.push_back( str.substr( start, end - start ) );
+    }
+}
