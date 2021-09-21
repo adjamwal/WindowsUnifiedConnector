@@ -106,13 +106,35 @@ bool WindowsConfiguration::RefreshIdentity()
     return UpdateUCID();
 }
 
+int32_t WindowsConfiguration::ReloadSslCertificates()
+{
+    std::lock_guard<std::mutex> lock( m_certMutex );
+
+    int32_t rtn = m_winCertLoader.UnloadSystemCerts();
+
+    if( rtn != 0 ) {
+        LOG_ERROR( "Failed to UnloadSystemCerts" );
+    }
+    else {
+        if( ( rtn = m_winCertLoader.LoadSystemCerts() ) != 0 ) {
+            LOG_ERROR( "Failed to LoadSystemCerts" );
+        }
+    }
+
+    return rtn;
+}
+
 int32_t WindowsConfiguration::GetSslCertificates( X509*** certificates, size_t& count )
 {
+    std::lock_guard<std::mutex> lock( m_certMutex );
+
     return m_winCertLoader.GetSystemCerts( certificates, count );
 }
 
 void WindowsConfiguration::ReleaseSslCertificates( X509** certificates, size_t count )
 {
+    std::lock_guard<std::mutex> lock( m_certMutex );
+
     m_winCertLoader.FreeSystemCerts( certificates, count );
 }
 

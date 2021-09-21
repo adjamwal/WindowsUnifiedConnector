@@ -24,3 +24,7 @@ void MockCertsAdapter::ExpectGetCertsListIsNotCalled()
     EXPECT_CALL( *this, GetCertsList() ).Times( 0 );
 }
 
+void MockCertsAdapter::ExpectReloadCertsIsNotCalled()
+{
+    EXPECT_CALL( *this, ReloadCerts() ).Times( 0 );
+}

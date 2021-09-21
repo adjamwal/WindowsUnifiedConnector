@@ -6,7 +6,6 @@
 #include "PackageDiscoveryManager.h"
 #include "CheckinFormatter.h"
 #include "UcidAdapter.h"
-#include "CertsAdapter.h"
 #include "CheckinManifestRetriever.h"
 #include "CatalogListRetriever.h"
 #include "CatalogJsonParser.h"
@@ -33,6 +32,7 @@
 #include "MockRebootHandler.h"
 #include "CustomPathMatchers.h"
 #include "MockWatchdog.h"
+#include "MockCertsAdapter.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -62,7 +62,7 @@ protected:
         m_packageInventoryProvider.reset( new PackageInventoryProvider( *m_mockFileUtil, *m_mockSslUtil ) );
         m_checkinFormatter.reset( new CheckinFormatter() );
         m_ucidAdapter.reset( new UcidAdapter() );
-        m_certsAdapter.reset( new CertsAdapter() );
+        m_certsAdapter.reset( new NiceMock<MockCertsAdapter>() );
 
         m_eventBuilder.reset( new CloudEventBuilder() );
         m_eventPublisher.reset( new NiceMock<MockCloudEventPublisher>() );
@@ -225,7 +225,7 @@ protected:
     std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
-    std::unique_ptr<ICertsAdapter> m_certsAdapter;
+    std::unique_ptr<MockCertsAdapter> m_certsAdapter;
     std::unique_ptr<ICheckinManifestRetriever> m_checkinManifestRetriever;
     std::unique_ptr<ICatalogJsonParser> m_catalogJsonParser;
     std::unique_ptr<ICatalogListRetriever> m_catalogListRetriever;
@@ -991,5 +991,25 @@ TEST_F( ComponentTestPacMan, PacManWillKickTheWatchdogOnNetworkError )
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
     lock.unlock();
 
+    EXPECT_TRUE( pass );
+}
+
+ TEST_F( ComponentTestPacMan, PacManWillUpdateCerts )
+{
+    bool pass = false;
+    
+    EXPECT_CALL( *m_certsAdapter, ReloadCerts() ).WillOnce( Invoke(
+        [this, &pass]() {
+            pass = true;
+            m_cv.notify_one();
+            return 0;
+        } ) );
+    
+    StartPacMan();
+    
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
+    
     EXPECT_TRUE( pass );
 }

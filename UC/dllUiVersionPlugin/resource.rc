@@ -18,17 +18,6 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_UCDIAGTOOL           ICON                    "..\..\Resources\images\UC.ico"
-
-IDI_SMALL               ICON                    "..\..\Resources\images\small.ico"
-
 #pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED

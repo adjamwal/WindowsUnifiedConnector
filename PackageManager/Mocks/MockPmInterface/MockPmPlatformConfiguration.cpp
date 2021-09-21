@@ -42,6 +42,11 @@ void MockPmPlatformConfiguration::ExpectRefreshIdentityIsNotCalled()
     EXPECT_CALL( *this, RefreshIdentity() ).Times( 0 );
 }
 
+void MockPmPlatformConfiguration::ExpectReloadSslCertificatesIsNotCalled()
+{
+    EXPECT_CALL( *this, ReloadSslCertificates() ).Times( 0 );
+}
+
 void MockPmPlatformConfiguration::MakeGetSslCertificatesReturn( int32_t value )
 {
     ON_CALL( *this, GetSslCertificates( _, _ ) ).WillByDefault( Return( value ) );

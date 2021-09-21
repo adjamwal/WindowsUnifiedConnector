@@ -19,11 +19,11 @@ CertsAdapter::~CertsAdapter()
 void CertsAdapter::Initialize( IPmPlatformDependencies* dep )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
+    m_dependencies = dep;
 
     //release any previously allocated certs
     InternalReleaseCerts();
 
-    m_dependencies = dep;
     InternalGetCerts();
 }
 
@@ -36,6 +36,17 @@ PmHttpCertList CertsAdapter::GetCertsList()
     }
 
     return m_certList;
+}
+
+void CertsAdapter::ReloadCerts()
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    if( !m_dependencies ) {
+        throw std::exception( __FUNCTION__ ": Dependencies not initialized." );
+    }
+
+    InternalReloadCerts();
 }
 
 void CertsAdapter::InternalGetCerts()
@@ -68,4 +79,11 @@ void CertsAdapter::InternalReleaseCerts()
     {
         LOG_ERROR( "Error releasing SSL certs." );
     }
+}
+
+void CertsAdapter::InternalReloadCerts()
+{
+    InternalReleaseCerts();
+    m_dependencies->Configuration().ReloadSslCertificates();
+    InternalGetCerts();
 }

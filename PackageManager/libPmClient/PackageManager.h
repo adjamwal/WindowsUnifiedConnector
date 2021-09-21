@@ -85,4 +85,5 @@ private:
     bool LoadPmConfig();
     std::chrono::milliseconds PmWatchdogWait();
     void PmWatchdogFired();
+    void UpdateSslCerts();
 };

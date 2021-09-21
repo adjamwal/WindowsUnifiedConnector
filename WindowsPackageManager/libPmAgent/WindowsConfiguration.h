@@ -31,6 +31,12 @@ public:
     bool RefreshIdentity() override;
 
     /**
+     * @brief (Optional) Reloads ssl certs from the cert store
+     *   Needed in Windows since curl can't load system certs without schannel
+     */
+    int32_t ReloadSslCertificates() override;
+
+    /**
      * @brief (Optional) Retrieves the clients system certs
      *   Needed in Windows since curl can't load system certs without schannel
      *
@@ -78,6 +84,7 @@ private:
     std::string m_ucid;
     PmUrlList m_urls;
     std::mutex m_ucidMutex;
+    std::mutex m_certMutex;
 
     bool UpdateUCID();
 };

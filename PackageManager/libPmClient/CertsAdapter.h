@@ -13,6 +13,7 @@ public:
 
     void Initialize( IPmPlatformDependencies* dep ) override;
     PmHttpCertList GetCertsList() override;
+    void ReloadCerts() override;
 
 private:
     IPmPlatformDependencies* m_dependencies;
@@ -22,4 +23,5 @@ private:
 
     void InternalGetCerts();
     void InternalReleaseCerts();
+    void InternalReloadCerts();
 };

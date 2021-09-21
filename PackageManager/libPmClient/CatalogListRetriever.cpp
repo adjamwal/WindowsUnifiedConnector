@@ -51,7 +51,6 @@ int32_t CatalogListRetriever::InternalGetCloudCatalogFrom( std::string& uri, std
     }
 
     m_cloud.SetToken( token );
-    m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
 
     m_cloud.Get( uri, responseData, eResult );
     LOG_DEBUG( "m_cloud.Get:\n------uri=%s\n------httpStatusResponse=%d\n------subError=%d\n------responseData=%s\n", 

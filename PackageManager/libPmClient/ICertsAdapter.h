@@ -13,4 +13,5 @@ public:
 
     virtual void Initialize( IPmPlatformDependencies* dep ) = 0;
     virtual PmHttpCertList GetCertsList() = 0;
+    virtual void ReloadCerts() = 0;
 };

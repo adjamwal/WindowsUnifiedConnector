@@ -51,21 +51,9 @@ TEST_F( TestCatalogListRetriever, WillGetAccessToken )
     m_patient->GetCloudCatalog();
 }
 
-TEST_F( TestCatalogListRetriever, WillGetCertsList )
-{
-    EXPECT_CALL( *m_certs, GetCertsList() ).Times( 1 );
-    m_patient->GetCloudCatalog();
-}
-
 TEST_F( TestCatalogListRetriever, WillSetToken )
 {
     EXPECT_CALL( *m_cloud, SetToken( _ ) ).Times( 1 );
-    m_patient->GetCloudCatalog();
-}
-
-TEST_F( TestCatalogListRetriever, WillSetCerts )
-{
-    EXPECT_CALL( *m_cloud, SetCerts( _ ) ).Times( 1 );
     m_patient->GetCloudCatalog();
 }
 

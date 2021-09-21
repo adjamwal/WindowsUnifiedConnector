@@ -34,6 +34,12 @@ public:
     virtual bool RefreshIdentity() = 0;
 
     /**
+     * @brief (Optional) Reloads ssl certs from the cert store
+     *   Needed in Windows since curl can't load system certs without schannel
+     */
+    virtual int32_t ReloadSslCertificates() = 0;
+
+    /**
      * @brief (Optional) Retrieves the clients system certs
      *   Needed in Windows since curl can't load system certs without schannel
      *

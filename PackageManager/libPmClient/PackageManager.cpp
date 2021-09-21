@@ -189,8 +189,22 @@ void PackageManager::PmWorkflowThread()
     std::vector<PmProductDiscoveryRules> productDiscoveryRules;
 
     m_watchdog.Kick();
+    try {
+        UpdateSslCerts();
+    }
+    catch( std::exception& ex ) {
+        LOG_ERROR( "UpdateSslCerts failed: %s", ex.what() );
+        m_useShorterInterval = true;
+        return;
+    }
+    catch( ... ) {
+        LOG_ERROR( "UpdateSslCerts failed: Unknown exception" );
+        m_useShorterInterval = true;
+        return;
+    }
 
     try {
+        m_dependencies->Configuration().ReloadSslCertificates();
         productDiscoveryRules = m_packageDiscoveryManager.PrepareCatalogDataset();
 
         m_packageDiscoveryManager.DiscoverPackages( productDiscoveryRules, inventory );
@@ -270,4 +284,15 @@ void PackageManager::PmWatchdogFired()
     int* x = NULL;
     int y = *x;
     LOG_EMERGENCY( ": Y is %d", y );
+}
+
+void PackageManager::UpdateSslCerts()
+{
+    if( m_dependencies ) {
+        PmHttpCertList emptyCertList = { 0 };
+
+        m_cloud.SetCerts( emptyCertList );
+        m_certsAdapter.ReloadCerts();
+        m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
+    }
 }

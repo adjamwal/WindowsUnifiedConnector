@@ -18,4 +18,6 @@ public:
     void MakeGetCertsListReturn( PmHttpCertList value );
     void ExpectGetCertsListIsNotCalled();
 
+    MOCK_METHOD0( ReloadCerts, void() );
+    void ExpectReloadCertsIsNotCalled();
 };

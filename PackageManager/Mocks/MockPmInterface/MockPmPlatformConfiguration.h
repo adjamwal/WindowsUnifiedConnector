@@ -21,6 +21,9 @@ public:
     void MakeRefreshIdentityReturn( bool value );
     void ExpectRefreshIdentityIsNotCalled();
 
+    MOCK_METHOD0( ReloadSslCertificates, int32_t() );
+    void ExpectReloadSslCertificatesIsNotCalled();
+
     MOCK_METHOD2( GetSslCertificates, int32_t( X509***, size_t & ) );
     void MakeGetSslCertificatesReturn( int32_t value );
     void ExpectGetSslCertificatesIsNotCalled();
