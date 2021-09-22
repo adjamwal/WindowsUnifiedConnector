@@ -467,6 +467,7 @@ UINT __stdcall CopyCscPlugin( MSIHANDLE hInstall )
         }
     }
 
+    std::filesystem::create_directories( pluginPath.parent_path() );
     std::filesystem::copy_file( ucPlugingPath, pluginPath, std::filesystem::copy_options::overwrite_existing, ec);
 
     if( ec ) {
