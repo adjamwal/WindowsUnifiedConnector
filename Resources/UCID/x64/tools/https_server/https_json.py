@@ -1,7 +1,7 @@
 """
-This script is a simulator for a UCID Cloud HTTPS server.
+This script is a simulator for a CMID Cloud HTTPS server.
 It accepts GET and POST requests. For POST requests, it accepts a JSON request
-and also responds with a JSON from ucid_response.json.
+and also responds with a JSON from cmid_response.json.
 
 Usage:
 1) Hostname has to be added to the /etc/hosts file. This step is only needed if
@@ -91,8 +91,8 @@ except Exception as e:
     HANDLE_ONCE.append(config.HANDLE_ONCE)
 
 
-UCID_REQUEST_FILE = os.path.join(BASE_DIR, 'ucid_request.json')
-UCID_RESPONSE_FILE = os.path.join(BASE_DIR, 'ucid_response.json')
+CMID_REQUEST_FILE = os.path.join(BASE_DIR, 'cmid_request.json')
+CMID_RESPONSE_FILE = os.path.join(BASE_DIR, 'cmid_response.json')
 CERIFICATE_FOLDER = os.path.join(BASE_DIR, 'certificates/')
 process_id = os.path.join(BASE_DIR, 'process_id')
 
@@ -158,37 +158,37 @@ class Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         print
         print 'Request:', request
         # Writing the request to a request file
-        with open(UCID_REQUEST_FILE, 'w') as f:
+        with open(CMID_REQUEST_FILE, 'w') as f:
             f.write(request)
 
         # Trying to fetch the response from the response file.
         # Respond with a hardcoded response if file is empty or not present
         try:
-            with open(UCID_RESPONSE_FILE, 'r') as f:
-                ucid_response = f.read()
-            if ucid_response == '':
+            with open(CMID_RESPONSE_FILE, 'r') as f:
+                cmid_response = f.read()
+            if cmid_response == '':
                 raise IOError
         except IOError:
             if self.path == '/identify':
-                ucid_response = '{ "ucid": "programmed-default-ucid", "ucid_token": "programmed-default-token" }'
+                cmid_response = '{"ucid":"programmed-default-ucid", "ucid_token":"programmed-default-token", "instance_key":"programmed-default-instance","urls": {"catalog":"localhost/catalog", "checkin":"localhost/checkin", "event":"localhost/event"} }'
             else:
-                ucid_response = '{"event_count": 1}'
+                cmid_response = '{"event_count": 1}'
 
         headers=[]
         # based on the response content, decide the error code.
-        ucid_response_json = json.loads(ucid_response)
-        if ucid_response_json.has_key("ucid") and self.path == '/identify':
+        cmid_response_json = json.loads(cmid_response)
+        if cmid_response_json.has_key("ucid") and self.path == '/identify':
             response_code = 200
-        elif ucid_response_json.has_key("event_count") and self.path == '/event/1':
+        elif cmid_response_json.has_key("event_count") and self.path == '/event/1':
             response_code = 200
         # special error code 9999 to trigger "Retry-After" response.
-        elif ucid_response_json.has_key("code") and ucid_response_json['code'] == 9999:
+        elif cmid_response_json.has_key("code") and cmid_response_json['code'] == 9999:
             response_code = 429
             headers.append(('Retry-After', '7')) # in seconds
         else:
             response_code = 401
 
-        self.send_POST_response(response_code=response_code, response_headers=headers, response_message=ucid_response)
+        self.send_POST_response(response_code=response_code, response_headers=headers, response_message=cmid_response)
 
 
 def launch_https_server():

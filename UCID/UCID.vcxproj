@@ -98,18 +98,18 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_ucid.exe $(TargetDir)csc_ucid_x86.exe
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidapi.dll $(TargetDir)ucidapi_x86.dll
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x86.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\csc_ucid.exe $(TargetDir)csc_ucid_x64.exe
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidapi.dll $(TargetDir)ucidapi_x64.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x86.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x64.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
+      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_cmid.exe $(TargetDir)csc_cmid_x86.exe
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidapi.dll $(TargetDir)cmidapi_x86.dll
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x86.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\csc_cmid.exe $(TargetDir)csc_cmid_x64.exe
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidapi.dll $(TargetDir)cmidapi_x64.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x86.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x64.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x64.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,18 +128,18 @@ call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_ucid.exe $(TargetDir)csc_ucid_x86.exe
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidapi.dll $(TargetDir)ucidapi_x86.dll
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x86.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\csc_ucid.exe $(TargetDir)csc_ucid_x64.exe
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidapi.dll $(TargetDir)ucidapi_x64.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x86.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x64.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
+      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_cmid.exe $(TargetDir)csc_cmid_x86.exe
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidapi.dll $(TargetDir)cmidapi_x86.dll
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x86.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\csc_cmid.exe $(TargetDir)csc_cmid_x64.exe
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidapi.dll $(TargetDir)cmidapi_x64.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x86.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x64.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x64.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -154,18 +154,18 @@ call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_ucid.exe $(TargetDir)csc_ucid_x86.exe
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidapi.dll $(TargetDir)ucidapi_x86.dll
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x86.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\csc_ucid.exe $(TargetDir)csc_ucid_x64.exe
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidapi.dll $(TargetDir)ucidapi_x64.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x86.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x64.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
+      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_cmid.exe $(TargetDir)csc_cmid_x86.exe
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidapi.dll $(TargetDir)cmidapi_x86.dll
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x86.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\csc_cmid.exe $(TargetDir)csc_cmid_x64.exe
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidapi.dll $(TargetDir)cmidapi_x64.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x86.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x64.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x64.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -184,18 +184,18 @@ call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_ucid.exe $(TargetDir)csc_ucid_x86.exe
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidapi.dll $(TargetDir)ucidapi_x86.dll
-copy $(SolutionDir)Resources\UCID\x86\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x86.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\csc_ucid.exe $(TargetDir)csc_ucid_x64.exe
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidapi.dll $(TargetDir)ucidapi_x64.dll
-copy $(SolutionDir)Resources\UCID\x64\bin\ucidcontrolplugin.dll $(TargetDir)ucidcontrolplugin_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x86.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x86.dll
-call $(SolutionDir)sign.bat $(TargetDir)csc_ucid_x64.exe
-call $(SolutionDir)sign.bat $(TargetDir)ucidapi_x64.dll
-call $(SolutionDir)sign.bat $(TargetDir)ucidcontrolplugin_x64.dll</Command>
+      <Command>copy $(SolutionDir)Resources\UCID\x86\bin\csc_cmid.exe $(TargetDir)csc_cmid_x86.exe
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidapi.dll $(TargetDir)cmidapi_x86.dll
+copy $(SolutionDir)Resources\UCID\x86\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x86.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\csc_cmid.exe $(TargetDir)csc_cmid_x64.exe
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidapi.dll $(TargetDir)cmidapi_x64.dll
+copy $(SolutionDir)Resources\UCID\x64\bin\cmidcontrolplugin.dll $(TargetDir)cmidcontrolplugin_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x86.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x86.dll
+call $(SolutionDir)sign.bat $(TargetDir)csc_cmid_x64.exe
+call $(SolutionDir)sign.bat $(TargetDir)cmidapi_x64.dll
+call $(SolutionDir)sign.bat $(TargetDir)cmidcontrolplugin_x64.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

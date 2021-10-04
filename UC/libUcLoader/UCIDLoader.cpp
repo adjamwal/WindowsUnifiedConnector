@@ -182,6 +182,7 @@ void UCIDLoader::LoadControlModule()
         return;
     }
 
+    WLOG_DEBUG( L"UCID Dll Dir %s Config Path %s", ucidDllDir.c_str(), pmConfigPath.c_str() );
     if( ( result = m_context.fpStart( ucidDllDir.c_str(), ucidDllDir.c_str(), pmConfigPath.c_str() ) ) != PM_MODULE_SUCCESS )
     {
         WLOG_ERROR( L"Failed to start Cloud Management ID Control Module: fpStart() returned %d.", result );

@@ -347,51 +347,51 @@
             <Component Id="UCID_API_FILE_PATH_REGISTRY_X86" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x86">
-                    <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X86]ucidapi.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X86]cmidapi.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_CONTROL_FILE_PATH_REGISTRY_X86" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x86">
-                    <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X86]ucidcontrolplugin.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X86]cmidcontrolplugin.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
             
             <Component Id="UCID_API_FILE_PATH_REGISTRY_X64" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x64">
-                    <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X64]ucidapi.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="ucidapi" Value="[UCID_DIRECTORY_X64]cmidapi.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_CONTROL_FILE_PATH_REGISTRY_X64" Guid="*">
                 <RegistryKey Root="HKLM"
 							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID\x64">
-                    <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X64]ucidcontrolplugin.dll" KeyPath="yes"/>
+                    <RegistryValue Type="string" Name="ucidcontrolplugin" Value="[UCID_DIRECTORY_X64]cmidcontrolplugin.dll" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="UCID_DATA_DIR" Guid="*">
                 <RegistryKey Root="HKLM"
-							 Key="Software\Cisco\$(var.ProductFamily)\UnifiedConnector\UCID">
+							 Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)\CMID">
                     <RegistryValue Type="string" Name="DataDir" Value="[UC_DATA_DIRECTORY]" KeyPath="yes"/>
                 </RegistryKey>
             </Component>
 
             <Component Id="ucid.exe" Guid="*">
-                <File Id="ucid.exe" Name="csc_ucid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_ucid_$(var.Platform).exe" />
+                <File Id="ucid.exe" Name="csc_cmid.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\csc_cmid_$(var.Platform).exe" />
             </Component>
 
         </ComponentGroup>
 
         <ComponentGroup Id="UCIDx86Components" Directory="UCID_DIRECTORY_X86">
             <Component Id="ucidapi.dll.x86" Guid="*">
-                <File Id="ucidapi.dll.x86" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidapi_x86.dll" />
+                <File Id="ucidapi.dll.x86" Name="cmidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\cmidapi_x86.dll" />
             </Component>
             <?if $(var.Platform) != "x64" ?>
               <Component Id="ucidcontrolplugin.dll.x86" Guid="*">
-                  <File Id="ucidcontrolplugin.dll.x86" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidcontrolplugin_x86.dll" />
+                  <File Id="ucidcontrolplugin.dll.x86" Name="cmidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\cmidcontrolplugin_x86.dll" />
               </Component>
             <?endif?>
         </ComponentGroup>
@@ -399,10 +399,10 @@
         <?if $(var.Platform) = "x64" ?>
           <ComponentGroup Id="UCIDx64Components" Directory="UCID_DIRECTORY_X64">
               <Component Id="ucidapi.dll.x64" Guid="*">
-                <File Id="ucidapi.dll.x64" Name="ucidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidapi_x64.dll" />
+                <File Id="ucidapi.dll.x64" Name="cmidapi.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\cmidapi_x64.dll" />
               </Component>
               <Component Id="ucidcontrolplugin.dll.x64" Guid="*">
-                <File Id="ucidcontrolplugin.dll.x64" Name="ucidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\ucidcontrolplugin_x64.dll" />
+                <File Id="ucidcontrolplugin.dll.x64" Name="cmidcontrolplugin.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)$(var.ProjectsPlatform)\$(var.Configuration)\cmidcontrolplugin_x64.dll" />
               </Component>
           </ComponentGroup>
         <?endif?>

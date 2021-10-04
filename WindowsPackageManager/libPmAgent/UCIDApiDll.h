@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ucidapi.h"
+#include "cmidapi.h"
 #include <cstdio>
 #include <Windows.h>
 #include <string>
@@ -23,13 +23,13 @@ public:
     void UnloadApi();
 
 private:
-    typedef ucid_result_t( *GetIdFunc )(IN OUT char*, IN OUT int* );
-    typedef ucid_result_t( *GetTokenFunc )(IN OUT char*, IN OUT int* );
-    typedef ucid_result_t( *RefreshTokenFunc )();
-    typedef ucid_result_t( *GetUrlFunc)( IN ucid_url_type_t, IN OUT char*, IN OUT int* );
+    typedef cmid_result_t( *GetIdFunc )(IN OUT char*, IN OUT int* );
+    typedef cmid_result_t( *GetTokenFunc )(IN OUT char*, IN OUT int* );
+    typedef cmid_result_t( *RefreshTokenFunc )();
+    typedef cmid_result_t( *GetUrlFunc)( IN cmid_url_type_t, IN OUT char*, IN OUT int* );
     bool LoadDll(const std::wstring dllPath);
     void UnloadDll();
-    ucid_result_t GetUrl( ucid_url_type_t urlType, std::string &url );
+    cmid_result_t GetUrl( cmid_url_type_t urlType, std::string &url );
 
     ICodesignVerifier& m_codeSignVerifier;
     HMODULE m_api;

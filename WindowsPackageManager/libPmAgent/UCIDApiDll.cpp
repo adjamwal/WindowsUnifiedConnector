@@ -7,10 +7,10 @@
 #include <IUcLogger.h>
 #include "PmTypes.h"
 
-#define UCID_API_GET_ID_FUNCTION_NAME "ucid_get_id"
-#define UCID_API_GET_TOKEN_FUNCTION_NAME "ucid_get_token"
-#define UCID_API_REFRESH_TOKEN_FUNCTION_NAME "ucid_refresh_token"
-#define UCID_API_GET_URL_FUNCTION_NAME "ucid_get_url"
+#define UCID_API_GET_ID_FUNCTION_NAME "cmid_get_id"
+#define UCID_API_GET_TOKEN_FUNCTION_NAME "cmid_get_token"
+#define UCID_API_REFRESH_TOKEN_FUNCTION_NAME "cmid_refresh_token"
+#define UCID_API_GET_URL_FUNCTION_NAME "cmid_get_url"
 
 #if defined(_WIN64)
 #define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x64"
@@ -42,9 +42,9 @@ int32_t UCIDApiDll::GetId( std::string& id )
 
     int bufsz = 0;
 
-    ucid_result_t res = m_getIdFunc( NULL, &bufsz );
+    cmid_result_t res = m_getIdFunc( NULL, &bufsz );
 
-    if( res == UCID_RES_INSUFFICIENT_LEN ) {
+    if( res == CMID_RES_INSUFFICIENT_LEN ) {
         char* myucid = ( char* )malloc( bufsz );
 
         res = m_getIdFunc( myucid, &bufsz );
@@ -55,7 +55,7 @@ int32_t UCIDApiDll::GetId( std::string& id )
             free( myucid );
         }
     }
-    if( res != UCID_RES_SUCCESS )
+    if( res != CMID_RES_SUCCESS )
     {
         return res;
     }
@@ -69,9 +69,9 @@ int32_t UCIDApiDll::GetToken( std::string& token )
 
     int bufsz = 0;
 
-    ucid_result_t res = m_getTokenFunc( NULL, &bufsz );
+    cmid_result_t res = m_getTokenFunc( NULL, &bufsz );
 
-    if( res == UCID_RES_INSUFFICIENT_LEN ) {
+    if( res == CMID_RES_INSUFFICIENT_LEN ) {
         char* myucid = ( char* )malloc( bufsz );
 
         res = m_getTokenFunc( myucid, &bufsz );
@@ -82,7 +82,7 @@ int32_t UCIDApiDll::GetToken( std::string& token )
             free( myucid );
         }
     }
-    if( res != UCID_RES_SUCCESS )
+    if( res != CMID_RES_SUCCESS )
     {
         return res;
     }
@@ -97,9 +97,9 @@ int32_t UCIDApiDll::RefreshToken()
     return m_refreshTokenFunc();
 }
 
-ucid_result_t UCIDApiDll::GetUrl( ucid_url_type_t urlType, std::string& url )
+cmid_result_t UCIDApiDll::GetUrl( cmid_url_type_t urlType, std::string& url )
 {
-    ucid_result_t result = UCID_RES_GENERAL_ERROR;
+    cmid_result_t result = CMID_RES_GENERAL_ERROR;
     int urlSize = 1024;
     char* tmpUrl = ( char* )malloc( urlSize );
 
@@ -108,19 +108,19 @@ ucid_result_t UCIDApiDll::GetUrl( ucid_url_type_t urlType, std::string& url )
     }
     else {
         result = m_getUrlFunc( urlType, tmpUrl, &urlSize );
-        if( result == UCID_RES_INSUFFICIENT_LEN ) {
+        if( result == CMID_RES_INSUFFICIENT_LEN ) {
             tmpUrl = ( char* )realloc( tmpUrl, urlSize );
             if( !tmpUrl ) {
                 LOG_EMERGENCY( "Failed to allocate %d bytes", urlSize );
             }
             else {
                 result = m_getUrlFunc( urlType, tmpUrl, &urlSize );
-                if( result == UCID_RES_SUCCESS ) {
+                if( result == CMID_RES_SUCCESS ) {
                     url = tmpUrl;
                 }
             }
         }
-        else if ( result == UCID_RES_SUCCESS ) {
+        else if ( result == CMID_RES_SUCCESS ) {
             url = tmpUrl;
         }
     }
@@ -135,26 +135,26 @@ ucid_result_t UCIDApiDll::GetUrl( ucid_url_type_t urlType, std::string& url )
 
 int32_t UCIDApiDll::GetUrls( PmUrlList& urls )
 {
-    int32_t rtn = UCID_RES_SUCCESS;
+    int32_t rtn = CMID_RES_SUCCESS;
     int32_t tmpRtn = 0;
     LoadApi();
 
-    tmpRtn = GetUrl( UCID_EVENT_URL, urls.eventUrl );
-    if( tmpRtn != UCID_RES_SUCCESS ) {
+    tmpRtn = GetUrl( CMID_EVENT_URL, urls.eventUrl );
+    if( tmpRtn != CMID_RES_SUCCESS ) {
         LOG_ERROR( "Failed to fetch event url %d", tmpRtn );
-        rtn = UCID_RES_GENERAL_ERROR;
+        rtn = CMID_RES_GENERAL_ERROR;
     }
 
-    tmpRtn = GetUrl( UCID_CHECKIN_URL, urls.checkinUrl );
-    if( tmpRtn != UCID_RES_SUCCESS ) {
+    tmpRtn = GetUrl( CMID_CHECKIN_URL, urls.checkinUrl );
+    if( tmpRtn != CMID_RES_SUCCESS ) {
         LOG_ERROR( "Failed to fetch checking url %d", tmpRtn );
-        rtn = UCID_RES_GENERAL_ERROR;
+        rtn = CMID_RES_GENERAL_ERROR;
     }
 
-    tmpRtn = GetUrl( UCID_CATALOG_URL, urls.catalogUrl );
-    if( tmpRtn != UCID_RES_SUCCESS ) {
+    tmpRtn = GetUrl( CMID_CATALOG_URL, urls.catalogUrl );
+    if( tmpRtn != CMID_RES_SUCCESS ) {
         LOG_ERROR( "Failed to fetch catalog url %d", tmpRtn );
-        rtn = UCID_RES_GENERAL_ERROR;
+        rtn = CMID_RES_GENERAL_ERROR;
     }
 
     LOG_DEBUG( "Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str() );
