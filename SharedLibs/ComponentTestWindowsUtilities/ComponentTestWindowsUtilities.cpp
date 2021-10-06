@@ -496,3 +496,8 @@ TEST_F( ComponentTestWindowsUtilites, WillResolveProgramArguments )
 
     EXPECT_EQ( WindowsUtilities::ResolvePath( arg ), "/arg2 C:\\ProgramData/Cisco/policy.xml" );
 }
+
+TEST_F( ComponentTestWindowsUtilites, WinHttpGetWillSucceed )
+{
+    EXPECT_TRUE( WindowsUtilities::WinHttpGet( "postman-echo.com" ) );
+}

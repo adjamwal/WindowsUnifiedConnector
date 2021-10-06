@@ -3,6 +3,7 @@
 #include "PackageManager.h"
 #include "PmCloud.h"
 #include "PmHttp.h"
+#include "PmBootStrap.h"
 #include "PmConfig.h"
 #include "PmManifest.h"
 #include "WorkerThread.h"
@@ -47,6 +48,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_cloud( new PmCloud( *m_http ) )
     , m_installeracheMgr( new InstallerCacheManager( *m_cloud, *m_fileUtil, *m_sslUtil ) )
     , m_ucidAdapter( new UcidAdapter() )
+    , m_bootstrap( new PmBootstrap( *m_fileUtil ) )
     , m_config( new PmConfig( *m_fileUtil, *m_ucidAdapter ) )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
@@ -78,7 +80,8 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_manifestProcessor( new ManifestProcessor( *m_manifest, *m_componentPackageProcessor ) )
     , m_rebootHandler( new RebootHandler( *m_config ) )
     , m_pacMan(
-        new PackageManager( *m_config,
+        new PackageManager( *m_bootstrap,
+            *m_config,
             *m_cloud,
             *m_installeracheMgr,
             *m_packageDiscoveryManager,

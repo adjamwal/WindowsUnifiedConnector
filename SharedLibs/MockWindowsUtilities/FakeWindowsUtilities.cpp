@@ -125,3 +125,8 @@ bool WindowsUtilities::SetPathOwnership( const std::filesystem::path& path, WELL
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->SetPathOwnership( path, userOrGroupSid, trusteeType );
 }
+
+bool WindowsUtilities::WinHttpGet( const std::string& url )
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->WinHttpGet( url );
+}

@@ -51,6 +51,10 @@ public:
     void MakeGetPmUrlsReturn( bool value );
     void ExpectGetPmUrlsIsNotCalled();
 
+    MOCK_METHOD1( UpdateCertStoreForUrl, bool( const std::string& ) );
+    void MakeUpdateCertStoreForUrlReturn( bool value );
+    void ExpectUpdateCertStoreForUrlCalled();
+
 private:
     std::string m_defaultUserAgent;
 };

@@ -33,9 +33,12 @@ public:
     void MakeHttpPostReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult );
     void ExpectHttpPostIsNotCalled();
 
-    MOCK_METHOD3( HttpDownload, bool( const std::string&, const std::string&, PmHttpExtendedResult& ) );
+    MOCK_METHOD3( HttpDownload, bool( const std::string&, const std::filesystem::path&, PmHttpExtendedResult& ) );
     void MakeHttpDownloadReturn( bool retval, const PmHttpExtendedResult& eResult );
     void ExpectHttpDownloadIsNotCalled();
 
+    MOCK_METHOD1( IsSslPeerValidationError, bool( PmHttpExtendedResult& ) );
+    void MakeIsSslPeerValidationErrorReturn( bool retval );
+    void ExpectIsSslPeerValidationErrorIsNotCalled();
 };
 

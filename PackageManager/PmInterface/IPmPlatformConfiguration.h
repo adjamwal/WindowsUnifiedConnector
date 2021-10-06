@@ -80,4 +80,12 @@ public:
      * @brief Retrieve the PM URLs from the identity module
      */
     virtual bool GetPmUrls( PmUrlList& urls ) = 0;
+
+    /**
+     * @brief (Optional) On windows this triggers the Windows AIA mechanism to
+     *   build out the certificate chain for the given URL
+     *
+     *  @param[in] url
+     */
+    virtual bool UpdateCertStoreForUrl( const std::string& url ) = 0;
 };

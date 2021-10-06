@@ -172,3 +172,36 @@ std::string WindowsConfiguration::GetPmVersion()
 
     return converter.to_bytes( STRFORMATPRODVER );
 }
+
+bool WindowsConfiguration::UpdateCertStoreForUrl( const std::string& url )
+{
+    bool rtn = false;
+    std::string urlRoot = ExtractUrlRoot( url );
+
+    if( !urlRoot.empty() ) {
+        m_certChaninUrlMap[ urlRoot ] = 0;
+    }
+
+    for( auto kv : m_certChaninUrlMap ) {
+        rtn = WindowsUtilities::WinHttpGet( kv.first );
+    }
+
+    return rtn;
+}
+
+std::string WindowsConfiguration::ExtractUrlRoot( const std::string& url )
+{
+    size_t begin = url.find( "://" );
+    if( begin == std::string::npos ) {
+        return "";
+    }
+
+    begin += 3;
+    size_t end = url.find( '/', begin );
+
+    if( end == std::string::npos ) {
+        return url.substr( begin );
+    }
+    
+    return url.substr( begin, end - begin );
+}

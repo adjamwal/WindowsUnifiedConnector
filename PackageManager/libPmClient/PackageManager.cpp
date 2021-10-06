@@ -4,6 +4,7 @@
 #include "PackageManager.h"
 #include "PmLogger.h"
 #include "IWorkerThread.h"
+#include "IPmBootstrap.h"
 #include "IPmConfig.h"
 #include "IPmCloud.h"
 #include "IPackageDiscoveryManager.h"
@@ -28,7 +29,8 @@
 
 using namespace std;
 
-PackageManager::PackageManager( IPmConfig& config,
+PackageManager::PackageManager( IPmBootstrap& bootstrap,
+    IPmConfig& config,
     IPmCloud& cloud,
     IInstallerCacheManager& installerCacheMgr,
     IPackageDiscoveryManager& packageDiscoveryManager,
@@ -44,7 +46,8 @@ PackageManager::PackageManager( IPmConfig& config,
     IRebootHandler& rebootHandler,
     IWorkerThread& thread,
     IWatchdog& watchdog ) :
-    m_config( config )
+    m_bootstrap( bootstrap )
+    , m_config( config )
     , m_cloud( cloud )
     , m_installerCacheMgr( installerCacheMgr )
     , m_packageDiscoveryManager( packageDiscoveryManager )
@@ -61,6 +64,7 @@ PackageManager::PackageManager( IPmConfig& config,
     , m_thread( thread )
     , m_watchdog( watchdog )
     , m_dependencies( nullptr )
+    , m_useShorterInterval( false )
 {
 
 }
@@ -70,13 +74,14 @@ PackageManager::~PackageManager()
 
 }
 
-int32_t PackageManager::Start( const char* pmConfigFile )
+int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrapFile )
 {
     int32_t rtn = -1;
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
 
     m_pmConfigFile = pmConfigFile;
+    m_pmBootstrapFile = pmBootstrapFile;
 
     if( !m_dependencies ) {
         LOG_ERROR( "Platform dependencies not provided. Cannot start Package Manager" );
@@ -84,6 +89,10 @@ int32_t PackageManager::Start( const char* pmConfigFile )
     else {
         if( !LoadPmConfig() ) {
             LOG_DEBUG( "Failed to load Pm configuration" );
+        }
+
+        if( !LoadPmBootstrap() ) {
+            LOG_DEBUG( "Failed to load Pm Bootstrap" );
         }
 
         std::string token = m_ucidAdapter.GetAccessToken();
@@ -145,6 +154,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_manifestProcessor.Initialize( m_dependencies );
         m_packageDiscoveryManager.Initialize( m_dependencies );
         m_cloudEventStorage.Initialize( m_dependencies );
+        m_cloud.Initialize( m_dependencies );
         m_cloud.SetUserAgent( m_dependencies->Configuration().GetHttpUserAgent() );
         m_cloud.SetShutdownFunc( [this] { return IsRunning(); } );
         m_ucUpgradeEventHandler.Initialize( m_dependencies );
@@ -166,7 +176,6 @@ std::chrono::milliseconds PackageManager::PmThreadWait()
     if ( m_useShorterInterval )
     {
         LOG_DEBUG( "Using NetworkFailureRetryInterval" );
-        m_useShorterInterval = false;
         return std::chrono::milliseconds( m_config.GetNetworkFailureRetryInterval() );
     } 
     else
@@ -204,7 +213,6 @@ void PackageManager::PmWorkflowThread()
     }
 
     try {
-        m_dependencies->Configuration().ReloadSslCertificates();
         productDiscoveryRules = m_packageDiscoveryManager.PrepareCatalogDataset();
 
         m_packageDiscoveryManager.DiscoverPackages( productDiscoveryRules, inventory );
@@ -236,6 +244,8 @@ void PackageManager::PmWorkflowThread()
         if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
             LOG_DEBUG( "Failed to load PM configuration" );
         }
+
+        m_useShorterInterval = false;
     }
     catch( std::exception& ex ) {
         m_useShorterInterval = true;
@@ -268,6 +278,11 @@ bool PackageManager::LoadPmConfig()
     return m_config.LoadPmConfig( m_pmConfigFile ) == 0;
 }
 
+bool PackageManager::LoadPmBootstrap()
+{
+    return m_bootstrap.LoadPmBootstrap( m_pmBootstrapFile ) == 0;
+}
+
 int32_t PackageManager::VerifyPmConfig( const char* pmConfigFile )
 {
     return m_config.VerifyPmFileIntegrity( pmConfigFile );
@@ -288,9 +303,11 @@ void PackageManager::PmWatchdogFired()
 
 void PackageManager::UpdateSslCerts()
 {
-    if( m_dependencies ) {
+    if( m_dependencies && m_useShorterInterval ) {
         PmHttpCertList emptyCertList = { 0 };
 
+        LOG_WARNING( "Updating SSL certs" );
+        m_dependencies->Configuration().UpdateCertStoreForUrl( m_bootstrap.GetIdentifyUri() );
         m_cloud.SetCerts( emptyCertList );
         m_certsAdapter.ReloadCerts();
         m_cloud.SetCerts( m_certsAdapter.GetCertsList() );

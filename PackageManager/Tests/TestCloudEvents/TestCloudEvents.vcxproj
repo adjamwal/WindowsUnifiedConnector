@@ -45,6 +45,7 @@
     <ClCompile Include="TestCloudEventBuilder.cpp" />
     <ClCompile Include="TestCloudEventPublisher.cpp" />
     <ClCompile Include="TestCloudEventStorage.cpp" />
+    <ClCompile Include="TestPmCloud.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libPmCloud\libPmCloud.vcxproj">

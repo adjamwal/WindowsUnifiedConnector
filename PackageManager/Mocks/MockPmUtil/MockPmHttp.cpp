@@ -99,3 +99,12 @@ void MockPmHttp::ExpectHttpDownloadIsNotCalled()
     EXPECT_CALL( *this, HttpDownload( _, _, _ ) ).Times( 0 );
 }
 
+void MockPmHttp::MakeIsSslPeerValidationErrorReturn( bool retval )
+{
+    ON_CALL( *this, IsSslPeerValidationError( _ ) ).WillByDefault( Return( retval ) );
+}
+
+void MockPmHttp::ExpectIsSslPeerValidationErrorIsNotCalled()
+{
+    EXPECT_CALL( *this, IsSslPeerValidationError( _ ) ).Times( 0 );
+}

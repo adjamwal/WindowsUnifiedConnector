@@ -167,12 +167,14 @@
     <ClInclude Include="MockPackageDiscovery.h" />
     <ClInclude Include="MockPackageDiscoveryMethods.h" />
     <ClInclude Include="MockUserImpersonator.h" />
+    <ClInclude Include="MockWinCertLoader.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockPackageDiscovery.cpp" />
     <ClCompile Include="MockPackageDiscoveryMethods.cpp" />
     <ClCompile Include="MockUserImpersonator.cpp" />
+    <ClCompile Include="MockWinCertLoader.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

@@ -283,3 +283,13 @@ void MockWindowsUtilities::ExpectSetPathOwnershipNotCalled()
 {
     EXPECT_CALL( *this, SetPathOwnership( _, _, _ ) ).Times( 0 );
 }
+
+void MockWindowsUtilities::MakeWinHttpGetReturn( bool value )
+{
+    ON_CALL( *this, WinHttpGet( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectWinHttpGetNotCalled()
+{
+    EXPECT_CALL( *this, WinHttpGet( _ ) ).Times( 0 );
+}

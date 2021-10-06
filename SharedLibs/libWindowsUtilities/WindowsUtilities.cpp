@@ -10,6 +10,7 @@
 #include <accctrl.h>
 #include <windows.h>
 #include <Sddl.h>
+#include <winhttp.h>
 
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\Cloud Management"
 
@@ -711,6 +712,67 @@ bool WindowsUtilities::SetPathOwnership( const std::filesystem::path& path, WELL
 
     if( psid ) LocalFree( psid );
     if( hToken ) CloseHandle( hToken );
+
+    return rtn;
+}
+
+bool WindowsUtilities::WinHttpGet( const std::string& url )
+{
+    bool rtn = false;
+    char data[ 1024 ] = { 0 };
+    DWORD dwDataSz = sizeof( data );
+
+    DWORD dwStatusCode = 0;
+    DWORD dwStatusCodeSize = sizeof( dwStatusCode );
+    DWORD dwOption = 0;
+    HINTERNET  hSession = NULL, hConnect = NULL, hRequest = NULL;
+    std::wstring sdomain = _g_converter.from_bytes( url );
+
+    // Use WinHttpOpen to obtain a session handle.
+    hSession = WinHttpOpen( L"WinHTTP Example/1.0",
+        WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+        WINHTTP_NO_PROXY_NAME,
+        WINHTTP_NO_PROXY_BYPASS, 0 );
+
+    if( !hSession ) {
+        goto abort;
+    }
+
+    // Specify an HTTP server.
+    hConnect = WinHttpConnect( hSession, sdomain.c_str(), INTERNET_DEFAULT_HTTPS_PORT, 0 );
+
+    if( !hConnect ) {
+        goto abort;
+    }
+
+    dwOption = WINHTTP_FLAG_BYPASS_PROXY_CACHE | WINHTTP_FLAG_ESCAPE_DISABLE |
+        WINHTTP_FLAG_ESCAPE_DISABLE_QUERY | WINHTTP_FLAG_REFRESH |
+        WINHTTP_FLAG_SECURE;
+
+    // Create an HTTP request handle.
+    hRequest = WinHttpOpenRequest( hConnect, L"GET", L"", L"HTTP/1.1", WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, dwOption );
+
+    if( !hRequest ) {
+        goto abort;
+    }
+
+    // Send a request.
+    if( WinHttpSendRequest( hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, ( LPVOID )data, dwDataSz, dwDataSz, 0 ) && WinHttpReceiveResponse( hRequest, NULL ) ) {
+        WinHttpQueryHeaders( hRequest,
+            WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+            WINHTTP_HEADER_NAME_BY_INDEX,
+            &dwStatusCode, &dwStatusCodeSize, WINHTTP_NO_HEADER_INDEX );
+
+        if( dwStatusCode != 0 ) {
+            rtn = true;
+        }
+    }
+
+abort:
+    // Close any open handles.
+    if( hRequest ) WinHttpCloseHandle( hRequest );
+    if( hConnect ) WinHttpCloseHandle( hConnect );
+    if( hSession ) WinHttpCloseHandle( hSession );
 
     return rtn;
 }

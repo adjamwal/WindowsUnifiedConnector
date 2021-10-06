@@ -112,6 +112,10 @@ public:
     void MakeSetPathOwnershipReturn( bool value );
     void ExpectSetPathOwnershipNotCalled();
 
+    MOCK_METHOD1( WinHttpGet, bool( const std::string& ) );
+    void MakeWinHttpGetReturn( bool value );
+    void ExpectWinHttpGetNotCalled();
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();

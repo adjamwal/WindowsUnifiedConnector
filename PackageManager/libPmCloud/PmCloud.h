@@ -6,12 +6,15 @@
 #include "IPmCloud.h"
 #include "IPmHttp.h"
 
+class IPmPlatformConfiguration;
+
 class PmCloud : public IPmCloud
 {
 public:
     PmCloud( IPmHttp& http );
     ~PmCloud();
 
+    void Initialize( IPmPlatformDependencies* dependencies );
     void SetCheckinUri( const std::string& uri ) override;
     void SetToken( const std::string& token ) override;
     void SetCerts( const PmHttpCertList& certs ) override;
@@ -25,6 +28,8 @@ public:
 private:
     IPmHttp& m_http;
     PmHttpCertList m_certs;
+    IPmPlatformConfiguration* m_deps;
+
     std::string m_checkinUri;
     std::string m_token;
     std::string m_userAgent;

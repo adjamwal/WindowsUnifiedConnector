@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+class IPmBootstrap;
 class IPmConfig;
 class IPmCloud;
 class IPackageDiscoveryManager;
@@ -31,7 +32,8 @@ struct PmDiscoveryComponent;
 class PackageManager : public IPackageManager
 {
 public:
-    PackageManager( IPmConfig& config,
+    PackageManager( IPmBootstrap &bootstrap,
+        IPmConfig& config,
         IPmCloud& cloud,
         IInstallerCacheManager& installerCacheMgr,
         IPackageDiscoveryManager& packageDiscoveryManager,
@@ -49,13 +51,14 @@ public:
         IWatchdog& watchdog );
     virtual ~PackageManager();
 
-    int32_t Start( const char* pmConfigFile ) override;
+    int32_t Start( const char* pmConfigFile, const char * pmBootstrapFile ) override;
     int32_t Stop() override;
     bool IsRunning() override;
     void SetPlatformDependencies( IPmPlatformDependencies* dependecies ) override;
     int32_t VerifyPmConfig( const char* pmConfigFile ) override;
 
 private:
+    IPmBootstrap& m_bootstrap;
     IPmConfig& m_config;
     IPmCloud& m_cloud;
     IInstallerCacheManager& m_installerCacheMgr;
@@ -75,6 +78,7 @@ private:
 
     std::mutex m_mutex;
     std::string m_pmConfigFile;
+    std::string m_pmBootstrapFile;
 
     bool m_useShorterInterval = false;
 
@@ -83,6 +87,7 @@ private:
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
     bool LoadPmConfig();
+    bool LoadPmBootstrap();
     std::chrono::milliseconds PmWatchdogWait();
     void PmWatchdogFired();
     void UpdateSslCerts();

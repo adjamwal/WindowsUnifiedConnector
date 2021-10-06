@@ -156,10 +156,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IPmBootstrap.h" />
     <ClInclude Include="IPmConfig.h" />
+    <ClInclude Include="PmBootStrap.h" />
     <ClInclude Include="PmConfig.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PmBootstrap.cpp" />
     <ClCompile Include="PmConfig.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

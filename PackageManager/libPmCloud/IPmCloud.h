@@ -6,6 +6,7 @@
 
 struct PmHttpCertList;
 struct PmHttpExtendedResult;
+class IPmPlatformDependencies;
 
 class IPmCloud
 {
@@ -13,6 +14,7 @@ public:
     IPmCloud() {}
     virtual ~IPmCloud() {}
 
+    virtual void Initialize( IPmPlatformDependencies* dependencies ) = 0;
     virtual void SetCheckinUri( const std::string& uri ) = 0;
     virtual void SetToken( const std::string& token ) = 0;
     virtual void SetCerts( const PmHttpCertList& certs ) = 0;

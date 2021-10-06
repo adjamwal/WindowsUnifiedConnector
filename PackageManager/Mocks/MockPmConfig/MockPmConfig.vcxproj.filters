@@ -21,9 +21,15 @@
     <ClInclude Include="MockPmConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MockPmBootstrap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MockPmConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MockPmBootstrap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

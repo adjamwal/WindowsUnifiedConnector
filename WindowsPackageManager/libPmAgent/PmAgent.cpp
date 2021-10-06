@@ -10,6 +10,7 @@
 
 PmAgent::PmAgent( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath, IPmPlatformDependencies& dependencies, IPMLogger& pmLogger ) :
     m_pmConfigFile( pmConfigFilePath )
+    , m_pmBootstrapFile( bsConfigFilePath )
     , m_pmDependencies( dependencies )
     , m_pmLogger( pmLogger )
     , m_PacMan( nullptr )
@@ -31,9 +32,10 @@ int32_t PmAgent::Start()
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     std::string pmConfigFile = converter.to_bytes( m_pmConfigFile );
+    std::string pmBootstrapFile = converter.to_bytes( m_pmBootstrapFile );
     
     LOG_DEBUG( "Starting Package Manager Client with config files %s", pmConfigFile.c_str() );
-    return m_PacMan->Start( pmConfigFile.c_str() );
+    return m_PacMan->Start( pmConfigFile.c_str(), pmBootstrapFile.c_str() );
 }
 
 int32_t PmAgent::Stop()

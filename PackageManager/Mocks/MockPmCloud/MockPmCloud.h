@@ -10,6 +10,9 @@ public:
     MockPmCloud();
     ~MockPmCloud();
 
+    MOCK_METHOD1( Initialize, void( IPmPlatformDependencies* ) );
+    void ExpectInitializeiIsNotCalled();
+
     MOCK_METHOD1( SetCheckinUri, void( const std::string& ) );
     void ExpectSetCheckinUriIsNotCalled();
 

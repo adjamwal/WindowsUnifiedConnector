@@ -46,7 +46,8 @@ public:
     static bool SetWellKnownGroupAccessToPath( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE wellKnownSid, DWORD accessPermissions, bool disableInheritance = false );
     static bool SetNamedUserAccessToPath( const std::filesystem::path& path, const std::wstring& userName, DWORD accessPermissions );
     static bool SetPathOwnership( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE userOrGroupSid, TRUSTEE_TYPE trusteeType );
-    
+    static bool WinHttpGet( const std::string& url );
+
 private:
     static std::string ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle );
 };

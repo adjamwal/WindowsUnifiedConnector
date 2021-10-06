@@ -29,6 +29,7 @@
     <ClCompile Include="TestPackageDiscoveryMethods.cpp" />
     <ClCompile Include="TestUserImpersonator.cpp" />
     <ClCompile Include="TestWindowsComponentManager.cpp" />
+    <ClCompile Include="TestWindowsConfiguration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\PackageManager\libPmUtil\libPmUtil.vcxproj">
@@ -131,7 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -151,7 +152,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -171,7 +172,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -191,7 +192,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)SharedLibs\MockWindowsUtilities;$(SolutionDir)SharedLibs\libVerifier;$(SolutionDir)SharedLibs\MockVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)WindowsPackageManager\Mocks\MockPmAgent;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

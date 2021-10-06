@@ -21,6 +21,7 @@ public:
     bool HttpGet( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
     bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
     bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) override;
+    bool IsSslPeerValidationError( PmHttpExtendedResult& eResult );
 
 private:
     IFileSysUtil& m_fileUtil;

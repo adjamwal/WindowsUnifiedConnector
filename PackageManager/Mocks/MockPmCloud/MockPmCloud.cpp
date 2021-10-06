@@ -12,6 +12,11 @@ MockPmCloud::~MockPmCloud()
 {
 }
 
+void MockPmCloud::ExpectInitializeiIsNotCalled()
+{
+    EXPECT_CALL( *this, Initialize( _ ) ).Times( 0 );
+}
+
 void MockPmCloud::ExpectSetCheckinUriIsNotCalled()
 {
     EXPECT_CALL( *this, SetCheckinUri( _ ) ).Times( 0 );

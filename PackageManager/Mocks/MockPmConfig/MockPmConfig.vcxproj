@@ -156,9 +156,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="MockPmBootstrap.h" />
     <ClInclude Include="MockPmConfig.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MockPmBootstrap.cpp" />
     <ClCompile Include="MockPmConfig.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

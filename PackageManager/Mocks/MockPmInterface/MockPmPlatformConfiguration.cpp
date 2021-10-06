@@ -6,6 +6,7 @@ MockPmPlatformConfiguration::MockPmPlatformConfiguration()
     MakeGetSslCertificatesReturn( int32_t() );
     MakeGetHttpUserAgentReturn( m_defaultUserAgent );
     MakeGetPmVersionReturn( "" );
+    MakeUpdateCertStoreForUrlReturn( "" );
 }
 
 MockPmPlatformConfiguration::~MockPmPlatformConfiguration()
@@ -110,4 +111,14 @@ void MockPmPlatformConfiguration::MakeGetPmUrlsReturn( bool value )
 void MockPmPlatformConfiguration::ExpectGetPmUrlsIsNotCalled()
 {
     EXPECT_CALL( *this, GetPmUrls( _ ) ).Times( 0 );
+}
+
+void MockPmPlatformConfiguration::MakeUpdateCertStoreForUrlReturn( bool value )
+{
+    ON_CALL( *this, UpdateCertStoreForUrl( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformConfiguration::ExpectUpdateCertStoreForUrlCalled()
+{
+    EXPECT_CALL( *this, UpdateCertStoreForUrl( _ ) ).Times( 0 );
 }

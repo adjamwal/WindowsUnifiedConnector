@@ -18,6 +18,7 @@
 #include "SslUtil.h"
 
 #include "MockFileSysUtil.h"
+#include "MockPmBootstrap.h"
 #include "MockPmConfig.h"
 #include "MockPmCloud.h"
 #include "MockPmPlatformConfiguration.h"
@@ -48,6 +49,7 @@ protected:
         m_configIntervalCalledOnce = false;
 
         m_mockFileUtil.reset( new NiceMock<MockFileSysUtil>() );
+        m_mockBootstrap.reset( new NiceMock<MockPmBootstrap>() );
         m_mockConfig.reset( new NiceMock<MockPmConfig>() );
         m_mockCloud.reset( new NiceMock<MockPmCloud>() );
         m_mockPlatformConfiguration.reset( new NiceMock<MockPmPlatformConfiguration>() );
@@ -101,6 +103,7 @@ protected:
         ) );
 
         m_patient.reset( new PackageManager(
+            *m_mockBootstrap,
             *m_mockConfig,
             *m_mockCloud,
             *m_mockInstallerCacheMgr,
@@ -150,6 +153,7 @@ protected:
         m_mockPlatformConfiguration.reset();
         m_mockCloud.reset();
         m_mockConfig.reset();
+        m_mockBootstrap.reset();
         m_mockFileUtil.reset();
     }
 
@@ -168,7 +172,7 @@ protected:
         return interval;
     }
 
-    void StartPacMan()
+    void SetupPacMacn()
     {
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
@@ -179,7 +183,12 @@ protected:
         m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
 
         m_patient->SetPlatformDependencies( m_mockDeps.get() );
-        m_patient->Start( "ConfigFile" );
+    }
+
+    void StartPacMan()
+    {
+        SetupPacMacn();
+        m_patient->Start( "ConfigFile", "BootstrapFile");
     }
 
     void PublishedEventHasExpectedData(
@@ -210,6 +219,7 @@ protected:
     std::condition_variable m_cv;
 
     std::unique_ptr<MockFileSysUtil> m_mockFileUtil;
+    std::unique_ptr<MockPmBootstrap> m_mockBootstrap;
     std::unique_ptr<MockPmConfig> m_mockConfig;
     std::unique_ptr<MockPmCloud> m_mockCloud;
     std::unique_ptr<MockPmPlatformConfiguration> m_mockPlatformConfiguration;
@@ -994,22 +1004,41 @@ TEST_F( ComponentTestPacMan, PacManWillKickTheWatchdogOnNetworkError )
     EXPECT_TRUE( pass );
 }
 
- TEST_F( ComponentTestPacMan, PacManWillUpdateCerts )
+TEST_F( ComponentTestPacMan, PacManWillUpdateCerts )
 {
     bool pass = false;
-    
+    PmHttpExtendedResult eResult = { 0, 60, "curl" };
+
+    SetupPacMacn();
+    ON_CALL( *m_mockConfig, GetCloudCheckinIntervalMs() ).WillByDefault( Return( 1 ) );
+    ON_CALL( *m_mockCloud, Get( _, _, _ ) ).WillByDefault( DoAll( SetArgReferee<2>( eResult ), Return( false ) ) );
+
     EXPECT_CALL( *m_certsAdapter, ReloadCerts() ).WillOnce( Invoke(
         [this, &pass]() {
+            ON_CALL( *m_mockConfig, GetCloudCheckinIntervalMs() ).WillByDefault( Return( 1000 ) );
             pass = true;
             m_cv.notify_one();
             return 0;
         } ) );
     
-    StartPacMan();
+    m_patient->Start( "ConfigFile", "BootstrapFile" );
     
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
     lock.unlock();
     
     EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacMan, PacManWillNotUpdateCertsWhenRunningProperly )
+{
+    bool pass = false;
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
+    m_certsAdapter->ExpectReloadCertsIsNotCalled();
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
 }

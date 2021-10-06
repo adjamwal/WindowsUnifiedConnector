@@ -477,3 +477,8 @@ bool PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& 
 
     return eResult.subErrorCode == CURLE_OK;
 }
+
+bool PmHttp::IsSslPeerValidationError( PmHttpExtendedResult& eResult )
+{
+    return eResult.subErrorType == "curl" && eResult.subErrorCode == CURLE_PEER_FAILED_VERIFICATION;
+}

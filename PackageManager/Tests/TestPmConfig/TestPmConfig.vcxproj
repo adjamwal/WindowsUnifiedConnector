@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TestPmBootstrap.cpp" />
     <ClCompile Include="TestPmConfig.cpp" />
   </ItemGroup>
   <ItemGroup>

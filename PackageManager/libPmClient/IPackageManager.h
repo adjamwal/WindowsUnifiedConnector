@@ -18,19 +18,12 @@ public:
     /**
      * @brief Starts the package manager. This starts are thread that will periodically check for updates from the
      *   cloud
-     * @param[in] configFile - Path to the configuration file. This is a json file that will provide the PM cloud
-     *   URL and the thread interval. The file should be in the form:
-     *   {
-     *       "cloud": {
-     *           "CheckinUri": "https://packagemanager.cisco.com/checkin",
-     *           "CheckinInterval": 20000,
-     *           "MaxStartupDelay": 20000
-     *       }
-     *   }
+     * @param[in] configFile - Path to the configuration file. This is a json file that will configure PacMan's behavoir
+     * @param[in] bootstrapFile - Path to the bootstrap file. Used to get the identify url
      *
      * @return 0 on success, -1 otherwise
      */
-    virtual int32_t Start( const char* pmConfigFile ) = 0;
+    virtual int32_t Start( const char* pmConfigFile, const char* pmBootstrapFile ) = 0;
 
     /**
      * @brief Stops the package manager

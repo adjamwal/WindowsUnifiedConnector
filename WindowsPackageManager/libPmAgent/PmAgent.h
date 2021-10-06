@@ -19,6 +19,7 @@ public:
 
 private:
     std::wstring m_pmConfigFile;
+    std::wstring m_pmBootstrapFile;
     IPmPlatformDependencies& m_pmDependencies;
     IPMLogger& m_pmLogger;
     IPackageManager* m_PacMan;

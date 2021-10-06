@@ -1,7 +1,11 @@
 #include "PmCloud.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformConfiguration.h"
+#include "PmLogger.h"
 
 PmCloud::PmCloud( IPmHttp& http )
     : m_http( http )
+    , m_deps( nullptr )
     , m_certs( { 0 } )
     , m_shutdownFunc( [] { return true; } )
     , m_userAgent( "PackageManager" )
@@ -10,6 +14,11 @@ PmCloud::PmCloud( IPmHttp& http )
 
 PmCloud::~PmCloud()
 {
+}
+
+void PmCloud::Initialize( IPmPlatformDependencies* dependencies )
+{
+    m_deps = dependencies ? &dependencies->Configuration() : nullptr;
 }
 
 void PmCloud::SetCheckinUri( const std::string& uri )
@@ -54,7 +63,12 @@ bool PmCloud::Get( const std::string& url, std::string& responseContent, PmHttpE
         m_http.SetCerts( m_certs, eResult ) &&
         m_http.SetToken( m_token, eResult ) )
     {
-        m_http.HttpGet( url, responseContent, eResult );
+        if( !m_http.HttpGet( url, responseContent, eResult ) && m_http.IsSslPeerValidationError( eResult ) ) {
+            LOG_WARNING( "Http request failed to %s due to SSL validation error. Updating SSL certs", url.c_str() );
+            if( m_deps ) {
+                m_deps->UpdateCertStoreForUrl( url );
+            }
+        }
     }
 
     m_http.Deinit();
@@ -70,7 +84,12 @@ bool PmCloud::Post( const std::string& url, const void* payload, size_t payloadS
         m_http.SetCerts( m_certs, eResult ) &&
         m_http.SetToken( m_token, eResult ) )
     {
-        m_http.HttpPost( url, payload, payloadSize, responseContent, eResult );
+        if( !m_http.HttpPost( url, payload, payloadSize, responseContent, eResult ) && m_http.IsSslPeerValidationError( eResult ) ) {
+            LOG_WARNING( "Http request failed to %s due to SSL validation error. Updating SSL certs", url.c_str() );
+            if( m_deps ) {
+                m_deps->UpdateCertStoreForUrl( url );
+            }
+        }
     }
 
     m_http.Deinit();
@@ -86,7 +105,12 @@ bool PmCloud::DownloadFile( const std::string& uri, const std::filesystem::path&
         m_http.SetCerts( m_certs, eResult ) &&
         m_http.SetToken( m_token, eResult ) )
     {
-        m_http.HttpDownload( uri, filename, eResult );
+        if( !m_http.HttpDownload( uri, filename, eResult ) && m_http.IsSslPeerValidationError( eResult ) ) {
+            LOG_WARNING( "Http request failed to %s due to SSL validation error. Updating SSL certs", uri.c_str() );
+            if( m_deps ) {
+                m_deps->UpdateCertStoreForUrl( uri );
+            }
+        }
     }
 
     m_http.Deinit();

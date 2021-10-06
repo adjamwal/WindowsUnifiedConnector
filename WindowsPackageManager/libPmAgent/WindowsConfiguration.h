@@ -4,6 +4,7 @@
 #include "IUcLogger.h"
 #include "UCIDApiDll.h"
 #include <mutex>
+#include <map>
 
 class IWinCertLoader;
 
@@ -77,6 +78,15 @@ public:
      * @brief Retrieve the PM URLs from the identity module
      */
     bool GetPmUrls( PmUrlList& urls ) override;
+
+    /**
+     * @brief (Optional) On windows this triggers the Windows AIA mechanism to
+     *   build out the certificate chain for the given URL
+     *
+     *  @param[in] url
+     */
+    bool UpdateCertStoreForUrl( const std::string& url );
+
 private:
     IWinCertLoader& m_winCertLoader;
     UCIDApiDll m_ucidApi;
@@ -85,6 +95,8 @@ private:
     PmUrlList m_urls;
     std::mutex m_ucidMutex;
     std::mutex m_certMutex;
+    std::map<std::string, int> m_certChaninUrlMap;
 
     bool UpdateUCID();
+    std::string ExtractUrlRoot( const std::string& url );
 };
