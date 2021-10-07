@@ -98,14 +98,14 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WindowsApp.lib;Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
@@ -124,7 +124,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -133,7 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WindowsApp.lib;Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
@@ -150,14 +150,14 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WindowsApp.lib;Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
@@ -176,7 +176,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libWinToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UC_PATH)SharedLibs\libLogger;$(UC_PATH)SharedLibs\libWindowsUtilities;$(UC_PATH)SharedLibs\libToast;$(UC_PATH)UC\libUcDiagTool;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include\zlib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -185,7 +185,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WindowsApp.lib;Winhttp.lib;Wtsapi32.lib;Userenv.lib;zlibstat.lib;Msi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
@@ -212,11 +212,11 @@
     <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\SharedLibs\libToast\libToast.vcxproj">
+      <Project>{cba8d385-54fc-4bec-8755-7ebdf314f7ff}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj">
       <Project>{86bfa0bc-6791-44b9-85a8-d0c420f57ee6}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SharedLibs\libWinToast\libWinToast.vcxproj">
-      <Project>{5d45a429-3a8c-45b9-b66c-2d7b4c91adb0}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libUcDiagTool\libUcDiagTool.vcxproj">
       <Project>{58eb5a11-9117-4d01-9f08-e611ef639289}</Project>

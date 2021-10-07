@@ -7,6 +7,7 @@
 #ifndef PCH_H
 #define PCH_H
 
+// add headers that you want to pre-compile here
 #include "framework.h"
 
 #include <SDKDDKVer.h>
@@ -28,6 +29,7 @@
 #include <wrl\client.h>
 #include <wrl\implements.h>
 #include <windows.ui.notifications.h>
-#include <shellapi.h>
 
+//Local headers
+#include "ToastEventHandler.h"
 #endif //PCH_H

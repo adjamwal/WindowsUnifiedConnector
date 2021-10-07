@@ -4,7 +4,7 @@
 #include "DiagToolContainer.h"
 #include "IDiagTool.h"
 #include "WindowsUtilities.h"
-#include "wintoastlib.h"
+#include "ToastNotificationPluginImpl.h"
 #include "WinApiWrapper.h"
 #include <tchar.h>
 #include <tlhelp32.h>
@@ -14,82 +14,33 @@
 #define TOAST_AUMI L"Cisco.CM"
 #define TOAST_TIMEOUT_MS ( 5 * 60 * 1000)
 
-class CustomHandler : public WinToastLib::IWinToastHandler {
-public:
-    void toastActivated() const {
-        LOG_DEBUG("The user clicked in this toast");
-        exit(0);
-    }
-
-    void toastActivated(int actionIndex) const {
-        LOG_DEBUG("The toast was activated", actionIndex);
-        exit(0);
-    }
-
-    void toastDismissed(WinToastDismissalReason state) const {
-        LOG_DEBUG("Enter");
-
-        switch (state) {
-        case UserCanceled:
-            LOG_DEBUG("The user dismissed this toast");
-            break;
-        case TimedOut:
-            LOG_DEBUG("The toast has timed out");
-            break;
-        case ApplicationHidden:
-            LOG_DEBUG("The application hid the toast using ToastNotifier.hide()");
-            break;
-        default:
-            LOG_DEBUG("Toast not activated");
-            break;
-        }
-
-        exit(0);
-    }
-
-    void toastFailed() const {
-        LOG_DEBUG("Error showing current toast");
-        exit(0);
-    }
-};
-
 void SendRebootToast()
 {
-    WinToastLib::WinToast* toast = WinToastLib::WinToast::instance();
-    WinToastLib::WinToastTemplate::AudioOption audioOption = WinToastLib::WinToastTemplate::AudioOption::Default;
-    const DWORD expiration = TOAST_TIMEOUT_MS;
+    WLOG_DEBUG( L"ENTER" );
 
-    if (toast) {
-        toast->setAppName(TOAST_APP_NAME);
-        toast->setAppUserModelId(TOAST_AUMI);
-        //Setup the shortcut first (Set AppUserModelId). Sometimes the first toast doesn't appear if this isn't already set
-        //This is a no-op if the shortcut is already configured
-        enum WinToastLib::WinToast::ShortcutResult result = toast->createShortcut();
-        if( ( result == WinToastLib::WinToast::SHORTCUT_WAS_CHANGED ) ||
-            ( result == WinToastLib::WinToast::SHORTCUT_WAS_CREATED ) ) {
-            LOG_DEBUG( "Shortcut modified/created. Sleeping 5 seconds to let changes take effect" );
-            Sleep( 5000 );
-        }
+    CoInitialize( NULL );
+    CToastNotificationPlugin *toast = new CToastNotificationPlugin();
 
-        if (!toast->initialize()) {
-            LOG_ERROR("Toast Initialization Failed");
-        }
-        else {
-            WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::Text02);
-            templ.setTextField(L"A Cisco software update requires a reboot to complete.", WinToastLib::WinToastTemplate::FirstLine);
-            templ.setAudioOption(audioOption);
-            templ.setAttributionText(L"");
+    if( toast ) {
+        const wchar_t* msg[] = { L"Cisco Cloud Management Diagnostics", L"A Cisco software update requires a reboot to complete." };
+        PluginResult res = toast->SendToastNotification( ToastImageAndText02,            //Toast template type
+            TOAST_AUMI,   //AppUserModelID set by the installer ("Cisco.AnyConnect")
+            L"",           //path to the icon
+            msg, //unicode string message array
+            2 );
 
-            templ.setExpiration( expiration );
+        WLOG_DEBUG( L"SendToastNotification result %d", res );
+        
+        Sleep( 1000 );
 
-
-            if (toast->showToast(templ, new CustomHandler()) < 0) {
-                LOG_ERROR("Could not launch toast notification");
-            }
-
-            Sleep( 2000 );
-        }
+        delete toast;
     }
+    else {
+        WLOG_ERROR( L"Failed to create CToastNotificationPlugin" );
+    }
+
+    CoUninitialize();
+    WLOG_DEBUG( L"Exit" );
 }
 
 DWORD GetParentPID( DWORD pid )

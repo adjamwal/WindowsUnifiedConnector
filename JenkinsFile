@@ -267,7 +267,7 @@ pipeline {
                 }
                 powershell 'Compress-Archive -Path "Symbols\\*" -DestinationPath "Symbols.zip"'
                 
-                archiveArtifacts artifacts: '*.zip', fingerprint: true
+                archiveArtifacts artifacts: 'Symbols.zip', fingerprint: true
               }
             }
           }

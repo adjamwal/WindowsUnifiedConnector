@@ -275,6 +275,7 @@
                           Directory="CiscoProgramMenuFolder" 
                           Advertise="yes" 
                           WorkingDirectory="UCSERVICE_DIRECTORY" >
+                    <ShortcutProperty Key="System.AppUserModel.ID" Value="Cisco.CM"/>
                 </Shortcut>
               </File>
             </Component>
