@@ -29,6 +29,13 @@ private:
         const std::vector<PmProductDiscoveryConfigurable>& configurables, 
         std::vector<PackageConfigInfo>& packageConfigs );
 
+    void ResolveAndDiscover( 
+        const std::filesystem::path& unresolvedPath,
+        const std::filesystem::path& resolvedPath,
+        std::string& knownFolderId,
+        std::string& knownFolderIdConversion,
+        std::vector<std::filesystem::path>& discoveredFiles );
+
     IPackageDiscoveryMethods& m_methods;
     PackageInventory m_lastDetectedPackages;
     IMsiApi& m_msiApi;

@@ -46,8 +46,11 @@ protected:
     void SetupConfig()
     {
         m_configInfo = {
-            "configpath",
-            "configpath",
+            "cfgPath",
+            "unresolvedCfgPath",
+            "", //deployPath
+            "", //unresolvedDeployPath
+            false, //isDiscoveredAtDeployPath
             "configsha256",
             "configcontents",
             "configverifyBinPath",
@@ -55,7 +58,7 @@ protected:
             "installLocation",
             "signerName",
             "test/1.0.0",
-            false
+            false //deleteConfig
         };
     }
 
@@ -273,7 +276,7 @@ TEST_F( TestPackageConfigProcessor, WillDeleteConfig )
 
     m_fileUtil->MakeFileExistsReturn( true );
 
-    EXPECT_CALL( *m_fileUtil, EraseFile( m_configInfo.installLocation / m_configInfo.path ) );
+    EXPECT_CALL( *m_fileUtil, EraseFile( m_configInfo.installLocation / m_configInfo.cfgPath ) );
 
     m_patient->ProcessConfig( m_configInfo );
 }

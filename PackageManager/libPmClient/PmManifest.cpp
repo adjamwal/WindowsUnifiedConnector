@@ -14,6 +14,7 @@
 #define MANIFEST_FIELD_INSTALL_SHA "installer_sha256"
 #define MANIFEST_FIELD_FILES "files"
 #define MANIFEST_FIELD_CONFIG_PATH "path"
+#define MANIFEST_FIELD_CONFIG_DEPLOY_PATH "deploy_path"
 #define MANIFEST_FIELD_CONFIG_CONTENT "contents"
 #define MANIFEST_FIELD_CONFIG_SHA "sha256"
 #define MANIFEST_FIELD_CONFIG_VERIFY_PATH "verify_path"
@@ -131,8 +132,17 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
     PackageConfigInfo config;
     config.deleteConfig = false;
 
-    config.path = std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) ) );
-    config.unresolvedPath = std::filesystem::u8path( GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) );
+    config.cfgPath = std::filesystem::u8path( 
+        m_dependencies->ComponentManager().ResolvePath( 
+            GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) ) );
+    config.unresolvedCfgPath = std::filesystem::u8path(
+        GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_PATH, true ) );
+
+    config.deployPath = std::filesystem::u8path(
+        m_dependencies->ComponentManager().ResolvePath( 
+            GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_DEPLOY_PATH, false ) ) );
+    config.unresolvedDeployPath = std::filesystem::u8path(
+        GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_DEPLOY_PATH, false ) );
 
     config.contents = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_CONTENT, false );
     config.sha256 = GetJsonStringField( configJson, MANIFEST_FIELD_CONFIG_SHA, false );

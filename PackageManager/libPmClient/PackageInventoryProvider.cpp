@@ -36,17 +36,30 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
         return false;
     }
 
-    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogRules, packagesDiscovered ) == 0 ) 
+    if( m_dependencies->ComponentManager().GetInstalledPackages( m_catalogRules, packagesDiscovered ) == 0 )
     {
-        for( auto &package : packagesDiscovered.packages ) 
+        for( auto& package : packagesDiscovered.packages )
         {
-            for ( auto &configFile : package.configs )
+            for( auto& configFile : package.configs )
             {
-                auto sha256 = m_sslUtil.CalculateSHA256( configFile.path );
+                std::optional<std::string> sha256 = std::nullopt;
 
-                if ( sha256.has_value() )
+                if( !configFile.deployPath.empty() )
                 {
-                    configFile.sha256 = sha256.value();
+                    sha256 = m_sslUtil.CalculateSHA256( configFile.deployPath );
+                    if( sha256.has_value() )
+                    {
+                        configFile.sha256 = sha256.value();
+                    }
+                }
+
+                if( !sha256.has_value() )
+                {
+                    sha256 = m_sslUtil.CalculateSHA256( configFile.cfgPath );
+                    if( sha256.has_value() )
+                    {
+                        configFile.sha256 = sha256.value();
+                    }
                 }
             }
         }
@@ -58,7 +71,7 @@ bool PackageInventoryProvider::GetInventory( PackageInventory& inventory )
     return rtn;
 }
 
-void PackageInventoryProvider::SetCatalogDataset( 
+void PackageInventoryProvider::SetCatalogDataset(
     const std::vector<PmProductDiscoveryRules>& discoveryRules )
 {
     std::lock_guard<std::mutex> lock( m_mutex );

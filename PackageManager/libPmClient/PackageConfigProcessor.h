@@ -27,6 +27,9 @@ public:
 private:
     bool AddConfig( PackageConfigInfo& config );
     bool RemoveConfig( PackageConfigInfo& config );
+    void EraseOrThrow( const std::filesystem::path& targetLocation,
+                       const std::filesystem::path& unresolvedPath,
+                       const std::string& configSha256 );
     void RemoveTempFile( const std::filesystem::path& tempFilePath );
 
     IFileSysUtil& m_fileUtil;

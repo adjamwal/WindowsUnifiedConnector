@@ -84,7 +84,7 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillGetUC )
     m_patient->DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
 
     ASSERT_EQ( 1, detectedInstallations.size() );
-    EXPECT_EQ( lookupProduct.product, detectedInstallations.front().product );
+    ASSERT_EQ( lookupProduct.product, detectedInstallations.front().product );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillDecodeRegistryLocationsCorrectly )
@@ -125,7 +125,7 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByRegistryWillPadVersionNumbers )
     m_patient->DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
 
     ASSERT_EQ( 1, detectedInstallations.size() );
-    EXPECT_EQ( "1.0.0.0", detectedInstallations[ 0 ].version );
+    ASSERT_EQ( "1.0.0.0", detectedInstallations[ 0 ].version );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiNoneFound )
@@ -146,7 +146,7 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiNoneFound )
 
     m_patient->DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
 
-    EXPECT_EQ( 0, detectedInstallations.size() );
+    ASSERT_EQ( 0, detectedInstallations.size() );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiProductFound )
@@ -168,8 +168,8 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiProductFound )
     m_patient->DiscoverByMsi( lookupProduct, msiRule, detectedInstallations );
 
     ASSERT_EQ( 1, detectedInstallations.size() );
-    EXPECT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
-    EXPECT_EQ( "testVersion", detectedInstallations[ 0 ].version );
+    ASSERT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
+    ASSERT_EQ( "testVersion", detectedInstallations[ 0 ].version );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductNone )
@@ -190,7 +190,7 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductNone )
 
     m_patient->DiscoverByMsiUpgradeCode( lookupProduct, msiRule, detectedInstallations );
 
-    EXPECT_EQ( 0, detectedInstallations.size() );
+    ASSERT_EQ( 0, detectedInstallations.size() );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductFound )
@@ -212,8 +212,8 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductFound )
     m_patient->DiscoverByMsiUpgradeCode( lookupProduct, msiRule, detectedInstallations );
 
     ASSERT_EQ( 1, detectedInstallations.size() );
-    EXPECT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
-    EXPECT_EQ( "testVersion", detectedInstallations[ 0 ].version );
+    ASSERT_EQ( lookupProduct.product, detectedInstallations[ 0 ].product );
+    ASSERT_EQ( "testVersion", detectedInstallations[ 0 ].version );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesNoneFound )
@@ -236,7 +236,7 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesNoneFound )
 
     m_patient->DiscoverByMsiRules( lookupProduct, msiRule, detectedInstallations, productCache );
 
-    EXPECT_EQ( 0, detectedInstallations.size() );
+    ASSERT_EQ( 0, detectedInstallations.size() );
 }
 
 TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesProductFound )
@@ -262,6 +262,6 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesProductFound )
     m_patient->DiscoverByMsiRules( lookupProduct, msiRule, detectedInstallations, productCache );
 
     ASSERT_EQ( 1, detectedInstallations.size() );
-    EXPECT_EQ( lookupProduct.product, detectedInstallations[0].product );
-    EXPECT_EQ( "testVersion", detectedInstallations[0].version );
+    ASSERT_EQ( lookupProduct.product, detectedInstallations[0].product );
+    ASSERT_EQ( "testVersion", detectedInstallations[0].version );
 }

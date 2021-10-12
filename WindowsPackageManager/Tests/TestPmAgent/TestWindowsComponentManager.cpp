@@ -53,8 +53,11 @@ protected:
         };
 
         m_expectedComponentPackage.configs.push_back( {
-            "configpath",
-            "configpath",
+            "cfgPath",
+            "unresolvedCfgPath",
+            "", //deployPath
+            "", //unresolvedDeployPath
+            false, //isDiscoveredAtDeployPath
             "configsha256",
             "configcontents",
             "configverifyBinPath",
@@ -62,7 +65,7 @@ protected:
             "installLocation",
             "signerName",
             "test/1.0.0",
-            false
+            false //deleteFile
             } );
     }
 

@@ -33,7 +33,7 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
     std::vector<MsiApiProductInfo> productCache;
     auto ret = m_msiApi.QueryProducts( productCache );
 
-    if ( ret != ERROR_SUCCESS || productCache.empty() )
+    if( ret != ERROR_SUCCESS || productCache.empty() )
     {
         LOG_ERROR( "Error getting products list from system  %d", ret );
     }
@@ -42,7 +42,7 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
     {
         std::vector<PmInstalledPackage> detectedInstallations;
         ApplyDiscoveryMethods( lookupProduct, detectedInstallations, productCache );
-        
+
         for( auto& detectedItem : detectedInstallations )
         {
             DiscoverPackageConfigurables( lookupProduct.configurables, detectedItem.configs );
@@ -65,17 +65,17 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
     std::vector<PmInstalledPackage>& detectedInstallations,
     std::vector<MsiApiProductInfo>& productCache )
 {
-    for ( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery ) {
+    for( auto upgradeCodeRule : lookupProduct.msiUpgradeCode_discovery ) {
         m_methods.DiscoverByMsiUpgradeCode( lookupProduct, upgradeCodeRule, detectedInstallations );
-        if ( !detectedInstallations.empty() ) {
+        if( !detectedInstallations.empty() ) {
             return;
         }
     }
 
-    for ( auto msiRule : lookupProduct.msi_discovery )
+    for( auto msiRule : lookupProduct.msi_discovery )
     {
         m_methods.DiscoverByMsiRules( lookupProduct, msiRule, detectedInstallations, productCache );
-        if ( !detectedInstallations.empty() ) {
+        if( !detectedInstallations.empty() ) {
             return;
         }
     }
@@ -83,44 +83,80 @@ void PackageDiscovery::ApplyDiscoveryMethods( const PmProductDiscoveryRules& loo
     for( auto regRule : lookupProduct.reg_discovery )
     {
         m_methods.DiscoverByRegistry( lookupProduct, regRule, detectedInstallations );
-        if ( !detectedInstallations.empty() ) {
+        if( !detectedInstallations.empty() ) {
             return;
         }
     }
 }
 
-void PackageDiscovery::DiscoverPackageConfigurables( 
-    const std::vector<PmProductDiscoveryConfigurable>& configurables, 
+void PackageDiscovery::ResolveAndDiscover(
+    const std::filesystem::path& unresolvedPath,
+    const std::filesystem::path& resolvedPath,
+    std::string& out_knownFolderId,
+    std::string& out_knownFolderIdConversion,
+    std::vector<std::filesystem::path>& out_discoveredFiles )
+{
+    out_knownFolderId = "";
+    out_knownFolderIdConversion = "";
+    out_discoveredFiles.clear();
+
+    if( unresolvedPath != resolvedPath )
+    {
+        //Resolved path is deferent which means we must calculate the knownfolderid
+        std::string tempResolvedPath = resolvedPath.generic_u8string();
+        std::string tempUnresolvedPath = unresolvedPath.generic_u8string();
+        size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
+        size_t last = tempUnresolvedPath.find_first_of( ">" );
+        out_knownFolderId = tempUnresolvedPath.substr( first, last + 1 );
+        std::string remainingPath = tempUnresolvedPath.substr( last + 1, tempUnresolvedPath.length() );
+
+        first = tempResolvedPath.find( remainingPath );
+
+        out_knownFolderIdConversion = tempResolvedPath.substr( 0, first );
+    }
+
+    WindowsUtilities::FileSearchWithWildCard( resolvedPath, out_discoveredFiles );
+    m_utf8PathVerifier.PruneInvalidPathsFromList( out_discoveredFiles );
+}
+
+void PackageDiscovery::DiscoverPackageConfigurables(
+    const std::vector<PmProductDiscoveryConfigurable>& configurables,
     std::vector<PackageConfigInfo>& packageConfigs )
 {
-    for ( auto& configurable : configurables )
+    for( auto& configurable : configurables )
     {
         std::string knownFolderId = "";
         std::string knownFolderIdConversion = "";
         std::vector<std::filesystem::path> discoveredFiles;
+        bool usingDeployPath = false;
 
-        if ( configurable.unresolvedPath != configurable.path )
+        if( !configurable.deployPath.empty() )
         {
-            //Resolved path is deferent which means we must calculate the knownfolderid
-            std::string tempResolvedPath = configurable.path.generic_u8string();
-            std::string tempUnresolvedPath = configurable.unresolvedPath.generic_u8string();
-            size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
-            size_t last = tempUnresolvedPath.find_first_of( ">" );
-            knownFolderId = tempUnresolvedPath.substr( first, last + 1 );
-            std::string remainingPath = tempUnresolvedPath.substr( last + 1, tempUnresolvedPath.length() );
+            ResolveAndDiscover(
+                configurable.unresolvedDeployPath,
+                configurable.deployPath,
+                knownFolderId,
+                knownFolderIdConversion,
+                discoveredFiles
+            );
 
-            first = tempResolvedPath.find( remainingPath );
-
-            knownFolderIdConversion = tempResolvedPath.substr( 0, first );
+            usingDeployPath = discoveredFiles.size() > 0;
         }
 
-        WindowsUtilities::FileSearchWithWildCard( configurable.path, discoveredFiles );
-
-        m_utf8PathVerifier.PruneInvalidPathsFromList( discoveredFiles );
-
-        if ( discoveredFiles.size() > configurable.max_instances )
+        if( !usingDeployPath )
         {
-            if ( configurable.max_instances == 0 )
+            ResolveAndDiscover(
+                configurable.unresolvedCfgPath,
+                configurable.cfgPath,
+                knownFolderId,
+                knownFolderIdConversion,
+                discoveredFiles
+            );
+        }
+
+        if( discoveredFiles.size() > configurable.max_instances )
+        {
+            if( configurable.max_instances == 0 )
             {
                 discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + 1 );
             }
@@ -129,23 +165,37 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 discoveredFiles = std::vector<std::filesystem::path>( discoveredFiles.begin(), discoveredFiles.begin() + configurable.max_instances );
             }
         }
-        
-        for ( auto &discoveredFile : discoveredFiles )
+
+        for( auto& discoveredFile : discoveredFiles )
         {
             PackageConfigInfo configInfo = {};
 
             std::string tempPath = discoveredFile.generic_u8string();
-
-            if ( knownFolderId != "" )
+            if( knownFolderId != "" )
             {
                 //We need to convert the path to include knownfolderid
                 tempPath = tempPath.substr( knownFolderIdConversion.length(), tempPath.length() );
                 tempPath = knownFolderId + tempPath;
             }
 
-            configInfo.path = discoveredFile;
-            configInfo.unresolvedPath = std::filesystem::u8path( tempPath );
+            configInfo.isDiscoveredAtDeployPath = usingDeployPath;
+
+            if( usingDeployPath )
+            {
+                configInfo.deployPath = discoveredFile;
+                configInfo.unresolvedDeployPath = std::filesystem::u8path( tempPath );
+                configInfo.cfgPath = "";
+                configInfo.unresolvedCfgPath = "";
+            }
+            else
+            {
+                configInfo.deployPath = "";
+                configInfo.unresolvedDeployPath = "";
+                configInfo.cfgPath = discoveredFile;
+                configInfo.unresolvedCfgPath = std::filesystem::u8path( tempPath );
+            }
+
             packageConfigs.push_back( configInfo );
-        }  
+        }
     }
 }

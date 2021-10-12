@@ -243,7 +243,7 @@ TEST_F( TestPmManifest, WillGetPackageConfig )
 
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].contents, "<base64-data>" );
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].verifyBinPath, "verify_config.exe" );
-    EXPECT_EQ( packages[ 0 ].configs[ 0 ].path, "cm_config.json" );
+    EXPECT_EQ( packages[ 0 ].configs[ 0 ].cfgPath, "cm_config.json" );
     EXPECT_EQ( packages[ 0 ].configs[ 0 ].sha256, "4d0bc0da51c1aac547c5473ed53413ae9d9d0c8c57c15ec6a2ac6652812058f4" );
 }
 

@@ -103,7 +103,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libcrypto-1_1.dll $(TargetDir)libcrypto-1_1.dll &amp;&amp; Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libssl-1_1.dll $(TargetDir)libssl-1_1.dll</Command>
+      <Command>Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libcrypto-1_1.dll $(TargetDir)libcrypto-1_1.dll &amp;&amp; Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libssl-1_1.dll $(TargetDir)libssl-1_1.dll &amp;&amp; Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\zlibd.dll $(TargetDir)zlibd.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,7 +147,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libcrypto-1_1-x64.dll $(TargetDir)libcrypto-1_1-x64.dll &amp;&amp; Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libssl-1_1-x64.dll $(TargetDir)libssl-1_1-x64.dll</Command>
+      <Command>Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libcrypto-1_1-x64.dll $(TargetDir)libcrypto-1_1-x64.dll &amp;&amp; Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\libssl-1_1-x64.dll $(TargetDir)libssl-1_1-x64.dll &amp;&amp; Copy $(IMN_COMMON)common-windows-build\$(Configuration)\$(PlatformName)\bin\zlibd.dll $(TargetDir)zlibd.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

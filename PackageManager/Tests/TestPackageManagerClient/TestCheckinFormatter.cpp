@@ -31,8 +31,8 @@ protected:
         package.version = "Version";
 
         PackageConfigInfo config = {};
-        config.path = "path";
-        config.unresolvedPath = "unresolvedpath";
+        config.cfgPath = "path";
+        config.unresolvedCfgPath = "unresolvedpath";
         config.sha256 = "sha";
 
         package.configs.push_back( config );
@@ -50,11 +50,11 @@ protected:
         package.product = "Package1";
         package.version = "Version1";
 
-        config.path = "path1";
+        config.cfgPath = "path1";
         config.sha256 = "sha1";
         package.configs.push_back( config );
 
-        config.path = "path2";
+        config.cfgPath = "path2";
         config.sha256 = "sha2";
         package.configs.push_back( config );
         m_inventory->packages.push_back( package );
@@ -64,11 +64,11 @@ protected:
         package.version = "Version2";
 
 
-        config.path = "path3";
+        config.cfgPath = "path3";
         config.sha256 = "sha3";
         package.configs.push_back( config );
 
-        config.path = "path4";
+        config.cfgPath = "path4";
         config.sha256 = "sha4";
         package.configs.push_back( config );
         m_inventory->packages.push_back( package );
@@ -125,7 +125,7 @@ TEST_F( TestCheckinFormatter, WillBuildPackageConfig )
 
     jsonReader->parse( json.c_str(), json.c_str() + json.length(), &root, NULL );
 
-    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().unresolvedPath.generic_u8string() );
+    EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "path" ], m_inventory->packages.front().configs.front().unresolvedCfgPath.generic_u8string() );
     EXPECT_EQ( root[ "installed" ][ 0 ][ "configs" ][ 0 ][ "sha256" ], m_inventory->packages.front().configs.front().sha256 );
 }
 

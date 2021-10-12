@@ -22,7 +22,7 @@ void CatalogJsonParser::Initialize( IPmPlatformDependencies* dep )
     m_dependencies = dep;
 }
 
-bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDiscoveryRules>&returnCatalogDataset )
+bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDiscoveryRules>& returnCatalogDataset )
 {
     std::unique_ptr<Json::CharReader> jsonReader( Json::CharReaderBuilder().newCharReader() );
     Json::Value root, packages;
@@ -45,7 +45,7 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDisc
             return false;
         }
     }
-    catch ( ... ) {
+    catch( ... ) {
         LOG_ERROR( "Exception error parsing Catalog json" );
         return false;
     }
@@ -57,20 +57,20 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDisc
             PmProductDiscoveryRules catalogEntry;
             bool validDiscoveryMechanismFound = false;
             catalogEntry.product = pkg[ "product" ].asString();
-            for ( Json::Value discovery : pkg[ "discovery" ] ) {
-                if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE ) {
+            for( Json::Value discovery : pkg[ "discovery" ] ) {
+                if( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE ) {
                     ParseMsiUpgradeCodeDiscovery( discovery, catalogEntry.msiUpgradeCode_discovery );
                     validDiscoveryMechanismFound = true;
                 }
-                else if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI ) {
+                else if( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_MSI ) {
                     ParseMsiDiscovery( discovery, catalogEntry.msi_discovery );
                     validDiscoveryMechanismFound = true;
                 }
-                    else if ( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) {
+                else if( discovery[ "type" ].asString() == UC_CATALOG_DISCOVERY_TYPE_REGISTRY ) {
                     ParseRegistryDiscovery( discovery, catalogEntry.reg_discovery );
                     validDiscoveryMechanismFound = true;
                 }
-                    else {
+                else {
                     LOG_DEBUG( "Ignoring Unknown discovery mechanism %s", discovery[ "type" ].asCString() );
                 }
             }
@@ -78,7 +78,7 @@ bool CatalogJsonParser::Parse( const std::string json, std::vector<PmProductDisc
             ParseConfigurables( pkg, catalogEntry.configurables );
             returnCatalogDataset.push_back( catalogEntry );
         }
-        catch ( std::exception& e ) {
+        catch( std::exception& e ) {
             LOG_ERROR( "Expection: %s", e.what() );
         }
     }
@@ -101,12 +101,14 @@ void CatalogJsonParser::ParseConfigurables( const Json::Value& pkgValue, std::ve
         std::vector<std::string> formats;
 
         ParseConfigFormats( cfg, formats );
-        if( formats.size() == 0 ) throw std::exception("Configurable must have at least one valid format");
-        
+        if( formats.size() == 0 ) throw std::exception( "Configurable must have at least one valid format" );
+
         PmProductDiscoveryConfigurable configEntry
         {
-            std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( cfg["path"].asString() ) ),
+            std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( cfg[ "path" ].asString() ) ),
             std::filesystem::u8path( cfg[ "path" ].asString() ),
+            cfg.isMember( "deploy_path" ) ? std::filesystem::u8path( m_dependencies->ComponentManager().ResolvePath( cfg[ "deploy_path" ].asString() ) ) : "",
+            cfg.isMember( "deploy_path" ) ? std::filesystem::u8path( cfg[ "deploy_path" ].asString() ) : "",
             cfg[ "max_instances" ].asUInt(),
             cfg[ "required" ].asBool(),
             formats
@@ -129,11 +131,11 @@ void CatalogJsonParser::ParseConfigFormats( const Json::Value& pkgConfigValue, s
     }
 }
 
-void CatalogJsonParser::ParseMsiDiscovery( const Json::Value & msiValue, std::vector<PmProductDiscoveryMsiMethod>&returnMsi )
+void CatalogJsonParser::ParseMsiDiscovery( const Json::Value& msiValue, std::vector<PmProductDiscoveryMsiMethod>& returnMsi )
 {
     PmProductDiscoveryMsiMethod msiDiscovery;
-    
-    if ( msiValue[ "name" ].isString() && msiValue[ "vendor" ].isString() ) {
+
+    if( msiValue[ "name" ].isString() && msiValue[ "vendor" ].isString() ) {
         msiDiscovery.type = UC_CATALOG_DISCOVERY_TYPE_MSI;
         msiDiscovery.name = msiValue[ "name" ].asString();
         msiDiscovery.vendor = msiValue[ "vendor" ].asString();
@@ -146,21 +148,21 @@ void CatalogJsonParser::ParseMsiDiscovery( const Json::Value & msiValue, std::ve
     }
 }
 
-void CatalogJsonParser::ParseRegistryDiscovery( const Json::Value & regValue, std::vector<PmProductDiscoveryRegistryMethod>&returnRegistry )
+void CatalogJsonParser::ParseRegistryDiscovery( const Json::Value& regValue, std::vector<PmProductDiscoveryRegistryMethod>& returnRegistry )
 {
     PmProductDiscoveryRegistryMethod regDiscovery;
-  
-    if ( regValue.isMember( "install" ) && regValue[ "install" ][ "key" ].isString() &&
-            regValue.isMember( "version" ) && regValue[ "version" ][ "key" ].isString() ) {
+
+    if( regValue.isMember( "install" ) && regValue[ "install" ][ "key" ].isString() &&
+        regValue.isMember( "version" ) && regValue[ "version" ][ "key" ].isString() ) {
         regDiscovery.type = UC_CATALOG_DISCOVERY_TYPE_REGISTRY;
-        
+
         regDiscovery.install.key = regValue[ "install" ][ "key" ].asString();
-        if ( regValue[ "install" ].isMember( "type" ) ) {
+        if( regValue[ "install" ].isMember( "type" ) ) {
             regDiscovery.install.type = regValue[ "install" ][ "type" ].asString();
         }
 
         regDiscovery.version.key = regValue[ "version" ][ "key" ].asString();
-        if ( regValue[ "version" ].isMember( "type" ) ) {
+        if( regValue[ "version" ].isMember( "type" ) ) {
             regDiscovery.version.type = regValue[ "version" ][ "type" ].asString();
         }
 
@@ -176,10 +178,10 @@ void CatalogJsonParser::ParseMsiUpgradeCodeDiscovery( const Json::Value& msiUpga
 {
     PmProductDiscoveryMsiUpgradeCodeMethod msiUpgradeDiscovery;
 
-    if ( msiUpgardeValue[ "code" ].isString() ) {
+    if( msiUpgardeValue[ "code" ].isString() ) {
         msiUpgradeDiscovery.type = UC_CATALOG_DISCOVERY_TYPE_MSI_UPGRADE_CODE;
         msiUpgradeDiscovery.upgradeCode = "{" + msiUpgardeValue[ "code" ].asString() + "}";
-        for ( auto& c : msiUpgradeDiscovery.upgradeCode ) {
+        for( auto& c : msiUpgradeDiscovery.upgradeCode ) {
             c = toupper( c );
         }
         returnMsi.push_back( msiUpgradeDiscovery );

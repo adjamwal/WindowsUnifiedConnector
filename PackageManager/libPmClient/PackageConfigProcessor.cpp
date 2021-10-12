@@ -63,19 +63,44 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
     std::filesystem::path tempFilePath;
     std::vector<uint8_t> configData;
-    std::filesystem::path targetLocation = config.installLocation / config.path;
+    std::filesystem::path verifiedTargetLocation;
+    std::filesystem::path targetFolderIdPath;
     FileUtilHandle* handle = NULL;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithNewFile( config.unresolvedPath, config.sha256, 0 );
-    if( m_fileUtil.FileExists( targetLocation ) )
+    if( !config.deployPath.empty() && m_fileUtil.FileExists( config.installLocation / config.deployPath ) )
     {
-        auto old_sha256 = m_sslUtil.CalculateSHA256( targetLocation );
-        m_eventBuilder.WithOldFile( 
-            config.unresolvedPath,
+        verifiedTargetLocation = config.installLocation / config.deployPath;
+        targetFolderIdPath = config.unresolvedDeployPath;
+        auto old_sha256 = m_sslUtil.CalculateSHA256( verifiedTargetLocation );
+        m_eventBuilder.WithOldFile(
+            config.unresolvedDeployPath,
             old_sha256.has_value() ? old_sha256.value() : "",
-            m_fileUtil.FileSize( targetLocation ) );
+            m_fileUtil.FileSize( verifiedTargetLocation ) );
+        m_eventBuilder.WithNewFile( config.unresolvedDeployPath, config.sha256, 0 );
     }
+    else if( !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
+    {
+        verifiedTargetLocation = config.installLocation / config.cfgPath;
+        targetFolderIdPath = config.unresolvedCfgPath;
+        auto old_sha256 = m_sslUtil.CalculateSHA256( verifiedTargetLocation );
+        m_eventBuilder.WithOldFile(
+            config.unresolvedDeployPath,
+            old_sha256.has_value() ? old_sha256.value() : "",
+            m_fileUtil.FileSize( verifiedTargetLocation ) );
+    }
+    else if( !config.unresolvedDeployPath.empty() )
+    {
+        verifiedTargetLocation = config.installLocation / config.deployPath;
+        targetFolderIdPath = config.unresolvedDeployPath;
+    }
+    else
+    {
+        verifiedTargetLocation = config.installLocation / config.cfgPath;
+        targetFolderIdPath = config.unresolvedCfgPath;
+    }
+
+    m_eventBuilder.WithNewFile( targetFolderIdPath, config.sha256, 0 );
 
     try
     {
@@ -103,21 +128,23 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
 
         auto sha256 = m_sslUtil.CalculateSHA256( config.verifyPath );
         m_eventBuilder.WithNewFile(
-            config.unresolvedPath,
+            targetFolderIdPath,
             sha256.has_value() ? sha256.value() : config.sha256,
             m_fileUtil.FileSize( config.verifyPath )
         );
 
         // only validate hash if installerHash is not empty
         rtn = ( config.sha256.empty() || sha256 == config.sha256 ) &&
-              ( config.verifyBinPath.empty() || ( m_dependencies->ComponentManager().DeployConfiguration( config ) == 0 ) ) &&
-              ( m_fileUtil.Rename( config.verifyPath, targetLocation ) == 0 ) &&
-              ( m_dependencies->ComponentManager().ApplyBultinUsersReadPermissions( targetLocation ) == 0 );
+            ( config.verifyBinPath.empty() || ( m_dependencies->ComponentManager().DeployConfiguration( config ) == 0 ) ) &&
+            //effectively move the temp file to the target destination
+            ( m_fileUtil.Rename( config.verifyPath, verifiedTargetLocation ) == 0 ) &&
+            ( m_dependencies->ComponentManager().ApplyBultinUsersReadPermissions( verifiedTargetLocation ) == 0 );
 
         if( !rtn )
         {
             RemoveTempFile( config.verifyPath );
-            throw PackageException( __FUNCTION__ ": Failed to deploy configuration to " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_DEPLOY );
+            throw PackageException( __FUNCTION__ ": Failed to deploy configuration to " + verifiedTargetLocation.generic_u8string(),
+                UCPM_EVENT_ERROR_CONFIG_DEPLOY );
         }
     }
     catch( PackageException& ex )
@@ -146,32 +173,38 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 {
     bool rtn = false;
 
-    std::filesystem::path targetLocation = config.installLocation / config.path;
-
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    m_eventBuilder.WithOldFile( config.unresolvedPath, config.sha256, m_fileUtil.FileSize( targetLocation ) );
+    m_eventBuilder.WithOldFile(
+        config.deployPath.empty() ? config.unresolvedCfgPath : config.unresolvedDeployPath,
+        config.sha256,
+        0 );
 
     try
     {
-        if( targetLocation.empty() || !m_fileUtil.FileExists( targetLocation ) )
+        if( !config.installLocation.empty() && !config.deployPath.empty() && m_fileUtil.FileExists( config.installLocation / config.deployPath ) )
         {
-            throw PackageException( __FUNCTION__ ": Failed to resolve config " + targetLocation.generic_u8string() , UCPM_EVENT_ERROR_CONFIG_RESOLVE );
+            EraseOrThrow(
+                config.installLocation / config.deployPath,
+                config.unresolvedDeployPath,
+                config.sha256 );
+
+            rtn = true;
         }
-
-        auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
-        m_eventBuilder.WithOldFile(
-            config.unresolvedPath,
-            sha256.has_value() ? sha256.value() : config.sha256,
-            m_fileUtil.FileSize( targetLocation ) );
-
-        if( m_fileUtil.EraseFile( targetLocation ) != 0 )
+        else if( !config.installLocation.empty() && !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
         {
-            throw PackageException( __FUNCTION__ ": Failed to remove config " + targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
+            EraseOrThrow(
+                config.installLocation / config.cfgPath,
+                config.unresolvedCfgPath,
+                config.sha256 );
+
+            rtn = true;
         }
-
-        LOG_DEBUG( "Removed config file %s", targetLocation.generic_u8string().c_str() );
-
-        rtn = true;
+        else
+        {
+            throw PackageException( __FUNCTION__ ": Failed to resolve config for removal: " +
+                config.deployPath.empty() ? config.cfgPath.generic_u8string() : config.deployPath.generic_u8string(),
+                UCPM_EVENT_ERROR_CONFIG_RESOLVE );
+        }
     }
     catch( PackageException& ex )
     {
@@ -193,6 +226,26 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
     m_eventPublisher.Publish( m_eventBuilder );
 
     return rtn;
+}
+
+void PackageConfigProcessor::EraseOrThrow(
+    const std::filesystem::path& targetLocation,
+    const std::filesystem::path& unresolvedPath,
+    const std::string& configSha256 )
+{
+    auto sha256 = m_sslUtil.CalculateSHA256( targetLocation );
+    m_eventBuilder.WithOldFile(
+        unresolvedPath,
+        sha256.has_value() ? sha256.value() : configSha256,
+        m_fileUtil.FileSize( targetLocation ) );
+
+    if( m_fileUtil.EraseFile( targetLocation ) != 0 )
+    {
+        throw PackageException( __FUNCTION__ ": Failed to remove config " +
+            targetLocation.generic_u8string(), UCPM_EVENT_ERROR_CONFIG_REMOVE );
+    }
+
+    LOG_DEBUG( "Removed config file %s", targetLocation.generic_u8string().c_str() );
 }
 
 void PackageConfigProcessor::RemoveTempFile( const std::filesystem::path& tempFilePath )

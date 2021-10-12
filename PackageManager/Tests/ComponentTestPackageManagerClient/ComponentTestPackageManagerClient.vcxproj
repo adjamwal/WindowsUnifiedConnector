@@ -28,7 +28,8 @@
     <ProjectName>ComponentTestPackageManagerClient</ProjectName>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="ComponentTestPacMan.cpp" />
+    <ClCompile Include="ComponentTestPacManConfigsPath.cpp" />
+    <ClCompile Include="ComponentTestPacManConfigsDeployPath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libPmClient\libPmClient.vcxproj">
@@ -58,6 +59,9 @@
     <ProjectReference Include="..\..\Mocks\MockPmUtil\MockPmUtil.vcxproj">
       <Project>{ef53b849-5527-47c8-98b7-3b88dacc3f4e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ComponentTestPacManBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

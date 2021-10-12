@@ -31,7 +31,8 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
                 for( int j = 0; j < ( int )packageDetection.configs.size(); j++ ) {
                     Json::Value config;
                     PackageConfigInfo& packageConfig = packageDetection.configs[ j ];
-                    config[ "path" ] = packageConfig.unresolvedPath.generic_u8string();
+                    config[ "path" ] = packageConfig.unresolvedCfgPath.generic_u8string();
+                    config[ "deploy_path" ] = packageConfig.unresolvedDeployPath.generic_u8string();
                     config[ "sha256" ] = packageConfig.sha256;
 
                     configs[ j ] = config;
