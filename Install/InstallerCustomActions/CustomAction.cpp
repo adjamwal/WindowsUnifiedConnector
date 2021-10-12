@@ -428,6 +428,7 @@ UINT __stdcall CopyCscPlugin( MSIHANDLE hInstall )
     DWORD customActionDataSize = 2048;
     std::filesystem::path pluginPath;
     std::filesystem::path ucPlugingPath;
+    std::filesystem::path tmpPlugingPath;
     std::filesystem::path cachePath;
     std::error_code ec;
 
@@ -450,6 +451,9 @@ UINT __stdcall CopyCscPlugin( MSIHANDLE hInstall )
             ucPlugingPath = customActionDataList[ 1 ];
             ucPlugingPath /= "csccmplugin.dll";
 
+            tmpPlugingPath = ucPlugingPath;
+            tmpPlugingPath += ".tmp";
+
             cachePath = customActionDataList[ 2 ];
         }
         else {
@@ -467,11 +471,17 @@ UINT __stdcall CopyCscPlugin( MSIHANDLE hInstall )
         }
     }
 
+    std::filesystem::copy_file( ucPlugingPath, tmpPlugingPath, std::filesystem::copy_options::overwrite_existing, ec);
+    if( ec ) {
+        WcaLogError( LOGMSG_STANDARD, __FUNCTION__ ": Failed to copy %S to %S. %s", ucPlugingPath.c_str(), tmpPlugingPath.c_str(), ec.message().c_str() );
+        hr = E_FAIL;
+    }
+
     std::filesystem::create_directories( pluginPath.parent_path() );
-    std::filesystem::copy_file( ucPlugingPath, pluginPath, std::filesystem::copy_options::overwrite_existing, ec);
+    std::filesystem::rename( tmpPlugingPath, pluginPath, ec );
 
     if( ec ) {
-        WcaLogError( LOGMSG_STANDARD, __FUNCTION__ ": Failed to copy %S to %S. %s", ucPlugingPath.c_str(), pluginPath.c_str(), ec.message().c_str() );
+        WcaLogError( LOGMSG_STANDARD, __FUNCTION__ ": Failed to move %S to %S. %s", tmpPlugingPath.c_str(), pluginPath.c_str(), ec.message().c_str() );
         hr = E_FAIL;
     }
 
