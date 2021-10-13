@@ -171,12 +171,12 @@ int32_t FileSysUtil::EraseFile( const std::filesystem::path& filePath )
     }
 
     try {
-        if ( FileExists( filePath ) ) {
-            ::std::filesystem::remove( filePath );
+        if( FileExists( filePath ) && ::std::filesystem::remove( filePath ) )
+        {
             rtn = 0;
         }
     }
-    catch ( std::filesystem::filesystem_error& ex ) {
+    catch( std::filesystem::filesystem_error& ex ) {
         LOG_ERROR( "%s", ex.what() );
     }
 

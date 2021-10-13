@@ -181,7 +181,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
     try
     {
-        if( !config.installLocation.empty() && !config.deployPath.empty() && m_fileUtil.FileExists( config.installLocation / config.deployPath ) )
+        if( !config.deployPath.empty() && m_fileUtil.FileExists( config.installLocation / config.deployPath ) )
         {
             EraseOrThrow(
                 config.installLocation / config.deployPath,
@@ -190,7 +190,7 @@ bool PackageConfigProcessor::RemoveConfig( PackageConfigInfo& config )
 
             rtn = true;
         }
-        else if( !config.installLocation.empty() && !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
+        else if( !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
         {
             EraseOrThrow(
                 config.installLocation / config.cfgPath,
