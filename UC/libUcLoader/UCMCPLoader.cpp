@@ -4,6 +4,7 @@
 #include "IUCLogger.h"
 #include "ICodeSignVerifier.h"
 #include "WindowsUtilities.h"
+#include "CmConstants.h"
 
 UCMCPLoader::UCMCPLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
@@ -114,7 +115,7 @@ void UCMCPLoader::LoadControlModule()
     }
 
     std::wstring dllFullPath;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\CMPM", L"DllPath", dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CMPM, L"DllPath", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
         return;
@@ -124,7 +125,7 @@ void UCMCPLoader::LoadControlModule()
 
     std::wstring pmConfigPath;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\config", L"path", pmConfigPath ) )
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", pmConfigPath ) )
     {
         WLOG_ERROR( L"Failed to read config path from registry" );
         return;

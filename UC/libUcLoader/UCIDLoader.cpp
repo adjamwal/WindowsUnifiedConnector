@@ -4,8 +4,7 @@
 #include "IUCLogger.h"
 #include "ICodeSignVerifier.h"
 #include "WindowsUtilities.h"
-
-#define UCID_MODULE_INTERFACE_VERSION 1u
+#include "CmConstants.h"
 
 UCIDLoader::UCIDLoader( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
@@ -121,28 +120,20 @@ void UCIDLoader::LoadControlModule()
 
     if ( WindowsUtilities::Is64BitWindows() )
     {
-        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x64";
+        ucidControlPluginKey = WREG_CMID_X64;
     }
     else
     {
-        ucidControlPluginKey = L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x86";
+        ucidControlPluginKey = WREG_CMID_X86;
     }
 
-    if ( !WindowsUtilities::ReadRegistryString(
-        HKEY_LOCAL_MACHINE,
-        L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID",
-        L"Path",
-        ucidDllDir ) )
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CMID, L"Path", ucidDllDir ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management ID Control Module folder path from registry" );
         return;
     }
 
-    if( !WindowsUtilities::ReadRegistryString( 
-        HKEY_LOCAL_MACHINE, 
-        ucidControlPluginKey,
-        L"ucidcontrolplugin", 
-        dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, ucidControlPluginKey, L"ucidcontrolplugin", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management ID Control Module dll path from registry" );
         return;
@@ -150,7 +141,8 @@ void UCIDLoader::LoadControlModule()
 
     std::wstring pmConfigPath;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management\\config", L"path", pmConfigPath ) ) {
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", pmConfigPath ) )
+    {
         WLOG_ERROR( L"Failed to read config path from registry" );
         return;
     }
@@ -168,7 +160,7 @@ void UCIDLoader::LoadControlModule()
         LOG_ERROR( "Exception: %s", ex.what() );
     }
 
-    m_context.nVersion = UCID_MODULE_INTERFACE_VERSION;
+    m_context.nVersion = CMID_MODULE_INTERFACE_VERSION;
     if( m_context.fpInit )
     {
         m_context.fpInit();

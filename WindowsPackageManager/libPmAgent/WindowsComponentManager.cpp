@@ -10,8 +10,8 @@
 #include <locale>
 #include <codecvt>
 #include <AccCtrl.h>
+#include "CmConstants.h"
 
-#define UCSERVICE_PATH_REG_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMSERVICE"
 #define DIAG_TOOL_EXE L"csc_cmdt.exe"
 #define DIAG_TOOL_NOTIFY_ARG L"--notifyreboot"
 
@@ -225,7 +225,7 @@ void WindowsComponentManager::NotifySystemRestart()
     std::wstring diagToolDir;
     std::vector<ULONG> sessionList;
 
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, UCSERVICE_PATH_REG_KEY, L"Path", diagToolDir ) || diagToolDir.empty() ) {
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_SERVICE, L"Path", diagToolDir ) || diagToolDir.empty() ) {
         LOG_ERROR( "Failed to get diag tool path" );
         return;
     }

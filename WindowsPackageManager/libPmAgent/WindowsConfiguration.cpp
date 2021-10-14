@@ -3,6 +3,7 @@
 #include "IWinCertLoader.h"
 #include "..\..\GlobalVersion.h"
 #include "WindowsUtilities.h"
+#include "CmConstants.h"
 #include <codecvt>
 
 WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier ) :
@@ -151,7 +152,7 @@ std::string WindowsConfiguration::GetInstallDirectory()
     std::wstring dir;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, L"Software\\Cisco\\SecureClient\\Cloud Management", L"Path", dir ) )
+    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM, L"Path", dir ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management install path from registry" );
     }

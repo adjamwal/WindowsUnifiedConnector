@@ -6,17 +6,7 @@
 #include "StringUtil.h"
 #include <IUcLogger.h>
 #include "PmTypes.h"
-
-#define UCID_API_GET_ID_FUNCTION_NAME "cmid_get_id"
-#define UCID_API_GET_TOKEN_FUNCTION_NAME "cmid_get_token"
-#define UCID_API_REFRESH_TOKEN_FUNCTION_NAME "cmid_refresh_token"
-#define UCID_API_GET_URL_FUNCTION_NAME "cmid_get_url"
-
-#if defined(_WIN64)
-#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x64"
-#else
-#define UCID_API_DLL_KEY L"Software\\Cisco\\SecureClient\\Cloud Management\\CMID\\x86"
-#endif
+#include "CmConstants.h"
 
 UCIDApiDll::UCIDApiDll( ICodesignVerifier& codeSignVerifier )
     : m_codeSignVerifier( codeSignVerifier )
@@ -200,25 +190,25 @@ bool UCIDApiDll::LoadDll( const std::wstring dllPath )
 
     SetDllDirectory( NULL );
 
-    m_getIdFunc = ( GetIdFunc )GetProcAddress( m_api, UCID_API_GET_ID_FUNCTION_NAME );
+    m_getIdFunc = ( GetIdFunc )GetProcAddress( m_api, CMID_API_GET_ID_FUNCTION_NAME );
     if( m_getIdFunc == NULL )
     {
         throw std::exception( "Couldn't bind to Get Id dll function. Error %d", GetLastError() );
     }
 
-    m_getTokenFunc = ( GetTokenFunc )GetProcAddress( m_api, UCID_API_GET_TOKEN_FUNCTION_NAME );
+    m_getTokenFunc = ( GetTokenFunc )GetProcAddress( m_api, CMID_API_GET_TOKEN_FUNCTION_NAME );
     if( m_getTokenFunc == NULL )
     {
         throw std::exception( "Couldn't bind to Get Token dll function. Error %d", GetLastError() );
     }
 
-    m_refreshTokenFunc = ( RefreshTokenFunc )GetProcAddress( m_api, UCID_API_REFRESH_TOKEN_FUNCTION_NAME );
+    m_refreshTokenFunc = ( RefreshTokenFunc )GetProcAddress( m_api, CMID_API_REFRESH_TOKEN_FUNCTION_NAME );
     if( m_refreshTokenFunc == NULL )
     {
         throw std::exception( "Couldn't bind to Refresh Token dll function. Error %d", GetLastError() );
     }
 
-    m_getUrlFunc = ( GetUrlFunc )GetProcAddress( m_api, UCID_API_GET_URL_FUNCTION_NAME );
+    m_getUrlFunc = ( GetUrlFunc )GetProcAddress( m_api, CMID_API_GET_URL_FUNCTION_NAME );
     if( m_getUrlFunc == NULL ) {
         throw std::exception( "Couldn't bind to Get Url dll function. Error %d", GetLastError() );
     }
@@ -260,11 +250,7 @@ bool UCIDApiDll::LoadApi()
 
     std::wstring dllFullPath;
 
-    if( !WindowsUtilities::ReadRegistryString( 
-        HKEY_LOCAL_MACHINE, 
-        UCID_API_DLL_KEY,
-        L"ucidapi",
-        dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, CMID_API_DLL_KEY, L"ucidapi", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management ID Api data from registry" );
         return false;
