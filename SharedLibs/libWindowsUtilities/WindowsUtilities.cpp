@@ -776,3 +776,30 @@ abort:
 
     return rtn;
 }
+
+bool WindowsUtilities::GetTimeZoneOffset( int32_t& tzOffset )
+{
+    bool rtn = false;
+    DWORD dwRet;
+    TIME_ZONE_INFORMATION tzi;
+
+    //The current bias for local time translation on this computer, in minutes. 
+    //The bias is the difference, in minutes, between Coordinated Universal Time (UTC) and local time. 
+    //All translations between UTC and local time are based on the following formula:
+    //UTC = local time + bias
+    //The offset is either Bias + StandardBias or Bias + DaylightBias depending on the date in question
+    dwRet = GetTimeZoneInformation( &tzi );
+
+    if ( dwRet == TIME_ZONE_ID_STANDARD || dwRet == TIME_ZONE_ID_UNKNOWN )
+    {
+        tzOffset = -(tzi.Bias + tzi.StandardBias) * 60;
+        rtn = true;
+    }
+    else if ( dwRet == TIME_ZONE_ID_DAYLIGHT )
+    {
+        tzOffset = -(tzi.Bias + tzi.DaylightBias) * 60;
+        rtn = true;
+    }
+
+    return rtn;
+}

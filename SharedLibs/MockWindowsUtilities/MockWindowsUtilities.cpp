@@ -293,3 +293,13 @@ void MockWindowsUtilities::ExpectWinHttpGetNotCalled()
 {
     EXPECT_CALL( *this, WinHttpGet( _ ) ).Times( 0 );
 }
+
+void MockWindowsUtilities::MakeGetTimeZoneOffsetReturn( bool value )
+{
+    ON_CALL( *this, GetTimeZoneOffset( _ ) ).WillByDefault( Return( value ) );
+}
+
+void MockWindowsUtilities::ExpectGetTimeZoneOffsetNotCalled()
+{
+    EXPECT_CALL( *this, GetTimeZoneOffset( _ ) ).Times( 0 );
+}
