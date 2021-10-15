@@ -211,6 +211,9 @@ TEST_F( ComponentTestPacManConfigsDeployPath, PacManWillUpdatePackageAndConfigWi
     ON_CALL( *m_mockFileUtil, FileSize( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 100 ) );
     ON_CALL( *m_mockFileUtil, EraseFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
+    ON_CALL( *m_mockFileUtil, FileExists( PathContains( "path_config.json" ) ) ).WillByDefault( Return( true ) );
+    ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "path_config.json" ) ) ).WillByDefault( Return( "0000000000000000000000000000000000000000000000000000000000000000" ) );
+
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "tmpPmConf_" ) ) ).WillByDefault( Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" ) );
 
@@ -256,8 +259,8 @@ TEST_F( ComponentTestPacManConfigsDeployPath, PacManWillUpdatePackageAndConfigWi
         "",
         0, //subErrCode
         "", //subErrType
-        "",
-        "",
+        "path_config.json",
+        "0000000000000000000000000000000000000000000000000000000000000000",
         0,
         "config.json",
         "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4",

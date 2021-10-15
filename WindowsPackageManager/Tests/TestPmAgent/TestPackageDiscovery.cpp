@@ -253,6 +253,38 @@ TEST_F( TestPackageDiscovery, OneConfigurableIsFoundAtDeployPath )
         std::filesystem::path( path1 ) );
 }
 
+TEST_F( TestPackageDiscovery, UnresolvedCfgPathIsReturnedWithDeployPath )
+{
+    std::string deployPath = "c:/test/one.xml";
+    std::string cfgPath = "c:/test/two.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.cfgPath = cfgPath;
+    configurable1.unresolvedCfgPath = cfgPath;
+    configurable1.deployPath = deployPath;
+    configurable1.unresolvedDeployPath = deployPath;
+    configurable1.max_instances = 1;
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( deployPath ) );
+
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillByDefault( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( installedPackages.packages.size(), 1 );
+    ASSERT_EQ( installedPackages.packages[ 0 ].configs.size(), 1 );
+    ASSERT_EQ( std::filesystem::path( installedPackages.packages[ 0 ].configs[ 0 ].unresolvedCfgPath ),
+        std::filesystem::path( cfgPath ) );
+}
+
 TEST_F( TestPackageDiscovery, MultipleConfigurablesAreFound )
 {
     std::string path1 = "c:/test/one.xml";

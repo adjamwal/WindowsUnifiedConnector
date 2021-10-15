@@ -82,10 +82,10 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     else if( !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
     {
         verifiedTargetLocation = config.installLocation / config.cfgPath;
-        targetFolderIdPath = config.unresolvedCfgPath;
+        targetFolderIdPath = config.deployPath.empty() ? config.unresolvedCfgPath : config.unresolvedDeployPath;
         auto old_sha256 = m_sslUtil.CalculateSHA256( verifiedTargetLocation );
         m_eventBuilder.WithOldFile(
-            config.unresolvedDeployPath,
+            config.unresolvedCfgPath,
             old_sha256.has_value() ? old_sha256.value() : "",
             m_fileUtil.FileSize( verifiedTargetLocation ) );
     }

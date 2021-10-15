@@ -191,7 +191,8 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 configInfo.deployPath = discoveredFile;
                 configInfo.unresolvedDeployPath = std::filesystem::u8path( tempPath );
                 configInfo.cfgPath = "";
-                configInfo.unresolvedCfgPath = "";
+                // Provide the original config path as this is needs to be sent in the checkin
+                configInfo.unresolvedCfgPath = configurable.unresolvedCfgPath;
             }
             else
             {
