@@ -18,7 +18,6 @@ std::string CheckinFormatter::GetJson( PackageInventory& inventory )
 
     root[ "arch" ] = inventory.architecture;
     root[ "platform" ] = inventory.platform;
-    root[ "utc_offset_sec" ] = inventory.utc_offset_sec;
 
     if( inventory.packages.size() ) {
         Json::Value& packages = root[ "installed" ];

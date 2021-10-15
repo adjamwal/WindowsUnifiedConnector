@@ -130,8 +130,3 @@ bool WindowsUtilities::WinHttpGet( const std::string& url )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->WinHttpGet( url );
 }
-
-bool WindowsUtilities::GetTimeZoneOffset( int32_t& tzOffset )
-{
-    return MockWindowsUtilities::GetMockWindowUtilities()->GetTimeZoneOffset( tzOffset );
-}

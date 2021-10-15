@@ -47,7 +47,6 @@ public:
     static bool SetNamedUserAccessToPath( const std::filesystem::path& path, const std::wstring& userName, DWORD accessPermissions );
     static bool SetPathOwnership( const std::filesystem::path& path, WELL_KNOWN_SID_TYPE userOrGroupSid, TRUSTEE_TYPE trusteeType );
     static bool WinHttpGet( const std::string& url );
-    static bool GetTimeZoneOffset( int32_t& tzOffset );
 
 private:
     static std::string ResolveKnownFolderId( const std::string& knownFolderId, HANDLE userHandle );

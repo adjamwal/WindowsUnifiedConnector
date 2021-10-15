@@ -55,7 +55,6 @@ struct PackageInventory
     std::string architecture;
     std::string platform;
     std::vector<PmInstalledPackage> packages;
-    int32_t utc_offset_sec;
 };
 
 struct PmProductDiscoveryConfigurable
