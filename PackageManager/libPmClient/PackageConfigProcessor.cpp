@@ -68,31 +68,15 @@ bool PackageConfigProcessor::AddConfig( PackageConfigInfo& config )
     FileUtilHandle* handle = NULL;
 
     m_eventBuilder.WithType( CloudEventType::pkgreconfig );
-    if( !config.deployPath.empty() && m_fileUtil.FileExists( config.installLocation / config.deployPath ) )
-    {
-        verifiedTargetLocation = config.installLocation / config.deployPath;
-        targetFolderIdPath = config.unresolvedDeployPath;
-        auto old_sha256 = m_sslUtil.CalculateSHA256( verifiedTargetLocation );
-        m_eventBuilder.WithOldFile(
-            config.unresolvedDeployPath,
-            old_sha256.has_value() ? old_sha256.value() : "",
-            m_fileUtil.FileSize( verifiedTargetLocation ) );
-        m_eventBuilder.WithNewFile( config.unresolvedDeployPath, config.sha256, 0 );
-    }
-    else if( !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
+    if( !config.cfgPath.empty() && m_fileUtil.FileExists( config.installLocation / config.cfgPath ) )
     {
         verifiedTargetLocation = config.installLocation / config.cfgPath;
-        targetFolderIdPath = config.deployPath.empty() ? config.unresolvedCfgPath : config.unresolvedDeployPath;
+        targetFolderIdPath = config.unresolvedCfgPath;
         auto old_sha256 = m_sslUtil.CalculateSHA256( verifiedTargetLocation );
         m_eventBuilder.WithOldFile(
             config.unresolvedCfgPath,
             old_sha256.has_value() ? old_sha256.value() : "",
             m_fileUtil.FileSize( verifiedTargetLocation ) );
-    }
-    else if( !config.unresolvedDeployPath.empty() )
-    {
-        verifiedTargetLocation = config.installLocation / config.deployPath;
-        targetFolderIdPath = config.unresolvedDeployPath;
     }
     else
     {

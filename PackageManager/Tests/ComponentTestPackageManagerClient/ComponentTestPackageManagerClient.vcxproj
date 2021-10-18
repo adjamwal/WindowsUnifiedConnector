@@ -29,7 +29,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="ComponentTestPacManConfigsPath.cpp" />
-    <ClCompile Include="ComponentTestPacManConfigsDeployPath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libPmClient\libPmClient.vcxproj">
