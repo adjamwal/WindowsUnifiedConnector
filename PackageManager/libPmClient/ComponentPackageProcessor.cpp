@@ -238,8 +238,6 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
         }
 
         m_eventPublisher.Publish( m_eventBuilder );
-
-        rtn = true;
     }
 
     m_watchdog.Kick();

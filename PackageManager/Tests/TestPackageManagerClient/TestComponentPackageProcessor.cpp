@@ -273,6 +273,13 @@ TEST_F( TestComponentPackageProcessor, WillSendFailureEventIfProcessComponentPac
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
 }
 
+TEST_F( TestComponentPackageProcessor, ProcessPackageBinaryWillFailIfMissingBinary )
+{
+    SetupComponentPackageWithMissingBinary();
+
+    EXPECT_FALSE( m_patient->ProcessPackageBinary( m_expectedComponentPackage ) );
+}
+
 TEST_F( TestComponentPackageProcessor, DownloadPackageBinaryWillCacheDownloadError )
 {
     SetupComponentPackageWithMissingBinary();
