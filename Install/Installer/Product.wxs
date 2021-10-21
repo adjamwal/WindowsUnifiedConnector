@@ -44,6 +44,8 @@
         <Property Id="REMOVE_CSC_PLUGIN_DATA" Value="0" />
         <Property Id="COPY_CSC_PLUGIN_DATA" Value="0" />
       
+        <SetProperty Id="BS_CONFIG" Value="[%PASS_BS_CONFIG]" Before="FindRelatedProducts" >NOT BS_CONFIG</SetProperty>
+        
         <Binary Id="CustomActionsDll" SourceFile="$(var.SolutionDir)\Win32\$(var.Configuration)\InstallerCustomActions.dll" />
         <CustomAction Id="ExtractCaResources" BinaryKey="CustomActionsDll" DllEntry="ExtractCaResources" />
         <CustomAction Id="RemoveCaResources" BinaryKey="CustomActionsDll" DllEntry="RemoveCaResources" />
@@ -541,7 +543,7 @@
             <!-- Bootstrapper Config Management -->
             <Component Id="C.BootstrapperConfig" Guid="3D8A1726-FCE9-4E4A-BA9E-07F3CF732617">
                 <CopyFile Id="CF.BootstrapperConfig" SourceProperty="BS_CONFIG" DestinationDirectory="UC_CONFIG_DIRECTORY" DestinationName="$(var.BootstrapperConfigName)"/>
-                <Condition>BS_CONFIG</Condition>
+                <Condition>BS_CONFIG AND <![CDATA[BS_CONFIG <> ""]]></Condition>
             </Component>
 
             <Component Id="C.Remove.BootstrapperConfig" Guid="D37A0F1E-EF10-479F-B1EF-D48D29A20086">
