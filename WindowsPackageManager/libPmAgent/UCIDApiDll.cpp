@@ -14,6 +14,7 @@ UCIDApiDll::UCIDApiDll( ICodesignVerifier& codeSignVerifier )
     , m_getIdFunc( NULL )
     , m_getTokenFunc( NULL )
     , m_refreshTokenFunc( NULL )
+    , m_getUrlFunc( NULL )
     , m_loadedDllName()
     , m_isModuleLoaded( false )
 {

@@ -131,6 +131,7 @@ void PmManifest::AddConfigToPackage( Json::Value& configJson, PmComponent& packa
 {
     PackageConfigInfo config;
     config.deleteConfig = false;
+    config.isDiscoveredAtDeployPath = false;
 
     config.cfgPath = std::filesystem::u8path( 
         m_dependencies->ComponentManager().ResolvePath( 

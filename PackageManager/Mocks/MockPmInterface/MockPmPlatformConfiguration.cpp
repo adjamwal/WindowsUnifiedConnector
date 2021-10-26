@@ -6,7 +6,6 @@ MockPmPlatformConfiguration::MockPmPlatformConfiguration()
     MakeGetSslCertificatesReturn( int32_t() );
     MakeGetHttpUserAgentReturn( m_defaultUserAgent );
     MakeGetPmVersionReturn( "" );
-    MakeUpdateCertStoreForUrlReturn( "" );
 }
 
 MockPmPlatformConfiguration::~MockPmPlatformConfiguration()
