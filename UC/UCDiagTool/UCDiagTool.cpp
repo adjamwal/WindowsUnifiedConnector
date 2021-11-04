@@ -14,15 +14,15 @@
 #define TOAST_AUMI L"Cisco.CM"
 #define TOAST_TIMEOUT_MS ( 5 * 60 * 1000)
 
-void SendRebootToast()
+void SendToast( const std::wstring& toastMsg )
 {
     WLOG_DEBUG( L"ENTER" );
 
     CoInitialize( NULL );
-    CToastNotificationPlugin *toast = new CToastNotificationPlugin();
+    CToastNotificationPlugin* toast = new CToastNotificationPlugin();
 
     if( toast ) {
-        const wchar_t* msg[] = { L"Cisco Cloud Management Diagnostics", L"A Cisco software update requires a reboot to complete." };
+        const wchar_t* msg[] = { L"Cisco Cloud Management Diagnostics", toastMsg.c_str() };
         PluginResult res = toast->SendToastNotification( ToastImageAndText02,            //Toast template type
             TOAST_AUMI,   //AppUserModelID set by the installer ("Cisco.AnyConnect")
             L"",           //path to the icon
@@ -30,7 +30,7 @@ void SendRebootToast()
             2 );
 
         WLOG_DEBUG( L"SendToastNotification result %d", res );
-        
+
         Sleep( 1000 );
 
         delete toast;
@@ -41,6 +41,16 @@ void SendRebootToast()
 
     CoUninitialize();
     WLOG_DEBUG( L"Exit" );
+}
+
+void SendRebootToast()
+{
+    SendToast( L"A Cisco software update requires a reboot to complete." );
+}
+
+void SendElevationFailedToast()
+{
+    SendToast( L"Administrative privileges are required to run correctly. Please run again from an Administrator account or with UAC enabled" );
 }
 
 DWORD GetParentPID( DWORD pid )
@@ -154,6 +164,7 @@ void RunElevated( int argc, wchar_t** argv )
     }
     else if( parentName == argv[ 0 ]) {
         WLOG_ERROR( L"Parent process is %s. Elevation likely failed", argv[ 0 ] );
+        SendElevationFailedToast();
     }
     else {
         SHELLEXECUTEINFO shExInfo = { 0 };
