@@ -597,3 +597,88 @@ TEST_F( TestPackageDiscovery, ConfigurableDeployPathWillBeUnresolved )
     ASSERT_EQ( std::filesystem::path( installedPackages.packages[ 0 ].configs[ 0 ].unresolvedDeployPath ),
         std::filesystem::path( "<FOLDERID_ProgramData>/test/one.xml" ) );
 }
+
+TEST_F( TestPackageDiscovery, DiscoveryWillNotAddDuplicateConfigurable )
+{
+    std::string path1 = "C:/ProgramData/test/one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.cfgPath = path1;
+    configurable1.unresolvedCfgPath= "<FOLDERID_ProgramData>/test/one.xml";
+    productDiscoveryRules.configurables.push_back( configurable1 );
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillByDefault( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( installedPackages.packages.size(), 1 );
+    ASSERT_EQ( installedPackages.packages[ 0 ].configs.size(), 1 );
+}
+
+TEST_F( TestPackageDiscovery, DiscoveryWillNotAddDuplicateDeployPathConfigurable )
+{
+    std::string path1 = "C:/ProgramData/test/one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.deployPath = path1;
+    configurable1.unresolvedDeployPath = "<FOLDERID_ProgramData>/test/one.xml";
+    productDiscoveryRules.configurables.push_back( configurable1 );
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillByDefault( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( installedPackages.packages.size(), 1 );
+    ASSERT_EQ( installedPackages.packages[ 0 ].configs.size(), 1 );
+}
+
+TEST_F( TestPackageDiscovery, DiscoveryWillNotAddDuplicateMixedPathConfigurable )
+{
+    std::string path1 = "C:/ProgramData/test/one.xml";
+
+    PmProductDiscoveryRules productDiscoveryRules;
+    SetupMsiDiscovery( productDiscoveryRules );
+
+    PmProductDiscoveryConfigurable configurable1 = {};
+    configurable1.cfgPath = path1;
+    configurable1.unresolvedCfgPath = "<FOLDERID_ProgramData>/test/one.xml";
+    productDiscoveryRules.configurables.push_back( configurable1 );
+
+    PmProductDiscoveryConfigurable configurable2 = {};
+    configurable2.deployPath = configurable1.cfgPath;
+    configurable2.unresolvedDeployPath = configurable1.unresolvedCfgPath;
+    productDiscoveryRules.configurables.push_back( configurable2 );
+
+    m_catalogRules.push_back( productDiscoveryRules );
+
+    std::vector<std::filesystem::path> configs1;
+    configs1.push_back( std::filesystem::path( path1 ) );
+
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), FileSearchWithWildCard( _, _ ) )
+        .WillByDefault( DoAll( SetArgReferee<1>( configs1 ), Return( 0 ) ) );
+
+    PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
+
+    ASSERT_EQ( installedPackages.packages.size(), 1 );
+    ASSERT_EQ( installedPackages.packages[ 0 ].configs.size(), 1 );
+}

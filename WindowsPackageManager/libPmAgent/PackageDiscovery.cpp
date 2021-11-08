@@ -169,6 +169,7 @@ void PackageDiscovery::DiscoverPackageConfigurables(
         for( auto& discoveredFile : discoveredFiles )
         {
             PackageConfigInfo configInfo = {};
+            bool uniqueConfigurable = true;
 
             std::string tempPath = discoveredFile.generic_u8string();
             if( knownFolderId != "" )
@@ -196,7 +197,30 @@ void PackageDiscovery::DiscoverPackageConfigurables(
                 configInfo.unresolvedCfgPath = std::filesystem::u8path( tempPath );
             }
 
-            packageConfigs.push_back( configInfo );
+            for( auto& it : packageConfigs ) {
+                if( usingDeployPath && ( configInfo.deployPath == it.deployPath ) ) {
+                    uniqueConfigurable = false;
+                    break;
+                }
+                else if( !configInfo.cfgPath.empty() && ( configInfo.cfgPath == it.cfgPath ) ) {
+                    uniqueConfigurable = false;
+                    break;
+                } 
+                else if( usingDeployPath && ( configInfo.deployPath == it.cfgPath ) ) {
+                    WLOG_ERROR( L"Deploy path %s matches a previous config path. Bad cloud configuration", configInfo.deployPath.wstring().c_str() );
+                    uniqueConfigurable = false;
+                    break;
+                }
+                else if( !configInfo.cfgPath.empty() && ( configInfo.cfgPath == it.deployPath) ) {
+                    WLOG_ERROR( L"Deploy path %s matches a previous config path. Bad cloud configuration", configInfo.cfgPath.wstring().c_str() );
+                    uniqueConfigurable = false;
+                    break;
+                }
+            }
+            
+            if( uniqueConfigurable ) {
+                packageConfigs.push_back( configInfo );
+            }
         }
     }
 }
