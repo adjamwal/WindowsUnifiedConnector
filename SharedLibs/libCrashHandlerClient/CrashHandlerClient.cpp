@@ -3,9 +3,11 @@
 #include <thread>
 #include <memory>
 #include "IUcLogger.h"
+#include "WindowsUtilities.h"
 
-#define OOP_THREAD_TIMEOUT  60000
-#define CRASH_PIPE_NAME     L"\\\\.\\PIPE\\IMMUNET_CRASH"
+#define OOP_THREAD_TIMEOUT          60000
+#define IMN_REG_KEY                 L"SOFTWARE\\Immunet Protect"
+#define IMN_REG_PATH_CRASH_PIPE     L"crash_pipe"
 
 google_breakpad::ExceptionHandler* CrashHandlerClient::s_ExceptionHandler = NULL;
 std::mutex CrashHandlerClient::s_mutex;
@@ -59,17 +61,24 @@ void CrashHandlerClient::Init( LPCTSTR pDumpFile, MINIDUMP_TYPE dumpType )
     m_DumpType = ( int )dumpType != -1 ? dumpType : MiniDumpNormal;
 }
 
-google_breakpad::ExceptionHandler* CrashHandlerClient::SetupCrashHandlerInternal()
+google_breakpad::ExceptionHandler* CrashHandlerClient::SetupCrashHandlerInternal(const std::wstring& pipeName)
 {
-    return new google_breakpad::ExceptionHandler(
-        m_DumpDir,
-        NULL,
-        &MinidumpCompletedCallback,
-        this,
-        google_breakpad::ExceptionHandler::HANDLER_ALL,
-        m_DumpType,
-        CRASH_PIPE_NAME,
-        NULL );
+    try
+    {
+        return new google_breakpad::ExceptionHandler(
+            m_DumpDir,
+            NULL,
+            &MinidumpCompletedCallback,
+            this,
+            google_breakpad::ExceptionHandler::HANDLER_ALL,
+            m_DumpType,
+            pipeName.c_str(),
+            NULL );
+    }
+    catch( ... )
+    {
+        return NULL;
+    }
 }
 void HandleAborts( int signal_number )
 {
@@ -86,10 +95,17 @@ bool CrashHandlerClient::SetupCrashHandler()
         return FALSE;
     }
 
-    s_ExceptionHandler = SetupCrashHandlerInternal();
+    std::wstring pipeName(L"");
+    if( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, IMN_REG_KEY, IMN_REG_PATH_CRASH_PIPE, pipeName ) || !pipeName.length() )
+    {
+        WLOG_ERROR( L": CSCMS crash pipe name could not be read from AMP registry" );
+        return FALSE;
+    }
+
+    s_ExceptionHandler = SetupCrashHandlerInternal( pipeName );
     signal( SIGABRT, &HandleAborts );
 
-    if( !s_ExceptionHandler->IsOutOfProcess() ) {
+    if( !s_ExceptionHandler || !s_ExceptionHandler->IsOutOfProcess() ) {
         WLOG_ERROR( L": OOP Not created. Crashes will be handled locally" );
     }
     else {
@@ -111,7 +127,7 @@ void CrashHandlerClient::CrashHandled( const wchar_t* dump_path, const wchar_t* 
     std::lock_guard<std::mutex> guard( CrashHandlerClient::s_mutex );
     WLOG_ERROR( L": Crash Dump Created: %s %s", dump_path, minidump_id );
 
-    if( !s_ExceptionHandler->IsOutOfProcess() ) {
+    if( !s_ExceptionHandler || !s_ExceptionHandler->IsOutOfProcess() ) {
         WLOG_ERROR( L": Crash was not created OOP. Dump not updated" );
     }
 

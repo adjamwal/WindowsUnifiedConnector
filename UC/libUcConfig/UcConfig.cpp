@@ -10,7 +10,7 @@ UcConfig::UcConfig() :
     m_logLevel( ( uint32_t )DEFAULT_LOG_LEVEL )
     , m_fileModifyTime( 0 )
 {
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"Service", m_path ) )
+    if( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"Service", m_path ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management config path from registry" );
     }

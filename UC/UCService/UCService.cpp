@@ -39,7 +39,7 @@ void UCService::OnStart( _In_ DWORD dwArgc, _In_ PWSTR* pszArgv )
     WLOG_DEBUG( L"in OnStart" );
 
     std::wstring bsConfigFile;
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"Bootstrapper", bsConfigFile ) )
+    if ( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"Bootstrapper", bsConfigFile ) )
     {
         throw std::exception( "Failed to read bootstrapper config path from registry");
     }
@@ -103,7 +103,7 @@ void UCService::FixUcdtShortcut()
 {
     std::wstring shortcutPath;
 
-    if( WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_SERVICE, L"ucdt Shortcut", shortcutPath ) ) {
+    if( WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_SERVICE, L"ucdt Shortcut", shortcutPath ) ) {
 
         if( !shortcutPath.empty() ) {
             WLOG_DEBUG( L"Fixing ucdt shortcut" );

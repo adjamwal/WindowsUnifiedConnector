@@ -116,12 +116,12 @@ void MockWindowsUtilities::ExpectGetDirPathIsNotCalled()
 
 void MockWindowsUtilities::MakeReadRegistryStringReturn( bool value )
 {
-    ON_CALL( *this, ReadRegistryString( _, _, _, _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ReadRegistryStringW( _, _, _, _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockWindowsUtilities::ExpectReadRegistryStringIsNotCalled()
 {
-    EXPECT_CALL( *this, ReadRegistryString( _, _, _, _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ReadRegistryStringW( _, _, _, _ ) ).Times( 0 );
 }
 
 void MockWindowsUtilities::MakeReadRegistryStringAReturn( bool value )

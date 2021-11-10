@@ -115,7 +115,7 @@ void UCMCPLoader::LoadControlModule()
     }
 
     std::wstring dllFullPath;
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CMPM, L"DllPath", dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CMPM, L"DllPath", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read PackageManager Control Module data from registry" );
         return;
@@ -125,7 +125,7 @@ void UCMCPLoader::LoadControlModule()
 
     std::wstring pmConfigPath;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", pmConfigPath ) )
+    if ( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", pmConfigPath ) )
     {
         WLOG_ERROR( L"Failed to read config path from registry" );
         return;

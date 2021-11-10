@@ -21,7 +21,7 @@ public:
     static bool DirectoryExists(const WCHAR* dirname);
     static std::wstring GetExePath();
     static std::wstring GetDirPath(const std::wstring& path);
-    static bool ReadRegistryString(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data);
+    static bool ReadRegistryStringW(_In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data);
     static bool ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _In_ DWORD flags, _Out_ std::string& data );
     static bool Is64BitWindows();
     static bool GetSysDirectory( std::string& path );

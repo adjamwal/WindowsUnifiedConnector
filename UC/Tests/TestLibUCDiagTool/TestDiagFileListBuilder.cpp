@@ -34,7 +34,7 @@ TEST_F( TestDiagFileListBuilder, WillFindFilesFromConfigPath )
     expectedList.push_back( "ConfigPath1" );
     expectedList.push_back( "ConfigPath2" );
 
-    ON_CALL( *m_windowsUtils, ReadRegistryString( _, _, _, _ ) ).WillByDefault( DoAll( 
+    ON_CALL( *m_windowsUtils, ReadRegistryStringW( _, _, _, _ ) ).WillByDefault( DoAll( 
         SetArgReferee<3>( configPath ), 
         Return( true ) ) );
 

@@ -41,7 +41,7 @@ public:
     void MakeGetDirPathReturn( std::wstring value );
     void ExpectGetDirPathIsNotCalled();
 
-    MOCK_METHOD4( ReadRegistryString, bool( HKEY, const std::wstring&, const std::wstring&, std::wstring& ) );
+    MOCK_METHOD4( ReadRegistryStringW, bool( HKEY, const std::wstring&, const std::wstring&, std::wstring& ) );
     void MakeReadRegistryStringReturn( bool value );
     void ExpectReadRegistryStringIsNotCalled();
 
