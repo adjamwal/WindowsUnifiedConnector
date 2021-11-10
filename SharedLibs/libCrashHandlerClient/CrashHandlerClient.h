@@ -30,7 +30,7 @@ private:
     HANDLE m_hShutDown;
     CrashDumpWrittenCallback m_callback;
 
-    google_breakpad::ExceptionHandler* SetupCrashHandlerInternal();
+    google_breakpad::ExceptionHandler* SetupCrashHandlerInternal( const std::wstring& pipeName );
 
     void SetDumpFileName( const wchar_t* dump_path, const wchar_t* minidump_id );
 };

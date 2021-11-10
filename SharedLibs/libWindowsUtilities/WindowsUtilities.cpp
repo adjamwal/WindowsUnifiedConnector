@@ -233,7 +233,7 @@ std::wstring WindowsUtilities::GetDirPath( const std::wstring& path )
     return path.substr( 0, pos );
 }
 
-bool WindowsUtilities::ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data )
+bool WindowsUtilities::ReadRegistryStringW( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data )
 {
     DWORD dataSize {};
 
@@ -385,7 +385,7 @@ std::wstring WindowsUtilities::GetLogDir()
     PWSTR path = NULL;
     std::wstring logDir;
 
-    ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir );
+    ReadRegistryStringW( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir );
 
     return logDir;
 }

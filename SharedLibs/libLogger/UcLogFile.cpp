@@ -136,7 +136,7 @@ std::wstring UcLogFile::GetProgramDataFolder()
     return programData;
 }
 
-static bool ReadRegistryString( HKEY hKey, const std::wstring& subKey, const std::wstring& valueName, std::wstring& data )
+static bool ReadRegistryStringW( HKEY hKey, const std::wstring& subKey, const std::wstring& valueName, std::wstring& data )
 {
     DWORD dataSize{};
     LONG retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize );
@@ -164,7 +164,7 @@ std::wstring UcLogFile::GetLogDir()
     PWSTR path = NULL;
     std::wstring logDir;
 
-    if ( !ReadRegistryString( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
+    if ( !ReadRegistryStringW( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
         logDir = GetProgramDataFolder();
         logDir += UC_DEFAULT_LOG_PATH;
     }

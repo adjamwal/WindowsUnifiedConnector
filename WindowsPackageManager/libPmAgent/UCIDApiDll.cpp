@@ -251,7 +251,7 @@ bool UCIDApiDll::LoadApi()
 
     std::wstring dllFullPath;
 
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, CMID_API_DLL_KEY, L"ucidapi", dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, CMID_API_DLL_KEY, L"ucidapi", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management ID Api data from registry" );
         return false;

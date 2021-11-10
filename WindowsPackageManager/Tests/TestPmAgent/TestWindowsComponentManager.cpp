@@ -357,7 +357,7 @@ TEST_F( TestWindowsComponentManager, NotifySystemRestartWillImpersonateUser )
 
     sessionList.push_back( 0 );
 
-    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryString( _, _, _, _ ) ).WillByDefault( DoAll(
+    ON_CALL( *MockWindowsUtilities::GetMockWindowUtilities(), ReadRegistryStringW( _, _, _, _ ) ).WillByDefault( DoAll(
         SetArgReferee<3>( diagToolDir ),
         Return( true )
     ) );

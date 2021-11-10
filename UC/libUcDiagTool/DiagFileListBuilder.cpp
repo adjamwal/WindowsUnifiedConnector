@@ -24,7 +24,7 @@ void DiagFileListBuilder::GetFileList( std::vector<std::filesystem::path>& fileL
 
     fileList.clear();
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", configPath ) ) {
+    if ( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", configPath ) ) {
         WLOG_ERROR( L"Failed to read config path from registry" );
     }
     else {

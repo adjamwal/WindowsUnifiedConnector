@@ -127,13 +127,13 @@ void UCIDLoader::LoadControlModule()
         ucidControlPluginKey = WREG_CMID_X86;
     }
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CMID, L"Path", ucidDllDir ) )
+    if ( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CMID, L"Path", ucidDllDir ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management ID Control Module folder path from registry" );
         return;
     }
 
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, ucidControlPluginKey, L"ucidcontrolplugin", dllFullPath ) )
+    if( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, ucidControlPluginKey, L"ucidcontrolplugin", dllFullPath ) )
     {
         WLOG_ERROR( L"Failed to read Cloud Management ID Control Module dll path from registry" );
         return;
@@ -141,7 +141,7 @@ void UCIDLoader::LoadControlModule()
 
     std::wstring pmConfigPath;
 
-    if ( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", pmConfigPath ) )
+    if ( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_CONFIG, L"path", pmConfigPath ) )
     {
         WLOG_ERROR( L"Failed to read config path from registry" );
         return;

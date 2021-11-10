@@ -225,7 +225,7 @@ void WindowsComponentManager::NotifySystemRestart()
     std::wstring diagToolDir;
     std::vector<ULONG> sessionList;
 
-    if( !WindowsUtilities::ReadRegistryString( HKEY_LOCAL_MACHINE, WREG_CM_SERVICE, L"Path", diagToolDir ) || diagToolDir.empty() ) {
+    if( !WindowsUtilities::ReadRegistryStringW( HKEY_LOCAL_MACHINE, WREG_CM_SERVICE, L"Path", diagToolDir ) || diagToolDir.empty() ) {
         LOG_ERROR( "Failed to get diag tool path" );
         return;
     }

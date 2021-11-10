@@ -38,9 +38,9 @@ std::wstring WindowsUtilities::GetDirPath( const std::wstring& path )
     return MockWindowsUtilities::GetMockWindowUtilities()->GetDirPath( path );
 }
 
-bool WindowsUtilities::ReadRegistryString( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data )
+bool WindowsUtilities::ReadRegistryStringW( _In_ HKEY hKey, _In_ const std::wstring& subKey, _In_ const std::wstring& valueName, _Out_ std::wstring& data )
 {
-    return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryString( hKey, subKey, valueName, data );
+    return MockWindowsUtilities::GetMockWindowUtilities()->ReadRegistryStringW( hKey, subKey, valueName, data );
 }
 
 bool WindowsUtilities::ReadRegistryStringA( _In_ HKEY hKey, _In_ const std::string& subKey, _In_ const std::string& valueName, _In_ DWORD flags, _Out_ std::string& data )
