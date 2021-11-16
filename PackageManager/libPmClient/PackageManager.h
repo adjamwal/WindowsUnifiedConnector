@@ -81,6 +81,7 @@ private:
     std::string m_pmBootstrapFile;
 
     bool m_useShorterInterval = false;
+    bool m_initialUcUpgradeEventSent = false;
 
     IPmPlatformDependencies* m_dependencies;
 

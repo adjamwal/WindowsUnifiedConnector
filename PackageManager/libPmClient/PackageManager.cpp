@@ -95,13 +95,6 @@ int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrap
             LOG_DEBUG( "Failed to load Pm Bootstrap" );
         }
 
-        std::string token = m_ucidAdapter.GetAccessToken();
-        if( !token.empty() ) {
-            m_cloud.SetToken( token );
-            m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
-            m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
-        }
-
         m_watchdog.Start(
             std::bind( &PackageManager::PmWatchdogWait, this ),
             std::bind( &PackageManager::PmWatchdogFired, this )
@@ -210,6 +203,28 @@ void PackageManager::PmWorkflowThread()
         LOG_ERROR( "UpdateSslCerts failed: Unknown exception" );
         m_useShorterInterval = true;
         return;
+    }
+
+    try {
+        if ( !m_initialUcUpgradeEventSent )
+        {
+            std::string token = m_ucidAdapter.GetAccessToken();
+            if ( !token.empty() ) {
+                m_cloud.SetToken( token );
+                m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
+                m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
+
+                m_initialUcUpgradeEventSent = true;
+            }
+        }
+    }
+    catch ( std::exception& ex ) {
+        m_useShorterInterval = true;
+        LOG_ERROR( "Failed to send uc upgrade event: %s", ex.what() );
+    }
+    catch ( ... ) {
+        m_useShorterInterval = true;
+        LOG_ERROR( "Failed to send uc upgrade event: Unknown exception" );
     }
 
     try {
