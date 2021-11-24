@@ -331,7 +331,12 @@ std::string CloudEventBuilder::Serialize()
             Json::Value oldfilearr;
             Json::Value oldfile;
             oldfile[ "path" ] = m_oldPath.generic_u8string();
-            oldfile[ "sha256" ] = m_oldHash;
+
+            if ( !m_oldHash.empty() )
+            {
+                oldfile[ "sha256" ] = m_oldHash;
+            }
+
             oldfile[ "size" ] = m_oldSize;
             oldfilearr[ 0 ] = oldfile;
             event[ "old" ] = oldfilearr;
@@ -342,7 +347,12 @@ std::string CloudEventBuilder::Serialize()
             Json::Value newfilearr;
             Json::Value newfile;
             newfile[ "path" ] = m_newPath.generic_u8string();
-            newfile[ "sha256" ] = m_newHash;
+
+            if ( !m_newHash.empty() )
+            {
+                newfile[ "sha256" ] = m_newHash;
+            }
+
             newfile[ "size" ] = m_newSize;
             newfilearr[ 0 ] = newfile;
             event[ "new" ] = newfilearr;
