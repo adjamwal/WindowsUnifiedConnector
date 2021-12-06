@@ -8,21 +8,20 @@ class IUcLogger
 {
 public:
     enum Severity {
-        LOG_EMERGENCY,
-        LOG_ALERT,
-        LOG_CRITICAL,
-        LOG_ERROR,
-        LOG_WARNING,
-        LOG_NOTICE,
-        LOG_INFO,
-        LOG_DEBUG
+        LOG_ALERT = 1,
+        LOG_CRITICAL = 2,
+        LOG_ERROR = 3,
+        LOG_WARNING = 4,
+        LOG_NOTICE = 5,
+        LOG_INFO = 6,
+        LOG_DEBUG = 7
     };
 
     virtual ~IUcLogger() {}
-    virtual void Log( Severity serverity, const char* msgFormatter, ... ) = 0;
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, ... ) = 0;
-    virtual void Log( Severity serverity, const char* msgFormatter, va_list args ) = 0;
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) = 0;
+    virtual void Log( Severity severity, const char* msgFormatter, ... ) = 0;
+    virtual void Log( Severity severity, const wchar_t* msgFormatter, ... ) = 0;
+    virtual void Log( Severity severity, const char* msgFormatter, va_list args ) = 0;
+    virtual void Log( Severity severity, const wchar_t* msgFormatter, va_list args ) = 0;
 
     virtual void SetLogLevel( Severity severity ) = 0;
 };
@@ -31,9 +30,6 @@ IUcLogger* GetUcLogger();
 void SetUcLogger( IUcLogger* logger );
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-
-#define LOG_EMERGENCY( fmt, ... ) GetUcLogger()->Log( IUcLogger::LOG_EMERGENCY, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
-#define WLOG_EMERGENCY( fmt, ... ) GetUcLogger()->Log( IUcLogger::LOG_EMERGENCY, "%hs:%hs:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
 
 #define LOG_ALERT( fmt, ... ) GetUcLogger()->Log( IUcLogger::LOG_ALERT, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
 #define WLOG_ALERT( fmt, ... ) GetUcLogger()->Log( IUcLogger::LOG_ALERT, "%hs:%hs:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )

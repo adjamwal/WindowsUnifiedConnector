@@ -16,7 +16,7 @@ MsiLogger::~MsiLogger()
 
 void MsiLogger::SetLogLevel( Severity logLevel )
 {
-    if ( ( logLevel >= LOG_EMERGENCY ) && ( logLevel <= LOG_DEBUG ) ) {
+    if ( ( logLevel >= LOG_ALERT ) && ( logLevel <= LOG_DEBUG ) ) {
         if ( m_logLevel != logLevel ) {
             m_logLevel = logLevel;
             Log( m_logLevel, "Set Debug Level to %d", m_logLevel );
@@ -27,32 +27,32 @@ void MsiLogger::SetLogLevel( Severity logLevel )
     }
 }
 
-void MsiLogger::Log( Severity serverity, const char* msgFormatter, ... )
+void MsiLogger::Log( Severity severity, const char* msgFormatter, ... )
 {
     va_list  args;
     va_start( args, msgFormatter );
 
-    Log( serverity, msgFormatter, args );
+    Log( severity, msgFormatter, args );
 
     va_end( args );
 }
 
-void MsiLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
+void MsiLogger::Log( Severity severity, const wchar_t* msgFormatter, ... )
 {
     va_list  args;
     va_start( args, msgFormatter );
 
-    Log( serverity, msgFormatter, args );
+    Log( severity, msgFormatter, args );
 
     va_end( args );
 }
 
-void MsiLogger::Log( Severity serverity, const char* msgFormatter, va_list args )
+void MsiLogger::Log( Severity severity, const char* msgFormatter, va_list args )
 {
-    if ( serverity <= LOG_ERROR ) {
-        LogWithError( serverity, msgFormatter, args );
+    if ( severity <= LOG_ERROR ) {
+        LogWithError( severity, msgFormatter, args );
     }
-    else if ( serverity <= m_logLevel ) {
+    else if ( severity <= m_logLevel ) {
         size_t length = _vscprintf( msgFormatter, args ) + 1;   // vsnprintf returns 1 character less???
         char* logLine = ( char* )calloc( 1, length + 1 );
 
@@ -74,12 +74,12 @@ void MsiLogger::Log( Severity serverity, const char* msgFormatter, va_list args 
     }
 }
 
-void MsiLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
+void MsiLogger::Log( Severity severity, const wchar_t* msgFormatter, va_list args )
 {
-    if ( serverity <= LOG_ERROR ) {
-        LogWithError( serverity, msgFormatter, args );
+    if ( severity <= LOG_ERROR ) {
+        LogWithError( severity, msgFormatter, args );
     }
-    else if ( serverity <= m_logLevel ) {
+    else if ( severity <= m_logLevel ) {
         size_t length = _vscwprintf( msgFormatter, args ) + 1;   // vsnprintf returns 1 character less???
         wchar_t* logLine = ( wchar_t* )calloc( 1, ( sizeof( wchar_t ) * ( length + 1 ) ) );
 

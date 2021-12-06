@@ -15,10 +15,10 @@ public:
     ~DefaultUCLogger();
 
 
-    virtual void Log( Severity serverity, const char* msgFormatter, ... ) override;
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, ... ) override;
-    virtual void Log( Severity serverity, const char* msgFormatter, va_list args ) override;
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) override;
+    virtual void Log( Severity severity, const char* msgFormatter, ... ) override;
+    virtual void Log( Severity severity, const wchar_t* msgFormatter, ... ) override;
+    virtual void Log( Severity severity, const char* msgFormatter, va_list args ) override;
+    virtual void Log( Severity severity, const wchar_t* msgFormatter, va_list args ) override;
 
     virtual void SetLogLevel( Severity severity ) override;
 };
@@ -59,7 +59,7 @@ static void printTime()
 
 #endif
 
-void DefaultUCLogger::Log( Severity serverity, const char* msgFormatter, ... )
+void DefaultUCLogger::Log( Severity severity, const char* msgFormatter, ... )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -75,7 +75,7 @@ void DefaultUCLogger::Log( Severity serverity, const char* msgFormatter, ... )
 #endif
 }
 
-void DefaultUCLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
+void DefaultUCLogger::Log( Severity severity, const wchar_t* msgFormatter, ... )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -91,7 +91,7 @@ void DefaultUCLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... 
 #endif
 }
 
-void DefaultUCLogger::Log( Severity serverity, const char* msgFormatter, va_list args )
+void DefaultUCLogger::Log( Severity severity, const char* msgFormatter, va_list args )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -103,7 +103,7 @@ void DefaultUCLogger::Log( Severity serverity, const char* msgFormatter, va_list
 #endif
 }
 
-void DefaultUCLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
+void DefaultUCLogger::Log( Severity severity, const wchar_t* msgFormatter, va_list args )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );

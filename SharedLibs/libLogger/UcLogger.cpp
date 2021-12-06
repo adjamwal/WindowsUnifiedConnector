@@ -18,7 +18,7 @@ UcLogger::~UcLogger()
 
 void UcLogger::SetLogLevel( Severity logLevel )
 {
-    if( ( logLevel >= LOG_EMERGENCY ) && ( logLevel <= LOG_DEBUG ) ) {
+    if( ( logLevel >= LOG_ALERT ) && ( logLevel <= LOG_DEBUG ) ) {
         if( m_logLevel != logLevel ) {
             m_logLevel = logLevel;
             Log( m_logLevel, "Set Debug Level to %d", m_logLevel );
@@ -29,66 +29,66 @@ void UcLogger::SetLogLevel( Severity logLevel )
     }
 }
 
-void UcLogger::Log( Severity serverity, const char* msgFormatter, ... )
+void UcLogger::Log( Severity severity, const char* msgFormatter, ... )
 {
     va_list  args;
     va_start( args, msgFormatter );
 
-    Log( serverity, msgFormatter, args );
+    Log( severity, msgFormatter, args );
 
     va_end( args );
 }
 
-void UcLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
+void UcLogger::Log( Severity severity, const wchar_t* msgFormatter, ... )
 {
     va_list  args;
     va_start( args, msgFormatter );
 
-    Log( serverity, msgFormatter, args );
+    Log( severity, msgFormatter, args );
 
     va_end( args );
 }
 
-void UcLogger::Log( Severity serverity, const char* msgFormatter, va_list args )
+void UcLogger::Log( Severity severity, const char* msgFormatter, va_list args )
 {
-    if( serverity <= LOG_ERROR ) {
-        LogWithError( serverity, msgFormatter, args );
+    if( severity <= LOG_ERROR ) {
+        LogWithError( severity, msgFormatter, args );
     }
-    else if( serverity <= m_logLevel ) {
+    else if( severity <= m_logLevel ) {
         size_t length = _vscprintf( msgFormatter, args ) + 1;   // vsnprintf returns 1 character less???
         char* logLine = ( char* )calloc( 1, length + 1 );
 
         if( logLine ) {
             vsnprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
 
-            m_logFile.WriteLogLine( LogLevelStr( serverity ), logLine );
+            m_logFile.WriteLogLine( LogLevelStr( severity ), logLine );
 
             free( logLine );
         }
         else {
-            m_logFile.WriteLogLine( LogLevelStr( serverity ), __FUNCTION__ ": calloc failed" );
+            m_logFile.WriteLogLine( LogLevelStr( severity ), __FUNCTION__ ": calloc failed" );
         }
     }
 }
 
-void UcLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
+void UcLogger::Log( Severity severity, const wchar_t* msgFormatter, va_list args )
 {
-    if( serverity <= LOG_ERROR ) {
-        LogWithError( serverity, msgFormatter, args );
+    if( severity <= LOG_ERROR ) {
+        LogWithError( severity, msgFormatter, args );
     }
-    else if( serverity <= m_logLevel ) {
+    else if( severity <= m_logLevel ) {
         size_t length = _vscwprintf( msgFormatter, args ) + 1;   // vsnprintf returns 1 character less???
         wchar_t* logLine = ( wchar_t* )calloc( 1, ( sizeof( wchar_t ) * ( length + 1 ) ) );
 
         if( logLine ) {
             _vsnwprintf_s( logLine, length, _TRUNCATE, msgFormatter, args );
 
-            m_logFile.WriteLogLine( LogLevelStrW( serverity ), logLine );
+            m_logFile.WriteLogLine( LogLevelStrW( severity ), logLine );
 
             free( logLine );
         }
         else {
-            m_logFile.WriteLogLine( LogLevelStr( serverity ), __FUNCTION__ ": calloc failed" );
+            m_logFile.WriteLogLine( LogLevelStr( severity ), __FUNCTION__ ": calloc failed" );
         }
     }
 }
@@ -184,9 +184,6 @@ const char* UcLogger::LogLevelStr( Severity level )
     const char* levelStr = "";
 
     switch( level ) {
-    case LOG_EMERGENCY:
-        levelStr = "EMERGENCY";
-        break;
     case LOG_ALERT:
         levelStr = "ALERT";
         break;
@@ -198,6 +195,9 @@ const char* UcLogger::LogLevelStr( Severity level )
         break;
     case LOG_WARNING:
         levelStr = "WARNING";
+        break;
+    case LOG_NOTICE:
+        levelStr = "NOTICE";
         break;
     case LOG_INFO:
         levelStr = "INFO";
@@ -217,9 +217,6 @@ const wchar_t* UcLogger::LogLevelStrW( Severity level )
     const wchar_t* levelStr = L"";
 
     switch( level ) {
-    case LOG_EMERGENCY:
-        levelStr = L"EMERGENCY";
-        break;
     case LOG_ALERT:
         levelStr = L"ALERT";
         break;
@@ -231,6 +228,9 @@ const wchar_t* UcLogger::LogLevelStrW( Severity level )
         break;
     case LOG_WARNING:
         levelStr = L"WARNING";
+        break;
+    case LOG_NOTICE:
+        levelStr = L"NOTICE";
         break;
     case LOG_INFO:
         levelStr = L"INFO";

@@ -95,14 +95,14 @@ cmid_result_t UCIDApiDll::GetUrl( cmid_url_type_t urlType, std::string& url )
     char* tmpUrl = ( char* )malloc( urlSize );
 
     if( !tmpUrl ) {
-        LOG_EMERGENCY( "Failed to allocate %d bytes", urlSize );
+        LOG_CRITICAL( "Failed to allocate %d bytes", urlSize );
     }
     else {
         result = m_getUrlFunc( urlType, tmpUrl, &urlSize );
         if( result == CMID_RES_INSUFFICIENT_LEN ) {
             tmpUrl = ( char* )realloc( tmpUrl, urlSize );
             if( !tmpUrl ) {
-                LOG_EMERGENCY( "Failed to allocate %d bytes", urlSize );
+                LOG_CRITICAL( "Failed to allocate %d bytes", urlSize );
             }
             else {
                 result = m_getUrlFunc( urlType, tmpUrl, &urlSize );
