@@ -7,9 +7,6 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 
-#define LOG_EMERGENCY( fmt, ... ) GetPMLogger()->Log( IPMLogger::LOG_EMERGENCY, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
-#define WLOG_EMERGENCY( fmt, ... ) GetPMLogger()->Log( IPMLogger::LOG_EMERGENCY, "%hs:%hs:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
-
 #define LOG_ALERT( fmt, ... ) GetPMLogger()->Log( IPMLogger::LOG_ALERT, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
 #define WLOG_ALERT( fmt, ... ) GetPMLogger()->Log( IPMLogger::LOG_ALERT, "%hs:%hs:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, __VA_ARGS__ )
 

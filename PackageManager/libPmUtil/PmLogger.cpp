@@ -9,12 +9,12 @@ public:
     ~DefaultPMLogger();
 
 
-    virtual void Log( Severity serverity, const char* msgFormatter, ... ) override;
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, ... ) override;
-    virtual void Log( Severity serverity, const char* msgFormatter, va_list args ) override;
-    virtual void Log( Severity serverity, const wchar_t* msgFormatter, va_list args ) override;
+    virtual void Log( Severity severity, const char* msgFormatter, ... ) override;
+    virtual void Log( Severity severity, const wchar_t* msgFormatter, ... ) override;
+    virtual void Log( Severity severity, const char* msgFormatter, va_list args ) override;
+    virtual void Log( Severity severity, const wchar_t* msgFormatter, va_list args ) override;
 
-    virtual void SetLogLevel( Severity serverity ) override;
+    virtual void SetLogLevel( Severity severity ) override;
 };
 
 static DefaultPMLogger defaultLogger;
@@ -41,7 +41,7 @@ static void printTime()
 }
 
 #endif
-void DefaultPMLogger::Log( Severity serverity, const char* msgFormatter, ... )
+void DefaultPMLogger::Log( Severity severity, const char* msgFormatter, ... )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -57,7 +57,7 @@ void DefaultPMLogger::Log( Severity serverity, const char* msgFormatter, ... )
 #endif
 }
 
-void DefaultPMLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... )
+void DefaultPMLogger::Log( Severity severity, const wchar_t* msgFormatter, ... )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -73,7 +73,7 @@ void DefaultPMLogger::Log( Severity serverity, const wchar_t* msgFormatter, ... 
 #endif
 }
 
-void DefaultPMLogger::Log( Severity serverity, const char* msgFormatter, va_list args )
+void DefaultPMLogger::Log( Severity severity, const char* msgFormatter, va_list args )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -85,7 +85,7 @@ void DefaultPMLogger::Log( Severity serverity, const char* msgFormatter, va_list
 #endif
 }
 
-void DefaultPMLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
+void DefaultPMLogger::Log( Severity severity, const wchar_t* msgFormatter, va_list args )
 {
 #ifdef _DEBUG
     std::lock_guard<std::mutex> lock( g_logMutex );
@@ -97,7 +97,7 @@ void DefaultPMLogger::Log( Severity serverity, const wchar_t* msgFormatter, va_l
 #endif
 }
 
-void DefaultPMLogger::SetLogLevel( Severity serverity )
+void DefaultPMLogger::SetLogLevel( Severity severity )
 {
 
 }

@@ -13,30 +13,30 @@ PmLogAdapter::~PmLogAdapter()
 
 }
 
-void PmLogAdapter::Log( Severity serverity, const char* msgFormatter, ... )
+void PmLogAdapter::Log( Severity severity, const char* msgFormatter, ... )
 {
     va_list args;
     va_start( args, msgFormatter );
-    GetUcLogger()->Log( ( IUcLogger::Severity )serverity, msgFormatter, args );
+    GetUcLogger()->Log( ( IUcLogger::Severity )severity, msgFormatter, args );
     va_end( args );
 }
 
-void PmLogAdapter::Log( Severity serverity, const wchar_t* msgFormatter, ... )
+void PmLogAdapter::Log( Severity severity, const wchar_t* msgFormatter, ... )
 {
     va_list args;
     va_start( args, msgFormatter );
-    GetUcLogger()->Log( ( IUcLogger::Severity )serverity, msgFormatter, args );
+    GetUcLogger()->Log( ( IUcLogger::Severity )severity, msgFormatter, args );
     va_end( args );
 }
 
-void PmLogAdapter::Log( Severity serverity, const char* msgFormatter, va_list args )
+void PmLogAdapter::Log( Severity severity, const char* msgFormatter, va_list args )
 {
-    GetUcLogger()->Log( ( IUcLogger::Severity )serverity, msgFormatter, args );
+    GetUcLogger()->Log( ( IUcLogger::Severity )severity, msgFormatter, args );
 }
 
-void PmLogAdapter::Log( Severity serverity, const wchar_t* msgFormatter, va_list args )
+void PmLogAdapter::Log( Severity severity, const wchar_t* msgFormatter, va_list args )
 {
-    GetUcLogger()->Log( ( IUcLogger::Severity )serverity, msgFormatter, args );
+    GetUcLogger()->Log( ( IUcLogger::Severity )severity, msgFormatter, args );
 }
 
 void PmLogAdapter::SetLogLevel( Severity severity )

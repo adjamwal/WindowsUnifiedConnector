@@ -160,3 +160,32 @@ TEST_F( TestCloudEventBuilder, EventJSONContainsNewFileForwardslash )
 
     ASSERT_TRUE( eventJson.find( "\"new\":[{\"path\":\"c:/path/test.file\",\"sha256\":\"newhash\",\"size\":123}]" ) != std::string::npos );
 }
+
+TEST_F( TestCloudEventBuilder, EventJSONShaIsNotSentWhenNewFileShaIsEmpty )
+{
+    m_eventBuilder.WithNewFile( "c:/path/test.file", "", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"new\":[{\"path\":\"c:/path/test.file\",\"size\":123}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, EventJSONShaIsNotSentWhenOldFileShaIsEmpty )
+{
+    m_eventBuilder.WithOldFile( "c:/path/test.file", "", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"old\":[{\"path\":\"c:/path/test.file\",\"size\":123}]" ) != std::string::npos );
+}
+
+TEST_F( TestCloudEventBuilder, EventJSONShaEmptyDeserializationSuccess )
+{
+    m_eventBuilder.WithOldFile( "c:/path/test.file", "", 123 );
+
+    std::string eventJson = m_eventBuilder.Build();
+    bool valid = CloudEventBuilder::Deserialize( m_restoredEvent, eventJson );
+
+    ASSERT_TRUE( valid );
+    ASSERT_EQ( m_eventBuilder, m_restoredEvent );
+}

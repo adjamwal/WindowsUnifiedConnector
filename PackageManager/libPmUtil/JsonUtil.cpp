@@ -30,3 +30,17 @@ bool JsonUtil::ExtractJsonString( Json::Value& root, const std::string& attribut
 
     return rtn;
 }
+
+bool JsonUtil::ExtractJsonStringOptional( Json::Value& root, const std::string& attribute, std::string& dest )
+{
+    bool rtn = true;
+
+    if ( root[ attribute ].isString() ) {
+        dest = root[ attribute ].asString();
+    }
+    else {
+        dest = "";
+    }
+
+    return rtn;
+}

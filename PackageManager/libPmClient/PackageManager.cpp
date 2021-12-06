@@ -310,10 +310,10 @@ std::chrono::milliseconds PackageManager::PmWatchdogWait()
 
 void PackageManager::PmWatchdogFired()
 {
-    LOG_EMERGENCY( "Triggering Crash" );
+    LOG_CRITICAL( "Triggering Crash" );
     int* x = NULL;
     int y = *x;
-    LOG_EMERGENCY( ": Y is %d", y );
+    LOG_CRITICAL( ": Y is %d", y );
 }
 
 void PackageManager::UpdateSslCerts()
