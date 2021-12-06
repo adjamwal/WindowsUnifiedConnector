@@ -221,7 +221,7 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
                     oldfile = oldfilearr[ 0 ];
 
                     isValid &= JsonUtil::ExtractJsonString( oldfile, "path", orig_oldPath );
-                    isValid &= JsonUtil::ExtractJsonString( oldfile, "sha256", orig_oldHash );
+                    isValid &= JsonUtil::ExtractJsonStringOptional( oldfile, "sha256", orig_oldHash );
                     isValid &= JsonUtil::ExtractJsonInt( oldfile, "size", orig_oldSize );
                 }
 
@@ -230,7 +230,7 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
                     newfile = newfilearr[ 0 ];
 
                     isValid &= JsonUtil::ExtractJsonString( newfile, "path", orig_newPath );
-                    isValid &= JsonUtil::ExtractJsonString( newfile, "sha256", orig_newHash );
+                    isValid &= JsonUtil::ExtractJsonStringOptional( newfile, "sha256", orig_newHash );
                     isValid &= JsonUtil::ExtractJsonInt( newfile, "size", orig_newSize );
                 }
             }
