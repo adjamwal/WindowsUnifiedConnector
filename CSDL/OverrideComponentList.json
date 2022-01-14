@@ -1,0 +1,24 @@
+{
+  "components":[
+    {
+	  "version_override": {
+        "name": "boost",
+        "supplier": "",
+        "release": "",
+        "current_version":null,
+        "override_version": "1.68.0"
+		},
+		"image_id": []
+    },
+	{
+	  "version_override": {
+        "name": "json-cpp",
+        "supplier": "",
+        "release": "",
+        "current_version":null,
+        "override_version": "1.9.3"
+		},
+		"image_id": []
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "image_id": "",
+  "image_sha1": "",
+  "name": "",
+  "append": "true",
+  "discovery_tool": "manual",
+  "components": [
+    {
+      "name": "ciscossl",
+      "supplier": "cisco",
+      "version": "1.1.1d.7.1.113",
+      "release": "",
+      "component_type": "Cisco Proprietary",
+      "license": []
+    },
+    {
+      "name": "breakpad",
+      "supplier": "google",
+      "version": "0.0.1",
+      "release": "",
+      "component_type": "Open Source",
+	  "license": ["Google notice"]
+    }
+  ]
+}

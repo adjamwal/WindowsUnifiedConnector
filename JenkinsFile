@@ -60,11 +60,15 @@ def SetupVersion( boolean upgrade ) {
       }
       ucMinor = 0
     }
-    else if (env.CHANGE_ID != null) {
-      ucMajor = 9
-      ucMinor = 0
+    else {
+      if (env.CHANGE_ID != null) {
+        ucMajor = 9
+        ucMinor = 0
+      }
+      
+      CORONA_REL_VER = "${ucMajor}.${ucMinor}.${ucPatch}"
     }
-
+    
     buildId = env.BUILD_ID
     contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(FILEVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'FILEVER\t\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
     contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(PRODUCTVER).+(\\d+,\\d+,\\d+,\\d+)', replace: 'PRODUCTVER\t' + ucMajor + ',' + ucMinor + ',' + ucPatch + ',' + buildId, matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'GlobalVersion.h') ])
@@ -77,6 +81,11 @@ def SetupVersion( boolean upgrade ) {
   }
 }
 
+def CoronaEnabled()
+{
+    return CORONA_UPLOAD == '1'
+}
+
 pipeline {
   agent none
   options {
@@ -86,6 +95,7 @@ pipeline {
   }
   parameters {
     choice(name: 'IMMUNET', choices: ['0', '1'], description: 'Create Immunet UC build')
+    choice(name: 'CORONA_UPLOAD', choices: ['0', '1'], description: 'Upload x64 msi to Corona for scanning')
   }
   environment {
     NOTIFICATION_RECIPIENTS = 'fireamp-dev-connector-win@cisco.com'
@@ -108,7 +118,17 @@ pipeline {
     CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
     WIN_AMP_OFFICIAL_BUILD = "${env.CHANGE_ID != null ? 0 : 1}"
     IMMUNET = "${params.IMMUNET}"
-
+    CLITE_CREDS = credentials('Corona-Lite')
+    COR_LITE_USER = "$CLITE_CREDS_USR"
+    COR_LITE_SECRET = "$CLITE_CREDS_PSW"
+    CORONA_CREDS = credentials('Corona-User')
+    CORONA_USER = "$CORONA_CREDS_USR"
+    CORONA_PASSWORD = "$CORONA_CREDS_PSW"
+    CORONA_CSDL_ID = "198676"
+    CORONA_PROD_ID = "8238"
+    CORONA_REL_VER = ""
+    CORONA_IMAGE_NAME = ""
+    
     UC_MAJOR = 1
     UC_MINOR = 0
     UC_PATCH = "${params.IMMUNET == '1' ? 0 : 1}"
@@ -272,6 +292,20 @@ pipeline {
             }
           }
         }
+        stage ('CLITE Upload') {
+          when {
+            expression { CoronaEnabled() }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+              CORONA_IMAGE_NAME = "${WORKSPACE}\\WindowsUnifiedConnector\\artifacts\\${UC_COMPANY}-UC-Installer-x64-${CORONA_REL_VER}.${BUILD_ID}.msi"
+              dir('WindowsUnifiedConnector\\CSDL') {
+                bat "python ${WORKSPACE}\\common\\common-windows-build\\tools\\corona\\JenkinCoronaAutomationUploadImage.py --image ${CORONA_IMAGE_NAME} --release ${CORONA_REL_VER} --enguid win_conn_jenkins.gen --secuid win_conn_jenkins.gen --csdl_id ${CORONA_CSDL_ID} --product_id ${CORONA_PROD_ID}"
+              }
+            }
+          }
+        }
         stage ('Publish') {
           when {
             not { changeRequest() }
@@ -414,6 +448,20 @@ pipeline {
                 bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat" && msbuild.exe WindowsUnifiedConnector.sln /p:Configuration=Release /p:Platform=x64 /t:clean'
 
                 coverityHelper.analyzeUnifiedConnector("${env.BRANCH_NAME}", "${env.WORKSPACE}\\WindowsUnifiedConnector", 1, 1)
+              }
+            }
+          }
+        }
+        stage ('Corona Manual Update') {
+          when {
+            expression { CoronaEnabled() }
+          }
+          steps {
+            script {
+              SetGithubPendingStatus()
+              CORONA_IMAGE_NAME = "${UC_COMPANY}-UC-Installer-x64-${CORONA_REL_VER}.${BUILD_ID}.msi"
+              dir('WindowsUnifiedConnector\\CSDL') {
+                bat "python ${WORKSPACE}\\common\\common-windows-build\\tools\\corona\\JenkinCoronaAutomationOverrideComponentVersion.py --image ${CORONA_IMAGE_NAME} --release ${CORONA_REL_VER} --product_id ${CORONA_PROD_ID} --newComponents AdditionComponentList.json --overrideComponents OverrideComponentList.json"
               }
             }
           }
