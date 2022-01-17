@@ -5,7 +5,9 @@
 #include "ProxyContainer.h"
 #include "IProxyDiscovery.h"
 #include "IProxyConsumer.h"
-#include "IUcLogger.h"
+#include "ConsoleLogger.h"
+
+static ConsoleLogger consoleLogger;
 
 void DisplayHelp()
 {
@@ -14,13 +16,13 @@ Usage:
 
 ProxyTestTool.exe [-a ] [-h] [-t <Test URL>] [-p <PAC file URL>]
 
-\t-a, --async: Performs proxy discovery asynchonously
+    -a, --async: Performs proxy discovery asynchonously
 
-\t-h, --help: Prints this menu
+    -h, --help: Prints this menu
 
-\t-p, --pacUrl: Location of the PAC file. Used for WINHTTP_AUTOPROXY_CONFIG_URL. QA URL - http://10.85.185.204:9001/lab_noauth.pac
+    -p, --pacUrl: Location of the PAC file. Used for WINHTTP_AUTOPROXY_CONFIG_URL. QA URL - http://10.85.185.204:9001/lab_noauth.pac
 
-\t-t, --testUrl: Used to find proxy within the PAC file
+    -t, --testUrl: Used to find proxy within the PAC file
 
 This tool excercises the proxy library. It can discovery 5 types of proxies:
 * System proxy set though netsh winhttp set proxy Address:port
@@ -78,6 +80,8 @@ private:
 
 int wmain( int argc, wchar_t* argv[], wchar_t* envp[] )
 {
+    SetUcLogger( &consoleLogger );
+
     ProxyContainer proxyContainer;
     IProxyDiscovery& proxyDiscovery = proxyContainer.GetProxyDiscovery();
     std::list<ProxyInfoModel> proxyList;
@@ -121,7 +125,7 @@ int wmain( int argc, wchar_t* argv[], wchar_t* envp[] )
     }
     else {
         proxyDiscovery.RegisterForProxyNotifications( &testProxyConsumer );
-        proxyDiscovery.StartProxyDiscovery( testUrl.c_str(), pacURL.c_str() );
+        proxyDiscovery.StartProxyDiscoveryAsync( testUrl.c_str(), pacURL.c_str() );
         testProxyConsumer.Wait();
         proxyDiscovery.UnregisterForProxyNotifications( &testProxyConsumer );
     }

@@ -370,3 +370,20 @@ TEST_F( TestPmHttp, SetCertWillSucceed )
 
     EXPECT_EQ( m_patient->SetCerts( certs, m_eResult ), true );
 }
+
+TEST_F( TestPmHttp, SetHttpProxyWillSucceed )
+{
+    std::string proxyuri = "proxyuri:8080";
+    std::string proxyuser = "proxyuser";
+    std::string proxypass = "proxypass";
+
+    std::string response;
+
+    InitPatient();
+    m_patient->SetHttpProxy( proxyuri, proxyuser, proxypass );
+
+    EXPECT_EQ( m_patient->HttpGet( "https://", response, m_eResult ), true );
+    EXPECT_TRUE( FindCurlOpt( CURLOPT_PROXY ) );
+    EXPECT_TRUE( FindCurlOpt( CURLOPT_PROXYUSERNAME ) );
+    EXPECT_TRUE( FindCurlOpt( CURLOPT_PROXYPASSWORD ) );
+}

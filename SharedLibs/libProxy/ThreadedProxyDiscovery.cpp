@@ -45,7 +45,7 @@ bool ThreadedProxyDiscovery::UnregisterForProxyNotifications( IProxyConsumer* ne
     return m_proxyDiscovery.UnregisterForProxyNotifications( newConsumer );
 }
 
-void ThreadedProxyDiscovery::StartProxyDiscovery( 
+void ThreadedProxyDiscovery::StartProxyDiscoveryAsync( 
     const LPCTSTR testURL,
     const LPCTSTR urlPAC )
 {
@@ -79,7 +79,7 @@ void ThreadedProxyDiscovery::DiscoveryThread(
     const LPCTSTR testURL,
     const LPCTSTR urlPAC )
 {
-    m_proxyDiscovery.StartProxyDiscovery( testURL, urlPAC );
+    m_proxyDiscovery.StartProxyDiscoveryAsync( testURL, urlPAC );
 
     std::unique_lock< std::mutex > lock( m_mutex );
     LOG_DEBUG( __FUNCTION__ ": exiting proxy discovery thread" );

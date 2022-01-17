@@ -10,6 +10,7 @@ public:
     virtual ~MockWinHttpWrapper();
 
     MOCK_METHOD1( WinHttpGetDefaultProxyConfiguration, BOOL( WINHTTP_PROXY_INFO* ) );
+    MOCK_METHOD1( WinHttpGetIEProxyConfigForCurrentUser, BOOL( WINHTTP_CURRENT_USER_IE_PROXY_CONFIG* ) );
     MOCK_METHOD5( WinHttpOpen, HINTERNET( LPCWSTR,
         DWORD,
         LPCWSTR,

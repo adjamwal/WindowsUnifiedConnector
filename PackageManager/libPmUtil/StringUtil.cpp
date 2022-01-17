@@ -53,7 +53,8 @@ std::wstring StringUtil::Str2WStr( const std::string& str )
 
 std::string StringUtil::WStr2Str( const std::wstring& wstr )
 {
-    std::string str( ( const char* )&wstr[ 0 ], sizeof( wchar_t ) / sizeof( char ) * wstr.size() );
+    std::string str( wstr.length(), 0 );
+    std::transform( wstr.begin(), wstr.end(), str.begin(), []( wchar_t c ) { return ( char )c; } );
     return str;
 }
 

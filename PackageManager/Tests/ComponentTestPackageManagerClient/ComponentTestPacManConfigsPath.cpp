@@ -51,7 +51,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillUpdatePackage )
 
     //this fails (matcher gets correct params but passes them wrongly to the == operator)
     //EXPECT_CALL( *m_eventPublisher, Publish( CloudEventBuilderMatch( m_eventBuilder.get() ) ) ).Times( 1 );
-    
+
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) ).Times( 1 );
 
     StartPacMan();
@@ -208,7 +208,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillDecodeConfig )
         {
             std::string strData( ( char* )data, dataLen );
             EXPECT_EQ( _decodedConfig, strData );
-                
+
             pass = true;
             m_cv.notify_one();
             return 0;
@@ -306,7 +306,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillMoveConfigWithoutVerification 
     m_mockSslUtil->MakeCalculateSHA256Return( "2927db35b1875ef3a426d05283609b2d95d429c091ee1a82f0671423a64d83a4" );
     m_mockFileUtil->MakeFileExistsReturn( true );
     m_mockPlatformComponentManager->ExpectDeployConfigurationIsNotCalled();
-    
+
     EXPECT_CALL( *m_mockFileUtil, Rename( _, _ ) ).WillOnce( Invoke(
         [this, &pass]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
         {
@@ -548,7 +548,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillUpdateMultiplePackageAndConfig
                         .WillOnce( Invoke(
                             [this, &configUpdated]( const std::filesystem::path& oldFilename, const std::filesystem::path& newName )
                             {
-                                EXPECT_EQ( std::filesystem::path(  "/install/location/p2_config2.json" ), newName );
+                                EXPECT_EQ( std::filesystem::path( "/install/location/p2_config2.json" ), newName );
                                 configUpdated++;
                                 m_cv.notify_one();
 
@@ -604,7 +604,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillUpdatePackageAndConfigCloudDat
     ON_CALL( *m_mockFileUtil, EraseFile( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( 0 ) );
 
     ON_CALL( *m_mockSslUtil, CalculateSHA256( PathContains( "InstallerDownloadLocation" ) ) ).WillByDefault( Return( "ec9b9dc8cb017a5e0096f79e429efa924cc1bfb61ca177c1c04625c1a9d054c3" ) );
-    
+
     EXPECT_CALL( *m_mockPlatformComponentManager, UpdateComponent( _, _ ) ).WillOnce( Invoke(
         [this, &packageUpdated]( const PmComponent& package, std::string& error )
         {
@@ -650,12 +650,12 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillSendDicoveryList )
 
     EXPECT_CALL( *m_mockPlatformComponentManager, GetInstalledPackages( _, _ ) )
         .WillOnce( Invoke(
-        [this, &pass]( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered )
-        {
-            pass = true;
-            m_cv.notify_one();
-            return 0;
-        } ) );
+            [this, &pass]( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered )
+            {
+                pass = true;
+                m_cv.notify_one();
+                return 0;
+            } ) );
 
     StartPacMan();
 
@@ -663,7 +663,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillSendDicoveryList )
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
     lock.unlock();
 
-//    std::this_thread::sleep_for( std::chrono::microseconds( 4000 ) );
+    //    std::this_thread::sleep_for( std::chrono::microseconds( 4000 ) );
 
     EXPECT_TRUE( pass );
 }
@@ -716,8 +716,8 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdog )
     bool pass = false;
     m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
 
-    EXPECT_CALL( *m_watchdog, Kick() ).Times(3).WillRepeatedly( Invoke(
-        [this, &pass]( )
+    EXPECT_CALL( *m_watchdog, Kick() ).Times( 3 ).WillRepeatedly( Invoke(
+        [this, &pass]()
         {
             pass = true;
             m_cv.notify_one();
@@ -739,7 +739,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdogOnNetworkError 
 
     m_mockPlatformConfiguration->MakeGetIdentityTokenReturn( false );
 
-    EXPECT_CALL( *m_watchdog, Kick() ).Times( 1 ).WillRepeatedly( Invoke(
+    EXPECT_CALL( *m_watchdog, Kick() ).WillRepeatedly( Invoke(
         [this, &pass]()
         {
             pass = true;
@@ -764,21 +764,22 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillUpdateCerts )
     SetupPacMacn();
     ON_CALL( *m_mockConfig, GetCloudCheckinIntervalMs() ).WillByDefault( Return( 1 ) );
     ON_CALL( *m_mockCloud, Get( _, _, _ ) ).WillByDefault( DoAll( SetArgReferee<2>( eResult ), Return( false ) ) );
-
-    EXPECT_CALL( *m_certsAdapter, ReloadCerts() ).WillOnce( Invoke(
+    ON_CALL( *m_certsAdapter, ReloadCerts() ).WillByDefault( Invoke(
         [this, &pass]() {
             ON_CALL( *m_mockConfig, GetCloudCheckinIntervalMs() ).WillByDefault( Return( 1000 ) );
             pass = true;
             m_cv.notify_one();
             return 0;
         } ) );
-    
+
+    EXPECT_CALL( *m_certsAdapter, ReloadCerts() ).Times( AtLeast( 1 ) );
+
     m_patient->Start( "ConfigFile", "BootstrapFile" );
-    
+
     std::unique_lock<std::mutex> lock( m_mutex );
     m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
     lock.unlock();
-    
+
     EXPECT_TRUE( pass );
 }
 

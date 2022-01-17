@@ -31,6 +31,12 @@
     <ClCompile Include="ComponentTestPacManConfigsPath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\SharedLibs\libProxy\libProxyMD.vcxproj">
+      <Project>{4459441c-588e-515a-be05-717727f5f5bf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\SharedLibs\MockProxy\MockProxy.vcxproj">
+      <Project>{873940b5-bf33-3648-4432-1873d4b7e65b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\libPmClient\libPmClient.vcxproj">
       <Project>{1f2019e6-7a09-434e-a790-b1e7d0a51f87}</Project>
     </ProjectReference>
@@ -130,7 +136,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libProxy;$(SolutionDir)SharedLibs\MockProxy;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,7 +154,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libProxy;$(SolutionDir)SharedLibs\MockProxy;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,7 +172,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libProxy;$(SolutionDir)SharedLibs\MockProxy;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -182,7 +188,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libProxy;$(SolutionDir)SharedLibs\MockProxy;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

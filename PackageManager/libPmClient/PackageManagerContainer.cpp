@@ -23,6 +23,9 @@
 #include "CloudEventPublisher.h"
 #include "UcUpgradeEventHandler.h"
 #include "CatalogJsonParser.h"
+#include "ProxyContainer.h"
+#include "IProxyDiscovery.h"
+#include "ProxyDiscoverySubscriber.h"
 
 #include "FileSysUtil.h"
 #include "SslUtil.h"
@@ -50,6 +53,9 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_ucidAdapter( new UcidAdapter() )
     , m_bootstrap( new PmBootstrap( *m_fileUtil ) )
     , m_config( new PmConfig( *m_fileUtil, *m_ucidAdapter ) )
+    , m_proxyContainer( new ProxyContainer() )
+    , m_proxyDiscoverySubscriber( new ProxyDiscoverySubscriber( *m_http ) )
+    , m_proxyDiscovery( &m_proxyContainer->GetProxyDiscovery() )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
     , m_packageInventoryProvider( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) )
@@ -96,7 +102,9 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_ucUpgradeEventHandler,
             *m_rebootHandler,
             *m_thread,
-            *m_watchdog ) )
+            *m_watchdog,
+            *m_proxyDiscoverySubscriber,
+            *m_proxyDiscovery ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );
 }

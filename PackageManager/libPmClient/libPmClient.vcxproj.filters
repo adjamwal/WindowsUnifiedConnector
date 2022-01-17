@@ -129,6 +129,9 @@
     <ClInclude Include="RebootHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProxyDiscoverySubscriber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CertsAdapter.cpp">
@@ -177,6 +180,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RebootHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyDiscoverySubscriber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

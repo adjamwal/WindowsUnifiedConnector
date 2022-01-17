@@ -5,6 +5,11 @@ BOOL WinHttpWrapper::WinHttpGetDefaultProxyConfiguration( WINHTTP_PROXY_INFO * p
     return ::WinHttpGetDefaultProxyConfiguration( pProxyInfo );
 }
 
+BOOL WinHttpWrapper::WinHttpGetIEProxyConfigForCurrentUser( WINHTTP_CURRENT_USER_IE_PROXY_CONFIG* pIeProxyInfo )
+{
+    return ::WinHttpGetIEProxyConfigForCurrentUser( pIeProxyInfo );
+}
+
 HINTERNET WinHttpWrapper::WinHttpOpen( LPCWSTR pszAgentW,
     DWORD dwAccessType,
     LPCWSTR pszProxyW,

@@ -63,7 +63,7 @@ bool ProxyDiscovery::UnregisterForProxyNotifications( IProxyConsumer* consumer )
     return bRtn;
 }
 
-void ProxyDiscovery::StartProxyDiscovery( 
+void ProxyDiscovery::StartProxyDiscoveryAsync( 
     const LPCTSTR testURL,
     const LPCTSTR urlPAC )
 {
@@ -73,7 +73,7 @@ void ProxyDiscovery::StartProxyDiscovery(
     m_Proxy->GetProxyInfo( &proxyList );
     m_proxyMutex.unlock();
 
-    LOG_DEBUG( __FUNCTION__ ": Discover %d proxies", proxyList.size() );
+    LOG_DEBUG( __FUNCTION__ ": Discovered %d proxies", proxyList.size() );
     NotifyConsumers( proxyList );
 }
 
@@ -85,7 +85,7 @@ void ProxyDiscovery::StartProxyDiscoverySync(
     std::unique_lock< std::mutex > lock( m_proxyMutex );
     m_Proxy->Init( testURL, urlPAC, m_shutdownCb );
     m_Proxy->GetProxyInfo( &proxyList );
-    LOG_DEBUG( __FUNCTION__ ": Discover %d proxies", proxyList.size() );
+    LOG_DEBUG( __FUNCTION__ ": Discovered %d proxies", proxyList.size() );
 }
 
 void ProxyDiscovery::NotifyConsumers( const PROXY_INFO_LIST& proxyList )

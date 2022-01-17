@@ -45,6 +45,7 @@ public:
     virtual bool Deinit() = 0;
     virtual bool SetToken( const std::string& token, PmHttpExtendedResult& eResult ) = 0;
     virtual bool SetCerts( const PmHttpCertList& cert, PmHttpExtendedResult& eResult ) = 0;
+    virtual void SetHttpProxy( const std::string& proxyUri, const std::string& proxyUserName, const std::string& proxyPassword ) = 0;
     virtual bool HttpGet( const std::string &url, std::string &responseContent, PmHttpExtendedResult& eResult ) = 0;
     virtual bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) = 0;
     virtual bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) = 0;

@@ -25,6 +25,9 @@
 #include "ICatalogJsonParser.h"
 #include "PmTypes.h"
 #include "IWatchdog.h"
+#include "IProxyDiscovery.h"
+#include "IProxyConsumer.h"
+#include "ProxyDiscoverySubscriber.h"
 #include <sstream>
 
 using namespace std;
@@ -45,8 +48,10 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     IUcUpgradeEventHandler& ucUpgradeEventHandler,
     IRebootHandler& rebootHandler,
     IWorkerThread& thread,
-    IWatchdog& watchdog ) :
-    m_bootstrap( bootstrap )
+    IWatchdog& watchdog,
+    IProxyConsumer& proxyDiscoverySubscriber,
+    IProxyDiscovery& proxyDiscovery ) 
+    : m_bootstrap( bootstrap )
     , m_config( config )
     , m_cloud( cloud )
     , m_installerCacheMgr( installerCacheMgr )
@@ -63,6 +68,8 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     , m_rebootHandler( rebootHandler )
     , m_thread( thread )
     , m_watchdog( watchdog )
+    , m_proxyDiscoverySubscriber( proxyDiscoverySubscriber )
+    , m_proxyDiscovery( proxyDiscovery )
     , m_dependencies( nullptr )
     , m_useShorterInterval( false )
 {
@@ -71,7 +78,7 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
 
 PackageManager::~PackageManager()
 {
-
+    
 }
 
 int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrapFile )
@@ -95,6 +102,8 @@ int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrap
             LOG_DEBUG( "Failed to load Pm Bootstrap" );
         }
 
+        m_proxyDiscovery.RegisterForProxyNotifications( &m_proxyDiscoverySubscriber );
+
         m_watchdog.Start(
             std::bind( &PackageManager::PmWatchdogWait, this ),
             std::bind( &PackageManager::PmWatchdogFired, this )
@@ -116,6 +125,7 @@ int32_t PackageManager::Stop()
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
 
+    m_proxyDiscovery.UnregisterForProxyNotifications( &m_proxyDiscoverySubscriber );
     m_watchdog.Stop();
 
     if( !m_thread.IsRunning() ) {
@@ -189,6 +199,7 @@ void PackageManager::PmWorkflowThread()
     PackageInventory inventory;
     bool isRebootRequired = false;
     std::vector<PmProductDiscoveryRules> productDiscoveryRules;
+    std::wstring proxyTestUrl, proxyPacURL;
 
     m_watchdog.Kick();
     try {
@@ -203,6 +214,16 @@ void PackageManager::PmWorkflowThread()
         LOG_ERROR( "UpdateSslCerts failed: Unknown exception" );
         m_useShorterInterval = true;
         return;
+    }
+
+    try {
+        m_proxyDiscovery.StartProxyDiscoveryAsync( proxyTestUrl.c_str(), proxyPacURL.c_str() );
+    }
+    catch( std::exception& ex ) {
+        LOG_ERROR( "Proxy discovery error: %s", ex.what() );
+    }
+    catch( ... ) {
+        LOG_ERROR( "Proxy discovery error: Unknown exception" );
     }
 
     try {

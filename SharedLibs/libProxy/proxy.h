@@ -21,4 +21,5 @@ protected:
 
     BOOL GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DWORD* options, PROXY_INFO_LIST& list );
     BOOL GetSystemProxyInfo( PROXY_INFO_LIST& list );
+    BOOL GetUserIEProxyInfo( PROXY_INFO_LIST& list );
 };

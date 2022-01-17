@@ -25,6 +25,9 @@ public:
     void MakeSetCertsReturn( bool retval, const PmHttpExtendedResult& eResult );
     void ExpectSetCertsIsNotCalled();
 
+    MOCK_METHOD3( SetHttpProxy, void( const std::string&, const std::string&, const std::string& ) );
+    void ExpectSetHttpProxyIsNotCalled();
+
     MOCK_METHOD3( HttpGet, bool( const std::string&, std::string&, PmHttpExtendedResult& ) );
     void MakeHttpGetReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult );
     void ExpectHttpGetIsNotCalled();

@@ -36,6 +36,8 @@
 #include "CustomPathMatchers.h"
 #include "MockWatchdog.h"
 #include "MockCertsAdapter.h"
+#include "MockProxyConsumer.h"
+#include "MockProxyDiscovery.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -104,6 +106,9 @@ protected:
             }
         ) );
 
+        m_proxyDiscoverySubscriber.reset( new NiceMock<MockProxyConsumer>() );
+        m_proxyDiscovery.reset( new NiceMock<MockProxyDiscovery>() );
+
         m_patient.reset( new PackageManager(
             *m_mockBootstrap,
             *m_mockConfig,
@@ -121,7 +126,9 @@ protected:
             *m_ucUpgradeEventHandler,
             *m_mockRebootHandler,
             *m_thread,
-            *m_watchdog ) );
+            *m_watchdog,
+            *m_proxyDiscoverySubscriber,
+            *m_proxyDiscovery ) );
     }
 
     void TearDown()
@@ -157,6 +164,8 @@ protected:
         m_mockConfig.reset();
         m_mockBootstrap.reset();
         m_mockFileUtil.reset();
+        m_proxyDiscoverySubscriber.reset();
+        m_proxyDiscovery.reset();
     }
 
     uint32_t GetCloudCheckinIntervalMs()
@@ -250,6 +259,8 @@ protected:
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
     std::unique_ptr<IPackageConfigProcessor> m_configProcesor;
+    std::unique_ptr<MockProxyConsumer> m_proxyDiscoverySubscriber;
+    std::unique_ptr<MockProxyDiscovery> m_proxyDiscovery;
 
     std::unique_ptr<IPackageManager> m_patient;
 };

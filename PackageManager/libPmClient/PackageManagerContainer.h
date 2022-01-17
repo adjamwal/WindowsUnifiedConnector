@@ -30,6 +30,9 @@ class IInstallerCacheManager;
 class IRebootHandler;
 class IUtf8PathVerifier;
 class IWatchdog;
+class ProxyContainer;
+class IProxyDiscovery;
+class IProxyConsumer;
 
 class PackageManagerContainer
 {
@@ -49,6 +52,9 @@ private:
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<IPmBootstrap> m_bootstrap;
     std::unique_ptr<IPmConfig> m_config;
+    std::unique_ptr<ProxyContainer> m_proxyContainer;
+    std::unique_ptr<IProxyConsumer> m_proxyDiscoverySubscriber;
+    std::unique_ptr<IProxyDiscovery> m_proxyDiscovery;
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;

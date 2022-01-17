@@ -61,6 +61,11 @@ void MockPmHttp::ExpectSetCertsIsNotCalled()
     EXPECT_CALL( *this, SetCerts( _, _ ) ).Times( 0 );
 }
 
+void MockPmHttp::ExpectSetHttpProxyIsNotCalled()
+{
+    EXPECT_CALL( *this, SetHttpProxy( _, _, _ ) ).Times( 0 );
+}
+
 void MockPmHttp::MakeHttpGetReturn( bool retval, const std::string& responseContent, const PmHttpExtendedResult& eResult )
 {
     ON_CALL( *this, HttpGet( _, _, _ ) ).WillByDefault( DoAll(

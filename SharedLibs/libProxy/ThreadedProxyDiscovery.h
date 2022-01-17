@@ -13,7 +13,7 @@ public:
     virtual bool RegisterForProxyNotifications( IProxyConsumer* newConsumer ) override;
     virtual bool UnregisterForProxyNotifications( IProxyConsumer* newConsumer ) override;
 
-    virtual void StartProxyDiscovery( 
+    virtual void StartProxyDiscoveryAsync( 
         const LPCTSTR testURL,
         const LPCTSTR urlPAC ) override;
     virtual void StartProxyDiscoverySync(

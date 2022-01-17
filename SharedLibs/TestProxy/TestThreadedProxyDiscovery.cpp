@@ -82,39 +82,39 @@ TEST_F( TestThreadedProxyDiscovery, WillNotStartTwoProxyDiscoveryThread )
 {
     static bool exitThread = false;
     static bool attemptSecondDiscoveryStart = false;
-    ON_CALL( *m_proxyDiscovery, StartProxyDiscovery( _, _ ) ).WillByDefault( testing::Invoke( []( LPCTSTR a, LPCTSTR b )
+    ON_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( testing::Invoke( []( LPCTSTR a, LPCTSTR b )
         {
             attemptSecondDiscoveryStart = true;
             WaitUntilTrueOrTimeout( exitThread );
         } ) );
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
     WaitUntilTrueOrTimeout( attemptSecondDiscoveryStart );
 
-    EXPECT_CALL( *m_proxyDiscovery, StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() ) ).Times( 0 );
+    EXPECT_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() ) ).Times( 0 );
 
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
     exitThread = true;
 }
 
 TEST_F( TestThreadedProxyDiscovery, WillStartProxyDiscoveryAgainAfterFirstAttempt )
 {
-    EXPECT_CALL( *m_proxyDiscovery, StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() ) ).Times( 2 );
+    EXPECT_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() ) ).Times( 2 );
 
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
     Sleep( 100 );
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
 }
 
 TEST_F( TestThreadedProxyDiscovery, WillNotCrashWhenClassIsCleanedUpBeforeThreadExit )
 {
     static bool exitThread = false;
     static bool startClassCleanup = false;
-    ON_CALL( *m_proxyDiscovery, StartProxyDiscovery( _, _ ) ).WillByDefault( testing::Invoke( []( LPCTSTR a, LPCTSTR b )
+    ON_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( testing::Invoke( []( LPCTSTR a, LPCTSTR b )
         {
             startClassCleanup = true;
             WaitUntilTrueOrTimeout( exitThread, 100 );
         } ) );
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
     WaitUntilTrueOrTimeout( startClassCleanup );
 
     m_patient.reset();

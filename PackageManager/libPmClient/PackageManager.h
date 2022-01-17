@@ -5,6 +5,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <list>
 
 class IPmBootstrap;
 class IPmConfig;
@@ -23,6 +24,9 @@ class IUcUpgradeEventHandler;
 class IInstallerCacheManager;
 class IRebootHandler;
 class IWatchdog;
+class IProxyDiscovery;
+class IProxyConsumer;
+class ProxyInfoModel;
 
 struct PmComponent;
 struct PmEvent;
@@ -48,7 +52,9 @@ public:
         IUcUpgradeEventHandler& ucUpgradeEventHandler,
         IRebootHandler& rebootHandler,
         IWorkerThread& thread,
-        IWatchdog& watchdog );
+        IWatchdog& watchdog,
+        IProxyConsumer& proxyDiscoverySubscriber,
+        IProxyDiscovery& proxyDiscovery );
     virtual ~PackageManager();
 
     int32_t Start( const char* pmConfigFile, const char * pmBootstrapFile ) override;
@@ -75,6 +81,8 @@ private:
     IRebootHandler& m_rebootHandler;
     IWorkerThread& m_thread;
     IWatchdog& m_watchdog;
+    IProxyConsumer& m_proxyDiscoverySubscriber;
+    IProxyDiscovery& m_proxyDiscovery;
 
     std::mutex m_mutex;
     std::string m_pmConfigFile;

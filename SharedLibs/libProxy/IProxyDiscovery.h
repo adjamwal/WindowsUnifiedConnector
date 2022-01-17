@@ -19,7 +19,7 @@ public:
     virtual bool UnregisterForProxyNotifications(
         IProxyConsumer* newConsumer ) = 0;
 
-    virtual void StartProxyDiscovery(
+    virtual void StartProxyDiscoveryAsync(
         const LPCTSTR testURL,
         const LPCTSTR urlPAC ) = 0;
     virtual void StartProxyDiscoverySync( 

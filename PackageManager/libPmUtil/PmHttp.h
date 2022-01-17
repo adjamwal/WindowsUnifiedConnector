@@ -18,6 +18,7 @@ public:
     bool Deinit() override;
     bool SetToken( const std::string& token, PmHttpExtendedResult& eResult ) override;
     bool SetCerts( const PmHttpCertList& cert, PmHttpExtendedResult& eResult ) override;
+    void SetHttpProxy( const std::string& proxyUri, const std::string& proxyUserName, const std::string& proxyPassword ) override;
     bool HttpGet( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
     bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
     bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) override;
@@ -31,6 +32,9 @@ private:
     std::string m_token;
     struct curl_slist* m_headerList;
     PmHttpCertList m_certList;
+    std::string m_proxyuri;
+    std::string m_proxyuser;
+    std::string m_proxypass;
 
     struct WriteFileCtx {
         IFileSysUtil* fileUtil;

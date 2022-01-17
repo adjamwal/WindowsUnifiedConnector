@@ -117,6 +117,7 @@ PmHttp::PmHttp( IFileSysUtil& fileUtil ) :
     , m_userAgent( "DefaultPackageManager" )
     , m_headerList( nullptr )
     , m_certList( { 0 } )
+    , m_proxyuri(), m_proxyuser(), m_proxypass()
 {
 
 }
@@ -177,7 +178,7 @@ bool PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& 
 #endif
 #endif
     else if( callback ) {
-        
+
         if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_NOPROGRESS, 0 ) ) != CURLE_OK ) {
             LOG_ERROR( "CURLOPT_NOPROGRESS failed on function %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
         }
@@ -315,17 +316,26 @@ bool PmHttp::HttpGet( const std::string& url, std::string& responseContent, PmHt
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXY, m_proxyuri.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXY failed on proxyuri %s %d:%s", m_proxyuri.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYUSERNAME, m_proxyuser.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXYUSERNAME failed on proxyuser %s %d:%s", m_proxyuser.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYPASSWORD, m_proxypass.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXYPASSWORD set failed, %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        LOG_ERROR( "CURLOPT_PROTOCOLS failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_SSL_VERIFYPEER failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYHOST, 2 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYHOST, 2 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_SSL_VERIFYHOST failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_SSLVERSION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
@@ -376,23 +386,32 @@ bool PmHttp::HttpPost( const std::string& url, const void* data, size_t dataSize
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXY, m_proxyuri.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXY failed on proxyuri %s %d:%s", m_proxyuri.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYUSERNAME, m_proxyuser.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXYUSERNAME failed on proxyuser %s %d:%s", m_proxyuser.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYPASSWORD, m_proxypass.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXYPASSWORD set failed, %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        LOG_ERROR( "CURLOPT_PROTOCOLS failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDS, data ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        LOG_ERROR( "CURLOPT_POSTFIELDS failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDSIZE, dataSize ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        LOG_ERROR( "CURLOPT_POSTFIELDSIZEL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYHOST, 2 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYHOST, 2 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
@@ -450,17 +469,26 @@ bool PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& 
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_URL, url.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_URL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXY, m_proxyuri.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXY failed on proxyuri %s %d:%s", m_proxyuri.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYUSERNAME, m_proxyuser.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXYUSERNAME failed on proxyuser %s %d:%s", m_proxyuser.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYPASSWORD, m_proxypass.c_str() ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROXYPASSWORD set failed, %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+        LOG_ERROR( "CURLOPT_PROTOCOLS failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_SSL_VERIFYPEER failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYHOST, 2 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYHOST, 2 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_SSL_VERIFYHOST failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if ( (eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 )) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( (CURLcode)eResult.subErrorCode ) );
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_SSLVERSION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
@@ -482,3 +510,26 @@ bool PmHttp::IsSslPeerValidationError( PmHttpExtendedResult& eResult )
 {
     return eResult.subErrorType == "curl" && eResult.subErrorCode == CURLE_PEER_FAILED_VERIFICATION;
 }
+
+void PmHttp::SetHttpProxy( const std::string& proxyUri, const std::string& proxyUserName, const std::string& proxyPassword )
+{
+    std::lock_guard<std::mutex> lock( m_mutex );
+
+    m_proxyuri = proxyUri;
+    m_proxyuser = m_proxyuri.empty() ? "" : proxyUserName;
+    m_proxypass = m_proxyuri.empty() ? "" : proxyPassword;
+
+    if( m_proxyuri.empty() )
+    {
+        LOG_DEBUG( "Remove CURL proxy" );
+    }
+    else if( !m_proxyuser.empty() )
+    {
+        LOG_DEBUG( "Set CURL proxyUri: %s, user: %s", m_proxyuri.c_str(), m_proxyuser.c_str() );
+    }
+    else
+    {
+        LOG_DEBUG( "Set CURL proxyUri: %s", m_proxyuri.c_str() );
+    }
+}
+

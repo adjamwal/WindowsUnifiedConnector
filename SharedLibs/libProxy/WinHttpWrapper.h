@@ -9,6 +9,7 @@ public:
     virtual ~WinHttpWrapper() {}
 
     virtual BOOL WinHttpGetDefaultProxyConfiguration( WINHTTP_PROXY_INFO * pProxyInfo ) override;
+    virtual BOOL WinHttpGetIEProxyConfigForCurrentUser( WINHTTP_CURRENT_USER_IE_PROXY_CONFIG* pIeProxyInfo ) override;
     virtual HINTERNET WinHttpOpen( LPCWSTR pszAgentW,
         DWORD dwAccessType,
         LPCWSTR pszProxyW,

@@ -108,7 +108,7 @@ TEST_F( TestProxyDiscovery, WillGetProxyinfoInSequence )
     EXPECT_CALL( *m_proxy, Init( _, _, _ ) );
     EXPECT_CALL( *m_proxy, GetProxyInfo(_) );
 
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
 }
 
 TEST_F( TestProxyDiscovery, WillNotifyConsumerOfDiscoveredProxies )
@@ -122,7 +122,7 @@ TEST_F( TestProxyDiscovery, WillNotifyConsumerOfDiscoveredProxies )
 
     EXPECT_CALL( consumer, ProxiesDiscovered( proxies ) );
 
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
 }
 
 TEST_F( TestProxyDiscovery, WillNotifyConsumersOfProxiesWhenDoneDiscovery )
@@ -135,7 +135,7 @@ TEST_F( TestProxyDiscovery, WillNotifyConsumersOfProxiesWhenDoneDiscovery )
     EXPECT_CALL( consumer1, ProxiesDiscovered( _ ) );
     EXPECT_CALL( consumer2, ProxiesDiscovered( _ ) );
 
-    m_patient->StartProxyDiscovery( m_testUrl.c_str(), m_urlPAC.c_str() );
+    m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
 }
 
 TEST_F( TestProxyDiscovery, WillDiscoveryProxiesWithoutCallback )

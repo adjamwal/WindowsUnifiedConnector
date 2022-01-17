@@ -41,7 +41,7 @@ BOOL Proxy::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DWORD* pOptionPar
     WINHTTP_PROXY_INFO proxySettings;
     BOOL status = FALSE, b = FALSE;
 
-    if( !testURL ) {
+    if( !wcslen( testURL ) ) {
         LOG_ERROR( __FUNCTION__ " test URL is empty" );
         return FALSE;
     }
@@ -58,7 +58,7 @@ BOOL Proxy::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DWORD* pOptionPar
     b = m_winHttp.WinHttpGetProxyForUrl( hSession, testURL, options, &proxySettings );
     if( !b ) {
         WLOG_DEBUG( __FUNCTION__ L" unable to get proxy using WPAD/PAC file at url: %s, %d", options->lpszAutoConfigUrl, GetLastError() );
-        goto abort;
+        goto abortAuto;
     }
 
     WLOG_DEBUG( __FUNCTION__ L" %d, %s, %s ", proxySettings.dwAccessType, proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
@@ -73,7 +73,7 @@ BOOL Proxy::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DWORD* pOptionPar
         status = psp.ParseProxyString( proxySettings.lpszProxy, list, discoveryMode );
     }
 
-abort:
+abortAuto:
     m_winHttp.WinHttpCloseHandle( hSession );
 
     if( proxySettings.lpszProxy ) GlobalFree( proxySettings.lpszProxy );
@@ -83,28 +83,61 @@ abort:
 
 /*
 Retrieves settings directly from system wide settings "HKLM\SOFTWARE\MICROSOFT\Windows\CurrentVersion\Internet Settings\Connections\WinHttpSettings"
+Set proxy: netsh winhttp set proxy <ip>:<port>
+Reset proxy: netsh winhttp reset proxy
+https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/configure-proxy-internet?view=o365-worldwide#configure-the-proxy-server-manually-using-netsh-command
 */
-
 BOOL Proxy::GetSystemProxyInfo( PROXY_INFO_LIST& list )
 {
-    WINHTTP_PROXY_INFO proxySettings {0};
+    WINHTTP_PROXY_INFO proxySettings { 0 };
     BOOL status = FALSE, b = FALSE;
 
     b = m_winHttp.WinHttpGetDefaultProxyConfiguration( &proxySettings );
     if( !b ) {
         LOG_ERROR( __FUNCTION__ " unable to get proxy using registry\n", GetLastError() );
-        goto abort;
+        goto abortREG;
     }
 
     WLOG_DEBUG( __FUNCTION__ L" %d, %s, %s", proxySettings.dwAccessType, proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
-    if( proxySettings.dwAccessType == WINHTTP_ACCESS_TYPE_NO_PROXY ) goto abort;
+    if( proxySettings.dwAccessType == WINHTTP_ACCESS_TYPE_NO_PROXY ) goto abortREG;
 
     if( proxySettings.lpszProxy ) {
         ProxyStringParser psp;
         status = psp.ParseProxyString( proxySettings.lpszProxy, list, PROXY_INFO_REG );
     }
 
-abort:
+abortREG:
+    if( proxySettings.lpszProxy ) GlobalFree( proxySettings.lpszProxy );
+    if( proxySettings.lpszProxyBypass ) GlobalFree( proxySettings.lpszProxyBypass );
+    return status;
+}
+
+/*
+Retrieves proxy from IE settings for current user only
+*/
+BOOL Proxy::GetUserIEProxyInfo( PROXY_INFO_LIST& list )
+{
+    WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxySettings { 0 };
+    BOOL status = FALSE, b = FALSE;
+
+    b = m_winHttp.WinHttpGetIEProxyConfigForCurrentUser( &proxySettings );
+    if( !b ) {
+        LOG_ERROR( __FUNCTION__ " unable to get proxy from current user's IE settings\n", GetLastError() );
+        goto abortIE;
+    }
+
+    WLOG_DEBUG( __FUNCTION__ L" %d, %s, %s, %s", 
+        proxySettings.fAutoDetect, proxySettings.lpszAutoConfigUrl, 
+        proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
+    if( proxySettings.fAutoDetect || !wcslen( proxySettings.lpszProxy ) ) goto abortIE;
+
+    if( proxySettings.lpszProxy ) {
+        ProxyStringParser psp;
+        status = psp.ParseProxyString( proxySettings.lpszProxy, list, PROXY_INFO_IE );
+    }
+
+abortIE:
+    if( proxySettings.lpszAutoConfigUrl ) GlobalFree( proxySettings.lpszAutoConfigUrl );
     if( proxySettings.lpszProxy ) GlobalFree( proxySettings.lpszProxy );
     if( proxySettings.lpszProxyBypass ) GlobalFree( proxySettings.lpszProxyBypass );
     return status;
@@ -117,7 +150,8 @@ BOOL Proxy::Discovery( PROXY_INFO_SRC discoveryMode, LPCTSTR testURL, LPCTSTR ur
     WINHTTP_AUTOPROXY_OPTIONS options;
     memset( &options, 0, sizeof( options ) );
 
-    switch( discoveryMode ) {
+    switch( discoveryMode )
+    {
     case PROXY_INFO_NONE:
     {
         ProxyInfoModel proxy;
@@ -129,7 +163,9 @@ BOOL Proxy::Discovery( PROXY_INFO_SRC discoveryMode, LPCTSTR testURL, LPCTSTR ur
     }
     case PROXY_INFO_REG:
         status = GetSystemProxyInfo( list );
-
+        break;
+    case PROXY_INFO_IE:
+        status = GetUserIEProxyInfo( list );
         break;
     case PROXY_INFO_PAC:
         if( testURL && urlPAC ) {
@@ -172,6 +208,7 @@ int Proxy::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDiscoveryCb cancelC
 
     PROXY_INFO_SRC discoveryOrder[] = {
         PROXY_INFO_REG,
+        PROXY_INFO_IE,
         PROXY_INFO_PAC,
         PROXY_INFO_PAC_DHCP,
         PROXY_INFO_PAC_DNS,
@@ -181,7 +218,7 @@ int Proxy::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDiscoveryCb cancelC
     for( PROXY_INFO_SRC discMode : discoveryOrder ) {
         if( cancelCb && cancelCb() ) {
             abortDiscovery = true;
-            goto abort;
+            goto abortInit;
         }
 
         Discovery( discMode, testURL, urlPAC, m_proxyList );
@@ -190,7 +227,7 @@ int Proxy::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDiscoveryCb cancelC
     for( auto it = m_proxyList.begin(); it != m_proxyList.end(); it++ ) {
         if( cancelCb && cancelCb() ) {
             abortDiscovery = true;
-            goto abort;
+            goto abortInit;
         }
 
         if( it->GetProxyDiscoveryMode() != PROXY_INFO_NONE ) {
@@ -203,7 +240,7 @@ int Proxy::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDiscoveryCb cancelC
         }
     }
 
-abort:
+abortInit:
     if( abortDiscovery ) {
         m_proxyList.clear();
         ret = PROXY_INFO_NONE;
