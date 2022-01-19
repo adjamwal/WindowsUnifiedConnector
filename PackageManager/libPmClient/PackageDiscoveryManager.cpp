@@ -28,8 +28,7 @@ void PackageDiscoveryManager::Initialize( IPmPlatformDependencies* dep )
 std::vector<PmProductDiscoveryRules> PackageDiscoveryManager::PrepareCatalogDataset()
 {
     std::string catalogList = m_catalogListRetriever.GetCloudCatalog();
-    LOG_DEBUG( "Retrieved Catalog: %s", catalogList.c_str() );
-
+    
     std::vector<PmProductDiscoveryRules> catalogProductRules;
     m_catalogJsonParser.Parse( catalogList, catalogProductRules );
 
