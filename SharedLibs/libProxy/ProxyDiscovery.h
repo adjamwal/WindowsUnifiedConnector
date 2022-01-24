@@ -22,7 +22,11 @@ public:
     virtual void StartProxyDiscoveryAsync(
         const LPCTSTR testURL,
         const LPCTSTR urlPAC ) override;
-    virtual void StartProxyDiscoverySync( 
+    virtual void ProxyDiscoverAndNotifySync(
+        const LPCTSTR testURL,
+        const LPCTSTR urlPAC,
+        std::list<ProxyInfoModel>& proxyList ) override;
+    virtual void ProxyDiscoverySync( 
         const LPCTSTR testURL,
         const LPCTSTR urlPAC,
         PROXY_INFO_LIST& proxyList ) override;

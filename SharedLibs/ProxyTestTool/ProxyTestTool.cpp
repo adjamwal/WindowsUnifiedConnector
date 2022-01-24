@@ -120,7 +120,7 @@ int wmain( int argc, wchar_t* argv[], wchar_t* envp[] )
     }
 
     if( !async ) {
-        proxyDiscovery.StartProxyDiscoverySync( testUrl.c_str(), pacURL.c_str(), proxyList );
+        proxyDiscovery.ProxyDiscoverySync( testUrl.c_str(), pacURL.c_str(), proxyList );
         PrintProxies( proxyList );
     }
     else {

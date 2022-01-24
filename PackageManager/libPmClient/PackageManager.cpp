@@ -50,7 +50,7 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     IWorkerThread& thread,
     IWatchdog& watchdog,
     IProxyConsumer& proxyDiscoverySubscriber,
-    IProxyDiscovery& proxyDiscovery ) 
+    IProxyDiscovery& proxyDiscovery )
     : m_bootstrap( bootstrap )
     , m_config( config )
     , m_cloud( cloud )
@@ -78,7 +78,7 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
 
 PackageManager::~PackageManager()
 {
-    
+
 }
 
 int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrapFile )
@@ -103,6 +103,7 @@ int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrap
         }
 
         m_proxyDiscovery.RegisterForProxyNotifications( &m_proxyDiscoverySubscriber );
+        PmCheckForProxies( false );
 
         m_watchdog.Start(
             std::bind( &PackageManager::PmWatchdogWait, this ),
@@ -176,11 +177,11 @@ std::chrono::milliseconds PackageManager::PmThreadWait()
         LOG_DEBUG( "Failed to load modified Pm configuration" );
     }
 
-    if ( m_useShorterInterval )
+    if( m_useShorterInterval )
     {
         LOG_DEBUG( "Using NetworkFailureRetryInterval" );
         return std::chrono::milliseconds( m_config.GetNetworkFailureRetryInterval() );
-    } 
+    }
     else
     {
         LOG_DEBUG( "Using CloudCheckinIntervalMs" );
@@ -199,9 +200,10 @@ void PackageManager::PmWorkflowThread()
     PackageInventory inventory;
     bool isRebootRequired = false;
     std::vector<PmProductDiscoveryRules> productDiscoveryRules;
-    std::wstring proxyTestUrl, proxyPacURL;
 
     m_watchdog.Kick();
+    PmCheckForProxies( true );
+
     try {
         UpdateSslCerts();
     }
@@ -217,20 +219,10 @@ void PackageManager::PmWorkflowThread()
     }
 
     try {
-        m_proxyDiscovery.StartProxyDiscoveryAsync( proxyTestUrl.c_str(), proxyPacURL.c_str() );
-    }
-    catch( std::exception& ex ) {
-        LOG_ERROR( "Proxy discovery error: %s", ex.what() );
-    }
-    catch( ... ) {
-        LOG_ERROR( "Proxy discovery error: Unknown exception" );
-    }
-
-    try {
-        if ( !m_initialUcUpgradeEventSent )
+        if( !m_initialUcUpgradeEventSent )
         {
             std::string token = m_ucidAdapter.GetAccessToken();
-            if ( !token.empty() ) {
+            if( !token.empty() ) {
                 m_cloud.SetToken( token );
                 m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
                 m_ucUpgradeEventHandler.PublishUcUpgradeEvent();
@@ -239,11 +231,11 @@ void PackageManager::PmWorkflowThread()
             }
         }
     }
-    catch ( std::exception& ex ) {
+    catch( std::exception& ex ) {
         m_useShorterInterval = true;
         LOG_ERROR( "Failed to send uc upgrade event: %s", ex.what() );
     }
-    catch ( ... ) {
+    catch( ... ) {
         m_useShorterInterval = true;
         LOG_ERROR( "Failed to send uc upgrade event: Unknown exception" );
     }
@@ -258,7 +250,7 @@ void PackageManager::PmWorkflowThread()
         m_useShorterInterval = true;
         return;
     }
-    catch ( ... ) {
+    catch( ... ) {
         LOG_ERROR( "PackageDiscovery failed: Unknown exception" );
         m_useShorterInterval = true;
         return;
@@ -287,7 +279,7 @@ void PackageManager::PmWorkflowThread()
         m_useShorterInterval = true;
         LOG_ERROR( "Checkin failed: %s", ex.what() );
     }
-    catch ( ... ) {
+    catch( ... ) {
         m_useShorterInterval = true;
         LOG_ERROR( "Checkin failed: Unknown exception" );
     }
@@ -301,11 +293,33 @@ void PackageManager::PmWorkflowThread()
 
         m_rebootHandler.HandleReboot( isRebootRequired );
     }
-    catch ( std::exception& ex ) {
+    catch( std::exception& ex ) {
         LOG_ERROR( "Post Checkin failed: %s", ex.what() );
     }
-    catch ( ... ) {
+    catch( ... ) {
         LOG_ERROR( "Post Checkin failed: Unknown exception" );
+    }
+}
+
+void PackageManager::PmCheckForProxies( bool discoverAsync = true )
+{
+    std::wstring proxyTestUrl, proxyPacURL;
+    try {
+        if( discoverAsync ) //async discovery
+        {
+            m_proxyDiscovery.StartProxyDiscoveryAsync( proxyTestUrl.c_str(), proxyPacURL.c_str() );
+        }
+        else //synchronous discovery
+        {
+            PROXY_INFO_LIST proxyList;
+            m_proxyDiscovery.ProxyDiscoverAndNotifySync( proxyTestUrl.c_str(), proxyPacURL.c_str(), proxyList );
+        }
+    }
+    catch( std::exception& ex ) {
+        LOG_ERROR( "Proxy discovery error: %s", ex.what() );
+    }
+    catch( ... ) {
+        LOG_ERROR( "Proxy discovery error: Unknown exception" );
     }
 }
 

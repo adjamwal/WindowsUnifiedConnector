@@ -22,7 +22,7 @@ void ProxyDiscoverySubscriber::ProxiesDiscovered( const std::list<ProxyInfoModel
     {
         if( proxy.GetProxyDiscoveryMode() != PROXY_INFO_NONE )
         {
-            WLOG_DEBUG( L"Proxy found: type %s, server %s:%d", proxy.GetProxyType().c_str(), proxy.GetProxyServer().c_str(), proxy.GetProxyPort() );
+            WLOG_DEBUG( L"Found proxy type %s, server %s:%d", proxy.GetProxyType().c_str(), proxy.GetProxyServer().c_str(), proxy.GetProxyPort() );
             if( proxy.GetProxyType() == L"http_proxy" || proxy.GetProxyType() == L"http" )
             {
                 m_http.SetHttpProxy(
@@ -35,6 +35,6 @@ void ProxyDiscoverySubscriber::ProxiesDiscovered( const std::list<ProxyInfoModel
         }
     }
 
-    //remove proxy if none of the detected proxies were valid
+    //remove proxy if none of the detected proxies were http
     m_http.SetHttpProxy( "", "", "" );
 }

@@ -22,7 +22,11 @@ public:
     virtual void StartProxyDiscoveryAsync(
         const LPCTSTR testURL,
         const LPCTSTR urlPAC ) = 0;
-    virtual void StartProxyDiscoverySync( 
+    virtual void ProxyDiscoverAndNotifySync(
+        const LPCTSTR testURL,
+        const LPCTSTR urlPAC,
+        std::list<ProxyInfoModel>& proxyList ) = 0;
+    virtual void ProxyDiscoverySync( 
         const LPCTSTR testURL,
         const LPCTSTR urlPAC,
         std::list<ProxyInfoModel>& proxyList ) = 0;

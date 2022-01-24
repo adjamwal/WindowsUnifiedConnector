@@ -100,4 +100,5 @@ private:
     std::chrono::milliseconds PmWatchdogWait();
     void PmWatchdogFired();
     void UpdateSslCerts();
+    void PmCheckForProxies( bool discoverAsync );
 };

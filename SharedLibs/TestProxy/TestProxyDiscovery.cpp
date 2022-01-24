@@ -2,6 +2,9 @@
 #include "ProxyDiscovery.h"
 #include "MockProxy.h"
 #include "MockProxyConsumer.h"
+#include "ConsoleLogger.h"
+
+static ConsoleLogger consoleLogger; 
 
 class TestProxyDiscovery : public ::testing::Test
 {
@@ -12,6 +15,7 @@ protected:
         m_urlPAC = L"";
         m_proxy.reset( new NiceMock<MockProxy>() );
         m_patient.reset( new ProxyDiscovery( m_proxy.get() ) );
+        SetUcLogger( &consoleLogger );
     };
 
     virtual void TearDown()
@@ -20,6 +24,7 @@ protected:
         m_urlPAC = L"";
         m_patient.reset();
         m_proxy.reset();
+        SetUcLogger( NULL );
     }
 
     PROXY_INFO_LIST SomeProxyInfos()
@@ -54,23 +59,29 @@ TEST_F( TestProxyDiscovery, CanAddConsumerForProxyNotifications )
 {
     MockProxyConsumer consumer;
     testing::internal::CaptureStdout();
+    testing::internal::CaptureStderr();
 
     EXPECT_TRUE( m_patient->RegisterForProxyNotifications( &consumer ) );
 
     std::string testOutput = testing::internal::GetCapturedStdout();
-    EXPECT_NE( testOutput.find( "Added consumer" ), std::string::npos );
+    testOutput += "\n" + testing::internal::GetCapturedStderr();
+
+    EXPECT_NE( std::string::npos, testOutput.find( "Added consumer" ) );
 }
 
 TEST_F( TestProxyDiscovery, CanNotAddSameConsumerTwice )
 {
     MockProxyConsumer consumer;
     testing::internal::CaptureStdout();
+    testing::internal::CaptureStderr();
 
     m_patient->RegisterForProxyNotifications( &consumer );
     EXPECT_FALSE( m_patient->RegisterForProxyNotifications( &consumer ) );
 
     std::string testOutput = testing::internal::GetCapturedStdout();
-    EXPECT_NE( testOutput.find( "Consumer is already registered" ), std::string::npos );
+    testOutput += "\n" + testing::internal::GetCapturedStderr();
+
+    EXPECT_NE( std::string::npos, testOutput.find( "Consumer is already registered" ) );
 }
 
 TEST_F( TestProxyDiscovery, CanAddMultipleConsumers )
@@ -146,7 +157,7 @@ TEST_F( TestProxyDiscovery, WillDiscoveryProxiesWithoutCallback )
         SetArgPointee<0>( expectedProxies ),
         Return( TRUE ) ) );
 
-    m_patient->StartProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList );
+    m_patient->ProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList );
 
     EXPECT_EQ( proxyList, expectedProxies );
 }
@@ -159,5 +170,5 @@ TEST_F( TestProxyDiscovery, WillGetProxyinfoInSequenceSynchronous )
     EXPECT_CALL( *m_proxy, Init( _, _, _ ) );
     EXPECT_CALL( *m_proxy, GetProxyInfo( _ ) );
 
-    m_patient->StartProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList);
+    m_patient->ProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList);
 }

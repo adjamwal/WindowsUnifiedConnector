@@ -144,7 +144,7 @@ TEST_F( ComponentTestProxy, ExpectedProxyDiscoverySync )
     WinHttpCloseHandle_fake.return_val = TRUE;
 
     IProxyDiscovery& m_patient = m_container->GetProxyDiscovery();
-    m_patient.StartProxyDiscoverySync( testUrl.c_str(), pacURL.c_str(), proxyList );
+    m_patient.ProxyDiscoverySync( testUrl.c_str(), pacURL.c_str(), proxyList );
 
     EXPECT_EQ( 1, WinHttpGetDefaultProxyConfiguration_fake.call_count );
     EXPECT_EQ( 1, WinHttpGetIEProxyConfigForCurrentUser_fake.call_count );

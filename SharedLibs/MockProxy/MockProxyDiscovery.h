@@ -13,6 +13,7 @@ public:
     MOCK_METHOD1( UnregisterForProxyNotifications, bool( IProxyConsumer* ) );
 
     MOCK_METHOD2( StartProxyDiscoveryAsync, void( const LPCTSTR, const LPCTSTR ) );
-    MOCK_METHOD3( StartProxyDiscoverySync, void( const LPCTSTR, const LPCTSTR, std::list<ProxyInfoModel>& ) );
+    MOCK_METHOD3( ProxyDiscoverAndNotifySync, void( const LPCTSTR, const LPCTSTR, std::list<ProxyInfoModel>& ) );
+    MOCK_METHOD3( ProxyDiscoverySync, void( const LPCTSTR, const LPCTSTR, std::list<ProxyInfoModel>& ) );
     MOCK_METHOD1( SetShutdownCallback, void( CheckShutdownCb ) );
 };

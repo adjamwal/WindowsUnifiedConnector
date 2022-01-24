@@ -67,12 +67,20 @@ void ThreadedProxyDiscovery::StartProxyDiscoveryAsync(
     }
 }
 
-void ThreadedProxyDiscovery::StartProxyDiscoverySync( 
+void ThreadedProxyDiscovery::ProxyDiscoverAndNotifySync(
     const LPCTSTR testURL,
     const LPCTSTR urlPAC,
     std::list<ProxyInfoModel>& proxyList )
 {
-    m_proxyDiscovery.StartProxyDiscoverySync( testURL, urlPAC, proxyList );
+    m_proxyDiscovery.ProxyDiscoverAndNotifySync( testURL, urlPAC, proxyList );
+}
+
+void ThreadedProxyDiscovery::ProxyDiscoverySync(
+    const LPCTSTR testURL,
+    const LPCTSTR urlPAC,
+    std::list<ProxyInfoModel>& proxyList )
+{
+    m_proxyDiscovery.ProxyDiscoverySync( testURL, urlPAC, proxyList );
 }
 
 void ThreadedProxyDiscovery::DiscoveryThread( 

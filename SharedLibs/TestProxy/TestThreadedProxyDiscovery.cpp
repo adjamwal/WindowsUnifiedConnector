@@ -57,9 +57,9 @@ TEST_F( TestThreadedProxyDiscovery, WillForwardProxyDiscoverySync )
 {
     std::list<ProxyInfoModel> proxyList;
 
-    EXPECT_CALL( *m_proxyDiscovery, StartProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList ) );
+    EXPECT_CALL( *m_proxyDiscovery, ProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList ) );
 
-    m_patient->StartProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList );
+    m_patient->ProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList );
 }
 
 /*
