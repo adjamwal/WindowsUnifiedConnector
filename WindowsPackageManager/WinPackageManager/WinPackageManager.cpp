@@ -89,13 +89,14 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
         }
     }
 
-    PmAgentContainer agentContainer( bsConfigFile, pmConfigFile );
-    agentContainer.pmAgent().Start();
+    PmAgentContainer *agentContainer = new PmAgentContainer( bsConfigFile, pmConfigFile );
+    agentContainer->pmAgent().Start();
 
     //Wait for termination signal from parent process
     WaitForTermination();
 
-    agentContainer.pmAgent().Stop();
+    agentContainer->pmAgent().Stop();
+    delete agentContainer;
 
     crashClient.RemoveCrashHandler();
     LOG_DEBUG( "Exit" );

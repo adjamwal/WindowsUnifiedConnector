@@ -58,7 +58,6 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_proxyContainer( new ProxyContainer() )
     , m_proxyVerifier( new PmProxyVerifier( *m_httpForProxyVerification, *m_config ) )
     , m_proxyDiscoverySubscriber( new PmProxyDiscoverySubscriber( *m_http, *m_proxyVerifier ) )
-    , m_proxyDiscovery( &m_proxyContainer->GetProxyDiscovery() )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )
     , m_packageInventoryProvider( new PackageInventoryProvider( *m_fileUtil, *m_sslUtil ) )
@@ -107,7 +106,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_thread,
             *m_watchdog,
             *m_proxyDiscoverySubscriber,
-            *m_proxyDiscovery ) )
+            m_proxyContainer->GetProxyDiscovery() ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );
 }

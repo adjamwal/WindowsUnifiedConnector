@@ -57,7 +57,6 @@ private:
     std::unique_ptr<ProxyContainer> m_proxyContainer;
     std::unique_ptr<IProxyVerifier> m_proxyVerifier;
     std::unique_ptr<IProxyConsumer> m_proxyDiscoverySubscriber;
-    std::unique_ptr<IProxyDiscovery> m_proxyDiscovery;
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
