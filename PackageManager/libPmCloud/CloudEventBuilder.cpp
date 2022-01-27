@@ -247,7 +247,7 @@ bool CloudEventBuilder::Deserialize( ICloudEventBuilder& eventBuilder, const std
     catch( std::exception& ex )
     {
         isValid = false;
-        LOG_ERROR( __FUNCTION__ ": Error deserializing event: %s", ex.what() );
+        LOG_ERROR( "Error deserializing event: %s", ex.what() );
     }
 
     if( isValid )
@@ -305,7 +305,7 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
             "'" << m_newSize << "' ?= '" << other.m_newSize << "', " <<
             "'" << m_fromVersion << "' ?= '" << other.m_fromVersion << "'";
 
-        LOG_DEBUG( __FUNCTION__ ": equality failed: %s", ss.str().c_str() );
+        LOG_DEBUG( "Events not equal: %s", ss.str().c_str() );
     }
 
     return result;

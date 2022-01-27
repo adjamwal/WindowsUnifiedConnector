@@ -31,6 +31,7 @@ class IRebootHandler;
 class IUtf8PathVerifier;
 class IWatchdog;
 class ProxyContainer;
+class IProxyVerifier;
 class IProxyDiscovery;
 class IProxyConsumer;
 
@@ -47,12 +48,14 @@ private:
     std::unique_ptr<IFileSysUtil> m_fileUtil;
     std::unique_ptr<ISslUtil> m_sslUtil;
     std::unique_ptr<IPmHttp> m_http;
+    std::unique_ptr<IPmHttp> m_httpForProxyVerification;
     std::unique_ptr<IPmCloud> m_cloud;
     std::unique_ptr<IInstallerCacheManager> m_installeracheMgr;
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<IPmBootstrap> m_bootstrap;
     std::unique_ptr<IPmConfig> m_config;
     std::unique_ptr<ProxyContainer> m_proxyContainer;
+    std::unique_ptr<IProxyVerifier> m_proxyVerifier;
     std::unique_ptr<IProxyConsumer> m_proxyDiscoverySubscriber;
     std::unique_ptr<IProxyDiscovery> m_proxyDiscovery;
     std::unique_ptr<IPmManifest> m_manifest;

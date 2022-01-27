@@ -2,17 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="MockProxy.cpp" />
+    <ClCompile Include="MockProxyDiscoveryEngine.cpp" />
     <ClCompile Include="MockProxyConsumer.cpp" />
     <ClCompile Include="MockProxyDiscovery.cpp" />
     <ClCompile Include="MockWinHttpWrapper.cpp" />
+    <ClCompile Include="MockProxyVerifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="MockProxy.h" />
+    <ClInclude Include="MockProxyDiscoveryEngine.h" />
     <ClInclude Include="MockProxyConsumer.h" />
     <ClInclude Include="MockProxyDiscovery.h" />
     <ClInclude Include="MockWinHttpWrapper.h" />
+    <ClInclude Include="MockProxyVerifier.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

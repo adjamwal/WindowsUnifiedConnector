@@ -13,5 +13,5 @@ protected:
     DWORD ProcessState( LPCTSTR buffer, DWORD& begin, DWORD& end, ProxyInfoModel* info );
 
 public:
-    BOOL ParseProxyString( LPCTSTR proxyString, PROXY_INFO_LIST& info, DWORD discoveryMode );
+    BOOL ParseProxyString( LPCTSTR proxyString, PROXY_INFO_LIST& info, DWORD discoveryMethod );
 };

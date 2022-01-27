@@ -27,7 +27,7 @@
 #include "IWatchdog.h"
 #include "IProxyDiscovery.h"
 #include "IProxyConsumer.h"
-#include "ProxyDiscoverySubscriber.h"
+#include "PmProxyDiscoverySubscriber.h"
 #include <sstream>
 
 using namespace std;

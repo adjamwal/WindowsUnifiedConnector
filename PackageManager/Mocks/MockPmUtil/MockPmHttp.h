@@ -43,5 +43,7 @@ public:
     MOCK_METHOD1( IsSslPeerValidationError, bool( PmHttpExtendedResult& ) );
     void MakeIsSslPeerValidationErrorReturn( bool retval );
     void ExpectIsSslPeerValidationErrorIsNotCalled();
+
+    MOCK_METHOD1( GetErrorDescription, std::string( int ) );
 };
 

@@ -8,12 +8,12 @@
 #include "IProxyDiscovery.h"
 #include "ProxyInfoModel.h"
 
-class IProxy;
+class IProxyDiscoveryEngine;
 
 class ProxyDiscovery : public IProxyDiscovery
 {
 public:
-    ProxyDiscovery( IProxy* proxy );
+    ProxyDiscovery( IProxyDiscoveryEngine* proxyDiscoveryEngine );
     virtual ~ProxyDiscovery();
 
     virtual bool RegisterForProxyNotifications( IProxyConsumer* newConsumer ) override;
@@ -40,6 +40,6 @@ protected:
     std::mutex m_proxyMutex;
     std::mutex m_consumerMutex;
 
-    IProxy* m_Proxy;
+    IProxyDiscoveryEngine* m_proxyDiscoveryEngine;
     CheckShutdownCb m_shutdownCb;
 };

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ProxyDiscovery.h"
-#include "MockProxy.h"
+#include "MockProxyDiscoveryEngine.h"
 #include "MockProxyConsumer.h"
 #include "ConsoleLogger.h"
 
@@ -13,8 +13,8 @@ protected:
     {
         m_testUrl = L"";
         m_urlPAC = L"";
-        m_proxy.reset( new NiceMock<MockProxy>() );
-        m_patient.reset( new ProxyDiscovery( m_proxy.get() ) );
+        m_proxyDiscoveryEngine.reset( new NiceMock<MockProxyDiscoveryEngine>() );
+        m_patient.reset( new ProxyDiscovery( m_proxyDiscoveryEngine.get() ) );
         SetUcLogger( &consoleLogger );
     };
 
@@ -23,7 +23,7 @@ protected:
         m_testUrl = L"";
         m_urlPAC = L"";
         m_patient.reset();
-        m_proxy.reset();
+        m_proxyDiscoveryEngine.reset();
         SetUcLogger( NULL );
     }
 
@@ -46,7 +46,7 @@ protected:
 protected:
     std::wstring m_testUrl;
     std::wstring m_urlPAC;
-    std::unique_ptr<MockProxy> m_proxy;
+    std::unique_ptr<MockProxyDiscoveryEngine> m_proxyDiscoveryEngine;
     std::unique_ptr<ProxyDiscovery> m_patient;
 };
 
@@ -116,8 +116,8 @@ TEST_F( TestProxyDiscovery, WillRemoveKnownConsumer )
 TEST_F( TestProxyDiscovery, WillGetProxyinfoInSequence )
 {
     InSequence s;
-    EXPECT_CALL( *m_proxy, Init( _, _, _ ) );
-    EXPECT_CALL( *m_proxy, GetProxyInfo(_) );
+    EXPECT_CALL( *m_proxyDiscoveryEngine, Init( _, _, _ ) );
+    EXPECT_CALL( *m_proxyDiscoveryEngine, GetProxyInfo(_) );
 
     m_patient->StartProxyDiscoveryAsync( m_testUrl.c_str(), m_urlPAC.c_str() );
 }
@@ -127,7 +127,7 @@ TEST_F( TestProxyDiscovery, WillNotifyConsumerOfDiscoveredProxies )
     MockProxyConsumer consumer;
     m_patient->RegisterForProxyNotifications( &consumer );
     PROXY_INFO_LIST proxies = SomeProxyInfos();
-    ON_CALL( *m_proxy, GetProxyInfo( _ ) ).WillByDefault(DoAll( 
+    ON_CALL( *m_proxyDiscoveryEngine, GetProxyInfo( _ ) ).WillByDefault(DoAll( 
         SetArgPointee<0>( proxies ),
         Return(TRUE)));
 
@@ -153,7 +153,7 @@ TEST_F( TestProxyDiscovery, WillDiscoveryProxiesWithoutCallback )
 {
     PROXY_INFO_LIST proxyList;
     PROXY_INFO_LIST expectedProxies = SomeProxyInfos();
-    ON_CALL( *m_proxy, GetProxyInfo( _ ) ).WillByDefault( DoAll(
+    ON_CALL( *m_proxyDiscoveryEngine, GetProxyInfo( _ ) ).WillByDefault( DoAll(
         SetArgPointee<0>( expectedProxies ),
         Return( TRUE ) ) );
 
@@ -167,8 +167,8 @@ TEST_F( TestProxyDiscovery, WillGetProxyinfoInSequenceSynchronous )
     PROXY_INFO_LIST proxyList;
 
     InSequence s;
-    EXPECT_CALL( *m_proxy, Init( _, _, _ ) );
-    EXPECT_CALL( *m_proxy, GetProxyInfo( _ ) );
+    EXPECT_CALL( *m_proxyDiscoveryEngine, Init( _, _, _ ) );
+    EXPECT_CALL( *m_proxyDiscoveryEngine, GetProxyInfo( _ ) );
 
     m_patient->ProxyDiscoverySync( m_testUrl.c_str(), m_urlPAC.c_str(), proxyList);
 }

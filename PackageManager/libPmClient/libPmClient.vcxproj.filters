@@ -129,7 +129,10 @@
     <ClInclude Include="RebootHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ProxyDiscoverySubscriber.h">
+    <ClInclude Include="PmProxyDiscoverySubscriber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PmProxyVerifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -182,7 +185,10 @@
     <ClCompile Include="RebootHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProxyDiscoverySubscriber.cpp">
+    <ClCompile Include="PmProxyDiscoverySubscriber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PmProxyVerifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

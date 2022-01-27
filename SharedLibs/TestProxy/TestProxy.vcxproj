@@ -164,7 +164,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TestProxy.cpp" />
+    <ClCompile Include="TestProxyDiscoveryEngine.cpp" />
     <ClCompile Include="TestProxyDiscovery.cpp" />
     <ClCompile Include="TestProxyStringParser.cpp" />
     <ClCompile Include="TestThreadedProxyDiscovery.cpp" />

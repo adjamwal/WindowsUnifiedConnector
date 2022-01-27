@@ -79,7 +79,7 @@ bool UcidAdapter::GetUrls( PmUrlList& urls )
 
     rtn = m_dependencies->Configuration().GetPmUrls( urls );
     if( !rtn ) {
-        LOG_ERROR( "Failed to Pm Urls" );
+        LOG_ERROR( "Failed to get Pm Urls" );
     }
 
     return rtn;

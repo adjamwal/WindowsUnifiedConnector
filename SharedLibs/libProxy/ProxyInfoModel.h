@@ -26,36 +26,35 @@ public:
     void SetProxyTunnel( DWORD tunnel );
     DWORD GetProxyTunnel() const;
 
-    void SetProxyType( const std::wstring &proxyType );
-    const std::wstring &GetProxyType() const;
+    void SetProxyType( const std::wstring& proxyType );
+    const std::wstring& GetProxyType() const;
 
-    void SetProxyAccessType( const std::wstring &proxyAccessType );
-    const std::wstring &GetProxyAccessType() const;
+    void SetProxyAccessType( const std::wstring& proxyAccessType );
+    const std::wstring& GetProxyAccessType() const;
 
-    void SetProxyServer( const std::wstring &proxyServer );
-    const std::wstring &GetProxyServer() const;
+    void SetProxyServer( const std::wstring& proxyServer );
+    const std::wstring& GetProxyServer() const;
 
-    void SetProxyUser( const std::wstring &proxyUserName );
-    const std::wstring &GetProxyUser() const;
+    void SetProxyUser( const std::wstring& proxyUserName );
+    const std::wstring& GetProxyUser() const;
 
-    void SetProxyPassword( const std::wstring &proxyPassword );
-    const std::wstring &GetProxyPassword() const;
+    void SetProxyPassword( const std::wstring& proxyPassword );
+    const std::wstring& GetProxyPassword() const;
 
     void SetProxyDiscoveryMode( DWORD proxyDiscoveryMode );
     DWORD GetProxyDiscoveryMode() const;
     void Clear();
 
-    ProxyInfoModel& operator = ( ProxyInfoModel other );
-
+    void operator=( const ProxyInfoModel& other );
     bool operator==( const ProxyInfoModel& rhs ) const;
     bool operator!=( const ProxyInfoModel& rhs ) const;
 
 private:
     USHORT m_proxyPort;
     DWORD m_proxyAuthType;
-    DWORD m_tunnel; 
+    DWORD m_tunnel;
     DWORD m_proxyDiscoveryMode;
-    std::wstring m_proxyType; 
+    std::wstring m_proxyType;
     std::wstring m_proxyServer;
     std::wstring m_proxyUname;
     std::wstring m_proxyPassword;

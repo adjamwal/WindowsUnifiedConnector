@@ -197,8 +197,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="proxy.cpp" />
     <ClCompile Include="ProxyDiscovery.cpp" />
+    <ClCompile Include="ProxyDiscoveryEngine.cpp" />
     <ClCompile Include="ProxyInfoModel.cpp" />
     <ClCompile Include="ProxyStringParser.cpp" />
     <ClCompile Include="ProxyContainer.cpp" />
@@ -206,12 +206,13 @@
     <ClCompile Include="WinHttpWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IProxy.h" />
     <ClInclude Include="IProxyConsumer.h" />
     <ClInclude Include="IProxyDiscovery.h" />
+    <ClInclude Include="IProxyDiscoveryEngine.h" />
+    <ClInclude Include="IProxyVerifier.h" />
     <ClInclude Include="IWinHttpWrapper.h" />
-    <ClInclude Include="proxy.h" />
     <ClInclude Include="ProxyDiscovery.h" />
+    <ClInclude Include="ProxyDiscoveryEngine.h" />
     <ClInclude Include="ProxyInfoModel.h" />
     <ClInclude Include="ProxyStringParser.h" />
     <ClInclude Include="ProxyContainer.h" />

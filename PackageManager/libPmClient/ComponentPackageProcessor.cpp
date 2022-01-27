@@ -215,7 +215,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
                 throw PackageException( ssError.str(), UCPM_EVENT_ERROR_COMPONENT_UPDATE );
             }
             else {
-                LOG_DEBUG( __FUNCTION__ ": Installer '%s' succeeded",
+                LOG_DEBUG( "Installer '%s' succeeded",
                     componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
             }
 

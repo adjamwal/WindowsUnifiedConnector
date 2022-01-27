@@ -102,7 +102,7 @@ void InstallerCacheManager::DeleteInstaller( const std::filesystem::path& instal
 
     LOG_DEBUG( "Removing %s", installerPath.generic_u8string().c_str() );
     if( m_fileUtil.EraseFile( installerPath ) != 0 ) {
-        LOG_ERROR( __FUNCTION__ ": Failed to remove %s", installerPath.generic_u8string().c_str() );
+        LOG_ERROR( "Failed to remove %s", installerPath.generic_u8string().c_str() );
     }
 }
 

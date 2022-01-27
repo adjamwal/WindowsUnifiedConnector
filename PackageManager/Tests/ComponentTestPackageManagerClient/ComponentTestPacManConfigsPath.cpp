@@ -727,7 +727,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdog )
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
     lock.unlock();
 
     EXPECT_TRUE( pass );

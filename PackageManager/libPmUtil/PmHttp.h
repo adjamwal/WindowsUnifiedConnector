@@ -22,7 +22,8 @@ public:
     bool HttpGet( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
     bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) override;
     bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) override;
-    bool IsSslPeerValidationError( PmHttpExtendedResult& eResult );
+    bool IsSslPeerValidationError( PmHttpExtendedResult& eResult ) override;
+    std::string GetErrorDescription( int errorCode ) override;
 
 private:
     IFileSysUtil& m_fileUtil;
@@ -35,6 +36,7 @@ private:
     std::string m_proxyuri;
     std::string m_proxyuser;
     std::string m_proxypass;
+    char m_errbuf[ CURL_ERROR_SIZE ];
 
     struct WriteFileCtx {
         IFileSysUtil* fileUtil;

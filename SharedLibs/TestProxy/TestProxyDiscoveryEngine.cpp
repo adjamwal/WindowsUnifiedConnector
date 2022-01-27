@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "Proxy.h"
+#include "ProxyDiscoveryEngine.h"
 #include "MockWinHttpWrapper.h"
 
-class TestProxy : public ::testing::Test
+class TestProxyDiscoveryEngine : public ::testing::Test
 {
 protected:
     virtual void SetUp()
@@ -12,7 +12,7 @@ protected:
         m_testUrl = L"";
         m_urlPAC = L"";
         m_winHttp.reset( new NiceMock<MockWinHttpWrapper>() );
-        m_patient.reset( new Proxy( *m_winHttp ) );
+        m_patient.reset( new ProxyDiscoveryEngine( *m_winHttp ) );
     };
 
     virtual void TearDown()
@@ -34,7 +34,7 @@ protected:
     }
 protected:
     std::unique_ptr<MockWinHttpWrapper> m_winHttp;
-    std::unique_ptr<Proxy> m_patient;
+    std::unique_ptr<ProxyDiscoveryEngine> m_patient;
 
     std::wstring m_testUrl;
     std::wstring m_urlPAC;
@@ -42,22 +42,22 @@ protected:
     int m_ShutdownCallCount;
 };
 
-TEST_F( TestProxy, WillTerminateEarly )
+TEST_F( TestProxyDiscoveryEngine, WillTerminateEarly )
 {
     m_patient->Init( m_testUrl.c_str(), m_urlPAC.c_str(), [this]() -> bool { return ShutdownAfterFirstCall(); });
     EXPECT_EQ( m_ShutdownCallCount, 2 );
 }
 
-TEST_F( TestProxy, ProxyNoneReturnedWhenTerminatedEarly )
+TEST_F( TestProxyDiscoveryEngine, ProxyNoneReturnedWhenTerminatedEarly )
 {
     m_testUrl = L"testUrl";
     m_urlPAC = L"urlPAC";
     int rtn = m_patient->Init( m_testUrl.c_str(), m_urlPAC.c_str(), [ this ]() -> bool { return ShutdownAfterFirstCall(); } );
 
-    EXPECT_EQ( ( PROXY_INFO_SRC )rtn, PROXY_INFO_NONE );
+    EXPECT_EQ( ( PROXY_FIND_METHOD )rtn, PROXY_FIND_NONE );
 }
 
-TEST_F( TestProxy, ProxyListIsEmptyWhenTerminatedEarly )
+TEST_F( TestProxyDiscoveryEngine, ProxyListIsEmptyWhenTerminatedEarly )
 {
     std::list<ProxyInfoModel> proxyList;
     m_testUrl = L"testUrl";

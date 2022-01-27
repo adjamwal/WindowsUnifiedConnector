@@ -5,6 +5,7 @@
 #include <sstream>
 
 const std::string WHITESPACE = " \n\r\t\f\v\0";
+const std::wstring L_WHITESPACE = L" \n\r\t\f\v\0";
 
 std::string StringUtil::LTrim( const std::string& s )
 {
@@ -19,6 +20,23 @@ std::string StringUtil::RTrim( const std::string& s )
 }
 
 std::string StringUtil::Trim( const std::string& s )
+{
+    return RTrim( LTrim( s ) );
+}
+
+std::wstring StringUtil::LTrim( const std::wstring& s )
+{
+    size_t start = s.find_first_not_of( L_WHITESPACE );
+    return ( start == std::wstring::npos ) ? L"" : s.substr( start );
+}
+
+std::wstring StringUtil::RTrim( const std::wstring& s )
+{
+    size_t end = s.find_last_not_of( L_WHITESPACE );
+    return ( end == std::wstring::npos ) ? L"" : s.substr( 0, end + 1 );
+}
+
+std::wstring StringUtil::Trim( const std::wstring& s )
 {
     return RTrim( LTrim( s ) );
 }

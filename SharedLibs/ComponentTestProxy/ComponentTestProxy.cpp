@@ -148,8 +148,8 @@ TEST_F( ComponentTestProxy, ExpectedProxyDiscoverySync )
 
     EXPECT_EQ( 1, WinHttpGetDefaultProxyConfiguration_fake.call_count );
     EXPECT_EQ( 1, WinHttpGetIEProxyConfigForCurrentUser_fake.call_count );
-    ASSERT_EQ( 9, proxyList.size() );
-    std::wstring expect[] = { L"systemProxy", L"ieProxy", L"proxy1", L"proxy2", L"proxy1", L"proxy2", L"proxy1", L"proxy2", L"" };
+    ASSERT_EQ( 8, proxyList.size() );
+    std::wstring expect[] = { L"systemProxy", L"ieProxy", L"proxy1", L"proxy2", L"proxy1", L"proxy2", L"proxy1", L"proxy2" };
     int i = 0;
     for( auto it = proxyList.begin(); it != proxyList.end(); ++it )
     {

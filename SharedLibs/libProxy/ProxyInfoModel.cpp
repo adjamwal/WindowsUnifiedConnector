@@ -18,25 +18,6 @@ ProxyInfoModel::~ProxyInfoModel()
     m_proxyPassword.clear();
 }
 
-ProxyInfoModel& ProxyInfoModel::operator=( ProxyInfoModel other )
-{
-    this->SetProxyPort( other.GetProxyPort() );
-    this->SetProxyAuthType( other.GetProxyAuthType() );
-    this->SetProxyTunnel( other.GetProxyTunnel() );
-    this->SetProxyDiscoveryMode( other.GetProxyDiscoveryMode() );
-    this->SetProxyType( other.GetProxyType() );
-    this->SetProxyServer( other.GetProxyServer() );
-    this->SetProxyUser( other.GetProxyUser() );
-
-    std::wstring password = other.GetProxyPassword();
-    this->SetProxyPassword( password );
-    password.clear();
-
-    this->SetProxyAccessType( other.GetProxyAccessType() );
-
-    return *this;
-}
-
 BOOL ProxyInfoModel::IsValid()
 {
     return ( m_proxyType.empty() ? FALSE : TRUE );
@@ -130,6 +111,19 @@ void ProxyInfoModel::SetProxyDiscoveryMode( DWORD proxyDiscoveryMode )
 DWORD ProxyInfoModel::GetProxyDiscoveryMode() const
 {
     return m_proxyDiscoveryMode;
+}
+
+void ProxyInfoModel::operator=( const ProxyInfoModel& other )
+{
+    m_proxyPort = other.m_proxyPort;
+    m_proxyAuthType = other.m_proxyAuthType;
+    m_tunnel = other.m_tunnel;
+    m_proxyDiscoveryMode = other.m_proxyDiscoveryMode;
+    m_proxyType = other.m_proxyType;
+    m_proxyServer = other.m_proxyServer;
+    m_proxyUname = other.m_proxyUname;
+    m_proxyPassword = other.m_proxyPassword;
+    m_accessType = other.m_accessType;
 }
 
 bool ProxyInfoModel::operator!=( const ProxyInfoModel& rhs ) const

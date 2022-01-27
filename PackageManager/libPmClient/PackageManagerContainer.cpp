@@ -24,8 +24,9 @@
 #include "UcUpgradeEventHandler.h"
 #include "CatalogJsonParser.h"
 #include "ProxyContainer.h"
+#include "PmProxyVerifier.h"
 #include "IProxyDiscovery.h"
-#include "ProxyDiscoverySubscriber.h"
+#include "PmProxyDiscoverySubscriber.h"
 
 #include "FileSysUtil.h"
 #include "SslUtil.h"
@@ -48,13 +49,15 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_fileUtil( new FileSysUtil( *m_utfPathVerifier ) )
     , m_sslUtil( new SslUtil() )
     , m_http( new PmHttp( *m_fileUtil ) )
+    , m_httpForProxyVerification( new PmHttp( *m_fileUtil ) )
     , m_cloud( new PmCloud( *m_http ) )
     , m_installeracheMgr( new InstallerCacheManager( *m_cloud, *m_fileUtil, *m_sslUtil ) )
     , m_ucidAdapter( new UcidAdapter() )
     , m_bootstrap( new PmBootstrap( *m_fileUtil ) )
     , m_config( new PmConfig( *m_fileUtil, *m_ucidAdapter ) )
     , m_proxyContainer( new ProxyContainer() )
-    , m_proxyDiscoverySubscriber( new ProxyDiscoverySubscriber( *m_http ) )
+    , m_proxyVerifier( new PmProxyVerifier( *m_httpForProxyVerification, *m_config ) )
+    , m_proxyDiscoverySubscriber( new PmProxyDiscoverySubscriber( *m_http, *m_proxyVerifier ) )
     , m_proxyDiscovery( &m_proxyContainer->GetProxyDiscovery() )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )

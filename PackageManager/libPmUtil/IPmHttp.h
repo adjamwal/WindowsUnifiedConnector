@@ -50,4 +50,5 @@ public:
     virtual bool HttpPost( const std::string& url, const void* data, size_t dataSize, std::string& responseContent, PmHttpExtendedResult& eResult ) = 0;
     virtual bool HttpDownload( const std::string& url, const std::filesystem::path& filepath, PmHttpExtendedResult& eResult ) = 0;
     virtual bool IsSslPeerValidationError( PmHttpExtendedResult& eResult ) = 0;
+    virtual std::string GetErrorDescription( int errorCode ) = 0;
 };

@@ -32,7 +32,7 @@
     <ClCompile Include="TestThreadedProxyDiscovery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestProxy.cpp">
+    <ClCompile Include="TestProxyDiscoveryEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TestProxyStringParser.cpp">

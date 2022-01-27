@@ -31,7 +31,7 @@ void CloudEventStorage::Initialize( IPmPlatformDependencies* dep )
     filePath.append( "\\" ).append( m_fileName );
     m_fullPath = filePath;
 
-    LOG_DEBUG( __FUNCTION__ ": CloudEventStorage path: %s", m_fullPath.c_str() );
+    LOG_DEBUG( "CloudEventStorage path: %s", m_fullPath.c_str() );
 }
 
 bool CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
@@ -47,7 +47,7 @@ bool CloudEventStorage::SaveEvent( ICloudEventBuilder& event )
 
     if( TimeUtil::Now_MilliTimeStamp() > eventTtlMs )
     {
-        LOG_DEBUG( __FUNCTION__ ": Event expired: %s", eventStr.c_str() );
+        LOG_DEBUG( "Event expired: %s", eventStr.c_str() );
         return false;
     }
 

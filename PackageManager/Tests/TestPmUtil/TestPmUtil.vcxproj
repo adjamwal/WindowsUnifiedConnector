@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="TestPmHttp.cpp" />
     <ClCompile Include="TestRandomUtil.cpp" />
+    <ClCompile Include="TestStringUtil.cpp" />
     <ClCompile Include="TestTimeUtil.cpp" />
     <ClCompile Include="TestUtf8PathVerifier.cpp" />
   </ItemGroup>

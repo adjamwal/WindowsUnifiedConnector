@@ -30,7 +30,7 @@ ThreadedProxyDiscovery::~ThreadedProxyDiscovery()
 
         ++retries;
         if( retries == MAX_SHUTDOWN_RETRIES ) {
-            LOG_ERROR( __FUNCTION__ ": Timeout after 20 seconds during shutdown. This may crash" );
+            LOG_ERROR( "Timeout after 20 seconds during shutdown. This may crash" );
         }
     }
 }
@@ -51,7 +51,7 @@ void ThreadedProxyDiscovery::StartProxyDiscoveryAsync(
 {
     std::unique_lock< std::mutex > lock( m_mutex );
     if( m_threadRunning ) {
-        LOG_DEBUG( __FUNCTION__ ": Proxy discovery thread already running" );
+        LOG_DEBUG( "Proxy discovery thread already running" );
         return;
     }
 
@@ -62,7 +62,7 @@ void ThreadedProxyDiscovery::StartProxyDiscoveryAsync(
         m_discoveryThread->detach();
     }
     catch( const std::system_error& systemError ) {
-        LOG_ERROR( __FUNCTION__ ": Failed to start proxy discovery - '%s'", systemError.what() );
+        LOG_ERROR( "Failed to start proxy discovery - '%s'", systemError.what() );
         m_threadRunning = false;
     }
 }
@@ -90,11 +90,11 @@ void ThreadedProxyDiscovery::DiscoveryThread(
     m_proxyDiscovery.StartProxyDiscoveryAsync( testURL, urlPAC );
 
     std::unique_lock< std::mutex > lock( m_mutex );
-    LOG_DEBUG( __FUNCTION__ ": exiting proxy discovery thread" );
+    LOG_DEBUG( "exiting proxy discovery thread" );
     m_threadRunning = false;
 }
 
 void ThreadedProxyDiscovery::SetShutdownCallback( CheckShutdownCb shutdownCB )
 {
-    LOG_DEBUG( __FUNCTION__ ": Not allowed" );
+    LOG_DEBUG( "Not allowed" );
 }

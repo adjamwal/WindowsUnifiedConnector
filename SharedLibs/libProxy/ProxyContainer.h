@@ -6,7 +6,7 @@
 #include <vector>
 #include <Windows.h>
 
-class IProxy;
+class IProxyDiscoveryEngine;
 class IProxyDiscovery;
 class IWinHttpWrapper;
 
@@ -20,7 +20,7 @@ public:
 
 protected:
     std::unique_ptr<IWinHttpWrapper, void( * )( IWinHttpWrapper* )> m_WinHttp;
-    std::unique_ptr<IProxy> m_Proxy;
+    std::unique_ptr<IProxyDiscoveryEngine> m_proxyDiscoveryEngine;
     std::unique_ptr<IProxyDiscovery> m_ProxyDiscovery;
     std::unique_ptr<IProxyDiscovery> m_threadedProxyDiscovery;
 };

@@ -111,7 +111,7 @@ DWORD ProxyStringParser::ProcessState( LPCTSTR buffer, DWORD& begin, DWORD& end,
         break;
 
     default:
-        LOG_DEBUG( __FUNCTION__ " reached invalid state: %d, prev: %d", state, prevState );
+        LOG_DEBUG( "reached invalid state: %d, prev: %d", state, prevState );
         status = 0;
         goto abort;
     }
@@ -135,7 +135,7 @@ abort:
 	} \
 }
 
-BOOL ProxyStringParser::ParseProxyString( LPCTSTR proxyString, PROXY_INFO_LIST& info, DWORD discoveryMode )
+BOOL ProxyStringParser::ParseProxyString( LPCTSTR proxyString, PROXY_INFO_LIST& info, DWORD discoveryMethod )
 {
     BOOL status = FALSE;
     DWORD pos = 0, prev = 0, len = 0, end = 0;
@@ -166,26 +166,26 @@ BOOL ProxyStringParser::ParseProxyString( LPCTSTR proxyString, PROXY_INFO_LIST& 
         while( 1 ) {
             prev = end;
             if( end >= len ) {
-                LOG_DEBUG( __FUNCTION__ " pos: %d, len: %d", pos, len );
+                LOG_DEBUG( "pos: %d, len: %d", pos, len );
                 break;
             }
 
             tokenId = GetToken( &pString[ prev ], pos );
             end = prev + pos;
             if( !ProcessState( pString, prev, end, &serverInfo ) ) {
-                LOG_DEBUG( __FUNCTION__ " prev: %d, pos: %d", prev, pos );
+                LOG_DEBUG( "prev: %d, pos: %d", prev, pos );
                 break;
             }
 
             if( state == FINAL ) {
-                serverInfo.SetProxyDiscoveryMode( discoveryMode );
+                serverInfo.SetProxyDiscoveryMode( discoveryMethod );
                 status = TRUE;
                 break;
             }
             end++;
         }
         info.push_back( serverInfo );
-        WLOG_DEBUG( __FUNCTION__ L": Add Proxy %s:%d to discovery list",
+        WLOG_DEBUG( L"Add proxy %s:%d to discovery list",
             serverInfo.GetProxyServer().c_str(),
             serverInfo.GetProxyPort() );
     }
