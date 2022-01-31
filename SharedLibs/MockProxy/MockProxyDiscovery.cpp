@@ -3,10 +3,8 @@
 
 MockProxyDiscovery::MockProxyDiscovery()
 {
-
 }
 
 MockProxyDiscovery::~MockProxyDiscovery()
 {
-
 }

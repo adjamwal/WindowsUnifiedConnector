@@ -13,6 +13,16 @@ class ProxyInfoModel
 {
 public:
     ProxyInfoModel();
+    ProxyInfoModel(
+        USHORT proxyPort,
+        DWORD proxyAuthType,
+        DWORD tunnel,
+        DWORD proxyDiscoveryMode,
+        std::wstring proxyType,
+        std::wstring proxyServer,
+        std::wstring proxyUname,
+        std::wstring proxyPassword,
+        std::wstring accessType );
     virtual ~ProxyInfoModel();
 
     BOOL IsValid();

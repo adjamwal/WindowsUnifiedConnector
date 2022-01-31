@@ -38,6 +38,12 @@
 #include "MockCertsAdapter.h"
 #include "MockProxyConsumer.h"
 #include "MockProxyDiscovery.h"
+#include "MockPmHttp.h"
+#include "PmProxyVerifier.h"
+#include "PmProxyDiscoverySubscriber.h"
+#include "IProxyConsumer.h"
+#include "IProxyDiscoveryEngine.h"
+#include "curl.h"
 
 MATCHER_P( CloudEventBuilderMatch, expected, "" )
 {
@@ -106,7 +112,25 @@ protected:
             }
         ) );
 
-        m_proxyDiscoverySubscriber.reset( new NiceMock<MockProxyConsumer>() );
+        m_http.reset( new NiceMock<MockPmHttp>() );
+        m_httpForProxyTesting.reset( new NiceMock<MockPmHttp>() );
+
+        m_proxyVerifier.reset( new PmProxyVerifier( *m_httpForProxyTesting, *m_mockConfig ) );
+        m_proxyDiscoverySubscriber.reset( new PmProxyDiscoverySubscriber( *m_http, *m_proxyVerifier ) );
+
+        ProxyInfoModel testProxy = {
+            8080, //m_proxyPort
+            0, //m_proxyAuthType
+            0, //m_tunnel
+            PROXY_FIND_REG, //m_proxyDiscoveryMode
+            L"http_proxy", //m_proxyType
+            L"proxyServer", //"m_proxyServer
+            L"proxyUser", //m_proxyUname
+            L"proxyPass", //m_proxyPassword
+            L"http_proxy" //m_accessType
+        };
+        m_proxyList.push_back( testProxy );
+
         m_proxyDiscovery.reset( new NiceMock<MockProxyDiscovery>() );
 
         m_patient.reset( new PackageManager(
@@ -161,11 +185,16 @@ protected:
         m_mockPlatformComponentManager.reset();
         m_mockPlatformConfiguration.reset();
         m_mockCloud.reset();
-        m_mockConfig.reset();
         m_mockBootstrap.reset();
         m_mockFileUtil.reset();
-        m_proxyDiscoverySubscriber.reset();
+
         m_proxyDiscovery.reset();
+        m_proxyDiscoverySubscriber.reset();
+        m_proxyVerifier.reset();
+        m_http.reset();
+        m_httpForProxyTesting.reset();
+        m_mockConfig.reset();
+        m_proxyList.clear();
     }
 
     uint32_t GetCloudCheckinIntervalMs()
@@ -188,7 +217,19 @@ protected:
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
+        m_mockConfig->MakeGetCloudEventUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudCatalogUriReturn( m_configUrl );
+        m_mockConfig->MakeAllowPostInstallRebootsReturn( true );
+        m_mockCloud->MakeGetReturn( true, "content", { 200, 0 } );
+        m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
+
+        m_patient->SetPlatformDependencies( m_mockDeps.get() );
+    }
+
+    void SetupPacMacNoConfig()
+    {
+        m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
+        m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeAllowPostInstallRebootsReturn( true );
         m_mockCloud->MakeGetReturn( true, "content", { 200, 0 } );
         m_mockInstallerCacheMgr->MakeDownloadOrUpdateInstallerReturn( "InstallerDownloadLocation" );
@@ -199,6 +240,12 @@ protected:
     void StartPacMan()
     {
         SetupPacMacn();
+        m_patient->Start( "ConfigFile", "BootstrapFile" );
+    }
+
+    void StartPacManNoConfig()
+    {
+        SetupPacMacNoConfig();
         m_patient->Start( "ConfigFile", "BootstrapFile" );
     }
 
@@ -242,6 +289,11 @@ protected:
 
     std::unique_ptr<IPmManifest> m_manifest;
     std::unique_ptr<IWorkerThread> m_thread;
+    std::unique_ptr<MockPmHttp> m_http;
+    std::unique_ptr<MockPmHttp> m_httpForProxyTesting;
+    std::unique_ptr<IProxyConsumer> m_proxyDiscoverySubscriber;
+    std::unique_ptr<MockProxyDiscovery> m_proxyDiscovery;
+    std::unique_ptr<IProxyVerifier> m_proxyVerifier;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
     std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;
     std::unique_ptr<ICheckinFormatter> m_checkinFormatter;
@@ -259,8 +311,7 @@ protected:
     std::unique_ptr<IComponentPackageProcessor> m_componentPackageProcessor;
     std::unique_ptr<IManifestProcessor> m_manifestProcessor;
     std::unique_ptr<IPackageConfigProcessor> m_configProcesor;
-    std::unique_ptr<MockProxyConsumer> m_proxyDiscoverySubscriber;
-    std::unique_ptr<MockProxyDiscovery> m_proxyDiscovery;
+    PROXY_INFO_LIST m_proxyList;
 
     std::unique_ptr<IPackageManager> m_patient;
 };

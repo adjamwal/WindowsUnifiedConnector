@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="ComponentTestPacManConfigsPath.cpp" />
+    <ClCompile Include="ComponentTestPacManProxy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharedLibs\libProxy\libProxyMD.vcxproj">
@@ -137,6 +138,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libProxy;$(SolutionDir)SharedLibs\MockProxy;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,6 +176,7 @@
       <WarningLevel>Level3</WarningLevel>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libProxy;$(SolutionDir)SharedLibs\MockProxy;$(SolutionDir)PackageManager\Mocks;$(SolutionDir)PackageManager\Mocks\MockPmClient;$(SolutionDir)PackageManager\Mocks\MockPmUtil;$(SolutionDir)PackageManager\Mocks\MockPmCloud;$(SolutionDir)PackageManager\Mocks\MockPmConfig;$(SolutionDir)PackageManager\Mocks\MockPmInterface;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

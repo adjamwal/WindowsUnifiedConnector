@@ -13,6 +13,28 @@ ProxyInfoModel::ProxyInfoModel()
 {
 }
 
+ProxyInfoModel::ProxyInfoModel(
+    USHORT proxyPort,
+    DWORD proxyAuthType,
+    DWORD tunnel,
+    DWORD proxyDiscoveryMode,
+    std::wstring proxyType,
+    std::wstring proxyServer,
+    std::wstring proxyUname,
+    std::wstring proxyPassword,
+    std::wstring accessType )
+    : m_proxyPort( proxyPort )
+    , m_proxyAuthType( proxyAuthType )
+    , m_tunnel( tunnel )
+    , m_proxyDiscoveryMode( proxyDiscoveryMode )
+    , m_proxyType( proxyType )
+    , m_proxyServer( proxyServer )
+    , m_proxyUname( proxyUname )
+    , m_proxyPassword( proxyPassword )
+    , m_accessType( accessType )
+{
+}
+
 ProxyInfoModel::~ProxyInfoModel()
 {
     m_proxyPassword.clear();

@@ -18,6 +18,9 @@
     <ClCompile Include="ComponentTestPacManConfigsPath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentTestPacManProxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComponentTestPacManBase.h">
