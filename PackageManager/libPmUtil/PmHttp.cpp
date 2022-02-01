@@ -334,6 +334,7 @@ bool PmHttp::HttpGet( const std::string& url, std::string& responseContent, PmHt
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYPASSWORD, m_proxypass.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "(%s) CURLOPT_PROXYPASSWORD set failed, %d:%s", m_userAgent.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+#ifndef CM_HTTP_ENABLED
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
         LOG_ERROR( "(%s) CURLOPT_PROTOCOLS failed %d:%s", m_userAgent.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
@@ -346,6 +347,7 @@ bool PmHttp::HttpGet( const std::string& url, std::string& responseContent, PmHt
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 ) ) != CURLE_OK ) {
         LOG_ERROR( "(%s) CURLOPT_SSLVERSION failed %d:%s", m_userAgent.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+#endif // CM_HTTP_ENABLED
     else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "(%s) curl_easy_perform failed %d:%s", m_userAgent.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
@@ -405,14 +407,15 @@ bool PmHttp::HttpPost( const std::string& url, const void* data, size_t dataSize
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYPASSWORD, m_proxypass.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_PROXYPASSWORD set failed, %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
-    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
-        LOG_ERROR( "CURLOPT_PROTOCOLS failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
-    }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDS, data ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_POSTFIELDS failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_POSTFIELDSIZE, dataSize ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_POSTFIELDSIZEL failed on url %s %d:%s", url.c_str(), eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
+#ifndef CM_HTTP_ENABLED
+    else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
+        LOG_ERROR( "CURLOPT_PROTOCOLS failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSL_VERIFYPEER, 1 ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
@@ -423,6 +426,7 @@ bool PmHttp::HttpPost( const std::string& url, const void* data, size_t dataSize
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_WRITEDATA failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+#endif // CM_HTTP_ENABLED
     else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
@@ -489,6 +493,7 @@ bool PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& 
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROXYPASSWORD, m_proxypass.c_str() ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_PROXYPASSWORD set failed, %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+#ifndef CM_HTTP_ENABLED
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_PROTOCOLS failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
@@ -501,6 +506,7 @@ bool PmHttp::HttpDownload( const std::string& url, const std::filesystem::path& 
     else if( ( eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2 ) ) != CURLE_OK ) {
         LOG_ERROR( "CURLOPT_SSLVERSION failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
+#endif // CM_HTTP_ENABLED
     else if( ( eResult.subErrorCode = curl_easy_perform( m_curlHandle ) ) != CURLE_OK ) {
         LOG_ERROR( "curl_easy_perform failed %d:%s", eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
     }
