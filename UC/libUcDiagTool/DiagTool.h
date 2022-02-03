@@ -12,7 +12,7 @@ public:
     DiagTool( IDiagFileListBuilder &fileListBuilder, IDiagPackager &packager );
     ~DiagTool();
 
-    void CreateDiagnosticPackage() override;
+    void CreateDiagnosticPackage( const std::wstring& outputFile = L"" ) override;
 
 private:
     IDiagFileListBuilder& m_fileListBuilder;

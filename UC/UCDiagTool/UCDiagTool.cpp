@@ -194,9 +194,11 @@ void RunElevated( int argc, wchar_t** argv )
     }
 }
 
-int wmain(int argc, wchar_t** argv, wchar_t** envp)
+int wmain( int argc, wchar_t** argv, wchar_t** envp )
 {
+    bool usermode = false;
     std::wstring dataDir = WindowsUtilities::GetLogDir();
+    std::wstring outputFile;
 
     UcLogFile logFile;
     logFile.Init();
@@ -207,12 +209,24 @@ int wmain(int argc, wchar_t** argv, wchar_t** envp)
 
     WLOG_DEBUG( L"Enter" );
 
-    if ((argc > 1) && (std::wstring( L"--notifyreboot" ) == argv[1])) {
-        SendRebootToast();
-        return 0;
+    for( int i = 0; i < argc; i++ ) {
+        if( ( std::wstring( L"--notifyreboot" ) == argv[ i ] ) ) {
+            SendRebootToast();
+            return 0;
+        }
+        else if( ( std::wstring( L"-u" ) == argv[ i ] ) ) {
+            usermode = true;
+            WLOG_DEBUG( L"Running in user mode" );
+        }
+        else if( ( std::wstring( L"-o" ) == argv[ i ] ) ) {
+            if( ( i + 1 ) < argc ) {
+                i++;
+                outputFile = argv[ i ];
+            }
+        }
     }
 
-    if( !IsProcessElevated() ) {
+    if( !usermode && !IsProcessElevated() ) {
         WLOG_DEBUG( L"Elevation required" );
         RunElevated( argc, argv );
         return 0;
@@ -220,7 +234,7 @@ int wmain(int argc, wchar_t** argv, wchar_t** envp)
 
     DiagToolContainer diagToolContainer;
 
-    diagToolContainer.GetDiagTool().CreateDiagnosticPackage();
+    diagToolContainer.GetDiagTool().CreateDiagnosticPackage( outputFile );
 
     WLOG_DEBUG( L"Exit" );
     return 0;

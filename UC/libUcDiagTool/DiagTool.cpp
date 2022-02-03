@@ -34,11 +34,11 @@ std::filesystem::path DiagTool::GetPackagePath()
     return packagePath;
 }
 
-void DiagTool::CreateDiagnosticPackage()
+void DiagTool::CreateDiagnosticPackage( const std::wstring& outputFile )
 {
     try {
         std::vector<std::filesystem::path> fileList;
-        std::filesystem::path packagePath = GetPackagePath();
+        std::filesystem::path packagePath = outputFile.empty() ? GetPackagePath() : std::filesystem::path( outputFile );
 
         m_fileListBuilder.GetFileList( fileList );
 
