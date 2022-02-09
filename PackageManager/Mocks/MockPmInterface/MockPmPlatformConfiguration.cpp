@@ -117,7 +117,17 @@ void MockPmPlatformConfiguration::MakeUpdateCertStoreForUrlReturn( bool value )
     ON_CALL( *this, UpdateCertStoreForUrl( _ ) ).WillByDefault( Return( value ) );
 }
 
-void MockPmPlatformConfiguration::ExpectUpdateCertStoreForUrlCalled()
+void MockPmPlatformConfiguration::ExpectUpdateCertStoreForUrlNotCalled()
 {
     EXPECT_CALL( *this, UpdateCertStoreForUrl( _ ) ).Times( 0 );
+}
+
+void MockPmPlatformConfiguration::MakeGetProxyDiscoveryReturn( void* value )
+{
+    ON_CALL( *this, GetProxyDiscovery() ).WillByDefault( Return( value ) );
+}
+
+void MockPmPlatformConfiguration::ExpectGetProxyDiscoveryCalledOnce()
+{
+    EXPECT_CALL( *this, GetProxyDiscovery() ).Times( 1 );
 }

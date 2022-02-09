@@ -7,11 +7,12 @@
 #include <map>
 
 class IWinCertLoader;
+class IProxyDiscovery;
 
 class WindowsConfiguration : public IPmPlatformConfiguration
 {
 public:
-    WindowsConfiguration(IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier);
+    WindowsConfiguration(IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier, IProxyDiscovery &proxyDiscovery);
     ~WindowsConfiguration();
 
     /**
@@ -85,11 +86,17 @@ public:
      *
      *  @param[in] url
      */
-    bool UpdateCertStoreForUrl( const std::string& url );
+    bool UpdateCertStoreForUrl( const std::string& url ) override;
+
+    /**
+     * @brief Retrieve the ProxyDiscovery instance as void ptr
+     */
+    void* GetProxyDiscovery() override;
 
 private:
     IWinCertLoader& m_winCertLoader;
     UCIDApiDll m_ucidApi;
+    IProxyDiscovery& m_proxyDiscovery;
     std::string m_token;
     std::string m_ucid;
     PmUrlList m_urls;

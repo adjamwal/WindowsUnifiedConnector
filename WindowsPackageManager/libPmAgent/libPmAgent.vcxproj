@@ -95,7 +95,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libProxy;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -115,7 +115,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libProxy;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -135,7 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libProxy;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -155,7 +155,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)\SharedLibs\libWindowsUtilities;$(SolutionDir)\Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)\SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libProxy;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>

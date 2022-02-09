@@ -3,6 +3,7 @@
 #include "MockWinCertLoader.h"
 #include "MockCodesignVerifier.h"
 #include "MockWindowsUtilities.h"
+#include "MockProxyDiscovery.h"
 #include <memory>
 
 class TestWindowsConfiguration: public ::testing::Test
@@ -13,8 +14,9 @@ protected:
         MockWindowsUtilities::Init();
         m_winCertLoader.reset( new NiceMock<MockWinCertLoader>() );
         m_codeSignVerifier.reset( new NiceMock<MockCodesignVerifier>() );
+        m_proxyDiscovery.reset( new NiceMock<MockProxyDiscovery>() );
 
-        m_patient.reset( new WindowsConfiguration( *m_winCertLoader, *m_codeSignVerifier ) );
+        m_patient.reset( new WindowsConfiguration( *m_winCertLoader, *m_codeSignVerifier, *m_proxyDiscovery ) );
     }
 
     void TearDown()
@@ -23,12 +25,14 @@ protected:
 
         m_winCertLoader.reset();
         m_codeSignVerifier.reset();
+        m_proxyDiscovery.reset();
 
         MockWindowsUtilities::Deinit();
     }
 
     std::unique_ptr<MockWinCertLoader> m_winCertLoader;
     std::unique_ptr<MockCodesignVerifier> m_codeSignVerifier;
+    std::unique_ptr<MockProxyDiscovery> m_proxyDiscovery;
 
     std::unique_ptr<WindowsConfiguration> m_patient;
 };

@@ -88,4 +88,9 @@ public:
      *  @param[in] url
      */
     virtual bool UpdateCertStoreForUrl( const std::string& url ) = 0;
+
+    /**
+     * @brief Retrieve the ProxyDiscovery instance as void ptr
+     */
+    virtual void* GetProxyDiscovery() = 0;
 };

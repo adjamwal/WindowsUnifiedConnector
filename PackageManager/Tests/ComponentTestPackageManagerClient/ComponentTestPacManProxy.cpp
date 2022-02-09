@@ -15,17 +15,58 @@ std::string _ucNullReponse( R"(
 }
 )" );
 
-TEST_F( ComponentTestPacManProxy, PacManWillDetectVerifyAndSetProxy )
+TEST_F( ComponentTestPacManProxy, PacManWillGetProxyDiscoveryInstanceFromPlatformDependencies )
 {
     m_mockCloud->MakeCheckinReturn( true, _ucNullReponse, { 200, 0 } );
-    ON_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockProxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
         [this]( const LPCTSTR testURL, const LPCTSTR urlPAC )
         {
             m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
         }
     ) );
 
-    ON_CALL( *m_proxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockProxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
+        [this]( const LPCTSTR testURL, const LPCTSTR urlPAC, std::list<ProxyInfoModel>& proxyList )
+        {
+            m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
+        }
+    ) );
+
+    m_mockConfig->MakeGetCloudCheckinUriReturn( "checkinuri" );
+    m_mockConfig->MakeGetCloudEventUriReturn( "eventuri" );
+    m_mockConfig->MakeGetCloudCatalogUriReturn( "cataloguri" );
+
+    ON_CALL( *m_httpForProxyTesting, HttpGet( _, _, _ ) ).WillByDefault( Invoke(
+        []( const std::string& url, std::string& responseContent, PmHttpExtendedResult& eResult )
+        {
+            responseContent = "";
+            eResult.httpResponseCode = 0;
+            eResult.subErrorType = "curl";
+            eResult.subErrorCode = CURLE_PEER_FAILED_VERIFICATION;
+            return true;
+        }
+    ) );
+
+    m_mockPlatformConfiguration->ExpectGetProxyDiscoveryCalledOnce();
+
+    StartPacManNoConfig();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 2 ) );
+    lock.unlock();
+}
+
+TEST_F( ComponentTestPacManProxy, PacManWillDetectVerifyAndSetProxy )
+{
+    m_mockCloud->MakeCheckinReturn( true, _ucNullReponse, { 200, 0 } );
+    ON_CALL( *m_mockProxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
+        [this]( const LPCTSTR testURL, const LPCTSTR urlPAC )
+        {
+            m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
+        }
+    ) );
+
+    ON_CALL( *m_mockProxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
         [this]( const LPCTSTR testURL, const LPCTSTR urlPAC, std::list<ProxyInfoModel>& proxyList )
         {
             m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
@@ -71,14 +112,14 @@ TEST_F( ComponentTestPacManProxy, PacManWillDetectVerifyAndSetProxy )
 TEST_F( ComponentTestPacManProxy, PacManWillDetectAndFailToVerifyIfConfigUrisMissing )
 {
     m_mockCloud->MakeCheckinReturn( true, _ucNullReponse, { 200, 0 } );
-    ON_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockProxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
         [this]( const LPCTSTR testURL, const LPCTSTR urlPAC )
         {
             m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
         }
     ) );
 
-    ON_CALL( *m_proxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockProxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
         [this]( const LPCTSTR testURL, const LPCTSTR urlPAC, std::list<ProxyInfoModel>& proxyList )
         {
             m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
@@ -107,14 +148,14 @@ TEST_F( ComponentTestPacManProxy, PacManWillDetectAndFailToVerifyIfConfigUrisMis
 TEST_F( ComponentTestPacManProxy, PacManWillDetectAndFailToVerifyIfResponseCodeUnexpected )
 {
     m_mockCloud->MakeCheckinReturn( true, _ucNullReponse, { 200, 0 } );
-    ON_CALL( *m_proxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockProxyDiscovery, StartProxyDiscoveryAsync( _, _ ) ).WillByDefault( Invoke(
         [this]( const LPCTSTR testURL, const LPCTSTR urlPAC )
         {
             m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );
         }
     ) );
 
-    ON_CALL( *m_proxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
+    ON_CALL( *m_mockProxyDiscovery, ProxyDiscoverAndNotifySync( _, _, _ ) ).WillByDefault( Invoke(
         [this]( const LPCTSTR testURL, const LPCTSTR urlPAC, std::list<ProxyInfoModel>& proxyList )
         {
             m_proxyDiscoverySubscriber->ProxiesDiscovered( m_proxyList );

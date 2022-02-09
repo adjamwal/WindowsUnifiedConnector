@@ -6,12 +6,14 @@
 #include "IPmConfig.h"
 #include <WindowsUtilities.h>
 #include <codecvt>
+#include "ProxyContainer.h"
 
 UcidFacade::UcidFacade()
     : m_oldLogger( GetUcLogger() )
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer( new CodesignVerifier() )
-    , m_winConf( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
+    , m_proxyContainer( new ProxyContainer() )
+    , m_winConf( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer, m_proxyContainer->GetProxyDiscovery() ) )
 {
 }
 

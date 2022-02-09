@@ -54,7 +54,6 @@ private:
     std::unique_ptr<IUcidAdapter> m_ucidAdapter;
     std::unique_ptr<IPmBootstrap> m_bootstrap;
     std::unique_ptr<IPmConfig> m_config;
-    std::unique_ptr<ProxyContainer> m_proxyContainer;
     std::unique_ptr<IProxyVerifier> m_proxyVerifier;
     std::unique_ptr<IProxyConsumer> m_proxyDiscoverySubscriber;
     std::unique_ptr<IPmManifest> m_manifest;

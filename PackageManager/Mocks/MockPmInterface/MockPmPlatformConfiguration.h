@@ -53,7 +53,11 @@ public:
 
     MOCK_METHOD1( UpdateCertStoreForUrl, bool( const std::string& ) );
     void MakeUpdateCertStoreForUrlReturn( bool value );
-    void ExpectUpdateCertStoreForUrlCalled();
+    void ExpectUpdateCertStoreForUrlNotCalled();
+
+    MOCK_METHOD0( GetProxyDiscovery, void*() );
+    void MakeGetProxyDiscoveryReturn( void* value );
+    void ExpectGetProxyDiscoveryCalledOnce();
 
 private:
     std::string m_defaultUserAgent;

@@ -23,7 +23,6 @@
 #include "CloudEventPublisher.h"
 #include "UcUpgradeEventHandler.h"
 #include "CatalogJsonParser.h"
-#include "ProxyContainer.h"
 #include "PmProxyVerifier.h"
 #include "IProxyDiscovery.h"
 #include "PmProxyDiscoverySubscriber.h"
@@ -55,7 +54,6 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_ucidAdapter( new UcidAdapter() )
     , m_bootstrap( new PmBootstrap( *m_fileUtil ) )
     , m_config( new PmConfig( *m_fileUtil, *m_ucidAdapter ) )
-    , m_proxyContainer( new ProxyContainer() )
     , m_proxyVerifier( new PmProxyVerifier( *m_httpForProxyVerification, *m_config ) )
     , m_proxyDiscoverySubscriber( new PmProxyDiscoverySubscriber( *m_http, *m_proxyVerifier ) )
     , m_manifest( new PmManifest() )
@@ -66,7 +64,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_eventStorage( new CloudEventStorage( CLOUD_EVENT_STORAGE_FILENAME, *m_fileUtil, *m_config ) )
     , m_eventBuilder( new CloudEventBuilder() )
     , m_eventPublisher( new CloudEventPublisher( *m_cloud, *m_eventStorage, *m_config ) )
-    , m_ucUpgradeEventBuilder( new CloudEventBuilder)
+    , m_ucUpgradeEventBuilder( new CloudEventBuilder )
     , m_ucUpgradeEventStorage( new CloudEventStorage( UC_UPGRADE_EVENT_STORAGE_FILENAME, *m_fileUtil, *m_config ) )
     , m_ucUpgradeEventHandler( new UcUpgradeEventHandler( *m_eventPublisher, *m_ucUpgradeEventStorage, *m_ucUpgradeEventBuilder ) )
     , m_checkinManifestRetriever( new CheckinManifestRetriever( *m_cloud, *m_ucidAdapter, *m_certsAdapter, *m_config ) )
@@ -105,8 +103,7 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_rebootHandler,
             *m_thread,
             *m_watchdog,
-            *m_proxyDiscoverySubscriber,
-            m_proxyContainer->GetProxyDiscovery() ) )
+            *m_proxyDiscoverySubscriber ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );
 }

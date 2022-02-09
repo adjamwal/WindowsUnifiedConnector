@@ -53,8 +53,7 @@ public:
         IRebootHandler& rebootHandler,
         IWorkerThread& thread,
         IWatchdog& watchdog,
-        IProxyConsumer& proxyDiscoverySubscriber,
-        IProxyDiscovery& proxyDiscovery );
+        IProxyConsumer& proxyDiscoverySubscriber );
     virtual ~PackageManager();
 
     int32_t Start( const char* pmConfigFile, const char * pmBootstrapFile ) override;
@@ -82,7 +81,6 @@ private:
     IWorkerThread& m_thread;
     IWatchdog& m_watchdog;
     IProxyConsumer& m_proxyDiscoverySubscriber;
-    IProxyDiscovery& m_proxyDiscovery;
 
     std::mutex m_mutex;
     std::string m_pmConfigFile;
@@ -91,6 +89,7 @@ private:
     bool m_useShorterInterval = false;
     bool m_initialUcUpgradeEventSent = false;
 
+    IProxyDiscovery* m_proxyDiscovery;
     IPmPlatformDependencies* m_dependencies;
 
     void PmWorkflowThread();

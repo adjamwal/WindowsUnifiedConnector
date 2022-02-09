@@ -16,6 +16,7 @@ class IPackageDiscovery;
 class IPackageDiscoveryMethods;
 class IUserImpersonator;
 class IUtf8PathVerifier;
+class ProxyContainer;
 
 class PmAgentContainer
 {
@@ -32,6 +33,7 @@ private:
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
     std::unique_ptr<IWinCertLoader> m_certLoader;
     std::unique_ptr<IPackageDiscoveryMethods> m_discoveryMethods;
+    std::unique_ptr<ProxyContainer> m_proxyContainer;
     std::unique_ptr<IPackageDiscovery> m_packageDiscovery;
     std::unique_ptr<IUserImpersonator> m_userImpersonator;
     std::unique_ptr<WindowsConfiguration> m_configuration;

@@ -25,9 +25,9 @@
 #include "ICatalogJsonParser.h"
 #include "PmTypes.h"
 #include "IWatchdog.h"
-#include "IProxyDiscovery.h"
-#include "IProxyConsumer.h"
+#include "ProxyDiscovery.h"
 #include "PmProxyDiscoverySubscriber.h"
+#include "ProxyInfoModel.h"
 #include <sstream>
 
 using namespace std;
@@ -49,8 +49,7 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     IRebootHandler& rebootHandler,
     IWorkerThread& thread,
     IWatchdog& watchdog,
-    IProxyConsumer& proxyDiscoverySubscriber,
-    IProxyDiscovery& proxyDiscovery )
+    IProxyConsumer& proxyDiscoverySubscriber )
     : m_bootstrap( bootstrap )
     , m_config( config )
     , m_cloud( cloud )
@@ -69,9 +68,10 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     , m_thread( thread )
     , m_watchdog( watchdog )
     , m_proxyDiscoverySubscriber( proxyDiscoverySubscriber )
-    , m_proxyDiscovery( proxyDiscovery )
-    , m_dependencies( nullptr )
     , m_useShorterInterval( false )
+    , m_initialUcUpgradeEventSent( false )
+    , m_proxyDiscovery( nullptr )
+    , m_dependencies( nullptr )
 {
 
 }
@@ -102,7 +102,9 @@ int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrap
             LOG_DEBUG( "Failed to load Pm Bootstrap" );
         }
 
-        m_proxyDiscovery.RegisterForProxyNotifications( &m_proxyDiscoverySubscriber );
+        if( m_proxyDiscovery ) {
+            m_proxyDiscovery->RegisterForProxyNotifications( &m_proxyDiscoverySubscriber );
+        }
         PmCheckForProxies( false );
 
         m_watchdog.Start(
@@ -126,7 +128,6 @@ int32_t PackageManager::Stop()
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_proxyDiscovery.UnregisterForProxyNotifications( &m_proxyDiscoverySubscriber );
     m_watchdog.Stop();
 
     if( !m_thread.IsRunning() ) {
@@ -135,6 +136,10 @@ int32_t PackageManager::Stop()
     else {
         m_thread.Stop();
         rtn = 0;
+    }
+
+    if( m_proxyDiscovery ) {
+        m_proxyDiscovery->UnregisterForProxyNotifications( &m_proxyDiscoverySubscriber );
     }
 
     LOG_DEBUG( "Exit %d", rtn );
@@ -164,6 +169,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_ucUpgradeEventHandler.Initialize( m_dependencies );
         m_rebootHandler.Initialize( m_dependencies );
         m_catalogJsonParser.Initialize( m_dependencies );
+        m_proxyDiscovery = ( IProxyDiscovery* )m_dependencies->Configuration().GetProxyDiscovery();
     }
     catch( std::exception& ex )
     {
@@ -305,14 +311,16 @@ void PackageManager::PmCheckForProxies( bool discoverAsync = true )
 {
     std::wstring proxyTestUrl, proxyPacURL;
     try {
+        if( !m_proxyDiscovery ) throw new std::exception("ProxyDiscovery dependency is not set!");
+
         if( discoverAsync ) //async discovery
         {
-            m_proxyDiscovery.StartProxyDiscoveryAsync( proxyTestUrl.c_str(), proxyPacURL.c_str() );
+            m_proxyDiscovery->StartProxyDiscoveryAsync( proxyTestUrl.c_str(), proxyPacURL.c_str() );
         }
         else //synchronous discovery
         {
             PROXY_INFO_LIST proxyList;
-            m_proxyDiscovery.ProxyDiscoverAndNotifySync( proxyTestUrl.c_str(), proxyPacURL.c_str(), proxyList );
+            m_proxyDiscovery->ProxyDiscoverAndNotifySync( proxyTestUrl.c_str(), proxyPacURL.c_str(), proxyList );
         }
     }
     catch( std::exception& ex ) {

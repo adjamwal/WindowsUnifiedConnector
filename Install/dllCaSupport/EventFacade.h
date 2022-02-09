@@ -16,6 +16,7 @@ class ICloudEventPublisher;
 class ICloudEventBuilder;
 class IUtf8PathVerifier;
 class IPMLogger;
+class ProxyContainer;
 
 class EventFacade : public IEventFacade
 {
@@ -38,6 +39,7 @@ private:
     std::unique_ptr<InstallerConfig> m_config;
     std::unique_ptr<ICloudEventStorage> m_eventStorage;
     std::unique_ptr<ICodesignVerifier> m_codeSignVerifer;
+    std::unique_ptr<ProxyContainer> m_proxyContainer;
     std::unique_ptr<IWinCertLoader> m_certLoader;
     std::unique_ptr<IPmPlatformConfiguration> m_winConf;
     std::unique_ptr<ICloudEventPublisher> m_eventPublisher;

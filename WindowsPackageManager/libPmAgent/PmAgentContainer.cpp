@@ -15,6 +15,8 @@
 #include "MsiApi.h"
 #include "UserImpersonator.h"
 #include "Utf8PathVerifier.h"
+#include "ProxyContainer.h"
+#include "IProxyDiscovery.h"
 
 PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const std::wstring& pmConfigFilePath ) :
     m_winApiWrapper( new WinApiWrapper() )
@@ -23,7 +25,8 @@ PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const 
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer( new CodesignVerifier() )
     , m_discoveryMethods( new PackageDiscoveryMethods( *m_msiApi ) )
-    , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
+    , m_proxyContainer( new ProxyContainer() )
+    , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer, m_proxyContainer->GetProxyDiscovery() ) )
     , m_packageDiscovery( new PackageDiscovery( *m_discoveryMethods, *m_msiApi, *m_utf8PathVerifier ) )
     , m_userImpersonator( new UserImpersonator( *m_winApiWrapper ) )
     , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery, *m_userImpersonator ) )

@@ -131,7 +131,7 @@ protected:
         };
         m_proxyList.push_back( testProxy );
 
-        m_proxyDiscovery.reset( new NiceMock<MockProxyDiscovery>() );
+        m_mockProxyDiscovery.reset( new NiceMock<MockProxyDiscovery>() );
 
         m_patient.reset( new PackageManager(
             *m_mockBootstrap,
@@ -151,8 +151,7 @@ protected:
             *m_mockRebootHandler,
             *m_thread,
             *m_watchdog,
-            *m_proxyDiscoverySubscriber,
-            *m_proxyDiscovery ) );
+            *m_proxyDiscoverySubscriber ) );
     }
 
     void TearDown()
@@ -188,7 +187,7 @@ protected:
         m_mockBootstrap.reset();
         m_mockFileUtil.reset();
 
-        m_proxyDiscovery.reset();
+        m_mockProxyDiscovery.reset();
         m_proxyDiscoverySubscriber.reset();
         m_proxyVerifier.reset();
         m_http.reset();
@@ -215,6 +214,7 @@ protected:
     void SetupPacMacn()
     {
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
+        m_mockPlatformConfiguration->MakeGetProxyDiscoveryReturn( m_mockProxyDiscovery.get() );
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeGetCloudCheckinUriReturn( m_configUrl );
         m_mockConfig->MakeGetCloudEventUriReturn( m_configUrl );
@@ -229,6 +229,7 @@ protected:
     void SetupPacMacNoConfig()
     {
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
+        m_mockPlatformConfiguration->MakeGetProxyDiscoveryReturn( m_mockProxyDiscovery.get() );
         m_mockConfig->MakeLoadPmConfigReturn( 0 );
         m_mockConfig->MakeAllowPostInstallRebootsReturn( true );
         m_mockCloud->MakeGetReturn( true, "content", { 200, 0 } );
@@ -292,7 +293,7 @@ protected:
     std::unique_ptr<MockPmHttp> m_http;
     std::unique_ptr<MockPmHttp> m_httpForProxyTesting;
     std::unique_ptr<IProxyConsumer> m_proxyDiscoverySubscriber;
-    std::unique_ptr<MockProxyDiscovery> m_proxyDiscovery;
+    std::unique_ptr<MockProxyDiscovery> m_mockProxyDiscovery;
     std::unique_ptr<IProxyVerifier> m_proxyVerifier;
     std::unique_ptr<IPackageInventoryProvider> m_packageInventoryProvider;
     std::unique_ptr<IPackageDiscoveryManager> m_packageDiscoveryManager;

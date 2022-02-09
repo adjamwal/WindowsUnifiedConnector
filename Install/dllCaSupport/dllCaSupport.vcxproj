@@ -62,7 +62,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libProxy;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -87,7 +87,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SharedLibs\libWindowsUtilities;$(SolutionDir)PackageManager\libPmUtil;$(SolutionDir)PackageManager\libPmClient;$(SolutionDir)PackageManager\libPmCloud;$(SolutionDir)PackageManager\libPmConfig;$(SolutionDir)PackageManager\PmInterface;$(SolutionDir)WindowsPackageManager\libPmAgent;$(SolutionDir)Resources\UCID\$(PlatformShortName)\include;$(SolutionDir)SharedLibs\LibVerifier;$(SolutionDir)SharedLibs\libLogger;$(SolutionDir)SharedLibs\libProxy;$(IMN_COMMON)common-windows-build\$(Configuration)\$(Platform)\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -134,6 +134,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\libLogger\libLogger.vcxproj">
       <Project>{822ccd07-f01c-4dd7-a587-0a241953fb62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SharedLibs\libProxy\libProxyMD.vcxproj">
+      <Project>{4459441c-588e-515a-be05-717727f5f5bf}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\SharedLibs\LibVerifier\LibVerifier.vcxproj">
       <Project>{780b5314-e3ca-4427-96e0-9262f8c7a2ce}</Project>

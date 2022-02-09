@@ -1,14 +1,16 @@
 #include "pch.h"
 #include "WindowsConfiguration.h"
 #include "IWinCertLoader.h"
+#include "IProxyDiscovery.h"
 #include "..\..\GlobalVersion.h"
 #include "WindowsUtilities.h"
 #include "CmConstants.h"
 #include <codecvt>
 
-WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier ) :
+WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier, IProxyDiscovery& proxyDiscovery ) :
     m_winCertLoader( winCertLoader ),
-    m_ucidApi(codeSignVerifier)
+    m_ucidApi( codeSignVerifier ),
+    m_proxyDiscovery( proxyDiscovery )
 {
     m_winCertLoader.LoadSystemCerts();
 }
@@ -190,6 +192,11 @@ bool WindowsConfiguration::UpdateCertStoreForUrl( const std::string& url )
     return rtn;
 }
 
+void* WindowsConfiguration::GetProxyDiscovery()
+{
+    return ( void* )&m_proxyDiscovery;
+}
+
 std::string WindowsConfiguration::ExtractUrlRoot( const std::string& url )
 {
     size_t begin = url.find( "://" );
@@ -206,3 +213,4 @@ std::string WindowsConfiguration::ExtractUrlRoot( const std::string& url )
     
     return url.substr( begin, end - begin );
 }
+

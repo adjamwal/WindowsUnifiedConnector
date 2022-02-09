@@ -13,6 +13,7 @@
 #include "PmConstants.h"
 #include "Utf8PathVerifier.h"
 #include "PmLogAdapter.h"
+#include "ProxyContainer.h"
 
 EventFacade::EventFacade()
     : m_pmLogger( new PmLogAdapter() )
@@ -24,7 +25,8 @@ EventFacade::EventFacade()
     , m_eventStorage( new MsiCloudEventStorage() )
     , m_certLoader( new WinCertLoader() )
     , m_codeSignVerifer( new CodesignVerifier() )
-    , m_winConf( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer ) )
+    , m_proxyContainer( new ProxyContainer() )
+    , m_winConf( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer, m_proxyContainer->GetProxyDiscovery() ) )
     , m_eventPublisher( new CloudEventPublisher( *m_cloud, *m_eventStorage, *m_config ) )
 {
     SetPMLogger( m_pmLogger.get() );
