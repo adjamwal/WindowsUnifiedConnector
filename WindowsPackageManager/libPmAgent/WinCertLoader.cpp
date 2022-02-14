@@ -138,14 +138,14 @@ int WinCertLoader::LoadSystemCerts()
 void WinCertLoader::FreeCerts( X509** trusted_certificates, size_t cert_count )
 {
     size_t i;
-    if( m_certificates != NULL ) {
-        for( i = 0; i < m_certcount; ++i ) {
-            X509_free( m_certificates[ i ] );
-            m_certificates[ i ] = NULL;
+    if( trusted_certificates != NULL ) {
+        for( i = 0; i < cert_count; ++i ) {
+            X509_free( trusted_certificates[ i ] );
+            trusted_certificates[ i ] = NULL;
         }
 
-        free( m_certificates );
-        m_certificates = NULL;
+        free( trusted_certificates );
+        trusted_certificates = NULL;
     }
 }
 
