@@ -6,9 +6,9 @@
 #include "DiagPackager.h"
 #include "DiagTool.h"
 
-DiagToolContainer::DiagToolContainer() :
+DiagToolContainer::DiagToolContainer( std::vector<std::filesystem::path>* additionalFiles ) :
     m_zlibWrapper( new ZlibWrapper() )
-    , m_fileListBuilder( new DiagFileListBuilder() )
+    , m_fileListBuilder( new DiagFileListBuilder( additionalFiles ) )
     , m_packager( new DiagPackager( *m_zlibWrapper ) )
     , m_diagTool( new DiagTool( *m_fileListBuilder, *m_packager ) )
 {

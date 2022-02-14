@@ -194,15 +194,41 @@ void RunElevated( int argc, wchar_t** argv )
     }
 }
 
+std::filesystem::path GetLogFileName()
+{
+    std::filesystem::path logFilename = WindowsUtilities::ResolveKnownFolderIdForCurrentUser( "FOLDERID_ProgramData" );
+    WCHAR swPath[ MAX_PATH + 5 ] = { 0 };
+    DWORD dwSize = GetModuleFileName( NULL, swPath, MAX_PATH );
+    std::wstring modulePath = swPath;
+
+    logFilename /= "Cisco";
+    logFilename /= "Cisco Secure Client";
+    logFilename /= "CM";
+
+    if( dwSize && ( modulePath.find_last_of( '\\' ) != std::wstring::npos ) ) {
+        modulePath = modulePath.substr( modulePath.find_last_of( '\\' ) + 1 );
+        logFilename /= modulePath;
+    }
+    else {
+        logFilename /= L"UnknownApplication";
+    }
+
+    logFilename += L".log";
+
+    return logFilename;
+}
+
 int wmain( int argc, wchar_t** argv, wchar_t** envp )
 {
     bool usermode = false;
-    std::wstring dataDir = WindowsUtilities::GetLogDir();
+    
     std::wstring outputFile;
 
     UcLogFile logFile;
-    logFile.Init();
-
+    std::filesystem::path logFilename = GetLogFileName();
+    logFile.Init( logFilename.wstring().c_str() );
+    WindowsUtilities::AllowEveryoneAccessToFile( logFilename );
+    
     UcLogger logger( logFile );
     logger.SetLogLevel( IUcLogger::LOG_DEBUG );
     SetUcLogger( &logger );
@@ -232,7 +258,10 @@ int wmain( int argc, wchar_t** argv, wchar_t** envp )
         return 0;
     }
 
-    DiagToolContainer diagToolContainer;
+    std::vector<std::filesystem::path> additionalFiles;
+    additionalFiles.push_back( logFilename );
+
+    DiagToolContainer diagToolContainer( &additionalFiles );
 
     diagToolContainer.GetDiagTool().CreateDiagnosticPackage( outputFile );
 

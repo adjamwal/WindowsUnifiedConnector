@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <filesystem>
+#include <vector>
 
 class IZlibWrapper;
 class IDiagFileListBuilder;
@@ -10,7 +12,7 @@ class IDiagTool;
 class DiagToolContainer
 {
 public:
-    DiagToolContainer();
+    DiagToolContainer( std::vector<std::filesystem::path>* additionalFiles = NULL );
     ~DiagToolContainer();
 
     IDiagTool& GetDiagTool();

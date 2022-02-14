@@ -142,3 +142,20 @@ TEST_F( TestDiagFileListBuilder, WillOnlyAddManifestOnce )
 
     EXPECT_EQ( 1, actualList.size() );
 }
+
+TEST_F( TestDiagFileListBuilder, WillAppendAdditionalFiles )
+{
+    std::wstring logPath;
+    std::vector<std::filesystem::path> expectedList;
+    std::vector<std::filesystem::path> actualList;
+    expectedList.push_back( "ConfigPath1" );
+    expectedList.push_back( "ConfigPath2" );
+
+    m_windowsUtils->MakeGetLogDirReturn( logPath );
+
+    m_patient.reset( new DiagFileListBuilder( &expectedList ) );
+
+    m_patient->GetFileList( actualList );
+
+    EXPECT_EQ( expectedList, actualList );
+}

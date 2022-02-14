@@ -8,9 +8,11 @@
 
 #include <sstream>
 
-DiagFileListBuilder::DiagFileListBuilder()
+DiagFileListBuilder::DiagFileListBuilder( std::vector<std::filesystem::path>* additionalFiles )
 {
-
+    if( additionalFiles ) {
+        m_AdditionalFiles = *additionalFiles;
+    }
 }
 
 DiagFileListBuilder::~DiagFileListBuilder()
@@ -32,6 +34,7 @@ void DiagFileListBuilder::GetFileList( std::vector<std::filesystem::path>& fileL
     }
 
     FindFilesAt( WindowsUtilities::GetLogDir(), fileList );
+    fileList.insert( fileList.end(), m_AdditionalFiles.begin(), m_AdditionalFiles.end() );
     CreateFileManifest( fileList );
 }
 

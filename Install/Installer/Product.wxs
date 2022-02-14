@@ -144,12 +144,17 @@
             <ComponentGroupRef Id="CG.ConfigFiles" />
             <ComponentGroupRef Id="CiscoStartMenu" />
             <ComponentGroupRef Id="CscPluginComponents" />
+            <ComponentRef Id="PD.RemoveFiles" />
         </Feature>
 
         <Property Id="UC_BASE_DIRECTORY">
             <RegistrySearch Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)" Root="HKLM" Type="raw" Id="UC_BASE_DIRECTORY_REGSEARCH" Name="Path" />
         </Property>
-
+        
+        <Property Id="PROGRAMDATA_UC_BASE_DIRECTORY">
+            <RegistrySearch Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)" Root="HKLM" Type="raw" Id="PD_UC_BASE_DIRECTORY_REGSEARCH" Name="DtLogPath" />
+        </Property>
+        
         <?if $(var.UC_CONSUMER) = 1 ?>
             <!-- ARPSYSTEMCOMPONENT=1 prevents the application from being displayed in the Add or Remove Programs list of Control Panel -->
             <!-- Note that you must remove this property completely to show in the list again. setting 0 is not enough -->
@@ -202,6 +207,13 @@
                 </Directory>
             </Directory>
             <?endif?>
+            <Directory Id="CommonAppDataFolder">
+                <Directory Id="PROGRAMDATA_CISCO_DIRECTORY" Name="$(var.CiscoDirectory)">
+                    <Directory Id="PROGRAMDATA_PRODUCT_FAMILY_DIRECTORY" Name="$(var.ProductDirectory)">
+                        <Directory Id="PROGRAMDATA_UC_BASE_DIRECTORY" Name="$(var.UnifiedConnectorDirectory)" />
+                    </Directory>
+                </Directory>
+            </Directory>
         </Directory>
     </Fragment>
 
@@ -228,9 +240,16 @@
                 <util:RemoveFolderEx On="uninstall" Property="UC_BASE_DIRECTORY" />
                 <util:RemoveFolderEx On="uninstall" Property="UC_INSTALLCACHE_DIR" />
             </Component>
+
+            <Component Id="PD.RemoveFiles">
+                <RegistryValue Root="HKLM"
+                               Key="Software\Cisco\$(var.ProductFamily)\$(var.InstallName)"
+                               Name="DtLogPath" Type="string" Value="[PROGRAMDATA_UC_BASE_DIRECTORY]" KeyPath="yes" />
+                <util:RemoveFolderEx On="uninstall" Property="PROGRAMDATA_UC_BASE_DIRECTORY" />
+            </Component>
         </ComponentGroup>
     </Fragment>
-
+    
     <Fragment>
         <ComponentGroup Id="CscPluginComponents" Directory="UCSERVICE_DIRECTORY">
             <Component Id="CscCmPlugin" Guid="*">
