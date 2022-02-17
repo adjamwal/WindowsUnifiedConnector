@@ -84,3 +84,22 @@ TEST_F( TestDiagPackager, WillCloseArchive )
 
     m_patient->CreatePackage( fileList, packagePath );
 }
+
+TEST_F( TestDiagPackager, ExtractPackageWillThowOnBadParameters )
+{
+    EXPECT_THROW( m_patient->ExtractPackage( "", "" ), std::runtime_error );
+}
+
+TEST_F( TestDiagPackager, ExtractPackageWillThowOnFailure )
+{
+    m_zlibWrapper->MakeExtractArchiveReturn( false );
+
+    EXPECT_THROW( m_patient->ExtractPackage( "123", "abc" ), std::runtime_error );
+}
+
+TEST_F( TestDiagPackager, ExtractPackageWillSucceed )
+{
+    m_zlibWrapper->MakeExtractArchiveReturn( true );
+
+    EXPECT_NO_THROW( m_patient->ExtractPackage( "123", "abc" ) );
+}

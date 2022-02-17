@@ -13,6 +13,7 @@ public:
     ~DiagTool();
 
     void CreateDiagnosticPackage( const std::wstring& outputFile = L"" ) override;
+    void CreateDiagnosticFiles( const std::wstring& outputDir ) override;
 
 private:
     IDiagFileListBuilder& m_fileListBuilder;

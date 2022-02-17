@@ -48,3 +48,23 @@ void DiagTool::CreateDiagnosticPackage( const std::wstring& outputFile )
         LOG_ERROR( "Exception %s", e.what() );
     }
 }
+
+void DiagTool::CreateDiagnosticFiles( const std::wstring& outputDir )
+{
+    try {
+        std::srand( ( unsigned int )std::time( nullptr ) );
+        std::filesystem::path packagePath = std::filesystem::temp_directory_path();
+        packagePath /= std::to_wstring( std::rand() );
+        packagePath += ".zip";
+
+        CreateDiagnosticPackage( packagePath.wstring() );
+
+        m_packager.ExtractPackage( packagePath, outputDir );
+
+        LOG_DEBUG( "Removing temp zip: %s", packagePath.u8string().c_str() );
+        std::filesystem::remove( packagePath );
+    }
+    catch( std::exception& e ) {
+        LOG_ERROR( "Exception %s", e.what() );
+    }
+}

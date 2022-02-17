@@ -14,7 +14,7 @@ MockZlibWrapper::~MockZlibWrapper()
 void MockZlibWrapper::MakeCreateArchiveFileReturn( bool result )
 {
     ON_CALL( *this, CreateArchiveFile( _ ) ).WillByDefault( Return( result ) );
-    ON_CALL( *this, CreateArchiveFile( _,_ ) ).WillByDefault( Return( result ) );
+    ON_CALL( *this, CreateArchiveFile( _, _ ) ).WillByDefault( Return( result ) );
 }
 
 void MockZlibWrapper::ExpectCreateArchiveFileNotCalled()
@@ -41,4 +41,14 @@ void MockZlibWrapper::MakeCloseArchiveFileReturn( bool result )
 void MockZlibWrapper::ExpectCloseArchiveFileNotCalled()
 {
     EXPECT_CALL( *this, CloseArchiveFile() ).Times( 0 );
+}
+
+void MockZlibWrapper::MakeExtractArchiveReturn( bool result )
+{
+    ON_CALL( *this, ExtractArchive( _, _ ) ).WillByDefault( Return( result ) );
+}
+
+void MockZlibWrapper::ExpectExtractArchiveNotCalled()
+{
+    EXPECT_CALL( *this, ExtractArchive( _, _ ) ).Times( 0 );
 }

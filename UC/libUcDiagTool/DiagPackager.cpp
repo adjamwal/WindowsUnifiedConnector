@@ -33,3 +33,14 @@ void DiagPackager::CreatePackage( const std::vector<std::filesystem::path>& file
 
     m_zlibWrapper.CloseArchiveFile();
 }
+
+void DiagPackager::ExtractPackage( const std::filesystem::path& packagePath, const std::filesystem::path& packageDir )
+{
+    if( packagePath.empty() || packageDir.empty() ) {
+        throw std::runtime_error( __FUNCTION__ ": Invalid Parameters" );
+    }
+
+    if( !m_zlibWrapper.ExtractArchive( packagePath.generic_u8string().c_str(), packageDir.generic_u8string().c_str() ) ) {
+        throw std::runtime_error( __FUNCTION__ ": ExtractArchive failed" );
+    }
+}

@@ -221,7 +221,9 @@ std::filesystem::path GetLogFileName()
 int wmain( int argc, wchar_t** argv, wchar_t** envp )
 {
     bool usermode = false;
-    
+    bool customOutputFile = false;
+    bool customOutputDir = false;
+
     std::wstring outputFile;
 
     UcLogFile logFile;
@@ -249,7 +251,26 @@ int wmain( int argc, wchar_t** argv, wchar_t** envp )
                 i++;
                 outputFile = argv[ i ];
             }
+            else {
+                return -1;
+            }
+            customOutputFile = true;
         }
+        else if( ( std::wstring( L"-d" ) == argv[ i ] ) ) {
+            if( ( i + 1 ) < argc ) {
+                i++;
+                outputFile = argv[ i ];
+            }
+            else {
+                return -1;
+            }
+            customOutputDir = true;
+        }
+    }
+
+    if( customOutputFile && customOutputDir ) {
+        LOG_ERROR( L"Invalid parameters: -o and -d are incompatable" );
+        return -1;
     }
 
     if( !usermode && !IsProcessElevated() ) {
@@ -263,7 +284,12 @@ int wmain( int argc, wchar_t** argv, wchar_t** envp )
 
     DiagToolContainer diagToolContainer( &additionalFiles );
 
-    diagToolContainer.GetDiagTool().CreateDiagnosticPackage( outputFile );
+    if( !customOutputDir ) {
+        diagToolContainer.GetDiagTool().CreateDiagnosticPackage( outputFile );
+    }
+    else {
+        diagToolContainer.GetDiagTool().CreateDiagnosticFiles( outputFile );
+    }
 
     WLOG_DEBUG( L"Exit" );
     return 0;

@@ -44,8 +44,9 @@ void DiagFileListBuilder::FindFilesAt( const std::filesystem::path& filePath, st
         std::filesystem::path searchPath = filePath;
         searchPath /= "*";
         searchPath.make_preferred();
-        LOG_DEBUG( "Finding files with at %s", searchPath.generic_u8string().c_str() );
-        WindowsUtilities::FileSearchWithWildCard( searchPath, fileList );
+        LOG_DEBUG( "Finding files with at %s", searchPath.u8string().c_str() );
+        int err = WindowsUtilities::FileSearchWithWildCard( searchPath, fileList );
+        LOG_DEBUG( "WindowsUtilities::FileSearchWithWildCard returned %d", err );
     }
     else {
         WLOG_ERROR( L"filePath is empty" );
@@ -65,8 +66,8 @@ void DiagFileListBuilder::CreateFileManifest( std::vector<std::filesystem::path>
         manifestFile.make_preferred();
 
         for ( auto& file : fileList ) {
-            LOG_DEBUG( "Add %s to manifest", file.generic_u8string().c_str() );
-            manifestStream << file.generic_u8string().c_str() << std::endl;
+            LOG_DEBUG( "Add %s to manifest", file.u8string().c_str() );
+            manifestStream << file.u8string().c_str() << std::endl;
             if ( file == manifestFile ) {
                 manifestAlreadyInList = true;
             }

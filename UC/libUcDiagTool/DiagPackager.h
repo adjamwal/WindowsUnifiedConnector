@@ -10,6 +10,7 @@ public:
     ~DiagPackager();
 
     void CreatePackage( const std::vector<std::filesystem::path>& fileList, const std::filesystem::path& packagePath ) override;
+    void ExtractPackage( const std::filesystem::path& packagePath, const std::filesystem::path& packageDir ) override;
 
 private:
     IZlibWrapper& m_zlibWrapper;

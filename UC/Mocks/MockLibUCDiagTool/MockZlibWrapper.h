@@ -20,4 +20,8 @@ public:
     MOCK_METHOD0( CloseArchiveFile, bool() );
     void MakeCloseArchiveFileReturn( bool result );
     void ExpectCloseArchiveFileNotCalled();
+
+    MOCK_METHOD2( ExtractArchive, bool( const char*, const char*) );
+    void MakeExtractArchiveReturn( bool result );
+    void ExpectExtractArchiveNotCalled();
 };
