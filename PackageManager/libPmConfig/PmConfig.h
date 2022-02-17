@@ -6,6 +6,7 @@
 
 #define PM_CONFIG_LOGLEVEL_DEFAULT 7
 #define PM_CONFIG_INTERVAL_DEFAULT_MS ( 5 * 60 * 1000 )  // 5 minutes
+#define PM_CONFIG_MAX_STARTUP_DELAY_DEFAULT_MS ( 2 * 1000 )  // 2 Seconds
 #define PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS ( 60 * 60 * 24 * 7) // One week
 #define PM_CONFIG_MAX_EVENT_TTL_SECS ( 60 * 60 * 24 * 7) // One week
 #define PM_CONFIG_REBOOT_THROTTLE_DEFAULT_SECS 86400 // One day
@@ -22,7 +23,7 @@ namespace Json
 struct PmConfigData
 {
     uint32_t intervalMs;
-    uint32_t maxDelayMs;
+    uint32_t maxStartupDelayMs;
     uint32_t log_level;
     uint32_t maxFileCacheAge;
     uint32_t maxEventTtl;

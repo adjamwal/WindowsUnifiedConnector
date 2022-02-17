@@ -41,7 +41,7 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
             LOG_ERROR( "Failed to parse %s", ( pmConfig + ".bak" ).c_str() );
 
             m_configData.intervalMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
-            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
+            m_configData.maxStartupDelayMs = PM_CONFIG_MAX_STARTUP_DELAY_DEFAULT_MS;
             m_configData.log_level = PM_CONFIG_LOGLEVEL_DEFAULT;
             m_configData.maxFileCacheAge = PM_CONFIG_MAX_CACHE_AGE_DEFAULT_SECS;
             m_configData.allowPostInstallReboots = false;
@@ -94,7 +94,7 @@ uint32_t PmConfig::GetCloudCheckinIntervalMs()
     if( m_isFirstCheckin )
     {
         m_isFirstCheckin = false;
-        retval = RandomUtil::GetInt( 2000, m_configData.maxDelayMs );
+        retval = RandomUtil::GetInt( 2000, m_configData.maxStartupDelayMs );
         LOG_DEBUG( "Random first time checkin delay: %d", retval );
     }
 
@@ -179,10 +179,10 @@ int32_t PmConfig::ParsePmConfig( const std::string& pmConfig )
 
         if ( !VerifyPmMaxStartupDelay( pm ) ) {
             LOG_WARNING("Invalid MaxStartupDelay. Using default");
-            m_configData.maxDelayMs = PM_CONFIG_INTERVAL_DEFAULT_MS;
+            m_configData.maxStartupDelayMs = PM_CONFIG_MAX_STARTUP_DELAY_DEFAULT_MS;
         }
         else {
-            m_configData.maxDelayMs = pm["MaxStartupDelay"].asUInt();
+            m_configData.maxStartupDelayMs = pm["MaxStartupDelay"].asUInt();
         }
 
         if ( !VerifyPmAllowPostInstallReboots( pm ) ) {
