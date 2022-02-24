@@ -199,7 +199,6 @@ int ProxyDiscoveryEngine::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDisc
 
     PROXY_FIND_METHOD discoveryOrder[] = {
         PROXY_FIND_REG,
-        PROXY_FIND_IE,
         PROXY_FIND_PAC,
         PROXY_FIND_PAC_DHCP,
         PROXY_FIND_PAC_DNS
