@@ -116,6 +116,10 @@ public:
     void MakeWinHttpGetReturn( bool value );
     void ExpectWinHttpGetNotCalled();
 
+    MOCK_METHOD1( GetTimeZoneOffset, bool( int32_t& ) );
+    void MakeGetTimeZoneOffsetReturn( bool value );
+    void ExpectGetTimeZoneOffsetNotCalled();
+
     static MockWindowsUtilities* GetMockWindowUtilities();
     static void Init();
     static void Deinit();

@@ -29,7 +29,13 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
 
     inventory.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
     inventory.platform = "win";
-
+    inventory.utc_offset_sec = 0;
+    
+    if ( !WindowsUtilities::GetTimeZoneOffset( inventory.utc_offset_sec ) )
+    {
+        LOG_ERROR( "Failed to get utc offset: %d", inventory.utc_offset_sec );
+    }
+    
     std::vector<MsiApiProductInfo> productCache;
     auto ret = m_msiApi.QueryProducts( productCache );
 
