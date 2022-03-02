@@ -179,9 +179,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
 
 std::chrono::milliseconds PackageManager::PmThreadWait()
 {
-    if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
-        LOG_DEBUG( "Failed to load modified Pm configuration" );
-    }
+    ReloadConfigIfChanged();
 
     if( m_useShorterInterval )
     {
@@ -275,9 +273,7 @@ void PackageManager::PmWorkflowThread()
         }
 
         //new config might've been deployed
-        if( m_config.PmConfigFileChanged( m_pmConfigFile ) && !LoadPmConfig() ) {
-            LOG_DEBUG( "Failed to load PM configuration" );
-        }
+        ReloadConfigIfChanged();
 
         m_useShorterInterval = false;
     }
@@ -369,5 +365,17 @@ void PackageManager::UpdateSslCerts()
         m_cloud.SetCerts( emptyCertList );
         m_certsAdapter.ReloadCerts();
         m_cloud.SetCerts( m_certsAdapter.GetCertsList() );
+    }
+}
+
+void PackageManager::ReloadConfigIfChanged()
+{
+    if( m_config.PmConfigFileChanged( m_pmConfigFile ) ) {
+        if( !LoadPmConfig() ) {
+            LOG_DEBUG( "Failed to load modified Pm configuration" );
+        }
+        else {
+            m_watchdog.Kick();
+        }
     }
 }

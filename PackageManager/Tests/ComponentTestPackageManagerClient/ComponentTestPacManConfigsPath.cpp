@@ -714,13 +714,17 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillPruneInstallers )
 TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdog )
 {
     bool pass = false;
+    int count = 0;
     m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
 
-    EXPECT_CALL( *m_watchdog, Kick() ).Times( 3 ).WillRepeatedly( Invoke(
-        [this, &pass]()
+    ON_CALL( *m_watchdog, Kick() ).WillByDefault( Invoke(
+        [this, &count, &pass]()
         {
-            pass = true;
-            m_cv.notify_one();
+            count++;
+            if( count == 3 ) {
+                pass = true;
+                m_cv.notify_one();
+            }
             return 0;
         } ) );
 
@@ -730,6 +734,36 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdog )
     m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
     lock.unlock();
 
+    EXPECT_EQ( count, 3);
+    EXPECT_TRUE( pass );
+}
+
+TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdogIfConfigChanges )
+{
+    bool pass = false;
+    int count = 0;
+    m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
+    m_mockConfig->MakePmConfigFileChangedReturn( true );
+    m_mockConfig->MakeLoadPmConfigReturn( 0 );
+
+    ON_CALL( *m_watchdog, Kick() ).WillByDefault( Invoke(
+        [this, &count, &pass]()
+        {
+            count++;
+            if( count == 4 ) {
+                pass = true;
+                m_cv.notify_one();
+            }
+            return 0;
+        } ) );
+
+    StartPacMan();
+
+    std::unique_lock<std::mutex> lock( m_mutex );
+    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
+    lock.unlock();
+
+    EXPECT_GE( count, 4 );
     EXPECT_TRUE( pass );
 }
 

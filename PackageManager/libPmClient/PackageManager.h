@@ -100,4 +100,5 @@ private:
     void PmWatchdogFired();
     void UpdateSslCerts();
     void PmCheckForProxies( bool discoverAsync );
+    void ReloadConfigIfChanged();
 };
