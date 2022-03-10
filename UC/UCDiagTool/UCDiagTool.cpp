@@ -9,10 +9,22 @@
 #include <tchar.h>
 #include <tlhelp32.h>
 #include <Psapi.h>
+#include "StringResources.h"
 
 #define TOAST_APP_NAME L"Cisco\\Cisco Cloud Management Diagnostics"
 #define TOAST_AUMI L"Cisco.CM"
 #define TOAST_TIMEOUT_MS ( 5 * 60 * 1000)
+
+std::wstring GetTranslatedText( int id )
+{
+    LANGID user_lang_id = GetUserDefaultUILanguage();
+
+    if( _translationMap.find( user_lang_id ) == _translationMap.end() ) {
+        user_lang_id = DEFAULT_LANG_ID;
+    }
+
+    return _translationMap[ user_lang_id ][ id ];
+}
 
 void SendToast( const std::wstring& toastMsg )
 {
@@ -45,12 +57,12 @@ void SendToast( const std::wstring& toastMsg )
 
 void SendRebootToast()
 {
-    SendToast( L"A Cisco software update requires a reboot to complete." );
+    SendToast( GetTranslatedText( IDS_UPDATE_REQUIRES_REBOOT ).c_str() );
 }
 
 void SendElevationFailedToast()
 {
-    SendToast( L"Administrative privileges are required to run correctly. Please run again from an Administrator account or with UAC enabled" );
+    SendToast( GetTranslatedText( IDS_ELEVATION_REQUIRED ).c_str() );
 }
 
 DWORD GetParentPID( DWORD pid )

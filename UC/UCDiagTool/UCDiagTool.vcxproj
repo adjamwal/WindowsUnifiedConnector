@@ -206,6 +206,7 @@
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="StringResources.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
