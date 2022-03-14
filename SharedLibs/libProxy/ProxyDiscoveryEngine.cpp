@@ -32,7 +32,7 @@ Assume proxy does not need to be queried for each URL. So need to call this at r
 */
 
 /*
-#define SAMPLE_URL		L"https://enterprise-mgmt.amp.sourcefire.com/health/"
+#define SAMPLE_URL		L"https://amp-mgmt-int-static.qa1.immunet.com/health/"
 */
 
 BOOL ProxyDiscoveryEngine::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DWORD* pOptionParam, PROXY_INFO_LIST& list )
@@ -67,9 +67,9 @@ BOOL ProxyDiscoveryEngine::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DW
         ProxyStringParser psp;
         DWORD discoveryMethod = PROXY_FIND_PAC;
         if( options->dwAutoDetectFlags & WINHTTP_AUTO_DETECT_TYPE_DHCP )
-            discoveryMethod = PROXY_FIND_PAC_DHCP;
+            discoveryMethod = PROXY_FIND_WPAD_DHCP;
         else if( options->dwAutoDetectFlags & WINHTTP_AUTO_DETECT_TYPE_DNS_A )
-            discoveryMethod = PROXY_FIND_PAC_DNS;
+            discoveryMethod = PROXY_FIND_WPAD_DNS;
         status = psp.ParseProxyString( proxySettings.lpszProxy, list, discoveryMethod );
     }
 
@@ -153,38 +153,37 @@ BOOL ProxyDiscoveryEngine::Discovery( PROXY_FIND_METHOD discoveryMethod, LPCTSTR
     switch( discoveryMethod )
     {
     case PROXY_FIND_REG:
+        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
         status = GetSystemProxyInfo( list );
         break;
     case PROXY_FIND_IE:
+        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
         status = GetUserIEProxyInfo( list );
         break;
     case PROXY_FIND_PAC:
-        if( testURL && urlPAC ) {
+        if( urlPAC ) {
+            LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
             options.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
             options.lpszAutoConfigUrl = urlPAC;
             status = GetAutoProxyInfo( ( LPCTSTR )testURL, urlPAC, ( DWORD* )&options, list );
         }
         break;
-    case PROXY_FIND_PAC_DHCP:
-        if( testURL ) {
-            options.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
-            options.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP;
-            status = GetAutoProxyInfo( ( LPCTSTR )testURL, NULL, ( DWORD* )&options, list );
-        }
+    case PROXY_FIND_WPAD_DHCP:
+        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
+        options.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
+        options.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP;
+        status = GetAutoProxyInfo( ( LPCTSTR )testURL, NULL, ( DWORD* )&options, list );
         break;
-    case PROXY_FIND_PAC_DNS:
-        if( testURL ) {
-            options.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
-            options.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DNS_A;
-            status = GetAutoProxyInfo( ( LPCTSTR )testURL, NULL, ( DWORD* )&options, list );
-        }
+    case PROXY_FIND_WPAD_DNS:
+        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
+        options.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
+        options.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DNS_A;
+        status = GetAutoProxyInfo( ( LPCTSTR )testURL, NULL, ( DWORD* )&options, list );
         break;
     default:
         LOG_ERROR( "method %d not supported" );
         break;
     }
-
-    LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
 
     return status;
 }
@@ -200,8 +199,8 @@ int ProxyDiscoveryEngine::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDisc
     PROXY_FIND_METHOD discoveryOrder[] = {
         PROXY_FIND_REG,
         PROXY_FIND_PAC,
-        PROXY_FIND_PAC_DHCP,
-        PROXY_FIND_PAC_DNS
+        PROXY_FIND_WPAD_DHCP,
+        PROXY_FIND_WPAD_DNS
     };
 
     for( PROXY_FIND_METHOD discMode : discoveryOrder ) {

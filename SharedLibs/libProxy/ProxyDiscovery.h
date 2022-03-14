@@ -8,6 +8,8 @@
 #include "IProxyDiscovery.h"
 #include "ProxyInfoModel.h"
 
+#define QA_PROXY_TEST_URL  L"https://mgmt.qa1.immunet.com/health/"
+
 class IProxyDiscoveryEngine;
 
 class ProxyDiscovery : public IProxyDiscovery

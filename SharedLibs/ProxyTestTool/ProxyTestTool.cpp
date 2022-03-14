@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "ProxyContainer.h"
-#include "IProxyDiscovery.h"
+#include "ProxyDiscovery.h"
 #include "IProxyConsumer.h"
 #include "ConsoleLogger.h"
 
@@ -42,14 +42,14 @@ void PrintProxies( const std::list<ProxyInfoModel>& proxyList )
     }
 
     for( auto& proxy : proxyList ) {
-        WLOG_DEBUG( L"Port %d", proxy.GetProxyPort() );
-        WLOG_DEBUG( L"Tunnel %d", proxy.GetProxyTunnel() );
-        WLOG_DEBUG( L"Type %s", proxy.GetProxyType().c_str() );
-        WLOG_DEBUG( L"AccessType %s", proxy.GetProxyAccessType().c_str() );
-        WLOG_DEBUG( L"Server %s", proxy.GetProxyServer().c_str() );
-        WLOG_DEBUG( L"User %s", proxy.GetProxyUser().c_str() );
-        WLOG_DEBUG( L"Password %s", proxy.GetProxyPassword().c_str() );
-        WLOG_DEBUG( L"DiscoveryMode %d", proxy.GetProxyDiscoveryMode() );
+        WLOG_DEBUG( L"Port: %d", proxy.GetProxyPort() );
+        WLOG_DEBUG( L"Tunnel: %d", proxy.GetProxyTunnel() );
+        WLOG_DEBUG( L"Type: %s", proxy.GetProxyType().c_str() );
+        WLOG_DEBUG( L"AccessType: %s", proxy.GetProxyAccessType().c_str() );
+        WLOG_DEBUG( L"Server: %s", proxy.GetProxyServer().c_str() );
+        WLOG_DEBUG( L"User: %s", proxy.GetProxyUser().c_str() );
+        WLOG_DEBUG( L"Password: %s", proxy.GetProxyPassword().c_str() );
+        WLOG_DEBUG( L"DiscoveryMode: %d", proxy.GetProxyDiscoveryMode() );
     }
 }
 
@@ -85,7 +85,8 @@ int wmain( int argc, wchar_t* argv[], wchar_t* envp[] )
     ProxyContainer proxyContainer;
     IProxyDiscovery& proxyDiscovery = proxyContainer.GetProxyDiscovery();
     std::list<ProxyInfoModel> proxyList;
-    std::wstring testUrl, pacURL;
+    std::wstring testUrl = QA_PROXY_TEST_URL;
+    std::wstring pacURL;
     TestProxyConsumer testProxyConsumer;
     bool async = false;
 

@@ -28,6 +28,7 @@
 #include "ProxyDiscovery.h"
 #include "PmProxyDiscoverySubscriber.h"
 #include "ProxyInfoModel.h"
+#include "StringUtil.h"
 #include <sstream>
 
 using namespace std;
@@ -305,18 +306,20 @@ void PackageManager::PmWorkflowThread()
 
 void PackageManager::PmCheckForProxies( bool discoverAsync = true )
 {
-    std::wstring proxyTestUrl, proxyPacURL;
+    std::wstring proxyPacURL;// TODO: this needs to be provided by the CM backend once supported
+    std::wstring testUrl = StringUtil::Str2WStr( m_bootstrap.GetIdentifyUri() );
+
     try {
         if( !m_proxyDiscovery ) throw new std::exception("ProxyDiscovery dependency is not set!");
 
         if( discoverAsync ) //async discovery
         {
-            m_proxyDiscovery->StartProxyDiscoveryAsync( proxyTestUrl.c_str(), proxyPacURL.c_str() );
+            m_proxyDiscovery->StartProxyDiscoveryAsync( testUrl.c_str(), proxyPacURL.c_str() );
         }
         else //synchronous discovery
         {
             PROXY_INFO_LIST proxyList;
-            m_proxyDiscovery->ProxyDiscoverAndNotifySync( proxyTestUrl.c_str(), proxyPacURL.c_str(), proxyList );
+            m_proxyDiscovery->ProxyDiscoverAndNotifySync( testUrl.c_str(), proxyPacURL.c_str(), proxyList );
         }
     }
     catch( std::exception& ex ) {
