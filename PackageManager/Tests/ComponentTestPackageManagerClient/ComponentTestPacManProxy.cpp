@@ -7,6 +7,8 @@ MATCHER_P( StrMatch, expected, "" ) {
 
 class ComponentTestPacManProxy : public ComponentTestPacManBase
 {
+public:
+    virtual ~ComponentTestPacManProxy() {}
 };
 
 std::string _ucNullReponse( R"(

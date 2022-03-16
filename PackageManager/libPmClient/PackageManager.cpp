@@ -129,8 +129,6 @@ int32_t PackageManager::Stop()
     LOG_DEBUG( "Enter " );
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    m_watchdog.Stop();
-
     if( !m_thread.IsRunning() ) {
         LOG_DEBUG( "Package Manager is not running" );
     }
@@ -138,6 +136,8 @@ int32_t PackageManager::Stop()
         m_thread.Stop();
         rtn = 0;
     }
+
+    m_watchdog.Stop();
 
     if( m_proxyDiscovery ) {
         m_proxyDiscovery->UnregisterForProxyNotifications( &m_proxyDiscoverySubscriber );

@@ -2,6 +2,8 @@
 
 class ComponentTestPacManConfigsPath : public ComponentTestPacManBase
 {
+public:
+    virtual ~ComponentTestPacManConfigsPath() {}
 };
 
 std::string _ucReponseNoConfig( R"(
@@ -750,7 +752,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdogIfConfigChanges
         [this, &count, &pass]()
         {
             count++;
-            if( count == 4 ) {
+            if( count == 6 ) {
                 pass = true;
                 m_cv.notify_one();
             }
@@ -763,7 +765,9 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdogIfConfigChanges
     m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
     lock.unlock();
 
-    EXPECT_GE( count, 4 );
+    // This needs to match exactly so that the Pacman thread exits before the test finishes
+    // Otherwise there is a random crash during teardown when stopping the mock watchdog
+    EXPECT_EQ( count, 6 );
     EXPECT_TRUE( pass );
 }
 
