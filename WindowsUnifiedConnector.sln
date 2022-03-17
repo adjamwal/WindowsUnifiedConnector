@@ -131,6 +131,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4891EE6D-E469-4193-9C04-86BE44890980}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libPmAgent", "WindowsPackageManager\libPmAgent\libPmAgent.vcxproj", "{410F4DF1-75B6-4AD2-88FA-51B2A68AA56D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D25927EB-2F30-41BF-B338-8D06E1BD0A54} = {D25927EB-2F30-41BF-B338-8D06E1BD0A54}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libControlModule", "WindowsPackageManager\libControlModule\libControlModule.vcxproj", "{1831924D-8C01-4AE6-A1AD-376D81A09E46}"
 EndProject

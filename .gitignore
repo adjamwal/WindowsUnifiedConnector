@@ -10,7 +10,7 @@
 Installer/bin/*
 packages/*
 
-!Resources/**
+Resources/UCID/**
 
 CMakeLists.txt.user
 CMakeCache.txt
