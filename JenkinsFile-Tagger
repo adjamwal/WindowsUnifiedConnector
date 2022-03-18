@@ -1,0 +1,96 @@
+#!/usr/bin/env groovy
+@Library('JenkinsShared')_
+
+import jenkins.model.Jenkins
+
+pipeline {
+    agent {
+        node {
+            label "windowsci2019"
+        }
+    }
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr:'5'))
+    }
+    stages {
+        stage('Collect Build') {
+            steps{
+                script {
+                    cleanWs()
+                    powershell "gci env:"
+                    (UCBuildNum, UCrevision) = FindBuildByDescription()
+                    echo "Build Num: ${UCBuildNum} Revision ${UCrevision}"
+                    copyArtifacts filter: '**', fingerprintArtifacts: true, flatten: true, projectName: "UnifiedConnector/WindowsUnifiedConnector/${BRANCH_NAME}", selector: specific("${UCBuildNum}")
+                    zip dir: '', exclude: '', glob: '', overwrite: true, zipFile: 'artifacts.zip'
+                }
+            }
+        }
+        stage('Tag Build') {
+            steps {
+                script {
+                    echo """Request: {"tag_name":"v${UC_VERSION}","target_commitish":"${UCrevision}","name":"v${UC_VERSION}"}"""
+                    def response = httpRequest acceptType: 'APPLICATION_JSON', authentication: 'fireamp-windows-dev', consoleLogResponseBody: true, httpMode: 'POST', 
+                        requestBody: """{"tag_name":"v${UC_VERSION}","target_commitish":"${UCrevision}","name":"v${UC_VERSION}"}""", responseHandle: 'NONE', 
+                        url: 'https://code.engine.sourcefire.com/api/v3/repos/UnifiedConnector/WindowsUnifiedConnector/releases', validResponseCodes: '201', wrapAsMultipart: false
+                
+                    def jsonObj = readJSON text: response.content
+                    uploadUrl = (jsonObj.upload_url =~ /(^.*)\{.*/)[0][1]
+                    echo "${uploadUrl}"
+                    httpRequest authentication: 'fireamp-windows-dev', consoleLogResponseBody: true, contentType: 'APPLICATION_ZIP', customHeaders: [[maskValue: false, name: 'name', value: 'artifacts.zip']], httpMode: 'POST', 
+                        responseHandle: 'NONE', uploadFile: 'artifacts.zip', url: "${uploadUrl}?name=artifacts.zip", validResponseCodes: '201', wrapAsMultipart: false
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                email.sendSuccessEmail("${JOB_NAME}")
+            }
+        }
+        failure {
+            script {
+                email.sendFailureEmail("${JOB_NAME}")
+            }
+        }
+        cleanup {
+            cleanWs cleanWhenAborted: true, cleanWhenFailure: false, cleanWhenSuccess: true
+        }
+    }
+}
+
+def FindBuildByDescription()
+{
+    buildId = 0
+    revision = ''
+    def job_data = Jenkins.instance.getItemByFullName("UnifiedConnector/WindowsUnifiedConnector/${BRANCH_NAME}")
+
+    job_data.getBuilds().each {
+        if( it.getDescription() == UC_VERSION ) {
+            buildId = it.getId()
+            revision = GetRevision(it.getActions())
+        }
+    }
+    
+    return [buildId, revision]
+}
+
+def GetRevision( def actionList )
+{
+    revision = ""
+    actionList.each{
+        try {
+            if(it.getDisplayName() == "Git Build Data") {
+                if(it.getRemoteUrls().contains("https://code.engine.sourcefire.com/UnifiedConnector/WindowsUnifiedConnector.git")) {
+                    buildData = it.getBuildsByBranchName()
+                    revision = (buildData =~ /.*Revision ([0-9a-f]*) .*/)[0][1]
+                }
+            }
+        }
+        catch(err) {
+        }
+    }
+    
+    return revision
+}
