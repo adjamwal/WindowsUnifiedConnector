@@ -51,6 +51,7 @@
         <CustomAction Id="RemoveCaResources" BinaryKey="CustomActionsDll" DllEntry="RemoveCaResources" />
         <CustomAction Id="DetectInvalidSideGrade" BinaryKey="CustomActionsDll" DllEntry="DetectOlderBuildVersion" />
         <CustomAction Id="DetectInvalidOS" BinaryKey="CustomActionsDll" DllEntry="DetectWindows10OrGreater" />
+        <CustomAction Id="DetectInvalidCpu" BinaryKey="CustomActionsDll" DllEntry="FailOnArmCpu" />
         <CustomAction Id="SetCacheDirectory" Property="UC_INSTALLCACHE_DIR" Value="[WindowsFolder]\Temp\$(var.PmInstallCacheDirectory)" />
         <CustomAction Id="CollectUCData" BinaryKey="CustomActionsDll" DllEntry="CollectUCData" />
         <!--=
@@ -75,6 +76,7 @@
             WIX_UPGRADE_DETECTED
           </Custom>
           <Custom Action="DetectInvalidOS" After="ExtractCaResources" />
+          <Custom Action="DetectInvalidCpu" After="ExtractCaResources" />
           <Custom Action="SetCacheDirectory" After="ExtractCaResources" />
 
           <Custom Action="SendEventOnUninstallError" OnExit="error">

@@ -20,6 +20,7 @@ bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo );
 bool GetPreviousBuildVersion( BuildInfo& buildInfo, LPWSTR& productName );
 std::string GetFileVersion( const std::string filename );
 bool IsWindows10OrGreater( const std::string fileVersion );
+bool IsArmCpu();
 bool ExtractResources( std::wstring& outputPath );
 bool DeleteResources( const std::wstring& dllPath );
 bool RunCollectUCData( IUcLogger* logger, const std::wstring& dllPath, std::string& url, std::string& ucid, std::string& ucidToken );

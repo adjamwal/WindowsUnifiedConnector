@@ -3,6 +3,7 @@ LIBRARY "InstallerCustomActions"
 EXPORTS
 	DetectOlderBuildVersion
 	DetectWindows10OrGreater
+	FailOnArmCpu
 	CollectUCData
 	SendEventOnUninstallBegin
 	SendEventOnUninstallError

@@ -155,6 +155,19 @@ bool IsWindows10OrGreater( const std::string fileVersion )
     return rtn;
 }
 
+bool IsArmCpu()
+{
+    SYSTEM_INFO SystemInfo;
+    GetNativeSystemInfo( &SystemInfo );
+
+    bool rtn = ( SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM ) ||
+               ( SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM64 );
+
+    WLOG_DEBUG( L"IsArmCpu: %s", rtn ? L"true" : L"false" );
+
+    return rtn;
+}
+
 bool ExtractResourceToFile( HMODULE dllHandle, LPCTSTR ResourceName, LPCTSTR ResourceType, LPCTSTR OutputFileName )
 {
     WLOG_DEBUG( L"Extracting Resource %s", OutputFileName );

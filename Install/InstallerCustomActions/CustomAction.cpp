@@ -103,7 +103,6 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-    BuildInfo prevBuildInfo;
     const char* filename = "C:\\Windows\\System32\\ntdll.dll";
     MsiLogger msiLogger;
     SetUcLogger( &msiLogger );
@@ -114,6 +113,26 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
     WcaLog( LOGMSG_STANDARD, "Initialized." );
 
     hr = IsWindows10OrGreater( GetFileVersion( filename ) ) ? S_OK : E_FAIL;
+
+LExit:
+    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    SetUcLogger( NULL );
+    return WcaFinalize( er );
+}
+
+UINT __stdcall FailOnArmCpu( MSIHANDLE hInstall )
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+    MsiLogger msiLogger;
+    SetUcLogger( &msiLogger );
+
+    hr = WcaInitialize( hInstall, __FUNCTION__ );
+    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
+
+    WcaLog( LOGMSG_STANDARD, "Initialized." );
+
+    hr = IsArmCpu() ? E_FAIL : S_OK;
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
