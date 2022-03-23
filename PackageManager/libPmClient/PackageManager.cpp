@@ -106,6 +106,9 @@ int32_t PackageManager::Start( const char* pmConfigFile, const char* pmBootstrap
         if( m_proxyDiscovery ) {
             m_proxyDiscovery->RegisterForProxyNotifications( &m_proxyDiscoverySubscriber );
         }
+
+        m_proxyTestUrl = StringUtil::Str2WStr( m_bootstrap.GetIdentifyUri() );
+        WLOG_DEBUG( L"proxyTestURL: %s", m_proxyTestUrl.c_str() );
         PmCheckForProxies( false );
 
         m_watchdog.Start(
@@ -306,20 +309,19 @@ void PackageManager::PmWorkflowThread()
 
 void PackageManager::PmCheckForProxies( bool discoverAsync = true )
 {
-    std::wstring proxyPacURL;// TODO: this needs to be provided by the CM backend once supported
-    std::wstring testUrl = StringUtil::Str2WStr( m_bootstrap.GetIdentifyUri() );
+    std::wstring proxyPacURL = L"";// TODO: this needs to be provided by the CM backend once supported
 
     try {
         if( !m_proxyDiscovery ) throw new std::exception("ProxyDiscovery dependency is not set!");
 
         if( discoverAsync ) //async discovery
         {
-            m_proxyDiscovery->StartProxyDiscoveryAsync( testUrl.c_str(), proxyPacURL.c_str() );
+            m_proxyDiscovery->StartProxyDiscoveryAsync( m_proxyTestUrl.c_str(), proxyPacURL.c_str() );
         }
         else //synchronous discovery
         {
             PROXY_INFO_LIST proxyList;
-            m_proxyDiscovery->ProxyDiscoverAndNotifySync( testUrl.c_str(), proxyPacURL.c_str(), proxyList );
+            m_proxyDiscovery->ProxyDiscoverAndNotifySync( m_proxyTestUrl.c_str(), proxyPacURL.c_str(), proxyList );
         }
     }
     catch( std::exception& ex ) {

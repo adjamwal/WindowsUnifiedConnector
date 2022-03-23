@@ -8,11 +8,12 @@
 
 class IPmConfig;
 class IProxyVerifier;
+class IPmBootstrap;
 
 class PmProxyVerifier : public IProxyVerifier
 {
 public:
-    PmProxyVerifier( IPmHttp& testHttp, IPmConfig& pmConfig );
+    PmProxyVerifier( IPmHttp& testHttp, IPmConfig& pmConfig, IPmBootstrap& pmBootstrap );
     ~PmProxyVerifier();
 
     bool IsBusy() override;
@@ -20,6 +21,7 @@ public:
 private:
     IPmHttp& m_testHttp;
     IPmConfig& m_pmConfig;
+    IPmBootstrap& m_pmBootstrap;
     std::atomic_bool m_isBusy;
     std::mutex m_mutex;
 

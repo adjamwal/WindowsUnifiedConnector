@@ -10,5 +10,5 @@ public:
     virtual ~MockProxyDiscoveryEngine();
 
     MOCK_METHOD1( GetProxyInfo, BOOL( PROXY_INFO_LIST* ) );
-    MOCK_METHOD3( Init, int( LPCTSTR, LPCTSTR, CancelProxyDiscoveryCb ) );
+    MOCK_METHOD3( Init, int( const LPCTSTR, const LPCTSTR, CancelProxyDiscoveryCb ) );
 };

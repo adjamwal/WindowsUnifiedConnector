@@ -115,7 +115,8 @@ protected:
         m_http.reset( new NiceMock<MockPmHttp>() );
         m_httpForProxyTesting.reset( new NiceMock<MockPmHttp>() );
 
-        m_proxyVerifier.reset( new PmProxyVerifier( *m_httpForProxyTesting, *m_mockConfig ) );
+        m_mockBootstrap->MakeGetIdentifyUriReturn( m_configUrl );
+        m_proxyVerifier.reset( new PmProxyVerifier( *m_httpForProxyTesting, *m_mockConfig, *m_mockBootstrap ) );
         m_proxyDiscoverySubscriber.reset( new PmProxyDiscoverySubscriber( *m_http, *m_proxyVerifier ) );
 
         ProxyInfoModel testProxy = {

@@ -54,7 +54,7 @@ PackageManagerContainer::PackageManagerContainer() :
     , m_ucidAdapter( new UcidAdapter() )
     , m_bootstrap( new PmBootstrap( *m_fileUtil ) )
     , m_config( new PmConfig( *m_fileUtil, *m_ucidAdapter ) )
-    , m_proxyVerifier( new PmProxyVerifier( *m_httpForProxyVerification, *m_config ) )
+    , m_proxyVerifier( new PmProxyVerifier( *m_httpForProxyVerification, *m_config, *m_bootstrap ) )
     , m_proxyDiscoverySubscriber( new PmProxyDiscoverySubscriber( *m_http, *m_proxyVerifier ) )
     , m_manifest( new PmManifest() )
     , m_thread( new WorkerThread() )

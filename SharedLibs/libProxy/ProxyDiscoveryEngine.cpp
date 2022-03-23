@@ -35,13 +35,13 @@ Assume proxy does not need to be queried for each URL. So need to call this at r
 #define SAMPLE_URL		L"https://amp-mgmt-int-static.qa1.immunet.com/health/"
 */
 
-BOOL ProxyDiscoveryEngine::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DWORD* pOptionParam, PROXY_INFO_LIST& list )
+BOOL ProxyDiscoveryEngine::GetAutoProxyInfo( const LPCTSTR testURL, const LPCTSTR urlPAC, DWORD* pOptionParam, PROXY_INFO_LIST& list )
 {
     WINHTTP_AUTOPROXY_OPTIONS* options = ( WINHTTP_AUTOPROXY_OPTIONS* )pOptionParam;
-    WINHTTP_PROXY_INFO proxySettings;
+    WINHTTP_PROXY_INFO proxySettings { 0 };
     BOOL status = FALSE, b = FALSE;
 
-    if( !wcslen( testURL ) ) {
+    if( !testURL || !wcslen( testURL ) ) {
         LOG_ERROR( "test URL is empty" );
         return FALSE;
     }
@@ -52,16 +52,16 @@ BOOL ProxyDiscoveryEngine::GetAutoProxyInfo( LPCTSTR testURL, LPCTSTR urlPAC, DW
         return FALSE;
     }
 
-    memset( &proxySettings, 0, sizeof( proxySettings ) );
-
-    WLOG_DEBUG( L"0x%x, 0x%x, %s", options->dwFlags, options->dwAutoDetectFlags, options->lpszAutoConfigUrl );
+    WLOG_DEBUG( L"flags 0x%x, auto 0x%x, autocfg %s, test %s", 
+        options->dwFlags, options->dwAutoDetectFlags, options->lpszAutoConfigUrl, testURL );
     b = m_winHttp.WinHttpGetProxyForUrl( hSession, testURL, options, &proxySettings );
     if( !b ) {
-        WLOG_DEBUG( L"unable to get proxy using WPAD/PAC file at url: %s, %d", options->lpszAutoConfigUrl, GetLastError() );
+        WLOG_DEBUG( L"unable to get proxy using WPAD/PAC: error %d", GetLastError() );
         goto abortAuto;
     }
 
-    WLOG_DEBUG( L"%d, %s, %s ", proxySettings.dwAccessType, proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
+    WLOG_DEBUG( L"access 0x%x, proxy %s, bypass %s ", 
+        proxySettings.dwAccessType, proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
 
     if( proxySettings.lpszProxy ) {
         ProxyStringParser psp;
@@ -98,7 +98,8 @@ BOOL ProxyDiscoveryEngine::GetSystemProxyInfo( PROXY_INFO_LIST& list )
         goto abortREG;
     }
 
-    WLOG_DEBUG( __FUNCTION__ L"%d, %s, %s", proxySettings.dwAccessType, proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
+    WLOG_DEBUG( L"access 0x%x, proxy %s, bypass %s", 
+        proxySettings.dwAccessType, proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
     if( proxySettings.dwAccessType == WINHTTP_ACCESS_TYPE_NO_PROXY ) goto abortREG;
 
     if( proxySettings.lpszProxy ) {
@@ -126,7 +127,7 @@ BOOL ProxyDiscoveryEngine::GetUserIEProxyInfo( PROXY_INFO_LIST& list )
         goto abortIE;
     }
 
-    WLOG_DEBUG( L"%d, %s, %s, %s",
+    WLOG_DEBUG( L"auto 0x%x, autocfg %s, proxy %s, bypass %s",
         proxySettings.fAutoDetect, proxySettings.lpszAutoConfigUrl,
         proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
     if( proxySettings.fAutoDetect || !wcslen( proxySettings.lpszProxy ) ) goto abortIE;
@@ -143,52 +144,47 @@ abortIE:
     return status;
 }
 
-BOOL ProxyDiscoveryEngine::Discovery( PROXY_FIND_METHOD discoveryMethod, LPCTSTR testURL, LPCTSTR urlPAC, PROXY_INFO_LIST& list )
+BOOL ProxyDiscoveryEngine::Discovery( PROXY_FIND_METHOD discoveryMethod, const LPCTSTR testURL, const LPCTSTR urlPAC, PROXY_INFO_LIST& list )
 {
     BOOL status = FALSE;
+    WINHTTP_AUTOPROXY_OPTIONS options { 0 };
 
-    WINHTTP_AUTOPROXY_OPTIONS options;
-    memset( &options, 0, sizeof( options ) );
-
+    WLOG_DEBUG( L"method: %d, size: %d, test: %s", discoveryMethod, list.size(), testURL );
     switch( discoveryMethod )
     {
     case PROXY_FIND_REG:
-        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
         status = GetSystemProxyInfo( list );
         break;
     case PROXY_FIND_IE:
-        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
         status = GetUserIEProxyInfo( list );
         break;
     case PROXY_FIND_PAC:
-        if( urlPAC ) {
-            LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
+        if( urlPAC && wcslen( urlPAC ) ) {
             options.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
             options.lpszAutoConfigUrl = urlPAC;
-            status = GetAutoProxyInfo( ( LPCTSTR )testURL, urlPAC, ( DWORD* )&options, list );
+            status = GetAutoProxyInfo( testURL, urlPAC, ( DWORD* )&options, list );
         }
         break;
     case PROXY_FIND_WPAD_DHCP:
-        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
         options.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
         options.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP;
-        status = GetAutoProxyInfo( ( LPCTSTR )testURL, NULL, ( DWORD* )&options, list );
+        status = GetAutoProxyInfo( testURL, NULL, ( DWORD* )&options, list );
         break;
     case PROXY_FIND_WPAD_DNS:
-        LOG_DEBUG( "method: %d, size: %d, status: %d", discoveryMethod, list.size(), status );
         options.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
         options.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DNS_A;
-        status = GetAutoProxyInfo( ( LPCTSTR )testURL, NULL, ( DWORD* )&options, list );
+        status = GetAutoProxyInfo( testURL, NULL, ( DWORD* )&options, list );
         break;
     default:
         LOG_ERROR( "method %d not supported" );
         break;
     }
 
+    LOG_DEBUG( "status: %d, size: %d", status, list.size() );
     return status;
 }
 
-int ProxyDiscoveryEngine::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDiscoveryCb cancelCb )
+int ProxyDiscoveryEngine::Init( const LPCTSTR testURL, const LPCTSTR urlPAC, CancelProxyDiscoveryCb cancelCb )
 {
     DWORD srcbfl = 0;
     bool abortDiscovery = false;
@@ -202,6 +198,8 @@ int ProxyDiscoveryEngine::Init( LPCTSTR testURL, LPCTSTR urlPAC, CancelProxyDisc
         PROXY_FIND_WPAD_DHCP,
         PROXY_FIND_WPAD_DNS
     };
+
+    WLOG_DEBUG( L"%s, %s", testURL, urlPAC );
 
     for( PROXY_FIND_METHOD discMode : discoveryOrder ) {
         if( cancelCb && cancelCb() ) {

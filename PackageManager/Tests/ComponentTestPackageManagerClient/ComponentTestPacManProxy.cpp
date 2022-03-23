@@ -128,6 +128,7 @@ TEST_F( ComponentTestPacManProxy, PacManWillDetectAndFailToVerifyIfConfigUrisMis
         }
     ) );
 
+    m_mockBootstrap->MakeGetIdentifyUriReturn( "" );
     m_mockConfig->MakeGetCloudCheckinUriReturn( "" );
     m_mockConfig->MakeGetCloudEventUriReturn( "" );
     m_mockConfig->MakeGetCloudCatalogUriReturn( "" );
@@ -185,7 +186,7 @@ TEST_F( ComponentTestPacManProxy, PacManWillDetectAndFailToVerifyIfResponseCodeU
             StrMatch( "proxyUser" ),
             StrMatch( "proxyPass" ) )
     ).Times( 2 );
-    EXPECT_CALL( *m_httpForProxyTesting, HttpGet( _, _, _ ) ).Times( 2 );
+    EXPECT_CALL( *m_httpForProxyTesting, HttpGet( _, _, _ ) ).Times( 4 );
     EXPECT_CALL( *m_http,
         SetHttpProxy(
             StrMatch( "" ),

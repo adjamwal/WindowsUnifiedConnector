@@ -4,11 +4,13 @@
 #include "PmConfig.h"
 #include "StringUtil.h"
 #include "PmLogger.h"
+#include "PmBootStrap.h"
 #include "curl.h"
 
-PmProxyVerifier::PmProxyVerifier( IPmHttp& testHttp, IPmConfig& pmConfig )
+PmProxyVerifier::PmProxyVerifier( IPmHttp& testHttp, IPmConfig& pmConfig, IPmBootstrap& pmBootstrap )
     : m_testHttp( testHttp )
     , m_pmConfig( pmConfig )
+    , m_pmBootstrap( pmBootstrap )
     , m_isBusy( false )
 {
     PmHttpExtendedResult eResult;
@@ -38,6 +40,7 @@ bool PmProxyVerifier::IsValidProxy( const ProxyInfoModel& testProxy )
     m_isBusy = true;
 
     bool isValid = false;
+    bool canUseIdentify = !m_pmBootstrap.GetIdentifyUri().empty();
 
     try
     {
@@ -45,17 +48,17 @@ bool PmProxyVerifier::IsValidProxy( const ProxyInfoModel& testProxy )
             testProxy.GetProxyPort() > 0 &&
             ( testProxy.GetProxyType() == L"http_proxy" || testProxy.GetProxyType() == L"http" ) )
         {
-            if( m_pmConfig.GetCloudCheckinUri().empty() )
+            if( m_pmConfig.GetCloudCheckinUri().empty() && !canUseIdentify )
             {
                 WLOG_DEBUG( L"Can't validate proxy '%s:%d', type '%s': CloudCheckinUri is empty",
                     testProxy.GetProxyServer().c_str(), testProxy.GetProxyPort(), testProxy.GetProxyType().c_str() );
             }
-            else if( m_pmConfig.GetCloudEventUri().empty() )
+            else if( m_pmConfig.GetCloudEventUri().empty() && !canUseIdentify )
             {
                 WLOG_DEBUG( L"Can't validate proxy '%s:%d', type '%s': CloudEventUri is empty",
                     testProxy.GetProxyServer().c_str(), testProxy.GetProxyPort(), testProxy.GetProxyType().c_str() );
             }
-            else if( m_pmConfig.GetCloudCatalogUri().empty() )
+            else if( m_pmConfig.GetCloudCatalogUri().empty() && !canUseIdentify )
             {
                 WLOG_DEBUG( L"Can't validate proxy '%s:%d', type '%s': CloudCatalogUri is empty",
                     testProxy.GetProxyServer().c_str(), testProxy.GetProxyPort(), testProxy.GetProxyType().c_str() );
@@ -72,9 +75,10 @@ bool PmProxyVerifier::IsValidProxy( const ProxyInfoModel& testProxy )
                 );
 
                 isValid =
-                    CanReachUrl( m_pmConfig.GetCloudCheckinUri() ) &&
-                    CanReachUrl( m_pmConfig.GetCloudEventUri() ) &&
-                    CanReachUrl( m_pmConfig.GetCloudCatalogUri() );
+                    ( CanReachUrl( m_pmConfig.GetCloudCheckinUri() ) &&
+                      CanReachUrl( m_pmConfig.GetCloudEventUri() ) &&
+                      CanReachUrl( m_pmConfig.GetCloudCatalogUri() ) ) ||
+                    CanReachUrl( m_pmBootstrap.GetIdentifyUri() );
 
                 WLOG_DEBUG( L"Proxy '%s:%d', type '%s' %s", testProxy.GetProxyServer().c_str(),
                     testProxy.GetProxyPort(), testProxy.GetProxyType().c_str(),
@@ -92,6 +96,8 @@ bool PmProxyVerifier::CanReachUrl( const std::string& url )
 {
     std::string responseContent = "";
     PmHttpExtendedResult eResult = {};
+
+    if( url.empty() ) return false;
 
     m_testHttp.HttpGet( url, responseContent, eResult );
 

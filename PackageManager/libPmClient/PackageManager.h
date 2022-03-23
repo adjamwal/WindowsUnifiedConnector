@@ -91,6 +91,7 @@ private:
 
     IProxyDiscovery* m_proxyDiscovery;
     IPmPlatformDependencies* m_dependencies;
+    std::wstring m_proxyTestUrl;
 
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
