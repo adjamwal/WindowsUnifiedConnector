@@ -178,5 +178,7 @@ int main(int argc, char **argv)
     fakeUcb.start();
 
     printf("Press any key to exit");
-    getchar();
+    ( void )getchar();
+
+    return 0;
 }

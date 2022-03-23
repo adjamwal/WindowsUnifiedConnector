@@ -158,7 +158,11 @@ bool PmHttp::Init( PM_PROGRESS_CALLBACK callback, void* ctx, const std::string& 
     }
 
     //https://curl.se/libcurl/c/CURLOPT_ERRORBUFFER.html
-    curl_easy_setopt( m_curlHandle, CURLOPT_ERRORBUFFER, m_errbuf );
+
+    eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_ERRORBUFFER, m_errbuf );
+    if( eResult.subErrorCode != CURLE_OK ) {
+        LOG_ERROR( "(%x) CURLOPT_ERRORBUFFER failed %d:%s", m_errbuf, eResult.subErrorCode, curl_easy_strerror( ( CURLcode )eResult.subErrorCode ) );
+    }
 
     eResult.subErrorCode = curl_easy_setopt( m_curlHandle, CURLOPT_USERAGENT, m_userAgent.c_str() );
     if( eResult.subErrorCode != CURLE_OK ) {

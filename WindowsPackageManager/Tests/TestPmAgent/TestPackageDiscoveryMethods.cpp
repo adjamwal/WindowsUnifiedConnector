@@ -62,10 +62,10 @@ protected:
         MsiApiProductInfo msiApiProductInfo = {};
         msiApiProductInfo.Properties.VersionString = L"testVersion";
 
-        auto msiReturnList = new std::vector<MsiApiProductInfo>();
-        msiReturnList->push_back( msiApiProductInfo );
+        std::vector<MsiApiProductInfo> msiReturnList;
+        msiReturnList.push_back( msiApiProductInfo );
 
-        value = std::make_tuple( 0, *msiReturnList );
+        value = std::make_tuple( 0, msiReturnList );
     }
 
     std::unique_ptr<MockMsiApi> m_msiApi;
@@ -138,8 +138,8 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiNoneFound )
     PmProductDiscoveryMsiMethod msiRule = {};
     SetupProductDiscoveryMsiMethod( msiRule );
 
-    auto msiReturnList = new std::vector<MsiApiProductInfo>();
-    auto methodReturnValue = std::make_tuple( 0, *msiReturnList );
+    std::vector<MsiApiProductInfo> msiReturnList;
+    auto methodReturnValue = std::make_tuple( 0, msiReturnList );
 
     ON_CALL( *m_msiApi, FindProductsByNameAndPublisher( _, _ ) )
         .WillByDefault( Return( methodReturnValue ) );
@@ -182,8 +182,8 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByUpgradeCodeProductNone )
     PmProductDiscoveryMsiUpgradeCodeMethod msiRule = {};
     SetupProductDiscoveryMsiUpgradeCodeMethod( msiRule );
 
-    auto msiReturnList = new std::vector<MsiApiProductInfo>();
-    auto methodReturnValue = std::make_tuple( 0, *msiReturnList );
+    std::vector<MsiApiProductInfo> msiReturnList;
+    auto methodReturnValue = std::make_tuple( 0, msiReturnList );
 
     ON_CALL( *m_msiApi, FindProductsByNameAndPublisher( _, _ ) )
         .WillByDefault( Return( methodReturnValue ) );
@@ -226,8 +226,8 @@ TEST_F( TestPackageDiscoveryMethods, DiscoverByMsiRulesNoneFound )
     PmProductDiscoveryMsiMethod msiRule = {};
     SetupProductDiscoveryMsiMethod( msiRule );
 
-    auto msiReturnList = new std::vector<MsiApiProductInfo>();
-    auto methodReturnValue = std::make_tuple( 0, *msiReturnList );
+    std::vector<MsiApiProductInfo> msiReturnList;
+    auto methodReturnValue = std::make_tuple( 0, msiReturnList );
 
     std::vector<MsiApiProductInfo> productCache;
 

@@ -124,6 +124,8 @@ void PmManifest::AddPackage( Json::Value& packageJson )
     else {
         LOG_DEBUG( __FUNCTION__ ": config array not found" );
     }
+
+    package.downloadSubError = { 0, 0, ""};
     m_ComponentList.push_back( package );
 }
 

@@ -37,6 +37,9 @@ using namespace Windows::Foundation;
 
 CToastNotificationPlugin::CToastNotificationPlugin()
     : m_pToastNotificationPluginCB(NULL)
+    , m_toastActivatedToken( { 0 } )
+    , m_toastDismissedToken( { 0 } )
+    , m_toastFailedToken( { 0 } )
 {
 }
 

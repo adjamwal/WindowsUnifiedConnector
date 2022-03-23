@@ -130,7 +130,7 @@ BOOL ProxyDiscoveryEngine::GetUserIEProxyInfo( PROXY_INFO_LIST& list )
     WLOG_DEBUG( L"auto 0x%x, autocfg %s, proxy %s, bypass %s",
         proxySettings.fAutoDetect, proxySettings.lpszAutoConfigUrl,
         proxySettings.lpszProxy, proxySettings.lpszProxyBypass );
-    if( proxySettings.fAutoDetect || !wcslen( proxySettings.lpszProxy ) ) goto abortIE;
+    if( proxySettings.fAutoDetect || !proxySettings.lpszProxy || !wcslen( proxySettings.lpszProxy ) ) goto abortIE;
 
     if( proxySettings.lpszProxy ) {
         ProxyStringParser psp;
