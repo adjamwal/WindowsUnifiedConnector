@@ -10,7 +10,7 @@
     <VCToolsVersion Condition = "'$(VCToolsVersion)' == ''" >14.28.29333</VCToolsVersion>
     <VCToolsRedistVersion Condition = "'$(VCToolsRedistVersion)' == ''" >14.28.29325</VCToolsRedistVersion>
     <UC_CONSUMER>0</UC_CONSUMER>
-    <UCID_BUILD_NUMBER>1.1.120</UCID_BUILD_NUMBER>
+    <UCID_BUILD_NUMBER>1.1.121</UCID_BUILD_NUMBER>
   </PropertyGroup>
   <PropertyGroup>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
