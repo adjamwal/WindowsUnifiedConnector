@@ -1,15 +1,13 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <tchar.h>
 
 #define SIGNER_CISCO_CN     _T("Cisco Systems, Inc.")
+#define SIGNER_CISCO_CN2    _T("CISCO SYSTEMS CANADA CO")
 #define SIGNER_MICROSOFT    _T("Microsoft Corporation")
 #define SIGNER_MOZILLA      _T("Mozilla Corporation")
-
-#ifdef _WIN32
-#define SIGNER_CISCO        SIGNER_CISCO_CN
-#endif
 
 enum class SigType
 {
@@ -36,5 +34,8 @@ class ICodesignVerifier
 {
 public:
     virtual CodesignStatus Verify( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type ) = 0;
+    virtual CodesignStatus Verify( const std::wstring& rtstrPath, const std::vector<std::wstring>& rtstrSignerList, SigType sig_type ) = 0;
     virtual CodesignStatus VerifyWithKilldate( const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type, uint64_t killdate ) = 0;
+
+    static inline const std::vector<std::wstring> CISCO_SIGNER_LIST = { SIGNER_CISCO_CN, SIGNER_CISCO_CN2 };
 };

@@ -10,6 +10,7 @@ public:
     ~MockCodesignVerifier();
 
     MOCK_METHOD( CodesignStatus, Verify, (const std::wstring& rtstrPath, const std::wstring& rtstrSigner, SigType sig_type) );
+    MOCK_METHOD( CodesignStatus, Verify, (const std::wstring& rtstrPath, const std::vector<std::wstring>& rtstrSigner, SigType sig_type ) );
     void MakeVerifyReturn( CodesignStatus );
     void ExpectVerifyIsNotCalled();
 

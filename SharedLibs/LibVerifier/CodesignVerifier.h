@@ -10,6 +10,10 @@ public:
         const std::wstring& rtstrPath, 
         const std::wstring& rtstrSigner, 
         SigType sig_type ) override;
+    CodesignStatus Verify( 
+        const std::wstring& rtstrPath, 
+        const std::vector<std::wstring>& rtstrSignerList, 
+        SigType sig_type ) override;
     CodesignStatus VerifyWithKilldate( 
         const std::wstring& rtstrPath, 
         const std::wstring& rtstrSigner, 

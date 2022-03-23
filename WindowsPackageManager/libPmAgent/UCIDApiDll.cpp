@@ -173,7 +173,7 @@ bool UCIDApiDll::LoadDll( const std::wstring dllPath )
         return false;
     }
 
-    if( m_codeSignVerifier.Verify( dllPath, SIGNER_CISCO, SIGTYPE_DEFAULT ) != CodesignStatus::CODE_SIGNER_SUCCESS ) {
+    if( m_codeSignVerifier.Verify( dllPath, ICodesignVerifier::CISCO_SIGNER_LIST, SIGTYPE_DEFAULT ) != CodesignStatus::CODE_SIGNER_SUCCESS ) {
         WLOG_ERROR( L"Failed to verify dll signature: %s", dllPath.c_str() );
         return false;
     }

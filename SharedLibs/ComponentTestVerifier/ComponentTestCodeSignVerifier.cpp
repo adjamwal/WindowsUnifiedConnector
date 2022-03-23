@@ -27,6 +27,14 @@ TEST_F( ComponentTestCodeSignVerifier, DISABLED_VerifyCisco )
         SIGTYPE_DEFAULT ), CodesignStatus::CODE_SIGNER_SUCCESS );
 }
 
+TEST_F( ComponentTestCodeSignVerifier, DISABLED_VerifyCisco1 )
+{
+    EXPECT_EQ( m_patient->Verify(
+        L"..\\..\\SharedLibs\\ComponentTestVerifier\\CodeSignTestCisco",
+        ICodesignVerifier::CISCO_SIGNER_LIST,
+        SIGTYPE_DEFAULT ), CodesignStatus::CODE_SIGNER_SUCCESS );
+}
+
 TEST_F( ComponentTestCodeSignVerifier, VerifyMismatch )
 {
     EXPECT_EQ( m_patient->Verify(

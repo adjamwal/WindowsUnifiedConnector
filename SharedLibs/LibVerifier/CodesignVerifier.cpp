@@ -144,7 +144,7 @@ CodesignStatus verify_by_file( const std::wstring& rtstrPath, const std::wstring
         LOG_WARNING( "Failed to get the timestamp" );
     }
 
-    if ( SIGNER_CISCO == rtstrSigner)
+    if (( SIGNER_CISCO_CN == rtstrSigner) || (SIGNER_CISCO_CN2 == rtstrSigner ) )
     {
         /* verify timestamp against killdate */
         if ( timeStamp < killdate )
@@ -340,4 +340,19 @@ CodesignStatus CodesignVerifier::Verify( const std::wstring& rtstrPath, const st
         return CodesignStatus::CODE_SIGNER_INVALID;
     }
     return VerifyWithKilldate( rtstrPath, rtstrSigner, sig_type, KILLDATE );
+}
+
+CodesignStatus CodesignVerifier::Verify( const std::wstring& rtstrPath, const std::vector<std::wstring>& rtstrSignerList, SigType sig_type )
+{
+    if( ( rtstrPath.empty() ) || ( rtstrSignerList.empty() ) || ( SigType::SIGTYPE_NATIVE != sig_type ) ) {
+        WLOG_ERROR( L"invalid parameters [%s] : List Size[%d]", rtstrPath.c_str(), rtstrSignerList.size() );
+        return CodesignStatus::CODE_SIGNER_INVALID;
+    }
+
+    for( auto& item : rtstrSignerList ) {
+        if( VerifyWithKilldate( rtstrPath, item, sig_type, KILLDATE ) == CodesignStatus::CODE_SIGNER_SUCCESS )
+            return CodesignStatus::CODE_SIGNER_SUCCESS;
+    }
+
+    return CodesignStatus::CODE_SIGNER_INVALID;
 }

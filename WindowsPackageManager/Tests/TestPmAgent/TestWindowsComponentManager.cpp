@@ -90,7 +90,7 @@ TEST_F( TestWindowsComponentManager, WillGetInstalledPackages )
 TEST_F( TestWindowsComponentManager, WillCodeSignVerifyOnUpdateComponent )
 {
     SetupComponentPackage();
-    EXPECT_CALL( *m_codeSignVerifier, Verify( _, _, _ ) );
+    EXPECT_CALL( *m_codeSignVerifier, Verify( _, Matcher<const std::wstring&>( _ ), _ ) );
 
     std::string error;
     m_patient->UpdateComponent( m_expectedComponentPackage, error );
@@ -110,7 +110,7 @@ TEST_F(TestWindowsComponentManager, UpdateComponentWontVerifyBinaryWhenSignerIsE
 
 TEST_F( TestWindowsComponentManager, WillCodeSignVerifyOnDeployConfiguration )
 {
-    EXPECT_CALL( *m_codeSignVerifier, Verify( _, _, _ ) );
+    EXPECT_CALL( *m_codeSignVerifier, Verify( _, Matcher<const std::wstring&>( _ ), _ ) );
 
     SetupComponentPackage();
     m_patient->DeployConfiguration( m_expectedComponentPackage.configs[0] );

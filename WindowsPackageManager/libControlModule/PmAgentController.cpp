@@ -238,7 +238,7 @@ PM_STATUS PmAgentController::startProcess()
     DWORD bRetStatus = -1;
 
     //Verify CodeSign
-    status = CodeSignToPmStatus( m_codesignVerifier.Verify( m_tstrProcessPath, SIGNER_CISCO, SIGTYPE_DEFAULT ) );
+    status = CodeSignToPmStatus( m_codesignVerifier.Verify( m_tstrProcessPath, ICodesignVerifier::CISCO_SIGNER_LIST, SIGTYPE_DEFAULT ) );
     if( PM_STATUS::PM_OK != status )
     {
         LOG_ERROR( "Sign verification failed for the process" );
