@@ -121,6 +121,7 @@
     <None Include="CustomAction.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InstructionSet.h" />
     <ClInclude Include="MsiLogger.h" />
     <ClInclude Include="PrivateFunctions.h" />
     <ClInclude Include="resource.h" />

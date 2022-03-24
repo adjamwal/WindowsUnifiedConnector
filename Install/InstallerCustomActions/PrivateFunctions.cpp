@@ -12,8 +12,10 @@
 #include <Tlhelp32.h>
 #include <winbase.h>
 #include <string.h>
+#include "InstructionSet.h"
 
 extern HMODULE globalDllHandle;
+const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
 
 bool StringToBuildInfo( const std::wstring& version, BuildInfo& buildInfo )
 {
@@ -162,6 +164,23 @@ bool IsArmCpu()
 
     bool rtn = ( SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM ) ||
                ( SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM64 );
+
+    rtn |= !InstructionSet::IsIntelOrAMD();
+
+    std::string cpuidStr = "";
+    char inBuffer[ MAX_PATH ] = "";
+    const char* csName = "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0";
+    HKEY hKey;
+    DWORD gotType, gotSize = MAX_PATH;
+    if( RegOpenKeyExA( HKEY_LOCAL_MACHINE, csName, 0, KEY_READ, &hKey ) == ERROR_SUCCESS )
+    {
+        if( !RegQueryValueExA( hKey, "Identifier", nullptr, &gotType, ( PBYTE )( inBuffer ), &gotSize ) )
+        {
+            if( ( gotType == REG_SZ ) && strlen( inBuffer ) ) cpuidStr = std::string( inBuffer );
+        }
+        RegCloseKey( hKey );
+    }
+    rtn |= cpuidStr.find( "ARM" ) != std::string::npos;
 
     WLOG_DEBUG( L"IsArmCpu: %s", rtn ? L"true" : L"false" );
 
@@ -520,7 +539,7 @@ void BuildCustomActionData( const std::vector<std::wstring>& propertyList, const
         }
     }
 }
-void Tokenize( const std::wstring &str, const char delim, std::vector<std::wstring>& stringList )
+void Tokenize( const std::wstring& str, const char delim, std::vector<std::wstring>& stringList )
 {
     size_t start;
     size_t end = 0;
