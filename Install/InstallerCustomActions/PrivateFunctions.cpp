@@ -182,7 +182,11 @@ bool IsArmCpu()
     }
     rtn |= cpuidStr.find( "ARM" ) != std::string::npos;
 
-    WLOG_DEBUG( L"IsArmCpu: %s", rtn ? L"true" : L"false" );
+    LOG_DEBUG( "IsArmCpu: %s, Id: %s, Vendor: %s, Brand: %s", 
+        rtn ? "true" : "false", 
+        cpuidStr.c_str(),
+        InstructionSet::Vendor().c_str(),
+        InstructionSet::Brand().c_str() );
 
     return rtn;
 }
