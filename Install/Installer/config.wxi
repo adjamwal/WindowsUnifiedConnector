@@ -13,6 +13,7 @@
         <?define ProductName =  "Cisco Secure Client - Cloud Management" ?>
         <?define ServiceName =  "CiscoCloudManagement" ?>
     <?endif ?>
+    <?define ServiceDescription = "Cisco Cloud Management is a module in Cisco Secure Client that enabled cloud driven profile and software updates. This module enables the endpoint to use Cisco Secure Client cloud infrastructure for deployment." ?>
     <?define ProductFamily = "SecureClient" ?>
   
     <!-- Directory Information -->

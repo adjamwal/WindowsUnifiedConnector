@@ -284,7 +284,7 @@
             <Component Id="ucs.exe" Guid="*">
                 <File Id="ucs.exe" Name="csc_cms.exe" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.SolutionDir)\$(var.ProjectsPlatform)\$(var.Configuration)\csc_cms.exe" />
                 <ServiceControl Id="StartService" Name="$(var.ServiceName)" Start="install" Stop="both" Remove="uninstall" Wait="no" />
-                <ServiceInstall Id="ServiceInstaller" Name="$(var.ServiceName)" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="[CustomDescription]">
+                <ServiceInstall Id="ServiceInstaller" Name="$(var.ServiceName)" DisplayName="$(var.ProductName)" Type="ownProcess" Start="auto" ErrorControl="normal" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Description="$(var.ServiceDescription)">
                     <util:ServiceConfig RestartServiceDelayInSeconds="60" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
                 </ServiceInstall>
             </Component>
