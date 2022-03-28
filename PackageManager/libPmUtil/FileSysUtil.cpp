@@ -1,5 +1,5 @@
 #include "FileSysUtil.h"
-#include "PMLogger.h"
+#include "PmLogger.h"
 #include <sstream>
 #include <fstream>
 #include <filesystem>
@@ -10,6 +10,10 @@ struct FileUtilHandle
 {
     FILE* file;
 };
+
+#ifdef __unix
+#define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),(mode)))==NULL
+#endif
 
 FileSysUtil::FileSysUtil( IUtf8PathVerifier& utf8PathVerifier ) :
     m_utf8PathVerifier( utf8PathVerifier )

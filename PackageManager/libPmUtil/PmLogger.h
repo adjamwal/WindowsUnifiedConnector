@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IPMLogger.h"
+#include "IPmLogger.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
