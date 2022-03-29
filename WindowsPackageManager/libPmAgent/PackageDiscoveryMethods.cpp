@@ -36,7 +36,7 @@ void PackageDiscoveryMethods::DiscoverByMsi(
 
     if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_DEBUG( "DiscoverByMsi could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
+        LOG_DEBUG( "could not find %s, %s: %d", msiRule.name.c_str(), msiRule.vendor.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -45,12 +45,23 @@ void PackageDiscoveryMethods::DiscoverByMsi(
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
 
-        LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
+        LOG_DEBUG( "found: %s, %s, %s, %d",
             msiRule.name.c_str(), 
             msiRule.vendor.c_str(),
-            converter.to_bytes( listItem.InstalledProductCode ).c_str() );
+            converter.to_bytes( listItem.InstalledProductCode ).c_str(),
+            listItem.InstallState);
 
-        detectedInstallations.push_back( detected );
+        if (listItem.InstallState != INSTALLSTATE_ADVERTISED)
+        {
+            detectedInstallations.push_back(detected);
+        }
+        else
+        {
+            LOG_DEBUG("found: %s, %s, %s. Ignoring due to ADVERTISED_STATE",
+                msiRule.name.c_str(),
+                msiRule.vendor.c_str(),
+                converter.to_bytes(listItem.InstalledProductCode).c_str());
+        }
     }
 }
 
@@ -126,7 +137,7 @@ void PackageDiscoveryMethods::DiscoverByRegistry(
     detected.version = data;
     PadBuildNumber( detected.version );
 
-    LOG_DEBUG( "DiscoverByRegistry found: %s, %s, %s (%s)",
+    LOG_DEBUG( "found: %s, %s, %s (%s)",
         lookupProduct.product.c_str(),
         regRule.install.key.c_str(),
         regRule.version.key.c_str(),
@@ -146,7 +157,7 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
 
     if ( retCode != ERROR_SUCCESS || msiList.empty() )
     {
-        LOG_DEBUG( "DiscoverByMsiUpgradeCode could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
+        LOG_DEBUG( "could not find %s: %d", upgradeCodeRule.upgradeCode.c_str(), retCode );
     }
 
     for ( auto listItem : msiList )
@@ -155,11 +166,21 @@ void PackageDiscoveryMethods::DiscoverByMsiUpgradeCode( const PmProductDiscovery
         detected.version = converter.to_bytes( listItem.Properties.VersionString );
         detected.product = lookupProduct.product;
 
-        LOG_DEBUG( "DiscoverByMsiUpgradeCode found: %s, %s",
+        LOG_DEBUG( "found: %s, %s, %d",
             upgradeCodeRule.upgradeCode.c_str(),
-            converter.to_bytes( listItem.InstalledProductCode ).c_str() );
+            converter.to_bytes( listItem.InstalledProductCode ).c_str(),
+            listItem.InstallState);
 
-        detectedInstallations.push_back( detected );
+        if (listItem.InstallState != INSTALLSTATE_ADVERTISED)
+        {
+            detectedInstallations.push_back(detected);
+        }
+        else
+        {
+            LOG_DEBUG("found: %s, %s. Ignoring due to ADVERTISED_STATE",
+                upgradeCodeRule.upgradeCode.c_str(),
+                converter.to_bytes(listItem.InstalledProductCode).c_str());
+        }
     }
 }
 
@@ -180,19 +201,31 @@ void PackageDiscoveryMethods::DiscoverByMsiRules(
         if ( !name.empty() &&
             !publisher.empty() &&
             name.compare( product.Properties.InstalledProductName ) == 0 &&
-            publisher.compare( product.Properties.Publisher ) == 0 )
+            publisher.compare( product.Properties.Publisher ) == 0 &&
+            product.InstallState != INSTALLSTATE_ADVERTISED )
         {
             PmInstalledPackage detected = {};
             detected.version = converter.to_bytes( product.Properties.VersionString );
             detected.product = lookupProduct.product;
 
-            LOG_DEBUG( "DiscoverByMsi found: %s, %s, %s",
+            LOG_DEBUG( "found: %s, %s, %s, %d",
                 msiRule.name.c_str(),
                 msiRule.vendor.c_str(),
-                converter.to_bytes( product.InstalledProductCode ).c_str() );
+                converter.to_bytes( product.InstalledProductCode ).c_str(),
+                product.InstallState );
 
-            detectedInstallations.push_back( detected );
-            found = true;
+            if (product.InstallState != INSTALLSTATE_ADVERTISED)
+            {
+                detectedInstallations.push_back(detected);
+                found = true;
+            }
+            else
+            {
+                LOG_DEBUG("found: %s, %s, %s. Ignoring due to ADVERTISED_STATE",
+                    msiRule.name.c_str(),
+                    msiRule.vendor.c_str(),
+                    converter.to_bytes(product.InstalledProductCode).c_str());
+            }
         }
     }
 

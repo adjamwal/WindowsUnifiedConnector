@@ -163,8 +163,7 @@ MsiApiProductInfo MsiApi::GetProductInformation(
     product.InstalledProductCode = std::wstring( szInstalledProductCode );
     product.MsiInstallContext = pdwInstalledContext;
 
-    //Commented out to improve performance. Might still be valid information in the future.
-    //product.InstallState = m_winApiWrapper.MsiQueryProductStateW( szInstalledProductCode );
+    product.InstallState = m_winApiWrapper.MsiQueryProductStateW( szInstalledProductCode );
 
     MsiApiProductProperties properties;
     properties.InstalledProductName = QueryProperty( szInstalledProductCode, tempSzUserSid, pdwInstalledContext, INSTALLPROPERTY_INSTALLEDPRODUCTNAME );
