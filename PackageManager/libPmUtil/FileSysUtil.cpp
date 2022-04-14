@@ -109,6 +109,11 @@ FileUtilHandle* FileSysUtil::PmCreateFile( const std::filesystem::path& filePath
         handle = ( FileUtilHandle* )malloc( sizeof( FileUtilHandle ) );
         errno_t rtn = fopen_s( &handle->file, filePath.generic_u8string().c_str(), "wb" );
         if( rtn != 0 ) {
+            if( handle )
+            {
+                free( handle );
+                handle = NULL;
+            }
             LOG_ERROR( "fopen_s failed" );
         }
         else {
