@@ -46,8 +46,13 @@ BOOL ProxyDiscoveryEngine::GetAutoProxyInfo( const LPCTSTR testURL, const LPCTST
         return FALSE;
     }
 
+    if( !options ) {
+        LOG_ERROR( "invalid void 'options' pointer in function call" );
+        return FALSE;
+    }
+
     HINTERNET hSession = m_winHttp.WinHttpOpen( NULL, 0, NULL, NULL, 0 );
-    if( !hSession || !options ) {
+    if( !hSession ) {
         LOG_ERROR( "unable to open http connection: %d", GetLastError() );
         return FALSE;
     }
