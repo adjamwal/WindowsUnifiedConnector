@@ -49,4 +49,6 @@ public:
 
     virtual std::tuple<int32_t, std::vector<MsiApiProductInfo>> FindRelatedProducts( 
         std::wstring upgradeCode ) = 0;
+
+    virtual bool IsMsiServiceReadyforInstall() = 0;
 };

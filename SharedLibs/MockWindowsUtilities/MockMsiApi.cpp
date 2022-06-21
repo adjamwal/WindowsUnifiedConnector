@@ -28,3 +28,13 @@ void MockMsiApi::MakeFindRelatedProductsReturn( std::tuple<int32_t, std::vector<
 {
     ON_CALL( *this, FindRelatedProducts( _ ) ).WillByDefault( Return( value ) );
 }
+
+void MockMsiApi::MakeIsMsiServiceReadyforInstallReturn( bool value )
+{
+    ON_CALL( *this, IsMsiServiceReadyforInstall() ).WillByDefault( Return( value ) );
+}
+
+void MockMsiApi::ExpectIsMsiServiceReadyforInstallIsNotCalled()
+{
+    EXPECT_CALL( *this, IsMsiServiceReadyforInstall() ).Times( 0 );
+}

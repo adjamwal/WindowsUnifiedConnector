@@ -117,4 +117,6 @@ public:
         LPSTARTUPINFOW lpStartupInfo,
         LPPROCESS_INFORMATION lpProcessInformation
     ) override;
+
+    void Sleep( DWORD milliseconds ) override;
 };

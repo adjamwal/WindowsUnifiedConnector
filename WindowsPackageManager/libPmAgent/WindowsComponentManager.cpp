@@ -5,6 +5,7 @@
 #include "ICodesignVerifier.h"
 #include "IPackageDiscovery.h"
 #include "IUserImpersonator.h"
+#include "IMsiApi.h"
 #include "IUcLogger.h"
 #include <sstream>
 #include <locale>
@@ -18,11 +19,13 @@
 WindowsComponentManager::WindowsComponentManager( IWinApiWrapper& winApiWrapper,
     ICodesignVerifier& codesignVerifier,
     IPackageDiscovery& packageDiscovery,
-    IUserImpersonator& userImpersonator ) :
+    IUserImpersonator& userImpersonator,
+    IMsiApi& msiApi ) :
     m_winApiWrapper( winApiWrapper )
     , m_codeSignVerifier( codesignVerifier )
     , m_packageDiscovery( packageDiscovery )
     , m_userImpersonator( userImpersonator )
+    , m_msiApi( msiApi )
 {
 }
 
@@ -80,28 +83,8 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
         }
         else if( package.installerType == "msi" )
         {
-            std::string msiexecFullPath;
-            std::string msiCmdline = "";
-
-            if( WindowsUtilities::GetSysDirectory( msiexecFullPath ) )
-            {
-                std::string logFilePath = converter.to_bytes( WindowsUtilities::GetLogDir() );
-                std::string logFileName = package.productAndVersion;
-
-                std::replace( logFileName.begin(), logFileName.end(), '/', '.' );
-                logFilePath.append( "\\" ).append( logFileName ).append( ".log" );
-
-                msiexecFullPath.append( "\\msiexec.exe" );
-
-                msiCmdline = " /package \"" + downloadedInstallerPath.u8string() + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
-
-                ret = RunPackage( msiexecFullPath, msiCmdline, error );
-            }
-            else
-            {
-                error = std::string( "Failed to get system directory." );
-                ret = -1;
-            }
+            std::string logFilePath = converter.to_bytes(WindowsUtilities::GetLogDir());
+            ret =  UpdateMsi(package, error, logFilePath, downloadedInstallerPath);
         }
         else
         {
@@ -262,4 +245,51 @@ int32_t WindowsComponentManager::RestrictPathPermissionsToAdmins( const std::fil
         && WindowsUtilities::SetWellKnownGroupAccessToPath( filePath, WinBuiltinAdministratorsSid, GENERIC_ALL, true )
         && WindowsUtilities::SetWellKnownGroupAccessToPath( filePath, WinBuiltinUsersSid, GENERIC_READ )
         ? ERROR_SUCCESS : -1;
+}
+
+int32_t WindowsComponentManager::UpdateMsi( const PmComponent& package, std::string& error, std::string &logFilePath, std::filesystem::path &downloadedInstallerPath)
+{
+    int32_t ret = -1;
+    bool expecting1618 = true;
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::string msiexecFullPath;
+    std::string msiCmdline = "";
+
+    //Wait up to 5 minutes for the Windows Installer Service
+    for( int i = 0; i < 30; i++ ) {
+        if( !m_msiApi.IsMsiServiceReadyforInstall() ) {
+            LOG_DEBUG( "Windows Installer Service is not ready. Waiting..." );
+            m_winApiWrapper.Sleep( 10000 );
+        }
+        else {
+            expecting1618 = false;
+            break;
+        }
+    }
+
+    if( expecting1618 ) {
+        LOG_DEBUG( "Timed out waiting for Windows Installer Service. Trying install anyway. Will most likely fail" );
+    }
+
+    if (WindowsUtilities::GetSysDirectory(msiexecFullPath))
+    {
+        std::string logFileName = package.productAndVersion;
+
+        std::replace(logFileName.begin(), logFileName.end(), '/', '.');
+        logFilePath.append("\\").append(logFileName).append(".log");
+
+        msiexecFullPath.append("\\msiexec.exe");
+
+        msiCmdline = " /package \"" + downloadedInstallerPath.u8string() + "\" /quiet /L*V \"" + logFilePath + "\" " + package.installerArgs + " /norestart";
+
+        ret = RunPackage(msiexecFullPath, msiCmdline, error);
+    }
+    else
+    {
+        error = std::string("Failed to get system directory.");
+        ret = -1;
+    }
+
+    return ret;
 }

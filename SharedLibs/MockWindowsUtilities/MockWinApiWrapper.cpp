@@ -138,3 +138,8 @@ void MockWinApiWrapper::ExpectCreateProcessAsUserWNotCalled()
 {
     EXPECT_CALL( *this, CreateProcessAsUserW( _, _, _, _, _, _, _, _ ) ).Times( 0 );
 }
+
+void MockWinApiWrapper::ExpectSleepNotCalled()
+{
+    EXPECT_CALL( *this, Sleep( _ ) ).Times( 0 );
+}

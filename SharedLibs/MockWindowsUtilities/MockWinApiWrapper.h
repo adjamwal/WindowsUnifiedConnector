@@ -131,4 +131,7 @@ public:
     ) );
     void MakeCreateProcessAsUserWReturn( BOOL value );
     void ExpectCreateProcessAsUserWNotCalled();
+
+    MOCK_METHOD1( Sleep, void( DWORD ) );
+    void ExpectSleepNotCalled();
 };

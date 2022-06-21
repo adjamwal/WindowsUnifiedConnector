@@ -10,6 +10,7 @@ class IWinApiWrapper;
 class ICodesignVerifier;
 class IPackageDiscovery;
 class IUserImpersonator;
+class IMsiApi;
 
 class WindowsComponentManager : public IPmPlatformComponentManager
 {
@@ -17,7 +18,8 @@ public:
     WindowsComponentManager( IWinApiWrapper& winApiWrapper, 
         ICodesignVerifier& codeSignVerifier, 
         IPackageDiscovery& packageDiscovery,
-        IUserImpersonator& userImpersonator );
+        IUserImpersonator& userImpersonator,
+        IMsiApi& msiApi );
     virtual ~WindowsComponentManager();
 
     /**
@@ -128,6 +130,8 @@ private:
     ICodesignVerifier& m_codeSignVerifier;
     IPackageDiscovery& m_packageDiscovery;
     IUserImpersonator& m_userImpersonator;
+    IMsiApi& m_msiApi;
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
+    int32_t UpdateMsi( const PmComponent& package, std::string& error, std::string &logFilePath,  std::filesystem::path &downloadedInstallerPath);
 };
