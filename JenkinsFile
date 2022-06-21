@@ -40,7 +40,7 @@ def NotifyWebexChannel(String webexUrl) {
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
   powershell ".\\AmpRepositorySync.exe -cws ."
-  powershell ".\\AmpRepositorySync.exe -cc 188"
+  powershell ".\\AmpRepositorySync.exe -cc 205"
 }
 
 def SetupVersion( boolean upgrade ) {
