@@ -152,7 +152,8 @@ protected:
             *m_mockRebootHandler,
             *m_thread,
             *m_watchdog,
-            *m_proxyDiscoverySubscriber ) );
+            *m_proxyDiscoverySubscriber,
+            *m_mockFileUtil ) );
     }
 
     void TearDown()
@@ -212,7 +213,7 @@ protected:
         return interval;
     }
 
-    void SetupPacMacn()
+    void SetupPacMan()
     {
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_mockPlatformConfiguration->MakeGetProxyDiscoveryReturn( m_mockProxyDiscovery.get() );
@@ -227,7 +228,7 @@ protected:
         m_patient->SetPlatformDependencies( m_mockDeps.get() );
     }
 
-    void SetupPacMacNoConfig()
+    void SetupPacManNoConfig()
     {
         m_mockPlatformConfiguration->MakeGetSslCertificatesReturn( 0 );
         m_mockPlatformConfiguration->MakeGetProxyDiscoveryReturn( m_mockProxyDiscovery.get() );
@@ -241,13 +242,13 @@ protected:
 
     void StartPacMan()
     {
-        SetupPacMacn();
+        SetupPacMan();
         m_patient->Start( "ConfigFile", "BootstrapFile" );
     }
 
     void StartPacManNoConfig()
     {
-        SetupPacMacNoConfig();
+        SetupPacManNoConfig();
         m_patient->Start( "ConfigFile", "BootstrapFile" );
     }
 

@@ -23,14 +23,14 @@ int32_t PmConfig::LoadPmConfig( const std::string& pmConfig )
     int rtn = -1;
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    std::string pmData = m_fileUtil.ReadFile( pmConfig );
+    std::string pmData = m_fileUtil.ReadTextFile( pmConfig );
     m_pmConfigFileTimestamp = m_fileUtil.FileTime( pmConfig );
 
     rtn = ParsePmConfig( pmData );
 
     if( rtn != 0 ) {
         LOG_ERROR( "Failed to parse %s", pmConfig.c_str() );
-        pmData = m_fileUtil.ReadFile( pmConfig + ".bak" );
+        pmData = m_fileUtil.ReadTextFile( pmConfig + ".bak" );
 
         rtn = ParsePmConfig( pmData );
 
@@ -315,7 +315,7 @@ int32_t PmConfig::VerifyPmContents( const std::string& pmData )
 
 int32_t PmConfig::VerifyPmFileIntegrity( const std::string& pmConfig )
 {
-    std::string pmData = m_fileUtil.ReadFile( pmConfig );
+    std::string pmData = m_fileUtil.ReadTextFile( pmConfig );
 
     return VerifyPmContents( pmData );
 }

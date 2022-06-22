@@ -639,11 +639,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillUpdatePackageAndConfigCloudDat
     EXPECT_TRUE( packageUpdated && configUpdated );
 }
 
-std::string _ucReponseNoPackages( R"(
-{
-  "packages": null
-}
-)" );
+std::string _ucReponseNoPackages( R"({"packages":null})" );
 
 TEST_F( ComponentTestPacManConfigsPath, PacManWillSendDicoveryList )
 {
@@ -651,7 +647,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillSendDicoveryList )
     m_mockCloud->MakeCheckinReturn( true, _ucReponseNoPackages, { 200, 0 } );
 
     EXPECT_CALL( *m_mockPlatformComponentManager, GetInstalledPackages( _, _ ) )
-        .WillOnce( Invoke(
+        .WillRepeatedly( Invoke(
             [this, &pass]( const std::vector<PmProductDiscoveryRules>& catalogRules, PackageInventory& packagesDiscovered )
             {
                 pass = true;
@@ -723,7 +719,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdog )
         [this, &count, &pass]()
         {
             count++;
-            if( count == 3 ) {
+            if( count == 4 ) {
                 pass = true;
                 m_cv.notify_one();
             }
@@ -733,10 +729,10 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillKickTheWatchdog )
     StartPacMan();
 
     std::unique_lock<std::mutex> lock( m_mutex );
-    m_cv.wait_for( lock, std::chrono::seconds( 5 ) );
+    m_cv.wait_for( lock, std::chrono::seconds( 10 ) );
     lock.unlock();
 
-    EXPECT_EQ( count, 3);
+    EXPECT_EQ( count, 4);
     EXPECT_TRUE( pass );
 }
 
@@ -799,7 +795,7 @@ TEST_F( ComponentTestPacManConfigsPath, PacManWillUpdateCerts )
     bool pass = false;
     PmHttpExtendedResult eResult = { 0, 60, "curl" };
 
-    SetupPacMacn();
+    SetupPacMan();
     ON_CALL( *m_mockConfig, GetCloudCheckinIntervalMs() ).WillByDefault( Return( 1 ) );
     ON_CALL( *m_mockCloud, Get( _, _, _ ) ).WillByDefault( DoAll( SetArgReferee<2>( eResult ), Return( false ) ) );
     ON_CALL( *m_certsAdapter, ReloadCerts() ).WillByDefault( Invoke(

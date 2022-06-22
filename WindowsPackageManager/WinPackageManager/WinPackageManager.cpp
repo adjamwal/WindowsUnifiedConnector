@@ -25,7 +25,7 @@ void WaitForTermination()
     //Wait for any input from parent process, including close of write end of pipe.
     char chData = 0;
     DWORD dwBytesRead = 0;
-    ReadFile( hStdin, &chData, sizeof( chData ), &dwBytesRead, NULL );
+    ::ReadFile( hStdin, &chData, sizeof( chData ), &dwBytesRead, NULL );
 }
 
 int APIENTRY wWinMain( _In_ HINSTANCE hInstance,

@@ -103,7 +103,8 @@ PackageManagerContainer::PackageManagerContainer() :
             *m_rebootHandler,
             *m_thread,
             *m_watchdog,
-            *m_proxyDiscoverySubscriber ) )
+            *m_proxyDiscoverySubscriber,
+            *m_fileUtil ) )
 {
     curl_global_init( CURL_GLOBAL_DEFAULT );
 }

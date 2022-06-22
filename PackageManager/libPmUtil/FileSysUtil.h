@@ -13,7 +13,7 @@ public:
     FileSysUtil( IUtf8PathVerifier& utf8PathVerifier );
     ~FileSysUtil();
 
-    std::string ReadFile( const std::filesystem::path& filePath ) override;
+    std::string ReadTextFile( const std::filesystem::path& filePath ) override;
     bool WriteLine( const std::filesystem::path& filePath, const std::string& data ) override;
     std::vector<std::string> ReadFileLines( const std::filesystem::path& filePath ) override;
     FileUtilHandle* PmCreateFile( const std::filesystem::path& filePath ) override;

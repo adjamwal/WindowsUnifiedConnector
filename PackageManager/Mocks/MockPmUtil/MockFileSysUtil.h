@@ -8,7 +8,7 @@ public:
     MockFileSysUtil();
     ~MockFileSysUtil();
 
-    MOCK_METHOD1( ReadFile, std::string( const std::filesystem::path& ) );
+    MOCK_METHOD1( ReadTextFile, std::string( const std::filesystem::path& ) );
     void MakeReadFileReturn( std::string value );
     void ExpectReadFileNotCalled();
 

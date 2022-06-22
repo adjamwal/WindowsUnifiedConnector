@@ -15,7 +15,7 @@ public:
     IFileSysUtil() {}
     virtual ~IFileSysUtil() {}
 
-    virtual std::string ReadFile( const std::filesystem::path& filePath ) = 0;
+    virtual std::string ReadTextFile( const std::filesystem::path& filePath ) = 0;
     virtual bool WriteLine( const std::filesystem::path& filePath, const std::string& data ) = 0;
     virtual std::vector<std::string> ReadFileLines( const std::filesystem::path& filePath ) = 0;
     virtual FileUtilHandle* PmCreateFile( const std::filesystem::path& filePath ) = 0;

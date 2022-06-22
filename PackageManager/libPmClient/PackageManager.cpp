@@ -30,6 +30,11 @@
 #include "ProxyInfoModel.h"
 #include "StringUtil.h"
 #include <sstream>
+#include <fstream>
+#include <json/json.h>
+#include "FileSysUtil.h"
+
+#define MANIFEST_JSON "manifest.json"
 
 using namespace std;
 
@@ -50,7 +55,8 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     IRebootHandler& rebootHandler,
     IWorkerThread& thread,
     IWatchdog& watchdog,
-    IProxyConsumer& proxyDiscoverySubscriber )
+    IProxyConsumer& proxyDiscoverySubscriber,
+    IFileSysUtil& fileUtil )
     : m_bootstrap( bootstrap )
     , m_config( config )
     , m_cloud( cloud )
@@ -69,6 +75,7 @@ PackageManager::PackageManager( IPmBootstrap& bootstrap,
     , m_thread( thread )
     , m_watchdog( watchdog )
     , m_proxyDiscoverySubscriber( proxyDiscoverySubscriber )
+    , m_fileUtil( fileUtil )
     , m_useShorterInterval( false )
     , m_initialUcUpgradeEventSent( false )
     , m_proxyDiscovery( nullptr )
@@ -174,6 +181,7 @@ void PackageManager::SetPlatformDependencies( IPmPlatformDependencies* dependeci
         m_rebootHandler.Initialize( m_dependencies );
         m_catalogJsonParser.Initialize( m_dependencies );
         m_proxyDiscovery = ( IProxyDiscovery* )m_dependencies->Configuration().GetProxyDiscovery();
+        m_manifestFile = std::filesystem::path( dependecies->Configuration().GetDataDirectory() + MANIFEST_JSON );
     }
     catch( std::exception& ex )
     {
@@ -205,9 +213,7 @@ void PackageManager::PmWorkflowThread()
         LOG_ERROR( "Failed to load PM configuration" );
     }
 
-    PackageInventory inventory;
     bool isRebootRequired = false;
-    std::vector<PmProductDiscoveryRules> productDiscoveryRules;
 
     m_watchdog.Kick();
     PmCheckForProxies( true );
@@ -248,18 +254,9 @@ void PackageManager::PmWorkflowThread()
         LOG_ERROR( "Failed to send uc upgrade event: Unknown exception" );
     }
 
-    try {
-        productDiscoveryRules = m_packageDiscoveryManager.PrepareCatalogDataset();
-
-        m_packageDiscoveryManager.DiscoverPackages( productDiscoveryRules, inventory );
-    }
-    catch( std::exception& ex ) {
-        LOG_ERROR( "PackageDiscovery failed: %s", ex.what() );
-        m_useShorterInterval = true;
-        return;
-    }
-    catch( ... ) {
-        LOG_ERROR( "PackageDiscovery failed: Unknown exception" );
+    PackageInventory inventory;
+    if ( !RunPackageDiscovery( inventory ) )
+    {
         m_useShorterInterval = true;
         return;
     }
@@ -304,6 +301,58 @@ void PackageManager::PmWorkflowThread()
     }
     catch( ... ) {
         LOG_ERROR( "Post Checkin failed: Unknown exception" );
+    }
+
+    m_watchdog.Kick();
+
+    PackageInventory postCheckinInventory;
+    if ( RunPackageDiscovery( postCheckinInventory ) ) ExportPackageList( postCheckinInventory );
+}
+
+bool PackageManager::RunPackageDiscovery( PackageInventory& inventory )
+{
+    try {
+        std::vector<PmProductDiscoveryRules> productDiscoveryRules = m_packageDiscoveryManager.PrepareCatalogDataset();
+        m_packageDiscoveryManager.DiscoverPackages( productDiscoveryRules, inventory );
+    }
+    catch ( std::exception& ex ) {
+        LOG_ERROR( "PackageDiscovery failed: %s", ex.what() );
+        return false;
+    }
+    catch ( ... ) {
+        LOG_ERROR( "PackageDiscovery failed: Unknown exception" );
+        return false;
+    }
+
+    return true;
+}
+
+void PackageManager::ExportPackageList( PackageInventory& inventory )
+{
+    try
+    {
+        Json::Value root;
+        Json::Value& json_packages = root[ "packages" ];
+        for ( PmInstalledPackage& package : inventory.packages )
+        {
+            Json::Value json_package;
+            json_package[ "product" ] = package.product;
+            json_package[ "version" ] = package.version;
+            json_packages.append( json_package );
+        }
+
+        if ( m_fileUtil.FileExists( m_manifestFile ) )
+        {
+            m_fileUtil.EraseFile( m_manifestFile );
+        }
+
+        m_fileUtil.WriteLine( m_manifestFile, Json::writeString( Json::StreamWriterBuilder(), root ) );
+    }
+    catch ( std::exception& e ) {
+        LOG_ERROR( "Failed to write %s. (%s)", m_manifestFile.u8string().c_str(), e.what() );
+    }
+    catch ( ... ) {
+        LOG_ERROR( "Failed to write %s. (Unknown exception)", m_manifestFile.u8string().c_str() );
     }
 }
 
