@@ -114,6 +114,12 @@ ICloudEventBuilder& CloudEventBuilder::WithTse( const std::string& tse )
     return *this;
 }
 
+ICloudEventBuilder& CloudEventBuilder::WithTseNow()
+{
+    UpdateEventTime();
+    return *this;
+}
+
 std::string CloudEventBuilder::GetPackageName() const
 {
     return m_packageName;
