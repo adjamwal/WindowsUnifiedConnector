@@ -29,6 +29,7 @@ public:
     virtual ICloudEventBuilder& WithNewFile( const std::filesystem::path& path, const std::string& hash, uint64_t size ) = 0;
     virtual ICloudEventBuilder& WithFrom( const std::string& fromVersion ) = 0;
     virtual ICloudEventBuilder& WithTse( const std::string& tse ) = 0;
+    virtual ICloudEventBuilder& WithTseNow() = 0;
 
     virtual std::string GetPackageName() const = 0;
     virtual std::string GetPackageVersion() const = 0;

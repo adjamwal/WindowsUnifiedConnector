@@ -15,12 +15,12 @@ MockFileSysUtil::~MockFileSysUtil()
 
 void MockFileSysUtil::MakeReadFileReturn( std::string value )
 {
-    ON_CALL( *this, ReadFile( _ ) ).WillByDefault( Return( value ) );
+    ON_CALL( *this, ReadTextFile( _ ) ).WillByDefault( Return( value ) );
 }
 
 void MockFileSysUtil::ExpectReadFileNotCalled()
 {
-    EXPECT_CALL( *this, ReadFile( _ ) ).Times( 0 );
+    EXPECT_CALL( *this, ReadTextFile( _ ) ).Times( 0 );
 }
 
 void MockFileSysUtil::MakeWriteLineReturn( bool value )

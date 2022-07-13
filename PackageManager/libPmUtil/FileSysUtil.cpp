@@ -26,7 +26,7 @@ FileSysUtil::~FileSysUtil()
 
 }
 
-std::string FileSysUtil::ReadFile( const std::filesystem::path& filePath )
+std::string FileSysUtil::ReadTextFile( const std::filesystem::path& filePath )
 {
     std::stringstream stream;
 

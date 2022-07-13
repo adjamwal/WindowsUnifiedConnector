@@ -37,7 +37,7 @@ TEST_F( TestPmBootstrap, LoadWillReadFile )
 
     m_fileUtil->MakeReadFileReturn( bsConfigData );
 
-    EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
+    EXPECT_CALL( *m_fileUtil, ReadTextFile( pmfilename ) );
 
     m_patient->LoadPmBootstrap( pmfilename.generic_u8string() );
 }

@@ -40,7 +40,7 @@ def NotifyWebexChannel(String webexUrl) {
 def CheckoutDependencies() {
   getAmpBuildTools(env.JENKINS_USERNAME, env.JENKINS_USER_PASSWORD)
   powershell ".\\AmpRepositorySync.exe -cws ."
-  powershell ".\\AmpRepositorySync.exe -cc 188"
+  powershell ".\\AmpRepositorySync.exe -cc 206"
 }
 
 def SetupVersion( boolean upgrade ) {
@@ -122,7 +122,7 @@ pipeline {
     CLITE_CREDS = credentials('Corona-Lite')
     COR_LITE_USER = "$CLITE_CREDS_USR"
     COR_LITE_SECRET = "$CLITE_CREDS_PSW"
-    CORONA_CREDS = credentials('Corona-User')
+    CORONA_CREDS = credentials('amp_windows_dev.gen')
     CORONA_USER = "$CORONA_CREDS_USR"
     CORONA_PASSWORD = "$CORONA_CREDS_PSW"
     CORONA_CSDL_ID = "198676"

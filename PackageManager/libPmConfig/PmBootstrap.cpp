@@ -19,7 +19,7 @@ int32_t PmBootstrap::LoadPmBootstrap( const std::string& filename )
     int rtn = -1;
     std::lock_guard<std::mutex> lock( m_mutex );
 
-    std::string bsData = m_fileUtil.ReadFile( filename );
+    std::string bsData = m_fileUtil.ReadTextFile( filename );
 
     rtn = ParseBootstrapConfig( bsData );
 

@@ -120,4 +120,6 @@ public:
         LPPROCESS_INFORMATION lpProcessInformation
     ) = 0;
 
+    virtual void Sleep( DWORD milliseconds ) = 0;
+
 };

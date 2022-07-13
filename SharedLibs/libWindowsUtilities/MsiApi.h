@@ -23,6 +23,9 @@ public:
 
     std::tuple<int32_t, std::vector<MsiApiProductInfo>> FindRelatedProducts( 
         std::wstring upgradeCode ) override;
+
+    bool IsMsiServiceReadyforInstall() override;
+
 private:
     IWinApiWrapper& m_winApiWrapper;
 

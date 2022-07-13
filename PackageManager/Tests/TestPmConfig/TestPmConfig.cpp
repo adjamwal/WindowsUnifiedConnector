@@ -72,7 +72,7 @@ TEST_F( TestPmConfig, LoadWillReadPmFile )
 
     m_fileUtil->MakeReadFileReturn( pmConfigData );
 
-    EXPECT_CALL( *m_fileUtil, ReadFile( pmfilename ) );
+    EXPECT_CALL( *m_fileUtil, ReadTextFile( pmfilename ) );
 
     m_patient->LoadPmConfig( pmfilename.generic_u8string() );
 }
@@ -129,8 +129,8 @@ TEST_F( TestPmConfig, LoadWillTryBackupFile )
 
     InSequence s;
 
-    EXPECT_CALL( *m_fileUtil, ReadFile( filename ) ).WillOnce( Return( "" ) );
-    EXPECT_CALL( *m_fileUtil, ReadFile( backupFilename ) ).WillOnce( Return( "" ) );
+    EXPECT_CALL( *m_fileUtil, ReadTextFile( filename ) ).WillOnce( Return( "" ) );
+    EXPECT_CALL( *m_fileUtil, ReadTextFile( backupFilename ) ).WillOnce( Return( "" ) );
 
     m_patient->LoadPmConfig( filename.generic_u8string() );
 }

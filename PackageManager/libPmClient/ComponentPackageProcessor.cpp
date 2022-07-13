@@ -217,6 +217,7 @@ bool ComponentPackageProcessor::ProcessPackageBinary( PmComponent& componentPack
             else {
                 LOG_DEBUG( "Installer '%s' succeeded",
                     componentPackage.downloadedInstallerPath.generic_u8string().c_str() );
+                m_eventBuilder.WithTseNow();
             }
 
             m_installerManager.DeleteInstaller( componentPackage.downloadedInstallerPath );

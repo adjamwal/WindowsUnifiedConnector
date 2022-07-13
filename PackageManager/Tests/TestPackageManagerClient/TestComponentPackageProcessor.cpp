@@ -247,6 +247,7 @@ TEST_F( TestComponentPackageProcessor, WillSendSuccessEventIfProcessComponentPac
     SetupComponentPackageWithConfig();
 
     EXPECT_CALL( *m_eventBuilder, WithError( _, _ ) ).Times( 0 );
+    EXPECT_CALL( *m_eventBuilder, WithTseNow() );
     EXPECT_CALL( *m_eventPublisher, Publish( _ ) );
 
     m_patient->ProcessPackageBinary( m_expectedComponentPackage );
