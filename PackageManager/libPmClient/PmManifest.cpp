@@ -61,6 +61,16 @@ int32_t PmManifest::ParseManifest( const std::string& manifestJson )
     }
     else {
         try {
+            if( root[ "deployment_id" ].isString() ) {
+                SetDeploymentId( root[ "deployment_id" ].asString() );
+            }
+            else if( root[ "deployment_id" ].isNull() ) {
+                LOG_ERROR( "deployment_id missing from checkin manifest" );
+            }
+            else {
+                LOG_ERROR( "No deployment_id string value found in checkin manifest" );
+            }
+
             if( root[ "packages" ].isArray() ) {
                 for( Json::Value::ArrayIndex i = 0; i != root[ "packages" ].size(); i++ ) {
                     AddPackage( root[ "packages" ][ i ] );
@@ -83,6 +93,17 @@ int32_t PmManifest::ParseManifest( const std::string& manifestJson )
     }
 
     return rtn;
+}
+
+void PmManifest::SetDeploymentId( const std::string& deploymentId )
+{
+    LOG_INFO( "deployment_id: %s", deploymentId.c_str() );
+    m_deploymentId = deploymentId;
+}
+
+const std::string& PmManifest::GetDeploymentId()
+{
+    return m_deploymentId;
 }
 
 std::vector<PmComponent> PmManifest::GetPackageList()
