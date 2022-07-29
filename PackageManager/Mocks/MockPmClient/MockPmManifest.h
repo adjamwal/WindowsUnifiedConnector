@@ -13,6 +13,13 @@ public:
     void MakeParseManifestReturn( int32_t value );
     void ExpectParseManifestIsNotCalled();
 
+    MOCK_METHOD1( SetDeploymentId, void( const std::string& ) );
+    void ExpectSetDeploymentIdIsNotCalled();
+
+    MOCK_METHOD0( GetDeploymentId, const std::string& () );
+    void MakeGetDeploymentIdReturn( std::string value );
+    void ExpectGetDeploymentIdIsNotCalled();
+
     MOCK_METHOD0( GetPackageList, std::vector<PmComponent>() );
     void MakeGetPackageListReturn( std::vector<PmComponent> value );
     void ExpectGetPackageListIsNotCalled();

@@ -8,6 +8,7 @@
 
 static std::string _validManifest( R"(
 {
+  "deployment_id": "b1dbc524-91b7-4ae5-858d-07358307c09b",
   "packages": [
     {
       "installer_args": [
@@ -27,6 +28,7 @@ static std::string _validManifest( R"(
 
 static std::string _minimalManifest( R"(
 {
+  "deployment_id": "b1dbc524-91b7-4ae5-858d-07358307c09b",
   "packages": [
     {
       "package": "package name"
@@ -66,6 +68,7 @@ static std::string _optionalManifest( R"(
 
 static std::string _multiPackageManifest( R"(
 {
+  "deployment_id": "b1dbc524-91b7-4ae5-858d-07358307c09b",
   "packages": [
     {
       "installer_type": "type1",
@@ -83,6 +86,7 @@ static std::string _multiPackageManifest( R"(
 
 static std::string _validPackageConfigManifest( R"(
 {
+  "deployment_id": "b1dbc524-91b7-4ae5-858d-07358307c09b",
   "packages": [
     {
       "package": "package name",
@@ -132,6 +136,13 @@ protected:
 TEST_F( TestPmManifest, WillParseManifest )
 {
     EXPECT_EQ( m_patient->ParseManifest( _validManifest ), 0 );
+}
+
+TEST_F( TestPmManifest, WillGetDeploymentId )
+{
+    m_patient->ParseManifest( _validManifest );
+
+    EXPECT_STREQ( "b1dbc524-91b7-4ae5-858d-07358307c09b", m_patient->GetDeploymentId().c_str() );
 }
 
 TEST_F( TestPmManifest, WillGetPackages )

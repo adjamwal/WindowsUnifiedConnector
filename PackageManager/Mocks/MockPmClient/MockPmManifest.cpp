@@ -21,6 +21,21 @@ void MockPmManifest::ExpectParseManifestIsNotCalled()
     EXPECT_CALL( *this, ParseManifest( _ ) ).Times( 0 );
 }
 
+void MockPmManifest::ExpectSetDeploymentIdIsNotCalled()
+{
+    EXPECT_CALL( *this, SetDeploymentId( _ ) ).Times( 0 );
+}
+
+void MockPmManifest::MakeGetDeploymentIdReturn( std::string value )
+{
+    ON_CALL( *this, GetDeploymentId() ).WillByDefault( ReturnRef( value ) );
+}
+
+void MockPmManifest::ExpectGetDeploymentIdIsNotCalled()
+{
+    EXPECT_CALL( *this, GetDeploymentId() ).Times( 0 );
+}
+
 void MockPmManifest::MakeGetPackageListReturn( std::vector<PmComponent> value )
 {
     ON_CALL( *this, GetPackageList() ).WillByDefault( Return( value ) );

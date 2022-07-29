@@ -47,6 +47,13 @@ TEST_F( TestCloudEventBuilder, EventJSONContainsEventType )
     ASSERT_TRUE( eventJson.find( "\"type\":\"pkg-reconfig\"" ) != std::string::npos );
 }
 
+TEST_F( TestCloudEventBuilder, EventJSONContainsSource )
+{
+    std::string eventJson = m_eventBuilder.Build();
+
+    ASSERT_TRUE( eventJson.find( "\"source\":\"cm-connector\"" ) != std::string::npos );
+}
+
 TEST_F( TestCloudEventBuilder, EventJSONContainsPackage )
 {
     std::string eventJson = m_eventBuilder.Build();

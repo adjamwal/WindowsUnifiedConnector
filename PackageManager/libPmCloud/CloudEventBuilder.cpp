@@ -328,6 +328,7 @@ std::string CloudEventBuilder::Serialize()
 {
     Json::Value event;
     event[ "type" ] = CloudEventString( m_evtype );
+    event[ "source" ] = "cm-connector";
     event[ "package" ] = m_packageName + "/" + m_packageVersion;
 
     if( m_evtype == pkgreconfig )

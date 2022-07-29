@@ -16,11 +16,14 @@ public:
     ~PmManifest();
 
     int32_t ParseManifest( const std::string& manifestJson ) override;
+    void SetDeploymentId( const std::string& deploymentId ) override;
+    const std::string& GetDeploymentId() override;
     std::vector<PmComponent> GetPackageList() override;
     void Initialize( IPmPlatformDependencies* dep ) override;
 
 private:
     std::mutex m_mutex;
+    std::string m_deploymentId;
     std::vector<PmComponent> m_ComponentList;
     IPmPlatformDependencies* m_dependencies;
 
