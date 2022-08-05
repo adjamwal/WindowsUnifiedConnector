@@ -74,7 +74,7 @@
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\VC\*.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libcrypto-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libssl-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\zlibd.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(WLHBASE)\bin\10.0.19041.0\x86\ucrt\ucrtbased.dll" "$(OutDir)"</Command>
+      <Command>COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\VC\*.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libcrypto-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libssl-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\zlibd.dll" "$(OutDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -105,7 +105,7 @@
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\VC\*.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libcrypto-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libssl-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(WLHBASE)\Redist\ucrt\DLLs\x86\ucrtbase.dll" "$(OutDir)" </Command>
+      <Command>COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\VC\*.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libcrypto-1_1.dll" "$(OutDir)" &amp;&amp; COPY /b/v/y "$(IMN_COMMON)\common-windows-build\$(Configuration)\Win32\bin\libssl-1_1.dll" "$(OutDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
