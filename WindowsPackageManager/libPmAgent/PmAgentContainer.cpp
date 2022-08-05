@@ -29,7 +29,7 @@ PmAgentContainer::PmAgentContainer( const std::wstring& bsConfigFilePath, const 
     , m_configuration( new WindowsConfiguration( *m_certLoader, *m_codeSignVerifer, m_proxyContainer->GetProxyDiscovery() ) )
     , m_packageDiscovery( new PackageDiscovery( *m_discoveryMethods, *m_msiApi, *m_utf8PathVerifier ) )
     , m_userImpersonator( new UserImpersonator( *m_winApiWrapper ) )
-    , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery, *m_userImpersonator ) )
+    , m_componentMgr( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifer, *m_packageDiscovery, *m_userImpersonator, *m_msiApi) )
     , m_pmDependencies( new WindowsPmDependencies( *m_configuration, *m_componentMgr ) )
     , m_pmLogger( new PmLogAdapter() )
     , m_pmAgent( new PmAgent( bsConfigFilePath, pmConfigFilePath, *m_pmDependencies, *m_pmLogger ) )

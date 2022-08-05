@@ -26,4 +26,8 @@ public:
 
     MOCK_METHOD1( FindRelatedProducts, std::tuple<int32_t, std::vector<MsiApiProductInfo>>( std::wstring upgradeCode ) );
     void MakeFindRelatedProductsReturn( std::tuple<int32_t, std::vector<MsiApiProductInfo>> value );
+
+    MOCK_METHOD0( IsMsiServiceReadyforInstall, bool() );
+    void MakeIsMsiServiceReadyforInstallReturn( bool value );
+    void ExpectIsMsiServiceReadyforInstallIsNotCalled();
 };

@@ -63,7 +63,7 @@ httpmock::MockServer::Response FakeUcbServer::GetJsonResponse(const std::string&
 
     printf("Reading File %s\n", filePath.string().c_str());
 
-    Response resp(200, fsUtil.ReadFile(filePath));
+    Response resp(200, fsUtil.ReadTextFile(filePath));
     resp.addHeader(Header("Content-Type", "application/json"));
     return resp;
 }

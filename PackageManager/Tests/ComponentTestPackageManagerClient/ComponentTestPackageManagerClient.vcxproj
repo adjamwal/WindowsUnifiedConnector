@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClCompile Include="ComponentTestPacManConfigsPath.cpp" />
     <ClCompile Include="ComponentTestPacManProxy.cpp" />
+    <ClCompile Include="ComponentTestPacManWorkflow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharedLibs\libProxy\libProxyMD.vcxproj">

@@ -252,3 +252,33 @@ bool MsiApi::VerifyMsiMatchesPublisherOnly( MsiApiProductInfo& productInfo,
 
     return rtn;
 }
+
+bool MsiApi::IsMsiServiceReadyforInstall()
+{
+    //Default to true so we at least try to install if we don't know the service state
+    bool readyForInstall = true;
+
+    SC_HANDLE hscm = NULL;
+    hscm = OpenSCManager ( NULL, NULL, SC_MANAGER_CONNECT );
+    if( hscm == NULL )
+        return readyForInstall;
+
+    SC_HANDLE hsrv = NULL;
+    hsrv = OpenService ( hscm, L"msiserver", SERVICE_QUERY_STATUS );
+    if( hsrv ) {
+        SERVICE_STATUS_PROCESS srvstatus;
+        DWORD bytesNeeded = 0;
+
+        if( QueryServiceStatusEx ( hsrv, SC_STATUS_PROCESS_INFO, ( LPBYTE )&srvstatus, sizeof ( srvstatus ), &bytesNeeded ) ) {
+            readyForInstall = srvstatus.dwControlsAccepted != SERVICE_ACCEPT_SHUTDOWN;
+        }
+
+        CloseServiceHandle ( hsrv );
+        hsrv = NULL;
+    }
+
+    CloseServiceHandle ( hscm );
+    hscm = NULL;
+
+    return readyForInstall;
+}

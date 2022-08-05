@@ -3,6 +3,8 @@
 #include "PmTypes.h"
 #include "PmLogger.h"
 #include "IPmManifest.h"
+#include "IPmPlatformDependencies.h"
+#include "IPmPlatformConfiguration.h"
 #include "IComponentPackageProcessor.h"
 #include "IWatchdog.h"
 #include <iostream>
@@ -33,7 +35,7 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest, bool& isRe
     std::lock_guard<std::mutex> lock( m_mutex );
     isRebootRequired = false;
 
-    if( m_manifest.ParseManifest( checkinManifest ) != 0 )
+    if ( m_manifest.ParseManifest( checkinManifest ) != 0 )
     {
         throw std::exception( __FUNCTION__": Failed to process manifest" );
     }
@@ -48,7 +50,7 @@ bool ManifestProcessor::ProcessManifest( std::string checkinManifest, bool& isRe
 
 void ManifestProcessor::PreDownloadAllFromManifest( std::vector<PmComponent>& packages )
 {
-    for( auto& package : packages )
+    for ( auto& package : packages )
     {
         m_componentProcessor.DownloadPackageBinary( package );
     }
@@ -59,29 +61,29 @@ void ManifestProcessor::ProcessDownloadedPackagesAndConfigs( std::vector<PmCompo
     int failedPackages = 0;
     isRebootRequired = false;
 
-    for( auto& package : packages )
+    for ( auto& package : packages )
     {
         bool processed = false;
 
         try
         {
             processed =
-                ( m_componentProcessor.ProcessPackageBinary( package ) ) &&
-                ( !m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ) );
+                (m_componentProcessor.ProcessPackageBinary( package )) &&
+                (!m_componentProcessor.HasConfigs( package ) || m_componentProcessor.ProcessConfigsForPackage( package ));
 
             isRebootRequired |= package.postInstallRebootRequired;
 
-            LOG_DEBUG( "Processed=%d: %s, postInstallRebootRequired=%d", 
+            LOG_DEBUG( "Processed=%d: %s, postInstallRebootRequired=%d",
                 processed, package.productAndVersion.c_str(), package.postInstallRebootRequired );
         }
-        catch( std::exception& e ) {
+        catch ( std::exception& e ) {
             LOG_ERROR( "Failed to process package: %s, %s", package.productAndVersion.c_str(), e.what() );
         }
 
         failedPackages += processed ? 0 : 1;
     }
 
-    if( failedPackages > 0 )
+    if ( failedPackages > 0 )
     {
         std::stringstream ss;
         ss << __FUNCTION__ << ": Failed to process " << failedPackages << " component package(s)";

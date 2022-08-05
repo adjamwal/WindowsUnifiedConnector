@@ -8,6 +8,7 @@
 #include "MockPackageDiscovery.h"
 #include "MockWindowsUtilities.h"
 #include "MockUserImpersonator.h"
+#include "MockMsiApi.h"
 #include <memory>
 #include <codecvt>
 
@@ -21,8 +22,9 @@ protected:
         m_codeSignVerifier.reset( new NiceMock<MockCodesignVerifier>() );
         m_packageDiscovery.reset( new NiceMock<MockPackageDiscovery>() );
         m_userImpersonator.reset( new NiceMock<MockUserImpersonator>() );
+        m_msiApi.reset( new NiceMock<MockMsiApi>() );
 
-        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery, *m_userImpersonator ) );
+        m_patient.reset( new WindowsComponentManager( *m_winApiWrapper, *m_codeSignVerifier, *m_packageDiscovery, *m_userImpersonator, *m_msiApi ) );
     }
 
     void TearDown()
@@ -33,6 +35,7 @@ protected:
         m_codeSignVerifier.reset();
         m_packageDiscovery.reset();
         m_userImpersonator.reset();
+        m_msiApi.reset();
 
         MockWindowsUtilities::Deinit();
         m_expectedComponentPackage = {};
@@ -74,6 +77,7 @@ protected:
     std::unique_ptr<MockCodesignVerifier> m_codeSignVerifier;
     std::unique_ptr<MockPackageDiscovery> m_packageDiscovery;
     std::unique_ptr<MockUserImpersonator> m_userImpersonator;
+    std::unique_ptr<MockMsiApi> m_msiApi;
 
     std::unique_ptr<WindowsComponentManager> m_patient;
 };
@@ -416,6 +420,71 @@ TEST_F( TestWindowsComponentManager, UpdateComponentWillUseBackSlashesForMsiPack
     m_expectedComponentPackage.downloadedInstallerPath = "C:/test/update.msi";
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+
+    EXPECT_CALL( *m_winApiWrapper, CreateProcessW( _, HasSubstr( L"C:\\test\\update.msi" ), _, _, _, _, _, _, _, _ ) );
+
+    m_patient->UpdateComponent( m_expectedComponentPackage, error );
+}
+
+TEST_F( TestWindowsComponentManager, UpdateComponentWillCheckIfMsiServiceIsReady )
+{
+    std::string error;
+    SetupComponentPackage();
+    m_expectedComponentPackage.installerType = "msi";
+    m_expectedComponentPackage.installerArgs = " /args";
+    m_expectedComponentPackage.downloadedInstallerPath = "C:/test/update.msi";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+    ON_CALL( *m_msiApi, IsMsiServiceReadyforInstall() ).WillByDefault( Return( true ) );
+
+    EXPECT_CALL( *m_msiApi, IsMsiServiceReadyforInstall() ).Times( 1 );
+
+    m_patient->UpdateComponent( m_expectedComponentPackage, error );
+}
+
+TEST_F( TestWindowsComponentManager, UpdateComponentWillRetryIffMsiServiceIsReadyIsNotReady )
+{
+    std::string error;
+    SetupComponentPackage();
+    m_expectedComponentPackage.installerType = "msi";
+    m_expectedComponentPackage.installerArgs = " /args";
+    m_expectedComponentPackage.downloadedInstallerPath = "C:/test/update.msi";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+
+    EXPECT_CALL( *m_msiApi, IsMsiServiceReadyforInstall() )
+        .WillOnce( Return( false ) )
+        .WillOnce( Return( true ) );
+
+    m_patient->UpdateComponent( m_expectedComponentPackage, error );
+}
+
+TEST_F( TestWindowsComponentManager, UpdateComponentWillCheckIfMsiServiceIsReadyUpTo30Times )
+{
+    std::string error;
+    SetupComponentPackage();
+    m_expectedComponentPackage.installerType = "msi";
+    m_expectedComponentPackage.installerArgs = " /args";
+    m_expectedComponentPackage.downloadedInstallerPath = "C:/test/update.msi";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+    ON_CALL( *m_msiApi, IsMsiServiceReadyforInstall() ).WillByDefault( Return( false ) );
+
+    EXPECT_CALL( *m_msiApi, IsMsiServiceReadyforInstall() ).Times( 30 );
+
+    m_patient->UpdateComponent( m_expectedComponentPackage, error );
+}
+
+TEST_F( TestWindowsComponentManager, UpdateComponentWillUpdateEvenIfSerivceIsNotReady )
+{
+    std::string error;
+    SetupComponentPackage();
+    m_expectedComponentPackage.installerType = "msi";
+    m_expectedComponentPackage.installerArgs = " /args";
+    m_expectedComponentPackage.downloadedInstallerPath = "C:/test/update.msi";
+
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( true );
+    ON_CALL( *m_msiApi, IsMsiServiceReadyforInstall() ).WillByDefault( Return( false ) );
 
     EXPECT_CALL( *m_winApiWrapper, CreateProcessW( _, HasSubstr( L"C:\\test\\update.msi" ), _, _, _, _, _, _, _, _ ) );
 

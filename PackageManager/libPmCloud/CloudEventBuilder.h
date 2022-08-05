@@ -43,6 +43,7 @@ public:
     ICloudEventBuilder& WithNewFile( const std::filesystem::path& path, const std::string& hash, uint64_t size ) override;
     ICloudEventBuilder& WithFrom( const std::string& fromVersion ) override;
     ICloudEventBuilder& WithTse( const std::string& tse ) override;
+    ICloudEventBuilder& WithTseNow() override;
 
     std::string GetPackageName() const override;
     std::string GetPackageVersion() const override;

@@ -250,3 +250,8 @@ BOOL WinApiWrapper::CreateProcessAsUserW(
         lpStartupInfo,
         lpProcessInformation );
 }
+
+void WinApiWrapper::Sleep( DWORD milliseconds )
+{
+    ::Sleep( milliseconds );
+}

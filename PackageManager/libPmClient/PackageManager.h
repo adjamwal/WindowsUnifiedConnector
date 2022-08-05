@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <filesystem>
 
 class IPmBootstrap;
 class IPmConfig;
@@ -26,12 +27,14 @@ class IRebootHandler;
 class IWatchdog;
 class IProxyDiscovery;
 class IProxyConsumer;
+class IFileSysUtil;
 class ProxyInfoModel;
 
 struct PmComponent;
 struct PmEvent;
 struct PmInstalledPackage;
 struct PmDiscoveryComponent;
+struct PackageInventory;
 
 class PackageManager : public IPackageManager
 {
@@ -53,7 +56,8 @@ public:
         IRebootHandler& rebootHandler,
         IWorkerThread& thread,
         IWatchdog& watchdog,
-        IProxyConsumer& proxyDiscoverySubscriber );
+        IProxyConsumer& proxyDiscoverySubscriber,
+        IFileSysUtil& fileUtil );
     virtual ~PackageManager();
 
     int32_t Start( const char* pmConfigFile, const char * pmBootstrapFile ) override;
@@ -81,6 +85,7 @@ private:
     IWorkerThread& m_thread;
     IWatchdog& m_watchdog;
     IProxyConsumer& m_proxyDiscoverySubscriber;
+    IFileSysUtil& m_fileUtil;
 
     std::mutex m_mutex;
     std::string m_pmConfigFile;
@@ -92,6 +97,7 @@ private:
     IProxyDiscovery* m_proxyDiscovery;
     IPmPlatformDependencies* m_dependencies;
     std::wstring m_proxyTestUrl;
+    std::filesystem::path m_manifestFile;
 
     void PmWorkflowThread();
     std::chrono::milliseconds PmThreadWait();
@@ -102,4 +108,6 @@ private:
     void UpdateSslCerts();
     void PmCheckForProxies( bool discoverAsync );
     void ReloadConfigIfChanged();
+    bool RunPackageDiscovery( PackageInventory& inventory );
+    void ExportPackageList( PackageInventory& inventory );
 };

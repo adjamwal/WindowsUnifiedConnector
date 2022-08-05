@@ -114,6 +114,12 @@ ICloudEventBuilder& CloudEventBuilder::WithTse( const std::string& tse )
     return *this;
 }
 
+ICloudEventBuilder& CloudEventBuilder::WithTseNow()
+{
+    UpdateEventTime();
+    return *this;
+}
+
 std::string CloudEventBuilder::GetPackageName() const
 {
     return m_packageName;
@@ -315,13 +321,14 @@ bool CloudEventBuilder::operator==( const CloudEventBuilder& other ) const
 
 void CloudEventBuilder::UpdateEventTime()
 {
-    m_tse = TimeUtil::Now_RFC3339();
+    m_tse = TimeUtil::Now_LocalRFC3339();
 }
 
 std::string CloudEventBuilder::Serialize()
 {
     Json::Value event;
     event[ "type" ] = CloudEventString( m_evtype );
+    event[ "source" ] = "cm-connector";
     event[ "package" ] = m_packageName + "/" + m_packageVersion;
 
     if( m_evtype == pkgreconfig )
@@ -380,7 +387,7 @@ std::string CloudEventBuilder::Serialize()
     }
 
     event[ "tse" ] = m_tse;
-    event[ "tstx" ] = TimeUtil::Now_RFC3339();
+    event[ "tstx" ] = TimeUtil::Now_LocalRFC3339();
     event[ "ucid" ] = m_ucid;
 
     Json::Value root;

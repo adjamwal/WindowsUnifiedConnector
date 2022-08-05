@@ -110,7 +110,7 @@ TEST_F( TestCloudEventStorage, ExpiredEventsWillNotBeSavedToFile )
     std::vector<std::string> events;
 
     //expired 8 seconds ago
-    std::string rfcExpiredTime = TimeUtil::MillisToRFC3339
+    std::string rfcExpiredTime = TimeUtil::MillisToLocalRFC3339
     ( 
         TimeUtil::Now_MilliTimeStamp() - ( 8 + PM_CONFIG_MAX_EVENT_TTL_SECS ) * 1000
     );
