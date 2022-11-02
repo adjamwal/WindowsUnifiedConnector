@@ -323,7 +323,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="ucrtbase.dll" Guid="*">
-                    <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase.dll" />
+                    <File Id="ucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\ucrtbase.dll" />
                 </Component>
             <?endif?>
             <?if $(var.Configuration) = "Debug" ?>
@@ -346,7 +346,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="ucrtbased.dll" Guid="*">
-                    <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\10.0.19041.0\$(var.Platform)\ucrt\ucrtbased.dll" />
+                    <File Id="ucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\ucrtbased.dll" />
                 </Component>
             <?endif?>
         </ComponentGroup>
@@ -475,7 +475,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="UCPMucrtbase.dll" Guid="*">
-                  <File Id="UCPMucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\Redist\ucrt\DLLs\$(var.Platform)\ucrtbase.dll" />
+                  <File Id="UCPMucrtbase.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\ucrtbase.dll" />
                 </Component>
             <?endif?>
             <?if $(var.Configuration) = "Debug" ?>
@@ -498,7 +498,7 @@
                     </Component>
                 <?endif?>
                 <Component Id="UCPMucrtbased.dll" Guid="*">
-                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.WLHBASE)\bin\10.0.19041.0\$(var.Platform)\ucrt\ucrtbased.dll" />
+                  <File Id="UCPMucrtbased.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\VC\ucrtbased.dll" />
                 </Component>
                 <Component Id="UCPMzlibd.dll" Guid="*">
                   <File Id="UCPMzlibd.dll" KeyPath="yes" Checksum="yes" DiskId="1" Source="$(var.IMN_COMMON)\common-windows-build\$(var.Configuration)\$(var.ProjectsPlatform)\bin\zlibd.dll" />

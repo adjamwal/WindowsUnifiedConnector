@@ -6,6 +6,8 @@
 #include <initguid.h>
 #include <KnownFolders.h>
 #include <ShlObj.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/rotating_file_sink.h"
 
 #define UC_REG_KEY L"SOFTWARE\\Cisco\\SecureClient\\Cloud Management"
 
@@ -17,12 +19,29 @@
 
 UcLogFile::UcLogFile() :
     m_logFileName( L"" )
-    , m_file( NULL )
     , m_lastTick( 0 )
     , m_maxFileSize( DEFAULT_MAX_FILE_SIZE )
     , m_maxLogFiles( DEFAULT_MAX_LOGFILES )
+    , m_loggerName ("rot_log")
 {
+    class trace_formatter : public spdlog::custom_flag_formatter
+    {
+    public:
+        void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) override
+        {
+            std::string tickStr = std::to_string(GetTickCount64());
+            dest.append(tickStr.data(), tickStr.data() + tickStr.size());
+        }
 
+        std::unique_ptr< custom_flag_formatter > clone() const override
+        {
+            return spdlog::details::make_unique< trace_formatter >();
+        }
+    };
+
+    auto formatter = std::make_unique< spdlog::pattern_formatter >();
+    formatter->add_flag< trace_formatter >('*').set_pattern("(%*, +%o ms) %b %d %T [%t] %v");
+    spdlog::set_formatter(std::move(formatter));
 }
 
 UcLogFile::~UcLogFile()
@@ -34,89 +53,81 @@ void UcLogFile::WriteLogLine( const char* logLevel, const char* logLine )
 {
     Init(); // Takes mutex
 
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::string strLevel(logLevel);
+    std::string strLog(logLine);
 
-    if( m_file ) {
-        char tstr[ 32 ] = {};
-        DWORD tid = GetCurrentThreadId();
-        time_t now = time( NULL );
-        struct tm tm;
-
-        localtime_s( &tm, &now );
-        strftime( tstr, sizeof( tstr ), "%b %d %H:%M:%S", &tm );
-
-        uint32_t dwTickNow = GetTickCount();
-
-        int iBytesWritten = fprintf( m_file, "(%d, +%d ms) %s [%d] %s: %s\n", dwTickNow, ( dwTickNow - m_lastTick ), tstr, tid, logLevel, logLine );
-        m_lastTick = dwTickNow;
-
-        if( iBytesWritten < 0 ) {
-            // well, if we can't log to file we can only resort to logging to stderr
-            ( void )fprintf( stderr, "failed to log (%s)", logLine );
-        }
-        else {
-            fflush( m_file );
-            RotateLogs();
-        }
+    if (IsLoggerInitialized()) {
+        spdlog::get(m_loggerName)->info(strLevel + ": " + strLog);
+        Flush();
+    }
+    else {
+        spdlog::error("failed to log ({})", strLog);
     }
 }
 
-void UcLogFile::WriteLogLine( const wchar_t* logLevel, const wchar_t* logLine )
+void UcLogFile::WriteLogLine(const wchar_t* logLevel, const wchar_t* logLine)
 {
     Init(); // Takes mutex
 
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::string strLevel(ConvertWCHARToString(logLevel));
+    std::string strLog(ConvertWCHARToString(logLine));
 
-    if( m_file ) {
-        wchar_t tstr[ 32 ] = {};
-        DWORD tid = GetCurrentThreadId();
-        time_t now = time( NULL );
-        struct tm tm;
-
-        localtime_s( &tm, &now );
-        wcsftime( tstr, sizeof( tstr ) / sizeof( wchar_t), L"%b %d %H:%M:%S", &tm );
-
-        uint32_t dwTickNow = GetTickCount();
-
-        int iBytesWritten = fwprintf( m_file, L"(%d, +%d ms) %s [%d] %s: %s\n", dwTickNow, ( dwTickNow - m_lastTick ), tstr, tid, logLevel, logLine );
-        m_lastTick = dwTickNow;
-
-        if( iBytesWritten < 0 ) {
-            // well, if we can't log to file we can only resort to logging to stderr
-            ( void )fwprintf( stderr, L"failed to log (%s)", logLine );
-        }
-        else {
-            fflush( m_file );
-            RotateLogs();
-        }
+    if (IsLoggerInitialized()) {
+        spdlog::get(m_loggerName)->info(strLevel + ": " + strLog);
+        Flush();
+    }
+    else {
+        spdlog::error("failed to log ({})", strLog);
     }
 }
 
-void UcLogFile::Init( const wchar_t* logname )
+void UcLogFile::Init(const wchar_t* logname)
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::lock_guard<std::mutex> lock(m_mutex);
 
-    if( !m_file ) {
-        m_logFileName = GenerateFileName( logname );
+    if (!IsLoggerInitialized()) {
+        m_logFileName = GenerateFileName(logname);
 
         CreateLogFile();
     }
 }
 
-void UcLogFile::SetLogConfig( uint32_t fileSize, uint32_t logFiles )
+void UcLogFile::SetLogConfig(uint32_t fileSize, uint32_t logFiles)
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_maxFileSize = fileSize;
     m_maxLogFiles = logFiles;
+
+    if (IsLoggerInitialized() && std::filesystem::exists(m_logFileName.parent_path())) {
+        DropLogger();
+        spdlog::rotating_logger_mt(m_loggerName, m_logFileName.string(), m_maxFileSize, m_maxLogFiles - 1);
+    }
+
 }
 
 void UcLogFile::Deinit()
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (IsLoggerInitialized()) {
+        DropLogger();
+    }
+}
 
-    if( m_file ) {
-        fclose( m_file );
-        m_file = NULL;
+bool UcLogFile::IsLoggerInitialized()
+{
+    return !(spdlog::get(m_loggerName) == NULL);
+}
+
+void UcLogFile::DropLogger()
+{
+    Flush();
+    spdlog::drop(m_loggerName);
+}
+
+void UcLogFile::Flush()
+{
+    if (IsLoggerInitialized()) {
+        spdlog::get(m_loggerName)->flush();
     }
 }
 
@@ -125,36 +136,36 @@ std::wstring UcLogFile::GetProgramDataFolder()
     PWSTR path = NULL;
     std::wstring programData;
 
-    HRESULT hr = SHGetKnownFolderPath( FOLDERID_ProgramData, 0, NULL, &path );
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &path);
 
-    if ( SUCCEEDED( hr ) ) {
+    if (SUCCEEDED(hr)) {
         programData = path;
-        CoTaskMemFree( path );
+        CoTaskMemFree(path);
         path = NULL;
     }
 
     return programData;
 }
 
-static bool ReadRegistryStringW( HKEY hKey, const std::wstring& subKey, const std::wstring& valueName, std::wstring& data )
+static bool ReadRegistryStringW(HKEY hKey, const std::wstring& subKey, const std::wstring& valueName, std::wstring& data)
 {
     DWORD dataSize{};
-    LONG retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize );
+    LONG retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &dataSize);
 
-    if ( retCode != ERROR_SUCCESS ) {
+    if (retCode != ERROR_SUCCESS) {
         return false;
     }
 
-    data.resize( dataSize / sizeof( wchar_t ) );
+    data.resize(dataSize / sizeof(wchar_t));
 
-    retCode = ::RegGetValue( hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, &data[ 0 ], &dataSize );
-    if ( retCode != ERROR_SUCCESS ) {
+    retCode = ::RegGetValue(hKey, subKey.c_str(), valueName.c_str(), RRF_RT_REG_SZ, nullptr, &data[0], &dataSize);
+    if (retCode != ERROR_SUCCESS) {
         return false;
     }
 
-    DWORD stringLengthInWchars = dataSize / sizeof( wchar_t );
+    DWORD stringLengthInWchars = dataSize / sizeof(wchar_t);
     stringLengthInWchars--; // Exclude the NUL written by the Win32 API
-    data.resize( stringLengthInWchars );
+    data.resize(stringLengthInWchars);
 
     return true;
 }
@@ -164,7 +175,7 @@ std::wstring UcLogFile::GetLogDir()
     PWSTR path = NULL;
     std::wstring logDir;
 
-    if ( !ReadRegistryStringW( HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir ) ) {
+    if (!ReadRegistryStringW(HKEY_LOCAL_MACHINE, UC_REG_KEY, L"LogDir", logDir)) {
         logDir = GetProgramDataFolder();
         logDir += UC_DEFAULT_LOG_PATH;
     }
@@ -172,22 +183,22 @@ std::wstring UcLogFile::GetLogDir()
     return logDir;
 }
 
-std::filesystem::path UcLogFile::GenerateFileName( const wchar_t* logname )
+std::filesystem::path UcLogFile::GenerateFileName(const wchar_t* logname)
 {
     std::filesystem::path filename;
 
-    if( logname ) {
+    if (logname) {
         filename = logname;
     }
     else {
-        WCHAR swPath[ MAX_PATH + 5 ] = { 0 };
-        DWORD dwSize = GetModuleFileName( NULL, swPath, MAX_PATH );
+        WCHAR swPath[MAX_PATH + 5] = { 0 };
+        DWORD dwSize = GetModuleFileName(NULL, swPath, MAX_PATH);
         std::wstring modulePath = swPath;
 
         filename = GetLogDir();
 
-        if( dwSize && ( modulePath.find_last_of( '\\' ) != std::wstring::npos ) ) {
-            modulePath = modulePath.substr( modulePath.find_last_of( '\\' ) + 1 );
+        if (dwSize && (modulePath.find_last_of('\\') != std::wstring::npos)) {
+            modulePath = modulePath.substr(modulePath.find_last_of('\\') + 1);
             filename /= modulePath;
         }
         else {
@@ -203,14 +214,15 @@ std::filesystem::path UcLogFile::GenerateFileName( const wchar_t* logname )
 bool UcLogFile::CreateLogFile()
 {
     bool ret = true;
+    std::shared_ptr<spdlog::logger> logInstance = NULL;
 
-    if( ( m_file == NULL ) && !m_logFileName.empty() ) {
+    if (!IsLoggerInitialized() && !m_logFileName.empty() ) {
         try
         {
             if ( !std::filesystem::exists( m_logFileName.parent_path() ) ) {
                 std::filesystem::create_directories( m_logFileName.parent_path() );
             }
-            m_file = _wfsopen( m_logFileName.c_str(), L"a+", SH_DENYNO );
+            logInstance = spdlog::rotating_logger_mt(m_loggerName, m_logFileName.string(), m_maxFileSize, m_maxLogFiles - 1);
         }
         catch( ... )
         {
@@ -218,78 +230,21 @@ bool UcLogFile::CreateLogFile()
         }
     }
 
-    return m_file ? true : false;
+    return logInstance ? true : false;
 }
 
-void UcLogFile::RotateLogs()
+char* UcLogFile::ConvertWCHARToString(const wchar_t* pOrig)
 {
-    if( m_file ) {
-        struct _stat64 file_stat = { 0 };
+    DWORD dwLen;
+    char* pStr = NULL;
 
-        if( ( _fstat64( _fileno( m_file ), &file_stat ) == 0 ) && ( file_stat.st_size >= m_maxFileSize ) ) {
-            if( fclose( m_file ) == 0 ) {  // Rotate only if we successfully close the file
-                struct tm tm;
-                WCHAR tstr[ 64 ];
-                time_t now;
-                std::wstring archiveFilePath;
-                BOOL bRotateSucceeded = FALSE;
+    if (!pOrig) return NULL;
 
-                archiveFilePath = m_logFileName.c_str();
-                archiveFilePath = archiveFilePath.substr( 0, archiveFilePath.length() - 4 ); // strip off .log
-
-                now = time( NULL );
-                localtime_s( &tm, &now );
-
-                wcsftime( tstr, sizeof( tstr ) / sizeof( WCHAR ), L"_%Y%m%d_%H%M%S.log", &tm );
-
-                archiveFilePath += tstr;
-                if( MoveFile( m_logFileName.c_str(), archiveFilePath.c_str() ) ) {
-                    bRotateSucceeded = TRUE;
-                }
-                else if( CopyFile( m_logFileName.c_str(), archiveFilePath.c_str(), TRUE ) ) {
-                    bRotateSucceeded = TRUE;
-                }
-
-                m_file = _wfsopen( m_logFileName.c_str(), L"w+", SH_DENYNO );
-                if( bRotateSucceeded ) {
-                    CleanLogs();
-                }
-            }
-        }
+    dwLen = WideCharToMultiByte(CP_UTF8, 0, pOrig, -1, NULL, 0, NULL, NULL) + 1;
+    pStr = (char*)malloc(dwLen);
+    if (!pStr) {
+        return NULL;
     }
-}
-
-void UcLogFile::CleanLogs()
-{
-    std::set<std::wstring> logFileSet;
-
-    std::wstring strSearchPath = m_logFileName.c_str();
-    strSearchPath = strSearchPath.substr( 0, strSearchPath.length() - 4 ); // strip off .log
-    strSearchPath.append( L"_*" );
-
-    WIN32_FIND_DATA FindFileData;
-    HANDLE hFind = FindFirstFile( strSearchPath.c_str(), &FindFileData );
-
-    if( hFind != INVALID_HANDLE_VALUE ) {
-        do {
-            logFileSet.insert( FindFileData.cFileName );
-        } while( FindNextFile( hFind, &FindFileData ) != 0 );
-
-        if( hFind ) FindClose( hFind );
-    }
-
-    while( logFileSet.size() > m_maxLogFiles ) {
-        std::set<std::wstring>::iterator it;
-        it = logFileSet.begin();
-
-        std::wstring strFilePath( m_logFileName );
-        size_t pos = strFilePath.find_last_of( L"\\" );
-
-        if( pos != std::wstring::npos )
-            strFilePath = strFilePath.substr( 0, pos + 1 );
-
-        strFilePath.append( *it );
-        ::DeleteFile( strFilePath.c_str() );
-        logFileSet.erase( it );
-    }
+    WideCharToMultiByte(CP_UTF8, 0, pOrig, -1, pStr, dwLen, NULL, NULL);
+    return pStr;
 }

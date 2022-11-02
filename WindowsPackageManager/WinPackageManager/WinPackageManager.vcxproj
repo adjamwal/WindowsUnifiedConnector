@@ -107,7 +107,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Winhttp.lib;;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -133,7 +133,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Winhttp.lib;;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -155,7 +155,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Winhttp.lib;;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a_debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>
@@ -181,7 +181,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Outdir)lib;$(IMN_COMMON)\common-windows-build\$(Configuration)\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Winhttp.lib;;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winhttp.lib;Wtsapi32.lib;Userenv.lib;common.lib;crash_generation_client.lib;exception_handler.lib;Msi.lib;Normaliz.lib;ws2_32.lib;libcrypto.lib;libssl.lib;Wintrust.lib;crypt32.lib;jsoncpp.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)sign.bat $(TargetPath)</Command>

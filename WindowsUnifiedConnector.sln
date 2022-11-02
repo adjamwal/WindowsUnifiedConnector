@@ -176,6 +176,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{5A746D25-C
 		Docs\CM.md = Docs\CM.md
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestLibLogger", "SharedLibs\ComponentTestLibLogger\ComponentTestLibLogger.vcxproj", "{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -622,6 +624,14 @@ Global
 		{D6B9E43B-2EF5-4CC1-B2DC-AB7C9B860AAA}.Release|x64.Build.0 = Release|x64
 		{D6B9E43B-2EF5-4CC1-B2DC-AB7C9B860AAA}.Release|x86.ActiveCfg = Release|Win32
 		{D6B9E43B-2EF5-4CC1-B2DC-AB7C9B860AAA}.Release|x86.Build.0 = Release|Win32
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Debug|x64.ActiveCfg = Debug|x64
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Debug|x64.Build.0 = Debug|x64
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Debug|x86.ActiveCfg = Debug|Win32
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Debug|x86.Build.0 = Debug|Win32
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Release|x64.ActiveCfg = Release|x64
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Release|x64.Build.0 = Release|x64
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Release|x86.ActiveCfg = Release|Win32
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -694,6 +704,7 @@ Global
 		{0A6204BB-015E-4ABD-997C-101E5EE34AAA} = {4891EE6D-E469-4193-9C04-86BE44890980}
 		{D6B9E43B-2EF5-4CC1-B2DC-AB7C9B860AAA} = {9FDD3E77-311E-49C9-A625-4AFA62B07D4C}
 		{5A746D25-C03D-4737-A591-7C4081932892} = {C8505725-0B3E-4425-9EB7-55785D1CCC9D}
+		{FB20B415-ECE2-49FF-92E8-C0D6DD2CB8EC} = {EA581C03-8594-4E64-A5D7-7D8CA6E48E03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D32372A1-589C-449A-990C-8B193E83BF8D}

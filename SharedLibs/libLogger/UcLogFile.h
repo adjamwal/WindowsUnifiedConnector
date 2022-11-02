@@ -23,18 +23,20 @@ public:
 private:
     std::filesystem::path m_logFileName;
     std::mutex m_mutex;
-    FILE* m_file;
     uint32_t m_lastTick;
     uint32_t m_maxFileSize;
     uint32_t m_maxLogFiles;
+    std::string m_loggerName;
 
     static const uint32_t DEFAULT_MAX_FILE_SIZE = 52428800;
     static const uint32_t DEFAULT_MAX_LOGFILES = 10;
-
+    
+    bool IsLoggerInitialized();
+    void DropLogger();
+    void Flush();
     std::filesystem::path GenerateFileName( const wchar_t* logname );
     bool CreateLogFile();
-    void RotateLogs();
-    void CleanLogs();
     std::wstring GetLogDir();
     std::wstring GetProgramDataFolder();
+    char* ConvertWCHARToString(const wchar_t* pOrig);
 };
