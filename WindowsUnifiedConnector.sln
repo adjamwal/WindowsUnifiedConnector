@@ -162,6 +162,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libProxyMD", "SharedLibs\libProxy\libProxyMD.vcxproj", "{4459441C-588E-515A-BE05-717727F5F5BF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libProxyMT", "SharedLibs\libProxy\libProxyMT.vcxproj", "{4DA94E4F-E8C5-CCE4-63B5-2CE76D75E633}"
+	ProjectSection(ProjectDependencies) = postProject
+		{822CCD07-F01C-4DD7-A587-0A241953FB62} = {822CCD07-F01C-4DD7-A587-0A241953FB62}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComponentTestProxy", "SharedLibs\ComponentTestProxy\ComponentTestProxy.vcxproj", "{B834EB7B-8305-C9EB-049D-F47F88B1E6FD}"
 EndProject
