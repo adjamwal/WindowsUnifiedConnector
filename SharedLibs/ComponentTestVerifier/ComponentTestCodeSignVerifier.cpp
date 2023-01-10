@@ -18,8 +18,7 @@ protected:
     std::unique_ptr<CodesignVerifier> m_patient;
 };
 
-// Not Everyone is using the same cert so this may fail locally
-TEST_F( ComponentTestCodeSignVerifier, DISABLED_VerifyCisco )
+TEST_F( ComponentTestCodeSignVerifier, VerifyCisco )
 {
     EXPECT_EQ( m_patient->Verify(
         L"..\\..\\SharedLibs\\ComponentTestVerifier\\CodeSignTestCisco",
@@ -27,7 +26,7 @@ TEST_F( ComponentTestCodeSignVerifier, DISABLED_VerifyCisco )
         SIGTYPE_DEFAULT ), CodesignStatus::CODE_SIGNER_SUCCESS );
 }
 
-TEST_F( ComponentTestCodeSignVerifier, DISABLED_VerifyCisco1 )
+TEST_F( ComponentTestCodeSignVerifier, VerifyCiscoList )
 {
     EXPECT_EQ( m_patient->Verify(
         L"..\\..\\SharedLibs\\ComponentTestVerifier\\CodeSignTestCisco",
@@ -43,7 +42,8 @@ TEST_F( ComponentTestCodeSignVerifier, VerifyMismatch )
         SIGTYPE_DEFAULT ), CodesignStatus::CODE_SIGNER_VERIFICATION_FAILED );
 }
 
-TEST_F( ComponentTestCodeSignVerifier, VerifyMicrosoft )
+// RD - 1/10/2023 The signer changed on vcruntime140.dll. Disabling test
+TEST_F( ComponentTestCodeSignVerifier, DISABLED_VerifyMicrosoft )
 {
     EXPECT_EQ( m_patient->Verify(
         L"C:\\Windows\\System32\\vcruntime140.dll",
