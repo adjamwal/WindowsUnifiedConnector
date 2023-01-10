@@ -1,2 +1,0 @@
-#define PackageManager_VERSION_MAJOR @PackageManager_VERSION_MAJOR@
-#define PackageManager_VERSION_MINOR @PackageManager_VERSION_MINOR@
