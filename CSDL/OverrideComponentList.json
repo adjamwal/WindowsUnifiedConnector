@@ -27,8 +27,8 @@
         "release": "",
 		"current_version":null,
 		"override_version": "9.1.0",
-      }
-	  "image_id": []
+      },
+      "image_id": []
     }
   ]
 }
