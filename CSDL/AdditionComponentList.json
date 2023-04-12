@@ -28,14 +28,6 @@
       "release": "",
       "component_type": "Open Source",
       "license": ["MIT"]
-    },
-    {
-      "name": "fmt",
-      "supplier": "fmt",
-      "version": "9.1.0",
-      "release": "",
-      "component_type": "Open Source",
-      "license": ["MIT"]
     }
   ]
 }
