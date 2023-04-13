@@ -19,7 +19,15 @@
       "version": "0.0.1",
       "release": "",
       "component_type": "Open Source",
-	  "license": ["Google notice"]
+      "license": ["Google notice"]
+    },
+    {
+      "name": "spdlog",
+      "supplier": "spdlog",
+      "version": "1.10.0",
+      "release": "",
+      "component_type": "Open Source",
+      "license": ["MIT"]
     }
   ]
 }
