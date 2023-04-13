@@ -114,7 +114,7 @@ pipeline {
     GITHUB_STATUS_API_KEY = credentials('GITHUB_STATUS_OAUTH_API_KEY')
     WIN_DEV_GITHUB_TOKEN = credentials('fireamp-win-dev-git-token')
     CLG5_LAB_PASSWORD = credentials('CLG5_LAB_GENERIC_USER_PW')
-    SIGNING_API_PASSWORD = credentials('VSPHERE_GENERIC_ACCOUNT')
+    AMP_WIN_DEV_PASS = credentials('VSPHERE_GENERIC_ACCOUNT')
     CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
     WIN_AMP_OFFICIAL_BUILD = "${env.CHANGE_ID != null ? 0 : 1}"
     IMMUNET = "${params.IMMUNET}"
