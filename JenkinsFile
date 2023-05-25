@@ -52,12 +52,7 @@ def SetupVersion( boolean upgrade ) {
     ucPatch = UC_PATCH
 
     if ( upgrade ) {
-      if (env.IMMUNET == '1') {
-        ucMajor = 98
-      }
-      else {
-        ucMajor = 99
-      }
+      ucMajor = 99
       ucMinor = 0
     }
     else {
@@ -94,7 +89,6 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'100'))
   }
   parameters {
-    choice(name: 'IMMUNET', choices: ['0', '1'], description: 'Create Immunet UC build')
     choice(name: 'CORONA_UPLOAD', choices: ['0', '1'], description: 'Upload x64 msi to Corona for scanning')
   }
   environment {
@@ -118,7 +112,6 @@ pipeline {
     CLG5_SHARE_BUILD_LOCATION = '\\\\clg5-lab-fserv1.cisco.com\\public\\WinUCBuild\\Automation'
     WIN_AMP_OFFICIAL_BUILD = "${env.CHANGE_ID != null ? 0 : 1}"
     AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
-    IMMUNET = "${params.IMMUNET}"
     CORONA_UPLOAD = "${params.CORONA_UPLOAD}"
     CLITE_CREDS = credentials('Corona-Lite')
     COR_LITE_USER = "$CLITE_CREDS_USR"
@@ -133,8 +126,8 @@ pipeline {
     
     UC_MAJOR = 1
     UC_MINOR = 0
-    UC_PATCH = "${params.IMMUNET == '1' ? 0 : 1}"
-    UC_COMPANY = "${params.IMMUNET == '1' ? 'Immunet' : 'Cisco'}"
+    UC_PATCH = 2
+    UC_COMPANY = "Cisco"
   }
   stages {
     stage ('Init') {
@@ -185,9 +178,6 @@ pipeline {
                 powershell "git clean -dfx"
                 powershell 'Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -Outfile "nuget.exe"'
                 powershell ".\\nuget.exe restore WindowsUnifiedConnector.sln"
-                if (env.IMMUNET == '1') {
-                    contentReplace( configs: [ fileContentReplaceConfig( configs: [ fileContentReplaceItemConfig( search: '(<UC_CONSUMER>0<\\/UC_CONSUMER>)', replace: '<UC_CONSUMER>1</UC_CONSUMER>', matchCount: 1) ], fileEncoding: 'UTF-8', filePath: 'Directory.Build.props') ])
-                }
               }
               SetupVersion(false)
               currentBuild.description = "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}"
