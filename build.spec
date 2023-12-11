@@ -2,7 +2,7 @@
 
 RepositoriesInRelease = fireamp-win-clamav|common-legacy|fireamp-win-client-build-scripts|fireamp-win-common-nexus|curl-rel|fireamp-win-est|fireamp-win-expat|fireamp-win-google-breakpad|fireamp-win-google-crashpad|fireamp-win-google-test|fireamp-win-httpmockserver|fireamp-win-jsoncpp|fireamp-win-lib-fmt|libxml2-rel|fireamp-win-namedpipe|fireamp-win-re2|fireamp-win-safec|fireamp-win-xml-signer|fireamp-win-xmlsec|spdlog-rel
 
-fireamp-win-clamav = 85
+fireamp-win-clamav = 89
 common-legacy = 65
 fireamp-win-client-build-scripts = 36
 fireamp-win-common-nexus = 99
