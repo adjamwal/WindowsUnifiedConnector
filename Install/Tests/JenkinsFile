@@ -74,11 +74,11 @@ pipeline {
           steps {
             script {
               dir('WindowsUnifiedConnector\\Install\\Tests') {
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageA"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageA"
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageB"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
+                bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageA"
+				bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageA"
+                bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageB"
+				bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
+				bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
 				
 				bat "RENAME TestPackageA\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-1.0.0.0.msi"
 				bat "RENAME TestPackageA\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-1.0.0.0.msi"
@@ -100,11 +100,11 @@ pipeline {
             script {
               SetupVersion(2,0,0,0)
               dir('WindowsUnifiedConnector\\Install\\Tests') {
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageA"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageA"
-                bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageB"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
-				bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
+                bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageA"
+				bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageA"
+                bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageB"
+				bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x64 -target:TestPackageB"
+				bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\" && msbuild.exe TestPackages.sln /p:Configuration=Release /p:Platform=x86 -target:TestPackageBootstrapper"
                 
 				bat "RENAME TestPackageA\\bin\\x64\\Release\\TestPackageA.msi TestPackageA-x64-2.0.0.0.msi"
 				bat "RENAME TestPackageA\\bin\\x86\\Release\\TestPackageA.msi TestPackageA-x86-2.0.0.0.msi"

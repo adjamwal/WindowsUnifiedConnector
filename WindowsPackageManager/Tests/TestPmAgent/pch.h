@@ -36,7 +36,5 @@ using ::testing::HasSubstr;
 using ::testing::NotNull;
 using ::testing::Action;
 using ::testing::ActionInterface;
-using ::testing::InvokeArgumentActionP2;
 using ::testing::Throw;
-using ::testing::ThrowActionP;
 using ::testing::MakeAction;
