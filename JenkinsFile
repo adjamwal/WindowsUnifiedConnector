@@ -126,7 +126,7 @@ pipeline {
     
     UC_MAJOR = 1
     UC_MINOR = 0
-    UC_PATCH = 2
+    UC_PATCH = 3
     UC_COMPANY = "Cisco"
   }
   stages {
