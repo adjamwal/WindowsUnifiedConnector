@@ -291,8 +291,9 @@ pipeline {
           steps {
             script {
               SetGithubPendingStatus()
-              CORONA_IMAGE_NAME = "${WORKSPACE}\\WindowsUnifiedConnector\\artifacts\\${UC_COMPANY}-UC-Installer-x64-${CORONA_REL_VER}.${BUILD_ID}.msi"
+              CORONA_IMAGE_NAME = "${UC_COMPANY}-UC-Installer-x64-${CORONA_REL_VER}.${BUILD_ID}.msi"
               dir('WindowsUnifiedConnector\\CSDL') {
+	            powershell "Copy-Item ${WORKSPACE}\\WindowsUnifiedConnector\\artifacts\\${CORONA_IMAGE_NAME} .\\${CORONA_IMAGE_NAME}"
                 bat "python ${WORKSPACE}\\common\\common-windows-build\\tools\\corona\\JenkinCoronaAutomationUploadImage.py --image ${CORONA_IMAGE_NAME} --release ${CORONA_REL_VER} --enguid win_conn_jenkins.gen --secuid win_conn_jenkins.gen --csdl_id ${CORONA_CSDL_ID} --product_id ${CORONA_PROD_ID}"
               }
             }
