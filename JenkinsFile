@@ -117,6 +117,7 @@ pipeline {
     COR_LITE_USER = "$CLITE_CREDS_USR"
     COR_LITE_SECRET = "$CLITE_CREDS_PSW"
     CORONA_CREDS = credentials('amp_windows_dev.gen')
+    //$CORONA_CREDS_USR=amp_windows_dev.gen@cisco.com but Corona expects amp_windows_dev.gen as value. So hardcoding the CORONA_USER variable here.
     CORONA_USER = "amp_windows_dev.gen"
     CORONA_PASSWORD = "$CORONA_CREDS_PSW"
     CORONA_CSDL_ID = "198676"
