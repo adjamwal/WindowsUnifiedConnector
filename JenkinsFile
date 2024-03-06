@@ -431,8 +431,8 @@ pipeline {
         stage ('Coverity') {
           when {
             anyOf {
-              not { changeRequest() }
-                expression { env.CHANGE_TITLE.toLowerCase().contains(env.FORCE_COVERITY) }
+              // not { changeRequest() } Coverity server is dead
+              expression { env.CHANGE_TITLE.toLowerCase().contains(env.FORCE_COVERITY) }
             }
           }
           steps {
