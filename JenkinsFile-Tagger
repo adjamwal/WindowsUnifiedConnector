@@ -46,7 +46,20 @@ pipeline {
     post {
         success {
             script {
+                echo "Build Success"
                 email.sendSuccessEmail("${JOB_NAME}")
+                build(job: "CloudManagement-Windows-Crash-Server-Symbol-Upload", parameters: [
+                    [
+                        $class: 'StringParameterValue',
+                        name: 'BRANCH_NAME',
+                        value: BRANCH_NAME
+                    ],
+                    [
+                        $class: 'StringParameterValue',
+                        name: 'CLOUD_MANAGEMENT_BUILD',
+                        value: UC_VERSION
+                    ]
+                ])
             }
         }
         failure {
