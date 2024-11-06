@@ -192,9 +192,59 @@ bool WindowsConfiguration::UpdateCertStoreForUrl( const std::string& url )
     return rtn;
 }
 
-void* WindowsConfiguration::GetProxyDiscovery()
+std::list<PmProxy> WindowsConfiguration::StartProxyDiscovery(const std::string& testUrl, const std::string& pacUrl)
 {
-    return ( void* )&m_proxyDiscovery;
+    std::list<PmProxy> pmProxyList;
+    std::list<ProxyInfoModel> proxyList;
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    m_proxyDiscovery.ProxyDiscoverySync(converter.from_bytes(testUrl).c_str(), converter.from_bytes(pacUrl).c_str(), proxyList);
+
+    for (auto& proxy : proxyList) {
+        pmProxyList.push_back({ converter.to_bytes(proxy.GetProxyServer()), proxy.GetProxyPort(), converter.to_bytes(proxy.GetProxyType()) });
+    }
+
+    return pmProxyList;
+}
+
+bool WindowsConfiguration::StartProxyDiscoveryAsync(const std::string& testUrl, const std::string& pacUrl, AsyncProxyDiscoveryCb cb, void* context)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    if (cb) {
+        m_proxy_cb = cb;
+        m_proxy_context = context;
+        if (m_proxyDiscovery.RegisterForProxyNotifications(this)) {
+            m_proxyDiscovery.StartProxyDiscoveryAsync(converter.from_bytes(testUrl).c_str(), converter.from_bytes(pacUrl).c_str());
+            return true;
+        }
+        else {
+            m_proxy_cb = nullptr;
+            m_proxy_context = nullptr;
+        }
+
+    }
+
+    return false;
+}
+
+void WindowsConfiguration::ProxiesDiscovered(const std::list<ProxyInfoModel>& proxySettings)
+{
+    if (m_proxy_cb) {
+        std::list<PmProxy> pmProxyList;
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+        for (auto& proxy : proxySettings) {
+            pmProxyList.push_back({ converter.to_bytes(proxy.GetProxyServer()), proxy.GetProxyPort(), converter.to_bytes(proxy.GetProxyType()) });
+        }
+
+        m_proxy_cb(m_proxy_context, pmProxyList);
+
+        m_proxyDiscovery.UnregisterForProxyNotifications(this);
+        m_proxy_cb = nullptr;
+        m_proxy_context = nullptr;
+    }
 }
 
 std::string WindowsConfiguration::ExtractUrlRoot( const std::string& url )
@@ -214,3 +264,34 @@ std::string WindowsConfiguration::ExtractUrlRoot( const std::string& url )
     return url.substr( begin, end - begin );
 }
 
+/**
+ * @brief Retrieve the PM platform name, accepted by backend
+ */
+std::string WindowsConfiguration::GetPmPlatform()
+{
+    return "windows";
+}
+
+/**
+ * @brief Retrieve the PM architecture name, accepted by backend
+ */
+std::string WindowsConfiguration::GetPmArchitecture()
+{
+    USHORT processArch{};
+    USHORT nativeArch{};
+
+    if (IsWow64Process2(GetCurrentProcess(), &processArch, &nativeArch)) {
+        switch (nativeArch) {
+        case IMAGE_FILE_MACHINE_I386:
+            return "x86";
+        case IMAGE_FILE_MACHINE_AMD64:
+            return "x64";
+        case IMAGE_FILE_MACHINE_ARM64:
+            return "ARM64";
+        default:
+            break;
+        }
+    }
+
+    return "Unknown";
+}

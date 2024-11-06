@@ -1,15 +1,16 @@
 #pragma once
 
 #include "IPmPlatformConfiguration.h"
+#include "IProxyConsumer.h"
 #include "IUcLogger.h"
 #include "UCIDApiDll.h"
 #include <mutex>
 #include <map>
 
-class IWinCertLoader;
 class IProxyDiscovery;
+class IWinCertLoader;
 
-class WindowsConfiguration : public IPmPlatformConfiguration
+class WindowsConfiguration : public IPmPlatformConfiguration, public IProxyConsumer
 {
 public:
     WindowsConfiguration(IWinCertLoader& winCertLoader, ICodesignVerifier& codeSignVerifier, IProxyDiscovery &proxyDiscovery);
@@ -81,6 +82,16 @@ public:
     bool GetPmUrls( PmUrlList& urls ) override;
 
     /**
+     * @brief Retrieve the PM platform name, accepted by backend
+     */
+    std::string GetPmPlatform() override;
+
+    /**
+     * @brief Retrieve the PM architecture name, accepted by backend
+     */
+    std::string GetPmArchitecture() override;
+
+    /**
      * @brief (Optional) On windows this triggers the Windows AIA mechanism to
      *   build out the certificate chain for the given URL
      *
@@ -89,9 +100,28 @@ public:
     bool UpdateCertStoreForUrl( const std::string& url ) override;
 
     /**
-     * @brief Retrieve the ProxyDiscovery instance as void ptr
+     * @brief Starts the proxy discovery process
+     *
+     * @param[in] testUrl - url used to lookup a proxy using when discoving a WPAD proxy
+     * @param[in] pacUrl - url of the PAC file. Used for WPAD proxies
+     *
+     * @return list of proxies discovered
      */
-    void* GetProxyDiscovery() override;
+    std::list<PmProxy> StartProxyDiscovery(const std::string& testUrl, const std::string& pacUrl) override;
+
+    /**
+     * @brief Starts the async proxy discovery process
+     *
+     * @param[in] testUrl - url used to lookup a proxy using when discoving a WPAD proxy
+     * @param[in] pacUrl - url of the PAC file. Used for WPAD proxies
+     * @param[in] cb - callback to invoke when the process discovery is finished
+     * @param[in] context - the context to provied to the callback
+     *
+     * @return true if the doscovery process was started
+     */
+    bool StartProxyDiscoveryAsync(const std::string& testUrl, const std::string& pacUrl, AsyncProxyDiscoveryCb cb, void* context) override;
+
+    void ProxiesDiscovered(const std::list<ProxyInfoModel>& proxySettings) override;
 
 private:
     IWinCertLoader& m_winCertLoader;
@@ -103,6 +133,8 @@ private:
     std::mutex m_ucidMutex;
     std::mutex m_certMutex;
     std::map<std::string, int> m_certChaninUrlMap;
+    AsyncProxyDiscoveryCb m_proxy_cb;
+    void* m_proxy_context;
 
     bool UpdateUCID();
     std::string ExtractUrlRoot( const std::string& url );

@@ -50,9 +50,10 @@ int32_t WindowsComponentManager::InstallComponent( const PmComponent& package )
     return -1;
 }
 
-int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, std::string& error )
+IPmPlatformComponentManager::PmInstallResult WindowsComponentManager::UpdateComponent( const PmComponent& package, std::string& error )
 {
-    int32_t ret = 0;
+    PmInstallResult ret{};
+
     CodesignStatus status = CodesignStatus::CODE_SIGNER_ERROR;
 
     std::filesystem::path downloadedInstallerPath = package.downloadedInstallerPath;
@@ -79,23 +80,24 @@ int32_t WindowsComponentManager::UpdateComponent( const PmComponent& package, st
             exeCmdline += " ";
             exeCmdline += package.installerArgs;
 
-            ret = RunPackage( downloadedInstallerPath.u8string(), exeCmdline, error );
+            ret = WindowsResultToPmInstallResult( RunPackage( downloadedInstallerPath.u8string(), exeCmdline, error ) );
         }
         else if( package.installerType == "msi" )
         {
             std::string logFilePath = converter.to_bytes(WindowsUtilities::GetLogDir());
-            ret =  UpdateMsi(package, error, logFilePath, downloadedInstallerPath);
+            ret = WindowsResultToPmInstallResult( UpdateMsi(package, error, logFilePath, downloadedInstallerPath) );
         }
         else
         {
             error = std::string( "Invalid Package Type: " + package.installerType );
-            ret = -1;
+            ret = WindowsResultToPmInstallResult( -1 );
         }
     }
     else
     {
         error = std::string( "Could not verify Package." );
-        ret = ( int32_t )status;
+        ret.platformResult = ( int32_t )status;
+        ret.pmResult = IPmPlatformComponentManager::PM_INSTALL_FAILURE;
     }
 
     return ret;
@@ -289,6 +291,27 @@ int32_t WindowsComponentManager::UpdateMsi( const PmComponent& package, std::str
     {
         error = std::string("Failed to get system directory.");
         ret = -1;
+    }
+
+    return ret;
+}
+
+IPmPlatformComponentManager::PmInstallResult WindowsComponentManager::WindowsResultToPmInstallResult( int32_t result )
+{
+    PmInstallResult ret{};
+
+    ret.platformResult = result;
+    switch (result) {
+    case 0:
+       ret.pmResult = IPmPlatformComponentManager::PM_INSTALL_SUCCESS;
+       break;
+    case ERROR_SUCCESS_REBOOT_REQUIRED:
+    case ERROR_SUCCESS_REBOOT_INITIATED:
+        ret.pmResult = IPmPlatformComponentManager::PM_INSTALL_SUCCESS_REBOOT_REQUIRED;
+        break;
+    default:
+        ret.pmResult = IPmPlatformComponentManager::PM_INSTALL_FAILURE;
+        break;
     }
 
     return ret;

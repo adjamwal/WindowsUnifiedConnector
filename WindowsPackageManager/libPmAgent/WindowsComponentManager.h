@@ -60,7 +60,7 @@ public:
      * @param[in] package - The package details
      * @return 0 if the package was updated. -1 otherwise
      */
-    int32_t UpdateComponent( const PmComponent& package, std::string& error ) override;
+    PmInstallResult UpdateComponent( const PmComponent& package, std::string& error ) override;
 
     /**
      * @brief This API will be used to remove a package. The package will provide the following:
@@ -134,4 +134,5 @@ private:
 
     int32_t RunPackage( std::string executable, std::string cmdline, std::string& error );
     int32_t UpdateMsi( const PmComponent& package, std::string& error, std::string &logFilePath,  std::filesystem::path &downloadedInstallerPath);
+    PmInstallResult WindowsResultToPmInstallResult( int32_t result );
 };

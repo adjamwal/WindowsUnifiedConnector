@@ -131,9 +131,9 @@ TEST_F( TestWindowsComponentManager, UpdateComponentSuccess )
     m_winApiWrapper->MakeWaitForSingleObjectReturn( 0 );
     m_winApiWrapper->MakeGetLastErrorReturn( 0 );
 
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_EQ( ret, 0 );
+    EXPECT_EQ( ret.platformResult, 0 );
     EXPECT_EQ( error, "" );
 }
 
@@ -180,9 +180,9 @@ TEST_F( TestWindowsComponentManager, UpdateComponentInvalidPackageType )
     SetupComponentPackage();
     m_expectedComponentPackage.installerType = "INVALID";
 
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_NE( ret, 0 );
+    EXPECT_NE( ret.platformResult, 0 );
     EXPECT_NE( error, "" );
 }
 
@@ -192,9 +192,9 @@ TEST_F( TestWindowsComponentManager, UpdateComponentFailureToGetSystemDirectory 
     SetupComponentPackage();
 
     MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSysDirectoryReturn( false );
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_NE( ret, 0 );
+    EXPECT_NE( ret.platformResult, 0 );
     EXPECT_NE( error, "" );
 }
 
@@ -208,9 +208,9 @@ TEST_F( TestWindowsComponentManager, UpdateComponentCreateProcessFailure )
     m_winApiWrapper->MakeCreateProcessWReturn( FALSE );
     m_winApiWrapper->MakeGetLastErrorReturn( 5 );
 
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_EQ( ret, 5 );
+    EXPECT_EQ( ret.platformResult, 5 );
     EXPECT_NE( error, "" );
 }
 
@@ -222,9 +222,9 @@ TEST_F( TestWindowsComponentManager, UpdateWaitForSingleObjectFailure )
     m_winApiWrapper->MakeCreateProcessWReturn( TRUE );
     m_winApiWrapper->MakeWaitForSingleObjectReturn( -1 );
 
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_EQ( ret, -1 );
+    EXPECT_EQ( ret.platformResult, -1 );
     EXPECT_NE( error, "" );
 }
 
@@ -239,9 +239,9 @@ TEST_F( TestWindowsComponentManager, UpdateComponentExitCodeProcessFailure )
     m_winApiWrapper->MakeGetExitCodeProcessReturn( FALSE );
     m_winApiWrapper->MakeGetLastErrorReturn( 5 );
 
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_EQ( ret, 5 );
+    EXPECT_EQ( ret.platformResult, 5 );
     EXPECT_NE( error, "" );
 }
 
@@ -252,9 +252,9 @@ TEST_F( TestWindowsComponentManager, UpdateComponentVerifyPackageFailure )
 
     m_codeSignVerifier->MakeVerifyReturn( CodesignStatus::CODE_SIGNER_ERROR );
 
-    int32_t ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
+    auto ret = m_patient->UpdateComponent( m_expectedComponentPackage, error );
 
-    EXPECT_EQ( ( CodesignStatus )ret, CodesignStatus::CODE_SIGNER_ERROR );
+    EXPECT_EQ( ( CodesignStatus )ret.platformResult, CodesignStatus::CODE_SIGNER_ERROR );
     EXPECT_NE( error, "" );
 }
 
