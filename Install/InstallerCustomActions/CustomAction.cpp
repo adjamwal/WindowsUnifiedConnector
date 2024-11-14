@@ -99,7 +99,7 @@ LExit:
     return WcaFinalize( er );
 }
 
-UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
+UINT __stdcall DetectValidWindowsVersion( MSIHANDLE hInstall )
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
@@ -112,27 +112,13 @@ UINT __stdcall DetectWindows10OrGreater( MSIHANDLE hInstall )
 
     WcaLog( LOGMSG_STANDARD, "Initialized." );
 
-    hr = IsWindows10OrGreater( GetFileVersion( filename ) ) ? S_OK : E_FAIL;
+    if ( IsArmCpu() ) {
+        hr = IsWindows11OrGreater( GetFileVersion( filename ) ) ? S_OK : E_FAIL;
+    }
+    else {
+        hr = IsWindows10OrGreater(GetFileVersion( filename ) ) ? S_OK : E_FAIL;
+    }
 
-LExit:
-    er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    SetUcLogger( NULL );
-    return WcaFinalize( er );
-}
-
-UINT __stdcall FailOnArmCpu( MSIHANDLE hInstall )
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-    MsiLogger msiLogger;
-    SetUcLogger( &msiLogger );
-
-    hr = WcaInitialize( hInstall, __FUNCTION__ );
-    ExitOnFailure( hr, __FUNCTION__ "Failed to initialize" );
-
-    WcaLog( LOGMSG_STANDARD, "Initialized." );
-
-    hr = IsArmCpu() ? E_FAIL : S_OK;
 
 LExit:
     er = SUCCEEDED( hr ) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;

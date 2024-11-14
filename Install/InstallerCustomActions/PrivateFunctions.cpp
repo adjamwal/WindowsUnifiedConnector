@@ -13,6 +13,7 @@
 #include <winbase.h>
 #include <string.h>
 #include "InstructionSet.h"
+#include <regex>
 
 extern HMODULE globalDllHandle;
 const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
@@ -144,16 +145,48 @@ std::string GetFileVersion( const std::string filename )
 bool IsWindows10OrGreater( const std::string fileVersion )
 {
     bool rtn = false;
-    std::string majorVersion;
-    size_t dot = fileVersion.find_first_of( "." );
-    if( dot != std::string::npos ) {
-        majorVersion = fileVersion.substr( 0, dot );
-    }
+    std::regex versionPattern(R"((\d+)\.(\d+)\.(\d+))");
+    std::smatch matches;
 
-    if( !majorVersion.empty() && atoi( majorVersion.c_str() ) >= 10 ) {
-        rtn = true;
-    }
+    if (std::regex_search(fileVersion, matches, versionPattern)) {
+        if (matches.size() == 4) {
+            int major = std::stoi(matches[1].str());
+            int minor = std::stoi(matches[2].str());
+            int patch = std::stoi(matches[3].str());
 
+            if (major >= 10) {
+                rtn = true;
+                WcaLog(LOGMSG_STANDARD, "Detected windows 10 or greater");
+            }
+        }
+    }
+    else {
+        WcaLog(LOGMSG_STANDARD, "Version string does not match the expected format");
+    }
+    return rtn;
+}
+
+bool IsWindows11OrGreater(const std::string fileVersion)
+{
+    bool rtn = false;
+    std::regex versionPattern(R"((\d+)\.(\d+)\.(\d+))");
+    std::smatch matches;
+
+    if (std::regex_search(fileVersion, matches, versionPattern)) {
+        if (matches.size() == 4) {
+            int major = std::stoi(matches[1].str());
+            int minor = std::stoi(matches[2].str());
+            int patch = std::stoi(matches[3].str());
+
+            if (major > 10 || (major == 10  && minor > 0 ) || ( major == 10 && minor == 0 && patch >= 22000 ) ) {
+                rtn = true;
+                WcaLog(LOGMSG_STANDARD, "Detected windows 11 or greater");
+            }
+        }
+    }
+    else {
+        WcaLog(LOGMSG_STANDARD, "Version string does not match the expected format");
+    }
     return rtn;
 }
 
