@@ -315,8 +315,7 @@ pipeline {
                 groupId: "UnifiedConnector/Windows/${env.BRANCH_NAME}",
                 version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
                 repository: 'raw',
-                // Nexus doesn't need creds right now...
-                // credentialsId: 'nexus_credentials', 
+                credentialsId: 'nexus_credentials',
                 artifacts: [
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x64",
@@ -379,8 +378,7 @@ pipeline {
                 groupId: "UnifiedConnector/Windows/${env.BRANCH_NAME}",
                 version: "${ucMajor}.${ucMinor}.${ucPatch}.${BUILD_ID}",
                 repository: 'raw',
-                // Nexus doesn't need creds right now...
-                // credentialsId: 'nexus_credentials', 
+                credentialsId: 'nexus_credentials',
                 artifacts: [
                   [
                     artifactId: "${UC_COMPANY}-UC-Installer-x64",
