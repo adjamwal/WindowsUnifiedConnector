@@ -144,6 +144,16 @@ void MockWindowsUtilities::ExpectIs64BitWindowsIsNotCalled()
     EXPECT_CALL( *this, Is64BitWindows() ).Times( 0 );
 }
 
+void MockWindowsUtilities::MakeGetSystemArchitectureReturn(std::string value)
+{
+    ON_CALL(*this, GetSystemArchitecture() ).WillByDefault(Return(value));
+}
+
+void MockWindowsUtilities::ExpectGetSystemArchitectureIsNotCalled()
+{
+    EXPECT_CALL(*this, GetSystemArchitecture()).Times(0);
+}
+
 void MockWindowsUtilities::MakeGetSysDirectoryReturn( bool value )
 {
     ON_CALL( *this, GetSysDirectory( _ ) ).WillByDefault( Return( value ) );

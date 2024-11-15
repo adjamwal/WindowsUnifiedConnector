@@ -132,6 +132,7 @@ private:
     PmUrlList m_urls;
     std::mutex m_ucidMutex;
     std::mutex m_certMutex;
+    std::mutex m_proxyMutex;
     std::map<std::string, int> m_certChaninUrlMap;
     AsyncProxyDiscoveryCb m_proxy_cb;
     void* m_proxy_context;

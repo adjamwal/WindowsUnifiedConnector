@@ -299,6 +299,27 @@ bool WindowsUtilities::Is64BitWindows()
 #endif
 }
 
+std::string WindowsUtilities::GetSystemArchitecture()
+{
+    USHORT processArch{};
+    USHORT nativeArch{};
+
+    if (IsWow64Process2(GetCurrentProcess(), &processArch, &nativeArch)) {
+        switch (nativeArch) {
+        case IMAGE_FILE_MACHINE_I386:
+            return "x86";
+        case IMAGE_FILE_MACHINE_AMD64:
+            return "x64";
+        case IMAGE_FILE_MACHINE_ARM64:
+            return "ARM64";
+        default:
+            break;
+        }
+    }
+
+    return "Unknown";
+}
+
 bool WindowsUtilities::GetSysDirectory( std::string& path )
 {
     bool ret = false;

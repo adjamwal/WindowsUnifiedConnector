@@ -27,7 +27,7 @@ PackageInventory PackageDiscovery::DiscoverInstalledPackages( const std::vector<
 {
     PackageInventory inventory;
 
-    inventory.architecture = WindowsUtilities::Is64BitWindows() ? "x64" : "x86";
+    inventory.architecture = WindowsUtilities::GetSystemArchitecture();
     inventory.platform = "win";
     inventory.utc_offset_sec = 0;
     

@@ -53,6 +53,10 @@ public:
     void MakeIs64BitWindowsReturn( bool value );
     void ExpectIs64BitWindowsIsNotCalled();
 
+    MOCK_METHOD0( GetSystemArchitecture, std::string() );
+    void MakeGetSystemArchitectureReturn(std::string value);
+    void ExpectGetSystemArchitectureIsNotCalled();
+
     MOCK_METHOD1( GetSysDirectory, bool( std::string& ) );
     void MakeGetSysDirectoryReturn( bool value );
     void ExpectGetSysDirectoryIsNotCalled();

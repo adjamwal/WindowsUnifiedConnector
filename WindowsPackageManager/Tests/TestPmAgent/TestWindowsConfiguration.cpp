@@ -77,3 +77,24 @@ TEST_F( TestWindowsConfiguration, UpdateCertStoreForUrlWillFail)
 
     EXPECT_FALSE( m_patient->UpdateCertStoreForUrl( "http://SomeDomain/api" ) );
 }
+
+void ProxyCallback(void* context, const std::list<PmProxy>& proxyList)
+{
+    *static_cast<bool*>(context) = true;
+}
+
+TEST_F(TestWindowsConfiguration, StartProxyDiscoveryAsyncWillGetNotification)
+{
+    bool notified = false;
+
+    ON_CALL(*m_proxyDiscovery, StartProxyDiscoveryAsync(_, _)).WillByDefault(Invoke([this](const LPCTSTR, const LPCTSTR) {
+        // Need to simulate the proxy discovery thread
+        std::thread discoverThread([this] { m_patient->ProxiesDiscovered({}); } );
+        discoverThread.detach();
+        }));
+
+    EXPECT_TRUE(m_patient->StartProxyDiscoveryAsync("TestUrl", "TestPacUrl", ProxyCallback, &notified));
+
+    Sleep( 10 ); // RD: I'm lazy
+    EXPECT_TRUE(notified);
+}

@@ -13,11 +13,14 @@ WindowsConfiguration::WindowsConfiguration( IWinCertLoader& winCertLoader, ICode
     m_proxyDiscovery( proxyDiscovery )
 {
     m_winCertLoader.LoadSystemCerts();
+    m_proxyDiscovery.RegisterForProxyNotifications( this );
 }
 
 WindowsConfiguration::~WindowsConfiguration()
 {
+    m_proxyDiscovery.UnregisterForProxyNotifications( this );
     m_winCertLoader.UnloadSystemCerts();
+
 }
 
 bool WindowsConfiguration::UpdateUCID()
@@ -213,17 +216,12 @@ bool WindowsConfiguration::StartProxyDiscoveryAsync(const std::string& testUrl, 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     if (cb) {
+        std::unique_lock lock(m_proxyMutex);
         m_proxy_cb = cb;
         m_proxy_context = context;
-        if (m_proxyDiscovery.RegisterForProxyNotifications(this)) {
-            m_proxyDiscovery.StartProxyDiscoveryAsync(converter.from_bytes(testUrl).c_str(), converter.from_bytes(pacUrl).c_str());
-            return true;
-        }
-        else {
-            m_proxy_cb = nullptr;
-            m_proxy_context = nullptr;
-        }
 
+        m_proxyDiscovery.StartProxyDiscoveryAsync(converter.from_bytes(testUrl).c_str(), converter.from_bytes(pacUrl).c_str());
+        return true;
     }
 
     return false;
@@ -231,6 +229,7 @@ bool WindowsConfiguration::StartProxyDiscoveryAsync(const std::string& testUrl, 
 
 void WindowsConfiguration::ProxiesDiscovered(const std::list<ProxyInfoModel>& proxySettings)
 {
+    std::unique_lock lock(m_proxyMutex);
     if (m_proxy_cb) {
         std::list<PmProxy> pmProxyList;
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -241,7 +240,6 @@ void WindowsConfiguration::ProxiesDiscovered(const std::list<ProxyInfoModel>& pr
 
         m_proxy_cb(m_proxy_context, pmProxyList);
 
-        m_proxyDiscovery.UnregisterForProxyNotifications(this);
         m_proxy_cb = nullptr;
         m_proxy_context = nullptr;
     }
@@ -277,21 +275,5 @@ std::string WindowsConfiguration::GetPmPlatform()
  */
 std::string WindowsConfiguration::GetPmArchitecture()
 {
-    USHORT processArch{};
-    USHORT nativeArch{};
-
-    if (IsWow64Process2(GetCurrentProcess(), &processArch, &nativeArch)) {
-        switch (nativeArch) {
-        case IMAGE_FILE_MACHINE_I386:
-            return "x86";
-        case IMAGE_FILE_MACHINE_AMD64:
-            return "x64";
-        case IMAGE_FILE_MACHINE_ARM64:
-            return "ARM64";
-        default:
-            break;
-        }
-    }
-
-    return "Unknown";
+    return WindowsUtilities::GetSystemArchitecture();
 }

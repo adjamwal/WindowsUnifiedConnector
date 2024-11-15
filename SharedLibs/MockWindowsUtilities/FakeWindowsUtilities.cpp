@@ -53,6 +53,11 @@ bool WindowsUtilities::Is64BitWindows()
     return MockWindowsUtilities::GetMockWindowUtilities()->Is64BitWindows();
 }
 
+std::string WindowsUtilities::GetSystemArchitecture()
+{
+    return MockWindowsUtilities::GetMockWindowUtilities()->GetSystemArchitecture();
+}
+
 bool WindowsUtilities::GetSysDirectory( std::string& path )
 {
     return MockWindowsUtilities::GetMockWindowUtilities()->GetSysDirectory( path );

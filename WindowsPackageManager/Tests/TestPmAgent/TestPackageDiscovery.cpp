@@ -83,11 +83,12 @@ protected:
 
 TEST_F( TestPackageDiscovery, DiscoverInstalledPackagesWillSetOS )
 {
-    MockWindowsUtilities::GetMockWindowUtilities()->MakeIs64BitWindowsReturn( true );
+    std::string arch = "x64";
+    MockWindowsUtilities::GetMockWindowUtilities()->MakeGetSystemArchitectureReturn( arch );
 
     PackageInventory installedPackages = m_patient->DiscoverInstalledPackages( m_catalogRules );
 
-    ASSERT_EQ( installedPackages.architecture, "x64" );
+    ASSERT_EQ( installedPackages.architecture, arch );
     ASSERT_EQ( installedPackages.platform, "win" );
 }
 
