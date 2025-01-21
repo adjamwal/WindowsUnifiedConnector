@@ -23,38 +23,42 @@ WinCertLoader::~WinCertLoader()
 
 int WinCertLoader::LoadSystemCerts()
 {
-    const LPCWSTR pTrustedCAStoreName = L"ROOT";
+    const LPCWSTR storeNames[] = { L"ROOT", L"CA" }; // Both ROOT and CA stores
+    const size_t storeCount = sizeof(storeNames) / sizeof(storeNames[0]);
 
     HCERTSTORE       hCertStore = NULL;
     int              ret = -1;
+    DWORD            dwCertCount = 0;
+    PCCERT_CONTEXT   pCertContext = NULL;
 
     std::lock_guard<std::mutex> lock( m_mutex );
-
-    do {
-        DWORD            dwCertCount = 0;
-        size_t           i = 0;
-        PCCERT_CONTEXT   pCertContext = NULL;
-
-        if( m_certcount != 0 ) {
+    
+    if( m_certcount != 0 ) {
             WLOG_WARNING( L"System certs already loaded" );
             break;
-        }
+    }
 
-        //-------------------------------------------------------------------
-        // Open a system certificate store.
-        if( hCertStore = CertOpenSystemStore(
-            ( HCRYPTPROV_LEGACY )NULL,
-            pTrustedCAStoreName ) ) {
-        }
-        else {
-            WLOG_ERROR( L"CertOpenSystemStoreW failed" );
-            break;
-        }
-
-        /* Loop through once to get a count */
-        while( pCertContext = CertEnumCertificatesInStore( hCertStore,
-            pCertContext ) ) {
+    do {
+        // First pass: Count certificates across all stores
+        for (size_t j = 0; j < storeCount; ++j) {
+            // Open a system certificate store.
+            if( hCertStore = CertOpenSystemStore(
+                ( HCRYPTPROV_LEGACY )NULL,
+                storeNames[j] ) ) {
+            }
+            else {
+                WLOG_ERROR( L"CertOpenSystemStoreW failed" );
+                break;
+            }
+            /* Loop through once to get a count */
+            while( pCertContext = CertEnumCertificatesInStore( hCertStore,pCertContext ) ) {
             dwCertCount++;
+            }
+
+            CertFreeCertificateContext(pCertContext);
+            pCertContext = NULL;
+            CertCloseStore(hCertStore, 0);
+            hCertStore = NULL;
         }
 
         if( dwCertCount == 0 ) {
@@ -69,55 +73,64 @@ int WinCertLoader::LoadSystemCerts()
             break;
         }
 
-        /* Load certificates into a local cache */
-        while( pCertContext = CertEnumCertificatesInStore( hCertStore,
-            pCertContext ) ) {
-            wchar_t pszNameString[ 256 ] = { 0 };
-            X509* x509Cert = NULL;
-            TCHAR* tcOutString = NULL;
-            DWORD   dwSize = 0;
-
-            if( i >= dwCertCount ) {
+        size_t i = 0;
+        // Second pass: Load certificates into memory
+        for (size_t j = 0; j < storeCount; ++j) {
+            if( hCertStore = CertOpenSystemStore(
+                ( HCRYPTPROV_LEGACY )NULL,
+                storeNames[j] ) ) {
+            }
+            else {
+                WLOG_ERROR( L"CertOpenSystemStoreW failed" );
                 break;
             }
+            /* Load certificates into a local cache */
+            while( pCertContext = CertEnumCertificatesInStore( hCertStore,
+                pCertContext ) ) {
+                wchar_t pszNameString[ 256 ] = { 0 };
+                X509* x509Cert = NULL;
+                TCHAR* tcOutString = NULL;
+                DWORD   dwSize = 0;
 
-            /* process each individual certificate */
-            if( CertGetNameStringW( pCertContext,
-                CERT_NAME_SIMPLE_DISPLAY_TYPE,
-                0,
-                NULL,
-                pszNameString,
-                _countof( pszNameString ) ) ) {
-            }
-            else {
-            }
+                if( i >= dwCertCount ) {
+                    break;
+                }
 
-            if( !CryptBinaryToString( pCertContext->pbCertEncoded, pCertContext->cbCertEncoded,
-                CRYPT_STRING_BASE64, tcOutString, &dwSize ) )
-            {
-                continue;
-            }
+                /* process each individual certificate */
+                if( CertGetNameStringW( pCertContext,
+                    CERT_NAME_SIMPLE_DISPLAY_TYPE,
+                    0,
+                    NULL,
+                    pszNameString,
+                    _countof( pszNameString ) ) ) {
+                }
+                else {
+                }
 
-            x509Cert = d2i_X509( NULL, ( const unsigned char** )&pCertContext->pbCertEncoded,
-                pCertContext->cbCertEncoded );
-            if( x509Cert != NULL ) {
-                m_certificates[ i ] = x509Cert;
-                m_certcount = ++i;
-                /* certificate is freed on unload */
+                if( !CryptBinaryToString( pCertContext->pbCertEncoded, pCertContext->cbCertEncoded,
+                    CRYPT_STRING_BASE64, tcOutString, &dwSize ) )
+                {
+                    continue;
+                }
+
+                x509Cert = d2i_X509( NULL, ( const unsigned char** )&pCertContext->pbCertEncoded,
+                    pCertContext->cbCertEncoded );
+                if( x509Cert != NULL ) {
+                    m_certificates[ i ] = x509Cert;
+                    m_certcount = ++i;
+                    /* certificate is freed on unload */
+                }
+                else {
+                }
             }
-            else {
-            }
+            CertFreeCertificateContext(pCertContext);
+            pCertContext = NULL;
+            CertCloseStore(hCertStore, 0);
+            hCertStore = NULL;
         }
 
-        CertFreeCertificateContext( pCertContext );
-        pCertContext = NULL;
-
-        ret = 0;
-
+    ret = 0;
     } while( 0 );
-
-    CertCloseStore( hCertStore, 0 );
-    hCertStore = NULL;
 
     if( ( m_certcount == 0 ) && ( m_certificates != NULL ) ) {
         /*
@@ -131,7 +144,15 @@ int WinCertLoader::LoadSystemCerts()
         WLOG_ERROR( L"Failed to covert certficates" );
         ret = -1;
     }
-
+    // Cleanup for the current scope
+    if (NULL != hCertStore) {
+        CertCloseStore(hCertStore, 0);
+        hCertStore = NULL;
+    }
+    if (NULL != pCertContext) {
+        CertFreeCertificateContext(pCertContext);
+        pCertContext = NULL;
+    }
     return ret;
 }
 
