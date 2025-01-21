@@ -35,7 +35,7 @@ int WinCertLoader::LoadSystemCerts()
     
     if( m_certcount != 0 ) {
             WLOG_WARNING( L"System certs already loaded" );
-            break;
+            return ret;
     }
 
     do {
