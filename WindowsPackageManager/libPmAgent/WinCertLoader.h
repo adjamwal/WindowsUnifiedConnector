@@ -20,4 +20,6 @@ private:
     size_t m_certcount;
 
     void FreeCerts( X509** trusted_certificates, size_t cert_count );
+    bool LoadCertificatesFromStore(const LPCWSTR storeName, std::vector<X509*>& certList);
+{
 };
