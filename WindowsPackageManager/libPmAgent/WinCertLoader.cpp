@@ -53,7 +53,7 @@ int WinCertLoader::LoadSystemCerts()
         WLOG_ERROR( L"No certs found" );
         return ret;
     }
-    dwCertCount = certList.size();
+    dwCertCount = static_cast<DWORD>(certList.size());
     m_certificates = ( X509** )calloc( dwCertCount,
         sizeof( *m_certificates ) );
     if( m_certificates == NULL ) {
@@ -61,7 +61,7 @@ int WinCertLoader::LoadSystemCerts()
         return ret;
     }
     
-    for (size_t i = 0; i < dwCertCount; ++i) {
+    for (DWORD i = 0; i < dwCertCount; ++i) {
         m_certificates[i] = certList[i];
         m_certcount++;
     }
