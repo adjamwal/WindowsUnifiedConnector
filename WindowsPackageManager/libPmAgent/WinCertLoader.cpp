@@ -23,116 +23,109 @@ WinCertLoader::~WinCertLoader()
 
 int WinCertLoader::LoadSystemCerts()
 {
-    const LPCWSTR pTrustedCAStoreName = L"ROOT";
-
-    HCERTSTORE       hCertStore = NULL;
+    const LPCWSTR pTrustedCAStoreName = L"ROOT";  // Root Certificate Authority store
+    const LPCWSTR pIntermediateCAStoreName = L"CA";  // Intermediate Certificate Authority store
+  
     int              ret = -1;
-
+    DWORD            dwCertCount = 0;
     std::lock_guard<std::mutex> lock( m_mutex );
+    
+    if( m_certcount != 0 ) {
+        WLOG_WARNING( L"System certs already loaded" );
+        return ret;
+    }
+    std::vector<X509*> certList;
+    m_certcount = 0;
 
-    do {
-        DWORD            dwCertCount = 0;
-        size_t           i = 0;
-        PCCERT_CONTEXT   pCertContext = NULL;
-
-        if( m_certcount != 0 ) {
-            WLOG_WARNING( L"System certs already loaded" );
-            break;
-        }
-
-        //-------------------------------------------------------------------
-        // Open a system certificate store.
-        if( hCertStore = CertOpenSystemStore(
-            ( HCRYPTPROV_LEGACY )NULL,
-            pTrustedCAStoreName ) ) {
-        }
-        else {
-            WLOG_ERROR( L"CertOpenSystemStoreW failed" );
-            break;
-        }
-
-        /* Loop through once to get a count */
-        while( pCertContext = CertEnumCertificatesInStore( hCertStore,
-            pCertContext ) ) {
-            dwCertCount++;
-        }
-
-        if( dwCertCount == 0 ) {
-            WLOG_ERROR( L"No certs found" );
-            break;
-        }
-
-        m_certificates = ( X509** )calloc( dwCertCount,
-            sizeof( *m_certificates ) );
-        if( m_certificates == NULL ) {
-            WLOG_ERROR( L"Failed to allocate certificates" );
-            break;
-        }
-
-        /* Load certificates into a local cache */
-        while( pCertContext = CertEnumCertificatesInStore( hCertStore,
-            pCertContext ) ) {
-            wchar_t pszNameString[ 256 ] = { 0 };
-            X509* x509Cert = NULL;
-            TCHAR* tcOutString = NULL;
-            DWORD   dwSize = 0;
-
-            if( i >= dwCertCount ) {
-                break;
-            }
-
-            /* process each individual certificate */
-            if( CertGetNameStringW( pCertContext,
-                CERT_NAME_SIMPLE_DISPLAY_TYPE,
-                0,
-                NULL,
-                pszNameString,
-                _countof( pszNameString ) ) ) {
-            }
-            else {
-            }
-
-            if( !CryptBinaryToString( pCertContext->pbCertEncoded, pCertContext->cbCertEncoded,
-                CRYPT_STRING_BASE64, tcOutString, &dwSize ) )
-            {
-                continue;
-            }
-
-            x509Cert = d2i_X509( NULL, ( const unsigned char** )&pCertContext->pbCertEncoded,
-                pCertContext->cbCertEncoded );
-            if( x509Cert != NULL ) {
-                m_certificates[ i ] = x509Cert;
-                m_certcount = ++i;
-                /* certificate is freed on unload */
-            }
-            else {
-            }
-        }
-
-        CertFreeCertificateContext( pCertContext );
-        pCertContext = NULL;
-
-        ret = 0;
-
-    } while( 0 );
-
-    CertCloseStore( hCertStore, 0 );
-    hCertStore = NULL;
-
-    if( ( m_certcount == 0 ) && ( m_certificates != NULL ) ) {
-        /*
-         *  We allocated memory to hold the certificates but we were unable to
-         *  convert the certificates into X509 format (i.e. invalid certificate)
-         */
-        free( m_certificates );
-        m_certificates = NULL;
-
-        /* no certs were loaded */
-        WLOG_ERROR( L"Failed to covert certficates" );
-        ret = -1;
+    // Process certificates from the ROOT store
+    if (!LoadCertificatesFromStore(pTrustedCAStoreName, certList)) {
+        WLOG_ERROR(L"Failed to process certificates from ROOT store");
+        return ret;
     }
 
+    // Process certificates from the CA store
+    if (!LoadCertificatesFromStore(pIntermediateCAStoreName, certList)) {
+        WLOG_ERROR(L"Failed to process certificates from CA store");
+        return ret;
+    }
+
+    if( certList.empty() ) {
+        WLOG_ERROR( L"No certs found" );
+        return ret;
+    }
+    dwCertCount = static_cast<DWORD>(certList.size());
+    m_certificates = ( X509** )calloc( dwCertCount,
+        sizeof( *m_certificates ) );
+    if( m_certificates == NULL ) {
+        WLOG_ERROR( L"Failed to allocate certificates" );
+        return ret;
+    }
+    
+    for (DWORD i = 0; i < dwCertCount; ++i) {
+        m_certificates[i] = certList[i];
+        m_certcount++;
+    }
+    ret = 0;
     return ret;
+}
+
+/**
+ * Opens a certificate store, enumerates certificates and converts them to X509 format
+ */
+bool WinCertLoader::LoadCertificatesFromStore(const LPCWSTR storeName, std::vector<X509*>& certList)
+{
+    HCERTSTORE       hCertStore = NULL;
+    PCCERT_CONTEXT   pCertContext = NULL;
+
+    if( hCertStore = CertOpenSystemStore(( HCRYPTPROV_LEGACY )NULL,storeName ) ) {
+    }
+    else {
+        WLOG_ERROR( L"CertOpenSystemStoreW failed" );
+        return false;
+    }
+    while( pCertContext = CertEnumCertificatesInStore( hCertStore, pCertContext ) ) 
+    {
+        wchar_t pszNameString[ 256 ] = { 0 };
+        X509* x509Cert = NULL;
+        TCHAR* tcOutString = NULL;
+        DWORD   dwSize = 0;
+
+        /* process each individual certificate */
+        if( CertGetNameStringW( pCertContext,
+            CERT_NAME_SIMPLE_DISPLAY_TYPE,
+            0,
+            NULL,
+            pszNameString,
+            _countof( pszNameString ) ) ) {
+        }
+        else {
+        }
+
+        if( !CryptBinaryToString( pCertContext->pbCertEncoded, pCertContext->cbCertEncoded,
+            CRYPT_STRING_BASE64, tcOutString, &dwSize ) )
+        {
+            continue;
+        }
+
+        x509Cert = d2i_X509( NULL, ( const unsigned char** )&pCertContext->pbCertEncoded,
+            pCertContext->cbCertEncoded );
+        if( x509Cert != NULL ) {
+            certList.emplace_back(x509Cert);
+        }
+        else {
+        }
+    }
+    if(NULL != pCertContext)
+    {
+        CertFreeCertificateContext(pCertContext);
+        pCertContext = NULL;
+    }
+    if(NULL != hCertStore)
+    {
+        CertCloseStore(hCertStore, 0);
+        hCertStore = NULL;
+    }  
+    return true;
 }
 
 void WinCertLoader::FreeCerts( X509** trusted_certificates, size_t cert_count )
