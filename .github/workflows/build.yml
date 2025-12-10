@@ -1,0 +1,189 @@
+name: Build Windows Unified Connector POC
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE: WindowsUnifiedConnector.sln
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}-${{ matrix.configuration }}
+    runs-on: windows-2022
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x64]
+        configuration: [Release]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: false  # Skip submodules for now
+        fetch-depth: 1
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install Conan
+      run: |
+        pip install conan
+        conan --version
+        echo "Conan installed successfully"
+    
+    - name: Detect Conan Profile
+      run: |
+        conan profile detect --force
+        echo "Conan profile detected"
+    
+    - name: Install Dependencies with Conan
+      run: |
+        Write-Host "Installing Conan dependencies..."
+        $arch = if ("${{ matrix.platform }}" -eq "Win32") { "x86" } else { "x86_64" }
+        conan install . --build=missing -s build_type=${{ matrix.configuration }} -s arch=$arch -s compiler="Visual Studio" -s compiler.version=193
+        Write-Host "Conan dependencies installed"
+      shell: powershell
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+      with:
+        vs-version: '[17.0,18.0)'
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+    
+    - name: Restore NuGet Packages
+      run: |
+        Write-Host "Restoring NuGet packages..."
+        nuget restore ${{ env.SOLUTION_FILE }}
+      shell: powershell
+    
+    - name: Build Mock UCID
+      run: |
+        Write-Host "Building Mock UCID..."
+        msbuild MockLibraries/MockUCID/MockUCID.vcxproj `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /verbosity:minimal
+        Write-Host "Mock UCID built successfully"
+      shell: powershell
+      continue-on-error: true
+    
+    - name: Build Mock Common
+      run: |
+        Write-Host "Building Mock Common..."
+        msbuild MockLibraries/MockCommon/MockCommon.vcxproj `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /verbosity:minimal
+        Write-Host "Mock Common built successfully"
+      shell: powershell
+      continue-on-error: true
+    
+    - name: Setup Mock Signing
+      run: |
+        Write-Host "Setting up mock signing..."
+        # Backup original sign.bat
+        if (Test-Path "sign.bat") {
+          Copy-Item sign.bat sign.bat.original -Force
+        }
+        # Use mock sign script
+        Copy-Item MockLibraries/MockSigning/mock_sign.bat sign.bat -Force
+        Write-Host "Mock signing configured"
+      shell: powershell
+    
+    - name: Set Environment Variables
+      run: |
+        Write-Host "Setting environment variables..."
+        # These will be used by Directory.Build.props
+        echo "UC_CONSUMER=0" >> $env:GITHUB_ENV
+        echo "UCID_BUILD_NUMBER=1.2.18-mock" >> $env:GITHUB_ENV
+        echo "USE_CONAN_DEPS=true" >> $env:GITHUB_ENV
+      shell: powershell
+    
+    - name: Build SharedLibs (Selected)
+      run: |
+        Write-Host "Building selected shared libraries..."
+        
+        # Build libLogger
+        msbuild SharedLibs/libLogger/libLogger.vcxproj `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /verbosity:minimal `
+          /maxcpucount
+        
+        Write-Host "SharedLibs built"
+      shell: powershell
+      continue-on-error: true
+    
+    - name: Build UC Components
+      run: |
+        Write-Host "Building UC components..."
+        
+        # Try to build UCService
+        msbuild UC/UCService/UCService.vcxproj `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /verbosity:normal `
+          /maxcpucount
+        
+        Write-Host "UC components build attempted"
+      shell: powershell
+      continue-on-error: true
+    
+    - name: List Build Outputs
+      if: always()
+      run: |
+        Write-Host "`n=== Build Outputs ===" -ForegroundColor Cyan
+        if (Test-Path "${{ matrix.platform }}/${{ matrix.configuration }}") {
+          Get-ChildItem -Path "${{ matrix.platform }}/${{ matrix.configuration }}" -Recurse | 
+            Where-Object { $_.Extension -match '\.(exe|dll|lib)$' } | 
+            ForEach-Object { Write-Host "  $($_.FullName)" }
+        } else {
+          Write-Host "  Build output directory not found"
+        }
+      shell: powershell
+    
+    - name: Upload Build Artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-outputs-${{ matrix.platform }}-${{ matrix.configuration }}
+        path: |
+          ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.exe
+          ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.dll
+          ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.lib
+          MockLibraries/**/Release/**/*.dll
+          MockLibraries/**/Release/**/*.lib
+        retention-days: 7
+        if-no-files-found: warn
+    
+    - name: Upload Build Logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs-${{ matrix.platform }}-${{ matrix.configuration }}
+        path: |
+          **/*.log
+          **/msbuild*.log
+        retention-days: 3
+        if-no-files-found: ignore
+    
+    - name: Build Summary
+      if: always()
+      run: |
+        Write-Host "`n=== Build Summary ===" -ForegroundColor Yellow
+        Write-Host "Platform: ${{ matrix.platform }}"
+        Write-Host "Configuration: ${{ matrix.configuration }}"
+        Write-Host "Status: ${{ job.status }}"
+        Write-Host "`nThis is a POC build with mock dependencies."
+        Write-Host "See CONAN_MIGRATION_ANALYSIS.md for details."
+      shell: powershell

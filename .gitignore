@@ -25,3 +25,16 @@ CTestTestfile.cmake
 _deps
 build/
 out/
+
+# Conan
+conan_cache/
+conaninfo.txt
+conanbuildinfo.*
+graph_info.json
+CMakeUserPresets.json
+
+# Mock binaries
+MockLibraries/*/bin/
+MockLibraries/*/lib/
+MockLibraries/**/Debug/
+MockLibraries/**/Release/
