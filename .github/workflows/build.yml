@@ -48,7 +48,7 @@ jobs:
       run: |
         Write-Host "Installing Conan dependencies..."
         $arch = if ("${{ matrix.platform }}" -eq "Win32") { "x86" } else { "x86_64" }
-        conan install . --build=missing -s build_type=${{ matrix.configuration }} -s arch=$arch -s compiler="Visual Studio" -s compiler.version=193
+        conan install . --build=missing -s build_type=${{ matrix.configuration }} -s arch=$arch -s compiler=msvc -s compiler.version=193
         Write-Host "Conan dependencies installed"
       shell: powershell
     
