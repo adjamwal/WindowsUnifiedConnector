@@ -109,33 +109,79 @@ jobs:
         echo "USE_CONAN_DEPS=true" >> $env:GITHUB_ENV
       shell: powershell
     
-    - name: Build SharedLibs (Selected)
+    - name: Build Solution Mock Projects
       run: |
-        Write-Host "Building selected shared libraries..."
+        Write-Host "Building solution's existing mock projects..."
         
-        # Build libLogger
-        msbuild SharedLibs/libLogger/libLogger.vcxproj `
-          /p:Configuration=${{ matrix.configuration }} `
-          /p:Platform=${{ matrix.platform }} `
-          /verbosity:minimal `
-          /maxcpucount
+        # Use the mocks that already exist in the solution
+        $mocks = @(
+          "SharedLibs\MockWindowsUtilities\MockWindowsUtilities.vcxproj",
+          "SharedLibs\MockVerifier\MockVerifier.vcxproj",
+          "UCID\FakeCMIDApiDll\FakeCMIDApiDll.vcxproj"
+        )
         
-        Write-Host "SharedLibs built"
+        foreach ($mock in $mocks) {
+          if (Test-Path $mock) {
+            Write-Host "Building $mock..."
+            msbuild $mock `
+              /p:Configuration=${{ matrix.configuration }} `
+              /p:Platform=${{ matrix.platform }} `
+              /verbosity:minimal `
+              /maxcpucount
+          }
+        }
+        
+        Write-Host "Solution mocks built"
       shell: powershell
       continue-on-error: true
     
-    - name: Build UC Components
+    - name: Build SharedLibs (Phase 1)
       run: |
-        Write-Host "Building UC components..."
+        Write-Host "Building Phase 1 shared libraries..."
         
-        # Try to build UCService
-        msbuild UC/UCService/UCService.vcxproj `
-          /p:Configuration=${{ matrix.configuration }} `
-          /p:Platform=${{ matrix.platform }} `
-          /verbosity:normal `
-          /maxcpucount
+        $projects = @(
+          "SharedLibs\libLogger\libLogger.vcxproj",
+          "SharedLibs\libLoggerMT\libLoggerMT.vcxproj",
+          "SharedLibs\libWindowsUtilities\libWindowsUtilities.vcxproj"
+        )
         
-        Write-Host "UC components build attempted"
+        foreach ($proj in $projects) {
+          if (Test-Path $proj) {
+            Write-Host "`nBuilding $proj..."
+            msbuild $proj `
+              /p:Configuration=${{ matrix.configuration }} `
+              /p:Platform=${{ matrix.platform }} `
+              /verbosity:minimal `
+              /maxcpucount
+          }
+        }
+        
+        Write-Host "SharedLibs Phase 1 completed"
+      shell: powershell
+      continue-on-error: true
+    
+    - name: Build UC Components (Phase 1)
+      run: |
+        Write-Host "Building Phase 1 UC components..."
+        
+        $projects = @(
+          "UC\libUcConfig\libUcConfig.vcxproj",
+          "UC\libUcLoader\libUcLoader.vcxproj",
+          "UC\UCService\UCService.vcxproj"
+        )
+        
+        foreach ($proj in $projects) {
+          if (Test-Path $proj) {
+            Write-Host "`nBuilding $proj..."
+            msbuild $proj `
+              /p:Configuration=${{ matrix.configuration }} `
+              /p:Platform=${{ matrix.platform }} `
+              /verbosity:normal `
+              /maxcpucount
+          }
+        }
+        
+        Write-Host "UC components Phase 1 completed"
       shell: powershell
       continue-on-error: true
     
