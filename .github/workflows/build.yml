@@ -66,39 +66,39 @@ jobs:
         nuget restore ${{ env.SOLUTION_FILE }}
       shell: powershell
     
-    - name: Build Mock UCID
-      run: |
-        Write-Host "Building Mock UCID..."
-        msbuild MockLibraries/MockUCID/MockUCID.vcxproj `
-          /p:Configuration=${{ matrix.configuration }} `
-          /p:Platform=${{ matrix.platform }} `
-          /verbosity:minimal
-        Write-Host "Mock UCID built successfully"
-      shell: powershell
-      continue-on-error: true
+    # - name: Build Mock UCID
+    #   run: |
+    #     Write-Host "Building Mock UCID..."
+    #     msbuild MockLibraries/MockUCID/MockUCID.vcxproj `
+    #       /p:Configuration=${{ matrix.configuration }} `
+    #       /p:Platform=${{ matrix.platform }} `
+    #       /verbosity:minimal
+    #     Write-Host "Mock UCID built successfully"
+    #   shell: powershell
+    #   continue-on-error: true
     
-    - name: Build Mock Common
-      run: |
-        Write-Host "Building Mock Common..."
-        msbuild MockLibraries/MockCommon/MockCommon.vcxproj `
-          /p:Configuration=${{ matrix.configuration }} `
-          /p:Platform=${{ matrix.platform }} `
-          /verbosity:minimal
-        Write-Host "Mock Common built successfully"
-      shell: powershell
-      continue-on-error: true
+    # - name: Build Mock Common
+    #   run: |
+    #     Write-Host "Building Mock Common..."
+    #     msbuild MockLibraries/MockCommon/MockCommon.vcxproj `
+    #       /p:Configuration=${{ matrix.configuration }} `
+    #       /p:Platform=${{ matrix.platform }} `
+    #       /verbosity:minimal
+    #     Write-Host "Mock Common built successfully"
+    #   shell: powershell
+    #   continue-on-error: true
     
-    - name: Setup Mock Signing
-      run: |
-        Write-Host "Setting up mock signing..."
-        # Backup original sign.bat
-        if (Test-Path "sign.bat") {
-          Copy-Item sign.bat sign.bat.original -Force
-        }
-        # Use mock sign script
-        Copy-Item MockLibraries/MockSigning/mock_sign.bat sign.bat -Force
-        Write-Host "Mock signing configured"
-      shell: powershell
+    # - name: Setup Mock Signing
+    #   run: |
+    #     Write-Host "Setting up mock signing..."
+    #     # Backup original sign.bat
+    #     if (Test-Path "sign.bat") {
+    #       Copy-Item sign.bat sign.bat.original -Force
+    #     }
+    #     # Use mock sign script
+    #     Copy-Item MockLibraries/MockSigning/mock_sign.bat sign.bat -Force
+    #     Write-Host "Mock signing configured"
+    #   shell: powershell
     
     - name: Set Environment Variables
       run: |
@@ -109,33 +109,33 @@ jobs:
         echo "USE_CONAN_DEPS=true" >> $env:GITHUB_ENV
       shell: powershell
     
-    - name: Build Solution Mock Projects
-      run: |
-        Write-Host "Building solution's existing mock projects..."
+    # - name: Build Solution Mock Projects
+    #   run: |
+    #     Write-Host "Building solution's existing mock projects..."
         
-        # Use the mocks that already exist in the solution
-        $mocks = @(
-          "SharedLibs\MockWindowsUtilities\MockWindowsUtilities.vcxproj",
-          "SharedLibs\MockVerifier\MockVerifier.vcxproj",
-          "UCID\FakeCMIDApiDll\FakeCMIDApiDll.vcxproj"
-        )
+    #     # Use the mocks that already exist in the solution
+    #     $mocks = @(
+    #       "SharedLibs\MockWindowsUtilities\MockWindowsUtilities.vcxproj",
+    #       "SharedLibs\MockVerifier\MockVerifier.vcxproj",
+    #       "UCID\FakeCMIDApiDll\FakeCMIDApiDll.vcxproj"
+    #     )
         
-        foreach ($mock in $mocks) {
-          if (Test-Path $mock) {
-            Write-Host "Building $mock..."
-            msbuild $mock `
-              /p:Configuration=${{ matrix.configuration }} `
-              /p:Platform=${{ matrix.platform }} `
-              /verbosity:minimal `
-              /maxcpucount
-          }
-        }
+    #     foreach ($mock in $mocks) {
+    #       if (Test-Path $mock) {
+    #         Write-Host "Building $mock..."
+    #         msbuild $mock `
+    #           /p:Configuration=${{ matrix.configuration }} `
+    #           /p:Platform=${{ matrix.platform }} `
+    #           /verbosity:minimal `
+    #           /maxcpucount
+    #       }
+    #     }
         
-        Write-Host "Solution mocks built"
-      shell: powershell
-      continue-on-error: true
+    #     Write-Host "Solution mocks built"
+    #   shell: powershell
+    #   continue-on-error: true
     
-    - name: Build SharedLibs (Phase 1)
+    - name: Build SharedLibs
       run: |
         Write-Host "Building Phase 1 shared libraries..."
         
@@ -160,9 +160,9 @@ jobs:
       shell: powershell
       continue-on-error: true
     
-    - name: Build UC Components (Phase 1)
+    - name: Build UC Components
       run: |
-        Write-Host "Building Phase 1 UC components..."
+        Write-Host "Building UC components..."
         
         $projects = @(
           "UC\libUcConfig\libUcConfig.vcxproj",
@@ -198,30 +198,30 @@ jobs:
         }
       shell: powershell
     
-    - name: Upload Build Artifacts
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-outputs-${{ matrix.platform }}-${{ matrix.configuration }}
-        path: |
-          ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.exe
-          ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.dll
-          ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.lib
-          MockLibraries/**/Release/**/*.dll
-          MockLibraries/**/Release/**/*.lib
-        retention-days: 7
-        if-no-files-found: warn
+    # - name: Upload Build Artifacts
+    #   if: always()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: build-outputs-${{ matrix.platform }}-${{ matrix.configuration }}
+    #     path: |
+    #       ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.exe
+    #       ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.dll
+    #       ${{ matrix.platform }}/${{ matrix.configuration }}/**/*.lib
+    #       MockLibraries/**/Release/**/*.dll
+    #       MockLibraries/**/Release/**/*.lib
+    #     retention-days: 7
+    #     if-no-files-found: warn
     
-    - name: Upload Build Logs
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-logs-${{ matrix.platform }}-${{ matrix.configuration }}
-        path: |
-          **/*.log
-          **/msbuild*.log
-        retention-days: 3
-        if-no-files-found: ignore
+    # - name: Upload Build Logs
+    #   if: failure()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: build-logs-${{ matrix.platform }}-${{ matrix.configuration }}
+    #     path: |
+    #       **/*.log
+    #       **/msbuild*.log
+    #     retention-days: 3
+    #     if-no-files-found: ignore
     
     - name: Build Summary
       if: always()
